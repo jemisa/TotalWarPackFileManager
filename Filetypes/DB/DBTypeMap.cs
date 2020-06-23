@@ -76,7 +76,7 @@ namespace Filetypes {
          * the same type/version but different structures.
          */
         public List<TypeInfo> GetVersionedInfos(string key, int version) {
-            List<TypeInfo> result = new List<TypeInfo>(GetAllInfos(key));
+            var result = new List<Filetypes.TypeInfo>(GetAllInfos(key));
             result.Sort(new BestVersionComparer { TargetVersion = version });
 #if DEBUG
             Console.WriteLine("Returning {0} infos for {1}/{2}", result.Count, key, version);

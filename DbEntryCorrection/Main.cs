@@ -46,9 +46,9 @@ namespace DbEntryCorrection {
                 byte[] fileData = packedFile.Data;
                 // we only accept the exact type/version combination here
                 // and only if we don't have to go around trying which one it is (yet)
-                List<TypeInfo> infos = DBTypeMap.Instance.GetVersionedInfos(typeName, header.Version);
+                var infos = DBTypeMap.Instance.GetVersionedInfos(typeName, header.Version);
                 bool added = false;
-                foreach(TypeInfo typeInfo in infos) {
+                foreach(Filetypes.TypeInfo typeInfo in infos) {
                     Console.Out.WriteLine("trying {0}", typeInfo);
                     DBFile newDbFile = new DBFile(newHeader, typeInfo);
                     try {
