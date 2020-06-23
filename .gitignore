@@ -2,16 +2,4 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/AutoUpdater/obj/Debug
-/Common/obj/Debug
-/CommonDialogs/obj/Debug
-/CommonUtilities/obj/Debug
-/DBEditorTableControl/obj/Debug
-/DbDecoding/obj/Debug
-/EsfControl/obj/Debug
-/Filetypes/obj/Debug
-/Library/FreeImage/obj/Debug
-/Library/7zip/obj/Debug
-/PackFileManager/obj/Debug
-/PackFileManager/_ReSharper.PackFileManager
-/PackFileManager/_UpgradeReport_Files
+/.vs/PackFileManager/v16
