@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Xml.Serialization;
 using Common;
 using Filetypes;
 using PackFileManager.Properties;
@@ -10,8 +7,10 @@ using System.Windows.Forms;
 using CommonDialogs;
 
 using TableVersions = System.Collections.Generic.SortedList<string, int>;
+using System.Linq;
 
-namespace PackFileManager {
+namespace PackFileManager
+{
     /*
      * Manager for the available games.
      */
@@ -35,8 +34,10 @@ namespace PackFileManager {
         }
         private GameManager() {
             if (!DBTypeMap.Instance.Initialized) {
-                DBTypeMap.Instance.InitializeTypeMap(InstallationPath);
+                DBTypeMap.Instance.InitializeTypeMap(PackFileManagerSettingManager.InstallationPath);
             }
+
+            PackFileManagerSettingManager.Load();
 
             // correct game install directories 
             // (should be needed for first start only)
@@ -67,65 +68,30 @@ namespace PackFileManager {
 #endif
         }
 
-        static string InstallationPath {
-            get {
-                return Path.GetDirectoryName(Application.ExecutablePath);
-            }
-        }
-        #region Game Directories File
-        // path to save game directories in
-        static string GameDirFilepath {
-            get {
-                return Path.Combine(InstallationPath, "gamedirs.txt");
-            }
-        }
-
-        // the entry for the given game
-        static string GamedirFileEntry(Game g) {
-            return string.Format("{0}{1}{2}", g.Id, Path.PathSeparator,
-                                 g.GameDirectory == null ? Game.NOT_INSTALLED : g.GameDirectory);
-        }
-
         // load the given game's directory from the gamedirs file
-        public static void LoadGameLocationFromFile(Game g) {
-            string result = null;
-            // load from file
-            if (File.Exists(GameDirFilepath)) {
-                // marker that file entry was present
-                result = "";
-                foreach (string line in File.ReadAllLines(GameDirFilepath)) {
-                    string[] split = line.Split(new char[] { Path.PathSeparator });
-                    if (split[0].Equals(g.Id)) {
-                        result = split[1];
-                        break;
-                    }
-                }
-            }
-            if (result != null) {
-                g.GameDirectory = result;
-            }
+        public static void LoadGameLocationFromFile(Game g)
+        {
+            var savedGameDirectories = PackFileManagerSettingManager.CurrentSettings.GameDirectories;
+            var gameDir = savedGameDirectories.FirstOrDefault(x => x.Game == g.Id);
+            g.GameDirectory = gameDir?.Path;
         }
 
         // write game directories to gamedirs file
-        static void SaveGameDirs() {
-            // save to file
-            List<string> entries = new List<string>();
-            if (File.Exists(GameDirFilepath)) {
-                entries.AddRange(File.ReadAllLines(GameDirFilepath));
+        static void SaveGameDirs() 
+        {
+            foreach (var game in Game.Games)
+            {
+                var dir = game.GameDirectory == null ? Game.NOT_INSTALLED : game.GameDirectory;
+                var currentEntry = PackFileManagerSettingManager.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Id);
+                if (currentEntry != null)
+                    currentEntry.Path = dir;
+                else
+                    PackFileManagerSettingManager.CurrentSettings.GameDirectories.Add(new PackFileManagerSettings.GamePathPair() { Game = game.Id,Path = dir});
             }
-            List<string> newEntries = new List<string>();
-            foreach (Game g in Game.Games) {
-                string write = GamedirFileEntry(g);
-                foreach (string entry in entries) {
-                    if (entry.StartsWith(g.Id)) {
-                        write = GamedirFileEntry(g);
-                    }
-                }
-                newEntries.Add(string.Format("{0}{1}", write, Environment.NewLine));
-            }
-            File.WriteAllLines(GameDirFilepath, newEntries);
+
+            PackFileManagerSettingManager.Save();
         }
-        #endregion
+        
 
         static Game DefaultGame = Game.TWH2;
         Game current;
@@ -189,7 +155,7 @@ namespace PackFileManager {
                 if (gameDbVersions.ContainsKey(game)) {
                     return;
                 }
-                string schemaFile = Path.Combine(InstallationPath, game.MaxVersionFilename);
+                string schemaFile = Path.Combine(PackFileManagerSettingManager.InstallationPath, game.MaxVersionFilename);
                 if (File.Exists(schemaFile)) {
                     SortedList<string, int> versions = SchemaOptimizer.ReadTypeVersions(schemaFile);
                     if (versions != null) {
@@ -202,7 +168,7 @@ namespace PackFileManager {
             } catch { }
         }
         public void CreateSchemaFile(Game game) {
-            string filePath = Path.Combine(InstallationPath, game.MaxVersionFilename);
+            string filePath = Path.Combine(PackFileManagerSettingManager.InstallationPath, game.MaxVersionFilename);
             if (game.IsInstalled && !File.Exists(filePath)) {
                 SchemaOptimizer optimizer = new SchemaOptimizer() {
                     PackDirectory = Path.Combine(game.GameDirectory, "data"),

@@ -442,6 +442,45 @@ namespace PackFileManager
             }
         }
 
+        void FillRecentFilesList()
+        {
+            recentFilesMenuItem.DropDownItems.Clear();
+            for (int i = 0; i < PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.Count; i++)
+            {
+                var file = PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles[i];
+                var item = new ToolStripMenuItem($"{i+1} {file}", null,
+                            delegate (object s, EventArgs a)
+                            {
+                                OpenExistingPackFile(file, true);
+                            });
+
+                recentFilesMenuItem.DropDownItems.Add(item);
+            }
+        }
+
+        void AddNewRecentFile(string filePath)
+        {
+            int maxRecentFiles = 5;
+
+            // Remove the file if it is add already
+            var index = PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.IndexOf(filePath);
+            if (index != -1)
+                PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.RemoveAt(index);
+
+            // Add the file
+            PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.Insert(0, filePath);
+
+            // Ensure we only have maxRecentFiles in the list
+            var currentFileCount = PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.Count;
+            if (currentFileCount > maxRecentFiles)
+            {
+                PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.RemoveRange(maxRecentFiles, currentFileCount - maxRecentFiles);
+            }
+            PackFileManagerSettingManager.Save();
+        }
+
+        //class PackFileManagerSettings
+
         private void ChangeGameIcon() {
             if(GameManager.Instance.CurrentGame == Game.STW)
                 this.Icon = Resources.Shogun;
@@ -563,6 +602,8 @@ namespace PackFileManager
 #if DEBUG
             Console.WriteLine("{0}allowing label edit", (CanWriteCurrentPack ? "" : "dis"));
 #endif
+
+            AddNewRecentFile(filepath);
             packTreeView.LabelEdit = CanWriteCurrentPack;
         }
         #endregion
@@ -1572,6 +1613,11 @@ namespace PackFileManager
             }
         }
         #endregion
+
+        private void OnFileDropDownOpening(object sender, EventArgs e)
+        {
+            FillRecentFilesList();
+        }
     }
 }
 
