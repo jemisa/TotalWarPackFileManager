@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{69EFD9F5-3100-4133-B4F5-289D7B07E448}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ReleaseBuild</RootNamespace>
+    <AssemblyName>Release Build</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ReleaseBuild.PrepareRelease</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DBEditorTableControl\DBEditorTableControl.csproj">
+      <Project>{3B928C9E-A55F-4912-9880-FF134E68AFCA}</Project>
+      <Name>DBEditorTableControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DbEntryCorrection\DbEntryCorrection.csproj">
+      <Project>{ba340f87-ca7e-42c8-abff-fc5543b4f4cb}</Project>
+      <Name>DbEntryCorrection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DbSql\DbSql.csproj">
+      <Project>{7CB586B7-A10B-4540-899B-671B9383605E}</Project>
+      <Name>DbSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Filetypes\Filetypes.csproj">
+      <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
+      <Name>Filetypes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PackFileManager\PackFileManager.csproj">
+      <Project>{BED0F2F6-BD7B-4D6D-8959-98A6E9B6F88A}</Project>
+      <Name>PackFileManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PfmCL\PfmCL.csproj">
+      <Project>{C8E2294E-525D-4EBF-95B1-5ACFBB556DC9}</Project>
+      <Name>PfmCL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PrepareRelease.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>copy "$(SolutionDir)\Files\master_schema.xml" "$(TargetDir)"
+copy "$(SolutionDir)\Files\*.dll" "$(TargetDir)"
+copy "$(SolutionDir)\Files\xmlversion" "$(TargetDir)"
+copy "$(SolutionDir)\Files\PackFileManager.exe.config" "$(TargetDir)"
+
+if exist "$(SolutionDir)\Files\gamedirs.txt" copy "$(SolutionDir)\Files\gamedirs.txt" "$(TargetDir)"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(SolutionDir)\PackFileManager\bin\Release\*.exe" "$(TargetDir)"
+copy "$(SolutionDir)\PackFileManager\bin\Release\*.dll" "$(TargetDir)"
+
+cd "$(TargetDir)"
+del "*vshost"*
+del "Pack File Manager.zip"
+
+copy "$(SolutionDir)\Files\master_schema.xml" "$(TargetDir)"
+start /wait "building schemas" "Release Build.exe"
+del "Release Build.exe"
+
+start WinRAR.exe a "Pack File Manager.zip" "*dll" "*exe" "*exe.config" "master_schema.xml" "maxVersions_*.xml" "xmlversion"
+set /p current_xml_version=&lt;xmlversion
+set schema_file=schema_%25current_xml_version%25.zip
+start WinRAR.exe a "%25schema_file%25" "master_schema.xml" "maxVersions_*.xml" "xmlversion"
+copy "%25schema_file%25" "$(SolutionDir)Files\update"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

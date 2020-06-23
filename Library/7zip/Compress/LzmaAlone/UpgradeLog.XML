@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="LzmaAlone">
+</Property><Property Name="Projektmappendatei" Value="C:\Users\Jörn\Documents\Visual Studio 2010\Projects\PackFileManager\Library\7zip\Compress\LzmaAlone\LzmaAlone.sln">
+</Property><Property Name="Date" Value="Sonntag, 8. April 2012">
+</Property><Property Name="Time" Value="11:09">
+</Property></Properties><Event ErrorLevel="0" Project="LzmaAlone" Source="LzmaAlone.csproj" Description="Projekt erfolgreich konvertiert">
+</Event><Event ErrorLevel="3" Project="LzmaAlone" Source="LzmaAlone.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="LzmaAlone.sln" Description="Die Projektmappe wurde erfolgreich konvertiert.">
+</Event><Event ErrorLevel="3" Project="" Source="LzmaAlone.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="LzmaAlone" Source="LzmaAlone.csproj" Description="Überprüfung abgeschlossen: Upgrade der Projektdateien nicht erforderlich.">
+</Event></UpgradeLog>

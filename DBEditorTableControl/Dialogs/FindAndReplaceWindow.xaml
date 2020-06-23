@@ -1,0 +1,41 @@
+﻿<Window x:Class="DBTableControl.FindAndReplaceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DBTableControl"
+        Name="FindReplaceWindow" 
+        Title="Find and Replace" 
+        Height="220" Width="240" 
+        Background="#FFF0F0F0" 
+        Topmost="True" Closing="FindReplaceWindow_OnClosing" Loaded="FindReplaceWindow_Loaded">
+    <Grid>
+        <DockPanel Name="WindowDockPanel" LastChildFill="False">
+            <StackPanel Name="ToolbarStackPanel" DockPanel.Dock="Top" Orientation="Horizontal" >
+                <ToggleButton Name="FindToggle" Content="Quick Find" Click="FindToggle_Click" Margin="20,0" />
+                <ToggleButton Name="ReplaceToggle" Content="Quick Replace" Click="ReplaceToggle_Click" Margin="5,0" />
+            </StackPanel>
+            <StackPanel Name="FindStackPanel" DockPanel.Dock="Top">
+                <Label Name="FindLabel" Content="Find what:" />
+                <TextBox Name="FindInputBox" Margin="5,0" />
+            </StackPanel>
+            <StackPanel Name="ReplaceStackPanel" DockPanel.Dock="Top">
+                <Label Name="ReplaceLabel" Content="Replace with:" />
+                <TextBox Name="ReplaceInputBox" Margin="5,0" />
+            </StackPanel>
+            <Grid Name="ButtonStackPanel" DockPanel.Dock="Bottom" MaxHeight="80">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                
+                <Button Name="FindNextButton" Content="Find Next" IsDefault="True" Grid.Column="0" Grid.Row="0" Margin="5" Click="FindNextButton_Click" />
+                <Button Name="FindAllButton" Content="Find All" Grid.Column="0" Grid.Row="1" Margin="5" Click="FindAllButton_Click" Visibility="Hidden" />
+                <Button Name="ReplaceButton" Content="Replace" Grid.Column="1" Grid.Row="0" Margin="5" Click="ReplaceButton_Click" />
+                <Button Name="ReplaceAllButton" Content="Replace All" Grid.Column="1" Grid.Row="1" Margin="5" Click="ReplaceAllButton_Click" />
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>

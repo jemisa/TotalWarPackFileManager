@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<pack name="pack.pack" version="1.0">
+	<mod name="Mod name" version="1.0"/>
+	<web>Web link</web>
+	<download>Download Link</download>
+	<info>
+		<description>Long pack description</description>
+		<shortDescription>Short pack description</shortDescription>
+		<license>License</license>
+		<author>Corresponding author name</author>
+		<members>
+			<member name="Member Name" task="Task description"/>
+		</members>
+		<thanks>Thanks to: LtChambers for his wonderful modding tools, alpaca for writing this editor, and the Martian Venus Fly</thanks>
+	</info>
+	<dependencies>
+		<packDependency name="dependency.pack" version="1.0">
+			<web>Web link</web>
+			<download>Download Link</download>
+			<optional>true</optional>
+		</packDependency>
+	</dependencies>
+	<changelog>
+		<entry>
+			<version>1.0</version>
+			<text>Changelog text</text>
+		</entry>
+	</changelog>
+</pack>

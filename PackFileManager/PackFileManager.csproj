@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <ProjectType>local</ProjectType>
+    <ProjectVersion>7.10.377</ProjectVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BED0F2F6-BD7B-4D6D-8959-98A6E9B6F88A}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <AssemblyName>PackFileManager</AssemblyName>
+    <OutputType>WinExe</OutputType>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <RootNamespace>PackFileManager</RootNamespace>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="cp ${SolutionDir}/Files/text_extensions.txt ${TargetDir}" pauseExternalConsole="true" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="cp ${SolutionDir}/Files/text_extensions.txt ${TargetDir}" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\Warhammer2.ico</ApplicationIcon>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="DataGridViewExtended.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DBFileTypesUpdater.cs" />
+    <Compile Include="Editors\AtlasFileEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\DBFileEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\DBFileEditorControl.Designer.cs">
+      <DependentUpon>DBFileEditorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\DBFileEditorTree.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\DBFileEditorTree.Designer.cs">
+      <DependentUpon>DBFileEditorTree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\FormationPreview.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\GridViewCopyPaste.cs" />
+    <Compile Include="Editors\GroupformationEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\GroupformationEditorControl.Designer.cs">
+      <DependentUpon>GroupformationEditorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\LocFileEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\PackedEsfEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\PackedEsfEditor.Designer.cs">
+      <DependentUpon>PackedEsfEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\TextFileEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\UnitVariantFileEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Mods.cs" />
+    <Compile Include="PackBrowseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PackBrowseDialog.Designer.cs">
+      <DependentUpon>PackBrowseDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PackFileManagerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PackFileManagerForm.Designer.cs">
+      <DependentUpon>PackFileManagerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PackFileTree.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PackFileTree.Designer.cs">
+      <DependentUpon>PackFileTree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PackTree.cs" />
+    <Compile Include="Program.cs" />
+    <EmbeddedResource Include="Editors\DBFileEditorControl.resx">
+      <DependentUpon>DBFileEditorControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\DBFileEditorTree.resx">
+      <DependentUpon>DBFileEditorTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\FormationPreview.resx">
+      <DependentUpon>FormationPreview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\GroupformationEditorControl.resx">
+      <DependentUpon>GroupformationEditorControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\LocFileEditorControl.resx">
+      <DependentUpon>LocFileEditorControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\PackedEsfEditor.resx">
+      <DependentUpon>PackedEsfEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PackBrowseDialog.resx">
+      <DependentUpon>PackBrowseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PackFileManagerForm.resx">
+      <DependentUpon>PackFileManagerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PackFileTree.resx">
+      <DependentUpon>PackFileTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <DependentUpon>Resources.cs</DependentUpon>
+    </EmbeddedResource>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.cs" />
+    <Compile Include="Properties\Settings.cs" />
+    <Compile Include="ToolTipRegion.cs" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\Files\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Compile Include="Editors\GroupformationEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\ReadmeEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Utilities.cs" />
+    <Compile Include="DataGridViewAutoFilter\DataGridViewAutoFilterColumnHeaderCell.cs" />
+    <Compile Include="DataGridViewAutoFilter\DataGridViewAutoFilterTextBoxColumn.cs" />
+    <Compile Include="DnD\DragDropHelper.cs" />
+    <Compile Include="DnD\DragFileInfo.cs" />
+    <Compile Include="DnD\FILEDESCRIPTOR.cs" />
+    <Reference Include="ObjectListView">
+      <HintPath>..\Files\ObjectListView.dll</HintPath>
+    </Reference>
+    <Compile Include="Dialogs\CaFileEditAdvisory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\CustomMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\ImageViewerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\ExternalEditor.cs" />
+    <Compile Include="GameManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonDialogs\CommonDialogs.csproj">
+      <Project>{1B2FA4F4-C320-496F-9365-636D9180BE03}</Project>
+      <Name>CommonDialogs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj">
+      <Project>{32F411D6-4EB1-41EA-9071-FC4B3FB62E65}</Project>
+      <Name>CommonUtilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DecodeTool\DecodeTool.csproj">
+      <Project>{B7E18A8E-7797-4865-97CD-97B2915AA774}</Project>
+      <Name>DecodeTool</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </ProjectReference>
+    <ProjectReference Include="..\EsfControl\EsfControl.csproj">
+      <Project>{AD415480-8879-4271-B8A6-CB7391DEA78C}</Project>
+      <Name>EsfControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EsfLibrary\EsfLibrary.csproj">
+      <Project>{A290E27B-4B04-4851-A17D-D0F6AEE533A2}</Project>
+      <Name>EsfLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Filetypes\Filetypes.csproj">
+      <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
+      <Name>Filetypes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoUpdater\AutoUpdater.csproj">
+      <Project>{89BF640C-76D4-4A04-A997-98594475D60C}</Project>
+      <Name>AutoUpdater</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Library\FreeImage\FreeImage.csproj">
+      <Project>{6598A7CD-8F27-4D3F-A675-5AE63113A7C3}</Project>
+      <Name>FreeImage</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Editors\ReadmeEditorControl.resources" />
+    <None Include="Dialogs\InputBox.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Empire.ico" />
+    <None Include="Resources\Napoleon.ico" />
+    <None Include="Resources\Shogun.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Britannia.ico" />
+    <None Include="Resources\ThreeKingdoms.ico" />
+    <Content Include="Resources\Warhammer2.ico" />
+    <None Include="Resources\Warhammer.ico" />
+    <None Include="Resources\Attila.ico" />
+    <Content Include="Resources\Rome2.ico" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>copy "$(SolutionDir)Files\master_schema.xml" "$(TargetDir)"
+rem copy "$(SolutionDir)Files\schema_models.xml" "$(TargetDir)"
+if exist "$(SolutionDir)PackFileTest\bin\schema_*" copy "$(SolutionDir)PackFileTest\bin\schema_*" "$(TargetDir)"
+if exist "$(SolutionDir)DBEditorTableControl\bin\DBEditorTableControl.dll" copy "$(SolutionDir)\DBEditorTableControl\bin\DBEditorTableControl.dll" "$(TargetDir)"
+if exist "$(SolutionDir)DBEditorTableControl\bin\DBEditorTableControl.pdb" copy "$(SolutionDir)\DBEditorTableControl\bin\DBEditorTableControl.pdb" "$(TargetDir)"
+
+if exist "$(SolutionDir)\Files\gamedirs.txt" copy "$(SolutionDir)\Files\gamedirs.txt" "$(TargetDir)"</PreBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,7 @@
+<correspondencies>
+ <table name="sea_climate_details" guid="f3a8c3bb-6b23-435e-8812-67006210f5e9">
+  <field pack="key" xml="key"/>
+  <unmappedPackedFields>Sea Deep Colour R,Sea Deep Colour G,Sea Deep Colour B,Sea Shallow Colour R,Sea Shallow Colour G,Sea Shallow Colour B,Sun Colour R,Sun Colour G,Sun Colour B,Sky Colour R,Sky Colour G,Sky Colour B</unmappedPackedFields>
+  <unmappedXmlFields>sea_deep_colour,sea_shallow_colour,sun_colour,sky_colour</unmappedXmlFields>
+ </table>
+</correspondencies>

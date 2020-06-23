@@ -1,0 +1,12 @@
+.txt
+.lua
+.csv
+.fx
+.fx_fragment 
+.h
+.battle_script
+.xml 
+.tai
+.xml.rigging
+.placement
+.hlsl

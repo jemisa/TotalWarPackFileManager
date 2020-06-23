@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C4EADC9F-E863-4262-A280-A9AEC73DA75E}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>DbDecoding</RootNamespace>
+    <AssemblyName>DbDecoding</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>TRACE;DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>true</Externalconsole>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DBTableDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DBTableDisplay.Designer.cs">
+      <DependentUpon>DBTableDisplay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="SchemaFieldNameChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SchemaFieldNameChooser.Designer.cs">
+      <DependentUpon>SchemaFieldNameChooser.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DecodeTool\DecodeTool.csproj">
+      <Project>{B7E18A8E-7797-4865-97CD-97B2915AA774}</Project>
+      <Name>DecodeTool</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Filetypes\Filetypes.csproj">
+      <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
+      <Name>Filetypes</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DBTableDisplay.resx">
+      <DependentUpon>DBTableDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SchemaFieldNameChooser.resx">
+      <DependentUpon>SchemaFieldNameChooser.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>copy "$(SolutionDir)\Files\master_schema.xml" "$(TargetDir)"
+if exist "$(SolutionDir)\Files\gamedirs.txt" copy "$(SolutionDir)\Files\gamedirs.txt" "$(TargetDir)"
+</PreBuildEvent>
+  </PropertyGroup>
+</Project>

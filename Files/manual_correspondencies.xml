@@ -1,0 +1,102 @@
+<correspondencies>
+ <table name="advice_levels" guid="d2df9b6f-9902-42fa-894e-fb472f9369de">
+  <field pack="Uninhabitable" xml="uninhibitable"/>
+ </table>
+ <table name="ancillaries" guid="0a33ec9e-cb5a-456c-9c0a-c2503ec5f552">
+  <field pack="avatar_special_ability" xml="avatar_special_ability"/>
+ </table>
+ <table name="avatar_campaign_maps" guid="8a8cb936-abcd-49e6-bd31-a239758a99b4">
+  <field pack="unknown5" xml="adjacent_13"/>
+  <field pack="unknown6" xml="adjacent_14"/>
+  <field pack="unknown5" xml="adjacent_15"/>
+ </table>
+ <table name="avatar_dojos" guid="7793c37a-8a87-4b33-92e2-82829e22bce6">
+  <field pack="key" xml="key"/>
+  <field pack="chain" xml="chain"/>
+ </table>
+ <table name="avatar_faction_flags" guid="d475db4b-2546-4a5f-a421-88782965d625">
+  <field pack="key" xml="key"/>
+  <field pack="image_file" xml="image_file"/>
+ </table>
+ <table name="avatar_gempei_dojos" guid="4eb89036-c04b-4549-a783-5de8dacaf11c">
+  <field pack="key" xml="key"/>
+  <field pack="chain" xml="chain"/>
+ </table>
+ <table name="battle_cameras" guid="f74f00b3-ae5d-41a3-a066-96f179088ed1">
+  <field pack="Move Speed Adjust" xml="move_speed_max_multiplier"/>
+  <field pack="Rotation Speed Adjust" xml="turn_speed_multiplier"/>
+ </table>
+ <table name="battle_entities" guid="2e35f755-81c0-48d0-90a0-d07c395af0e3">
+  <field pack="Distance to Adopt Charge Stance" xml="charge_distance_adopt_charge_pose"/>
+  <field pack="Distance to Pick Charge Target" xml="charge_distance_pick_target"/>
+ </table>
+ <table name="battle_weather_types" guid="e4f1091d-4c97-4f45-9265-a79f29743dc0">
+  <field pack="Weather ID" xml="key"/>
+  <field pack="Precipitation Type" xml="precipitation_type"/>
+ </table>
+ <table name="cai_personalities_construction_preference_policy_building_junctions" guid="8248d78b-8979-41ea-969d-dcd96eaaa721">
+  <field pack="unknown" xml="bias_level"/>
+ </table>
+ <table name="campaign_map_playable_areas" guid="358c97e5-ba09-420b-9f69-7dfcd292de81">
+  <field pack="Onscreen name" xml="onscreen_name"/>
+ </table>
+ <table name="campaign_variables" guid="24962825-9cb8-46a4-ac61-250acc600b1e">
+  <field pack="variable_key" xml="variable_key"/>
+  <field pack="value" xml="value"/>
+  <unmappedXmlFields>description</unmappedXmlFields>
+ </table>
+ <table name="cursors" guid="e735cdc6-c5d9-404e-8703-f1c4e3787117">
+  <field pack="hotspotX" xml="hotspotX"/>
+  <field pack="hotspotY" xml="hotspotY"/>
+  <field pack="width" xml="width"/>
+  <field pack="height" xml="height"/>
+  <field pack="loop" xml="loop"/>
+  <field pack="reverse" xml="reverse"/>
+ </table>
+ <table name="ministerial_effectiveness_modifiers" guid="28c3072e-88f6-4ea4-9238-5f35b3273c93">
+  <field pack="effectiveness_bonus" xml="effectiveness_bonus"/>
+ </table>
+ <table name="projectiles" guid="a70189a0-c6b6-4824-9430-db7d80e8f58c">
+  <field pack="can_bounce" xml="can_bounce"/>
+ </table>
+ <table name="sea_surfaces" guid="351087ac-a8cd-4f93-9e83-728329e90e33">
+  <field pack="sea_phillips_constant" xml="sea_phillips_constant"/>
+  <field pack="swell_phillips_constant" xml="swell_phillips_constant"/>
+ </table>
+ <table name="technologies" guid="f3cf0cf3-3ad2-4c9b-a41a-4b328019c020">
+  <field pack="mp_available_early" xml="mp_available_early"/>
+  <field pack="mp_available_late" xml="mp_available_late"/>
+ </table>
+ <table name="unit_stats_land_experience_bonuses" guid="a3f25a2a-c69f-4ea7-8c49-d08d23ae9d58">
+  <field pack="core_reloading_skill" xml="core_reloading_skill"/>
+  <field pack="core_marksmanship" xml="core_marksmanship"/>
+ </table>
+ <table name="unit_stats_land" guid="35d5ac1c-6202-4e36-a7a3-25873fc8240d">
+  <field pack="siege_gun" xml="siege_gun"/>
+  <field pack="primary_missile_attack" xml="primary_missile_attack"/>
+  <field pack="grenades" xml="grenades"/>
+  <field pack="pistols" xml="pistols"/>
+  <field pack="can_rally" xml="can_rally"/>
+  <field pack="does_fire_mounted_by_default" xml="does_fire_mounted_by_default"/>
+  <field pack="campmap_stealth" xml="campmap_stealth"/>
+  <field pack="campmap_policing_bonus" xml="campmap_policing_bonus"/>
+  <field pack="fear_effect" xml="fear_effect"/>
+  <field pack="pike_wall" xml="pike_wall"/>
+  <field pack="pike_square" xml="pike_square"/>
+ </table>
+ <table name="unit_stats_naval_crew" guid="66e9a0ad-76a3-4c8b-8397-59ca8bf4d68c">
+  <field pack="pistols" xml="pistols"/>
+ </table>
+ <table name="unit_stats_naval_experience_bonuses" guid="08c20819-f92c-4c37-9117-968282df7787">
+  <field pack="xp_level" xml="xp_level"/>
+  <field pack="melee_defence" xml="melee_defence"/>
+  <field pack="melee_attack" xml="melee_attack"/>
+ </table>
+ <table name="unit_stats_naval" guid="ad88c54f-3e8c-42b8-968f-5d2d6918356d">
+  <field pack="can_trade" xml="can_trade"/>
+ </table>
+ <table name="units" guid="7077b9a6-bac0-4752-8a94-008ceb748f35">
+  <field pack="multiplayer_cost" xml="multiplayer_cost"/>
+  <field pack="multiplayer_late_cost" xml="multiplayer_late_cost"/>
+ </table>
+</correspondencies>

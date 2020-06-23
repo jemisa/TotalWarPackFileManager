@@ -1,0 +1,67 @@
+﻿<Window x:Class="DBTableControl.ManageFiltersWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Title="Filter Manager"
+             Height="200" Width="400"
+             d:DesignHeight="200" d:DesignWidth="400">
+    <DockPanel Name="filterDockPanel" LastChildFill="True" >
+        <Grid Name="buttonGrid" DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button Name="saveButton" Content="Save" Grid.Column="2" Margin="5" Click="saveButton_Click" IsDefault="True" />
+            <Button Name="cancelButton" Content="Cancel" Grid.Column="3" Margin="5" Click="cancelButton_Click" IsCancel="True" />
+        </Grid>
+        <DockPanel Name="innerDockPanel">
+            <ListView Name="filterListView" DockPanel.Dock="Right" SelectionMode="Single" Visibility="Collapsed" >
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Filter Name" DisplayMemberBinding="{Binding Path=Name}" />
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="PreviewMouseMove" Handler="filterListView_PreviewMouseMove" />
+                        <EventSetter Event="Drop" Handler="filterListView_Drop" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+            <Grid Name="infoGrid" DockPanel.Dock="Left">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <StackPanel Name="filternameStackPanel" Grid.Row="0" >
+                    <Label Name="filternameLabel" Content="Filter Name:" />
+                    <TextBox Name="filternameTextBox" Width="200" Margin="4,0" HorizontalAlignment="Left" />
+                </StackPanel>
+                <Grid Name="filterinfoGrid" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Name="columnStackPanel" Grid.Column="0">
+                        <Label Name="columnLabel" Content="Column:" Grid.Row="0" Grid.Column="0" />
+                        <ComboBox Name="columnComboBox" Margin="5,0" SelectionChanged="columnComboBox_SelectionChanged" />
+                    </StackPanel>
+                    <StackPanel Name="matchtypeStackPanel" Grid.Column="1">
+                        <Label Name="matchtypeLabel" Content="Match Type:" Grid.Row="0" Grid.Column="1" />
+                        <ComboBox Name="matchtypeComboBox" Margin="5,0" SelectionChanged="matchtypeComboBox_SelectionChanged" />
+                    </StackPanel>
+                    <StackPanel Name="filtervalueStackPanel" Grid.Column="2">
+                        <Label Name="valueLabel" Content="Filter Value:" />
+                        <ComboBox Name="filtervalueComboBox" Margin="5,0" IsEditable="True" IsReadOnly="False" />
+                        <TextBox Name="filtervalueTextBox" Margin="5,0" Visibility="Collapsed"  />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </DockPanel>
+</Window>

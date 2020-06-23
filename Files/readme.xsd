@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+xmlns="http://etw-mod-tools.sourceforge.net/"
+xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+<xs:element name="MyDataSet" msdata:IsDataSet="true">
+	<xs:complexType>
+		<xs:choice maxOccurs="1">
+			<xs:element name="pack">
+    			<xs:complexType>
+      				<xs:sequence>
+						<xs:element name="mod">
+							<xs:complexType>
+								<xs:attribute name="name" type="xs:string" use="required"/>
+      							<xs:attribute name="version" type="xs:string" use="required"/>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="web" type="xs:string"/>
+						<xs:element name="download" type="xs:string"/>
+						<xs:element name="info">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="description" type="xs:string"/>
+									<xs:element name="shortDescription" type="xs:string"/>
+									<xs:element name="license" type="xs:string"/>
+									<xs:element name="author" type="xs:string"/>
+									<xs:element name="members">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="member" maxOccurs="unbounded">
+													<xs:complexType>
+														<xs:attribute name="name" type="xs:string" use="required"/>
+														<xs:attribute name="task" type="xs:string" use="required"/>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="thanks" type="xs:string"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="dependencies">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="packDependency" maxOccurs="unbounded">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="web" type="xs:string"/>
+												<xs:element name="download" type="xs:string"/>
+												<xs:element name="optional" type="xs:string"/>
+											</xs:sequence>
+											<xs:attribute name="name" type="xs:string" use="required"/>
+      										<xs:attribute name="version" type="xs:string" use="required"/>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="changelog">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="entry" maxOccurs="unbounded">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="version" type="xs:string"/>
+												<xs:element name="text" type="xs:string"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+      				</xs:sequence>
+      				<xs:attribute name="name" type="xs:string" use="required"/>
+      				<xs:attribute name="version" type="xs:string" use="required"/>
+    			</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+</xs:element>
+
+</xs:schema>

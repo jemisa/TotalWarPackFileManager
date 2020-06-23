@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Filetypes</RootNamespace>
+    <AssemblyName>Filetypes</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Atlas\AtlasCodec.cs" />
+    <Compile Include="Atlas\AtlasFile.cs" />
+    <Compile Include="Atlas\AtlasObject.cs" />
+    <Compile Include="Codec.cs" />
+    <Compile Include="DB\DBFile.cs" />
+    <Compile Include="DB\DBFileCodec.cs" />
+    <Compile Include="DB\DBFileNotSupportedException.cs" />
+    <Compile Include="DB\DBReferenceMap.cs" />
+    <Compile Include="DB\DBTypeMap.cs" />
+    <Compile Include="DB\FieldInfo.cs" />
+    <Compile Include="DB\FieldInstance.cs" />
+    <Compile Include="DB\MappedTable.cs" />
+    <Compile Include="DB\SchemaXml.cs" />
+    <Compile Include="DB\TypeInfo.cs" />
+    <Compile Include="DB\XsdParser.cs" />
+    <Compile Include="Loc\LocCodec.cs" />
+    <Compile Include="Loc\LocFile.cs" />
+    <Compile Include="PackedFileEditor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitVariant\UnitVariantCodec.cs" />
+    <Compile Include="UnitVariant\UnitVariantFile.cs" />
+    <Compile Include="UnitVariant\UnitVariantObject.cs" />
+    <Compile Include="Groupformations\Groupformation.cs" />
+    <Compile Include="Models\ModelCodecs.cs" />
+    <Compile Include="Models\Models.cs" />
+    <Compile Include="Models\Buildings.cs" />
+    <Compile Include="Models\Naval.cs" />
+    <Compile Include="DB\DBFileUpdate.cs" />
+    <Compile Include="DB\SchemaOptimizer.cs" />
+    <Compile Include="DB\TextDbCodec.cs" />
+    <Compile Include="DB\ModToolDBCodec.cs" />
+    <Compile Include="DB\FieldMappingManager.cs" />
+    <Compile Include="DB\CaXmlDbFileCodec.cs" />
+    <Compile Include="DB\DBRow.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup />
+</Project>
