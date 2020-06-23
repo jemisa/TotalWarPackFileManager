@@ -314,15 +314,27 @@
             }
         }
         public Bitmap Decode(Stream stream) {
-            try {
+            try
+            {
                 FreeImageBitmap bitmap = new FreeImageBitmap(stream, format);
                 bitmap.ConvertType(FREE_IMAGE_TYPE.FIT_BITMAP, true);
                 return (Bitmap)bitmap;
-            } catch (Exception e) {
+            }
+            catch (DllNotFoundException)
+            {
+                MessageBox.Show("Unable to located the FreeImageBitmap dll. Please install it.", "Dll load error");
+            }
+            catch (BadImageFormatException)
+            {
+                MessageBox.Show("Unable to located the FreeImageBitmap dll. Probably 32v64 bit mixup", "Dll load error");
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine(e);
             }
             return null;
         }
+
         public void Encode(Stream stream, Bitmap toEncode) {
             throw new NotImplementedException ();
         }

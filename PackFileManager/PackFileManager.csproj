@@ -164,6 +164,17 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <DependentUpon>Resources.cs</DependentUpon>
     </EmbeddedResource>
+    <Reference Include="FreeImage.Standard, Version=4.3.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeImage.Standard.4.3.8\lib\net472\FreeImage.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.5.1\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Primitives.4.3.0\lib\net45\System.Drawing.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -239,10 +250,6 @@
       <Project>{89BF640C-76D4-4A04-A997-98594475D60C}</Project>
       <Name>AutoUpdater</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Library\FreeImage\FreeImage.csproj">
-      <Project>{6598A7CD-8F27-4D3F-A675-5AE63113A7C3}</Project>
-      <Name>FreeImage</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -262,6 +269,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\Empire.ico" />
     <None Include="Resources\Napoleon.ico" />
     <None Include="Resources\Shogun.ico" />
