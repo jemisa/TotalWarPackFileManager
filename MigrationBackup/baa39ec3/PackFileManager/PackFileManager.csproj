@@ -164,6 +164,17 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <DependentUpon>Resources.cs</DependentUpon>
     </EmbeddedResource>
+    <Reference Include="FreeImage.Standard, Version=4.3.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeImage.Standard.4.3.8\lib\net472\FreeImage.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.5.1\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Primitives.4.3.0\lib\net45\System.Drawing.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -258,6 +269,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\Empire.ico" />
     <None Include="Resources\Napoleon.ico" />
     <None Include="Resources\Shogun.ico" />
@@ -272,11 +284,6 @@
     <None Include="Resources\Warhammer.ico" />
     <None Include="Resources\Attila.ico" />
     <Content Include="Resources\Rome2.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="FreeImage.Standard">
-      <Version>4.3.8</Version>
-    </PackageReference>
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
