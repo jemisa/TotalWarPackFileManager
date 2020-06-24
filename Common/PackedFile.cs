@@ -94,9 +94,17 @@ namespace Common {
      */
     [DebuggerDisplay("{Name}")]
     public class PackedFile : PackEntry {
+
+        string _fileSystemPath;
+        DateTime? _editTime = null;
         public DateTime EditTime {
-            get;
-            set;
+            get
+            {
+                if(_editTime == null)
+                    _editTime = File.GetLastWriteTime(_fileSystemPath);
+                return _editTime.Value;
+            }
+            set { _editTime = value; }
         }
 
         private static readonly byte[] EMPTY = new byte[0];
@@ -147,6 +155,7 @@ namespace Common {
         #region Constructors
         public PackedFile() { }
         public PackedFile(string filename, bool fileSource = true) {
+            _fileSystemPath = filename;
             fullPath = filename;
             Name = Path.GetFileName(filename);
             if (fileSource) {
@@ -155,14 +164,15 @@ namespace Common {
                 Source = new MemorySource(new byte[0]);
             }
             Modified = false;
-            EditTime = File.GetLastWriteTime(filename);
+ 
         }
         public PackedFile(string packFile, string packedName, long offset, long len) {
+            _fileSystemPath = packedName;
             fullPath = packedName;
             Name = Path.GetFileName(packedName);
             Source = new PackedFileSource(packFile, offset, len);
             Modified = false;
-            EditTime = File.GetLastWriteTime(packFile);
+            
         }
         #endregion
     }
@@ -354,11 +364,10 @@ namespace Common {
             string baseDir = Path.GetDirectoryName(relativePath);
             string[] dirs = baseDir != null ? baseDir.Split(splitAt, StringSplitOptions.RemoveEmptyEntries) : new string[0];
             VirtualDirectory current = this;
-            if (dirs.Length > 0) {
-                foreach (string dir in dirs) {
-                    current = current.GetSubdirectory(dir);
-                }
-            }
+            
+            foreach (string dir in dirs) 
+                current = current.GetSubdirectory(dir);
+
             file.Parent = current;
             current.Add(file, overwrite);
         }

@@ -1566,7 +1566,9 @@ namespace PackFileManager
                 return;
             }
             TreeNode node2 = new DirEntryNode(CurrentPackFile.Root);
+            packTreeView.BeginUpdate();
             packTreeView.Nodes.Add(node2);
+            packTreeView.EndUpdate();
 
             // recover opened nodes and selection
             foreach (TreeNode node in GetAllContainedNodes(packTreeView.Nodes)) {
