@@ -42,3 +42,15 @@
 /Release Build/obj/Debug
 /SchemaIntegration/bin/Debug
 /SchemaIntegration/obj/Debug
+/DBEditorTableControl/obj
+/.vs
+/SchemaIntegration/obj/Release
+/ObjectListView/obj
+/MMS/obj/Release
+/Library/FreeImage/obj/Release
+/EditSF/obj
+/EditSF/CameraFix/obj
+/CommonUtilities/obj/Release
+/AutoUpdater/obj/Release
+/CommonDialogs/obj/Release
+/PackFileManager/obj/Release

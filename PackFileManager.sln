@@ -40,8 +40,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbDecoding", "DbDecoding\Db
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbEntryCorrection", "DbEntryCorrection\DbEntryCorrection.csproj", "{BA340F87-CA7E-42C8-ABFF-FC5543B4F4CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlExport", "XmlExport\XmlExport.csproj", "{AAA7B76C-24AB-4090-8BAC-77BE1E8DC959}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,12 +143,6 @@ Global
 		{BA340F87-CA7E-42C8-ABFF-FC5543B4F4CB}.Linux|Any CPU.Build.0 = Debug|Any CPU
 		{BA340F87-CA7E-42C8-ABFF-FC5543B4F4CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA340F87-CA7E-42C8-ABFF-FC5543B4F4CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AAA7B76C-24AB-4090-8BAC-77BE1E8DC959}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAA7B76C-24AB-4090-8BAC-77BE1E8DC959}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAA7B76C-24AB-4090-8BAC-77BE1E8DC959}.Linux|Any CPU.ActiveCfg = Release|Any CPU
-		{AAA7B76C-24AB-4090-8BAC-77BE1E8DC959}.Linux|Any CPU.Build.0 = Release|Any CPU
-		{AAA7B76C-24AB-4090-8BAC-77BE1E8DC959}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAA7B76C-24AB-4090-8BAC-77BE1E8DC959}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
