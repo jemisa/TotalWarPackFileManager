@@ -134,6 +134,7 @@
       <DependentUpon>PackFileTree.cs</DependentUpon>
     </Compile>
     <Compile Include="PackTree.cs" />
+    <Compile Include="PackTreeViewFilterService.cs" />
     <Compile Include="Program.cs" />
     <EmbeddedResource Include="Editors\DBFileEditorControl.resx">
       <DependentUpon>DBFileEditorControl.cs</DependentUpon>

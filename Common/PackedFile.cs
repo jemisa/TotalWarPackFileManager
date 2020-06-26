@@ -95,6 +95,10 @@ namespace Common {
     [DebuggerDisplay("{Name}")]
     public class PackedFile : PackEntry {
 
+        string _fileExtention;
+        public string FileExtention { get { return _fileExtention; } }
+
+
         string _fileSystemPath;
         DateTime? _editTime = null;
         public DateTime EditTime {
@@ -172,7 +176,9 @@ namespace Common {
             Name = Path.GetFileName(packedName);
             Source = new PackedFileSource(packFile, offset, len);
             Modified = false;
-            
+            _fileExtention = Path.GetExtension(packedName);
+            if(!string.IsNullOrEmpty(_fileExtention))
+                _fileExtention = _fileExtention.Remove(0, 1);
         }
         #endregion
     }

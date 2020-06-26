@@ -6,6 +6,8 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using System.Linq;
+
 namespace PackFileManager {
     /*
      * Base class for any kind of entry (directory of file).
@@ -87,11 +89,11 @@ namespace PackFileManager {
                                 Parent.ForeColor = Color.Blue;
                             }
                         } else if (!PackedFileDbCodec.CanDecode(packedFile, out mouseover)) {
-                            if (Parent != null) {
-                                Parent.ToolTipText = mouseover;
+                            if (Parent != null) {                             
                                 Parent.ForeColor = Color.Red;
                             }
                             ForeColor = Color.Red;
+                            ToolTipText = mouseover;
                         } else if (HeaderVersionObsolete(packedFile)) {
                             if (Parent != null) {
                                 Parent.BackColor = Color.Yellow;
@@ -117,15 +119,37 @@ namespace PackFileManager {
      */
     class DirEntryNode : PackEntryNode {
         public DirEntryNode(VirtualDirectory nodeDir)
-            : base(nodeDir) {
-            foreach (VirtualDirectory dir in nodeDir.Subdirectories) {
-                Nodes.Add(new DirEntryNode(dir));
+            : base(nodeDir) 
+        {
+            // Check if the node is a directory with only one subfolder and one file.This happens a lot when there are database tables.
+            // Instead of creating a node with this relation Folder->File we then create a single node with the name Folder/File.
+            // Less clicking for the user
+            var subDirsWithoutParents = nodeDir.Subdirectories.Where(x => x.Subdirectories.Count == 0 && x.Files.Count() == 1);
+            if(subDirsWithoutParents.Count() == nodeDir.Subdirectories.Count())
+            {
+                foreach (var item in subDirsWithoutParents)
+                {
+                    PackEntryNode node = new PackedFileNode(item.Files.First());
+                    Nodes.Add(node);
+                    node.ChangeColor();
+                    node.Text = item.Name +"\\" + item.Files.First().Name;
+                }
             }
-            foreach (PackedFile file in nodeDir.Files) {
+            else
+            {
+                foreach (VirtualDirectory dir in nodeDir.Subdirectories)
+                {
+                    Nodes.Add(new DirEntryNode(dir));
+                }
+            }
+
+            foreach (PackedFile file in nodeDir.Files)
+            {
                 PackEntryNode node = new PackedFileNode(file);
                 Nodes.Add(node);
                 node.ChangeColor();
             }
+
             nodeDir.DirectoryAdded += InsertNew;
             nodeDir.FileAdded += InsertNew;
             nodeDir.FileRemoved += RemoveEntry;

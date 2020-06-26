@@ -1,22 +1,17 @@
 ﻿using Common;
 using Filetypes;
-using DecodeTool;
 using PackFileManager.Properties;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using EsfControl;
-using EsfLibrary;
 using CommonDialogs;
 using CommonUtilities;
+using System.Linq;
 
 namespace PackFileManager
 {
@@ -39,13 +34,14 @@ namespace PackFileManager
 
                 DBReferenceMap.Instance.CurrentPack = value;
                 
-                Refresh ();
+                Refresh();
             }
         }
 
         private CustomMessageBox search;
         DBFileUpdate dbUpdater = new DBFileUpdate();
-        
+        PackTreeViewFilterService _packTreeFilterService;
+
         #region Editors
 
         private readonly DBFileEditorControl dbFileEditorControl = new DBFileEditorControl {
@@ -215,6 +211,8 @@ namespace PackFileManager
             EnableMenuItems();
 
             RefreshTitle();
+
+            _packTreeFilterService = new PackTreeViewFilterService(packTreeView);
         }
         
         #region Form Management
@@ -1582,7 +1580,7 @@ namespace PackFileManager
                 }
             }
             RefreshTitle();
-            packStatusLabel.Text = PackInfo;
+            packStatusLabel.Text = PackInfo;          
             base.Refresh();
         }
 
@@ -1620,6 +1618,66 @@ namespace PackFileManager
         {
             FillRecentFilesList();
         }
+
+        private void expandToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (packTreeView.SelectedNode == null)
+                return;
+
+            packTreeView.BeginUpdate();
+            if (!packTreeView.SelectedNode.IsExpanded)
+                packTreeView.SelectedNode.ExpandAll();
+            else
+                packTreeView.SelectedNode.Collapse(false);
+            packTreeView.EndUpdate();
+        }
+
+
+        private void PackTreeView_NodeMouseHover(object sender, TreeNodeMouseHoverEventArgs e)
+        {
+            packTreeViewToolTip.RemoveAll();
+            var pos = packTreeView.PointToClient(Cursor.Position);
+            TreeNode selNode = (TreeNode)packTreeView.GetNodeAt(pos);
+
+            if (selNode != null)
+            {
+                var toolTip = selNode.ToolTipText;
+                if (selNode.Tag != null)
+                {
+                    var directory = selNode.Tag as VirtualDirectory;
+                    if (directory != null)
+                    {
+                        var fileCount = directory.AllFiles.Count;
+                        toolTip += "File count = " + fileCount;
+                    }
+                }
+
+                if(!string.IsNullOrWhiteSpace(selNode.ToolTipText))
+                    toolTip += "\n" + selNode.ToolTipText;
+                packTreeViewToolTip.SetToolTip(packTreeView, toolTip);
+            }
+        }
+
+        private void OnSearchKeyUp(object sender, KeyEventArgs e)
+        {
+            if (packTreeSearchTextBox.Text.Length >= 3)
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    _packTreeFilterService.Search(packTreeSearchTextBox.Text);
+                }
+                else
+                {
+                    _packTreeFilterService.DeplayedSearch(packTreeSearchTextBox.Text);
+                } 
+            }
+
+            if (packTreeSearchTextBox.Text.Length == 0)
+            {
+                _packTreeFilterService.ClearSearch();
+            }
+          
+        }    
     }
 }
 
