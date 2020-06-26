@@ -9,6 +9,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 using PackFileManager.Properties;
+using Filetypes.Codecs;
 
 namespace PackFileManager
 {

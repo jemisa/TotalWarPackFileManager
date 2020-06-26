@@ -229,10 +229,6 @@
       <Project>{AD415480-8879-4271-B8A6-CB7391DEA78C}</Project>
       <Name>EsfControl</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EsfLibrary\EsfLibrary.csproj">
-      <Project>{A290E27B-4B04-4851-A17D-D0F6AEE533A2}</Project>
-      <Name>EsfLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Filetypes\Filetypes.csproj">
       <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
       <Name>Filetypes</Name>
@@ -276,9 +272,6 @@
     <Content Include="Resources\Rome2.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FreeImage.Standard">
-      <Version>4.3.8</Version>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
     </PackageReference>

@@ -1,0 +1,449 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.7.2": {
+      "FreeImage.Standard/4.3.8": {
+        "type": "package",
+        "dependencies": {
+          "System.Drawing.Common": "4.5.1",
+          "System.Drawing.Primitives": "4.3.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Primitives"
+        ],
+        "compile": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        },
+        "runtime": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-arm/native/FreeImage.so": {
+            "assetType": "native",
+            "rid": "linux-arm"
+          },
+          "runtimes/linux-x64/native/FreeImage.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/win-x64/native/FreeImage.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/FreeImage.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
+      "SevenZip/19.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/SevenZip.dll": {}
+        },
+        "runtime": {
+          "lib/net20/SevenZip.dll": {}
+        }
+      },
+      "System.Drawing.Common/4.5.1": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System",
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.Drawing.Common.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.Drawing.Common.dll": {}
+        }
+      },
+      "System.Drawing.Primitives/4.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net45/System.Drawing.Primitives.dll": {}
+        },
+        "runtime": {
+          "lib/net45/System.Drawing.Primitives.dll": {}
+        }
+      },
+      "Common/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Common.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.7.2/win": {
+      "FreeImage.Standard/4.3.8": {
+        "type": "package",
+        "dependencies": {
+          "System.Drawing.Common": "4.5.1",
+          "System.Drawing.Primitives": "4.3.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Primitives"
+        ],
+        "compile": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        },
+        "runtime": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        }
+      },
+      "SevenZip/19.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/SevenZip.dll": {}
+        },
+        "runtime": {
+          "lib/net20/SevenZip.dll": {}
+        }
+      },
+      "System.Drawing.Common/4.5.1": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System",
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.Drawing.Common.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.Drawing.Common.dll": {}
+        }
+      },
+      "System.Drawing.Primitives/4.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net45/System.Drawing.Primitives.dll": {}
+        },
+        "runtime": {
+          "lib/net45/System.Drawing.Primitives.dll": {}
+        }
+      },
+      "Common/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Common.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.7.2/win-x64": {
+      "FreeImage.Standard/4.3.8": {
+        "type": "package",
+        "dependencies": {
+          "System.Drawing.Common": "4.5.1",
+          "System.Drawing.Primitives": "4.3.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Primitives"
+        ],
+        "compile": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        },
+        "runtime": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        },
+        "native": {
+          "runtimes/win-x64/native/FreeImage.dll": {}
+        }
+      },
+      "SevenZip/19.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/SevenZip.dll": {}
+        },
+        "runtime": {
+          "lib/net20/SevenZip.dll": {}
+        }
+      },
+      "System.Drawing.Common/4.5.1": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System",
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.Drawing.Common.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.Drawing.Common.dll": {}
+        }
+      },
+      "System.Drawing.Primitives/4.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net45/System.Drawing.Primitives.dll": {}
+        },
+        "runtime": {
+          "lib/net45/System.Drawing.Primitives.dll": {}
+        }
+      },
+      "Common/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Common.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.7.2/win-x86": {
+      "FreeImage.Standard/4.3.8": {
+        "type": "package",
+        "dependencies": {
+          "System.Drawing.Common": "4.5.1",
+          "System.Drawing.Primitives": "4.3.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Primitives"
+        ],
+        "compile": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        },
+        "runtime": {
+          "lib/net472/FreeImage.Standard.dll": {}
+        },
+        "native": {
+          "runtimes/win-x86/native/FreeImage.dll": {}
+        }
+      },
+      "SevenZip/19.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/SevenZip.dll": {}
+        },
+        "runtime": {
+          "lib/net20/SevenZip.dll": {}
+        }
+      },
+      "System.Drawing.Common/4.5.1": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System",
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.Drawing.Common.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.Drawing.Common.dll": {}
+        }
+      },
+      "System.Drawing.Primitives/4.3.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.Drawing",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net45/System.Drawing.Primitives.dll": {}
+        },
+        "runtime": {
+          "lib/net45/System.Drawing.Primitives.dll": {}
+        }
+      },
+      "Common/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Common.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "FreeImage.Standard/4.3.8": {
+      "sha512": "DAxcVerI9/uTr1pyvKRHwwLZdxFQbb4Y8sjJRma+VgXN7GZtw1OuKwBYlfUgSQuDleQquD0+0L0wDQ7vErGMGA==",
+      "type": "package",
+      "path": "freeimage.standard/4.3.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "freeimage.standard.4.3.8.nupkg.sha512",
+        "freeimage.standard.nuspec",
+        "lib/net472/FreeImage.Standard.dll",
+        "lib/netstandard2.0/FreeImage.Standard.dll",
+        "runtimes/linux-arm/native/FreeImage.so",
+        "runtimes/linux-x64/native/FreeImage.so",
+        "runtimes/win-x64/native/FreeImage.dll",
+        "runtimes/win-x86/native/FreeImage.dll"
+      ]
+    },
+    "SevenZip/19.0.0": {
+      "sha512": "+Eeb/uvC0REvMlG1auBqlBMiFiPZs+WizlLroHPSKtBh/V7NR/qOocgk+/7S0lNzciYsurMCeJzUL7LYIqVnWw==",
+      "type": "package",
+      "path": "sevenzip/19.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net20/SevenZip.dll",
+        "lib/netstandard2.0/SevenZip.dll",
+        "pack-package.cmd",
+        "publish-package.cmd",
+        "sevenzip.19.0.0.nupkg.sha512",
+        "sevenzip.nuspec"
+      ]
+    },
+    "System.Drawing.Common/4.5.1": {
+      "sha512": "GiyeGi/v4xYDz1vCNFwFvhz9k1XddOG7VD3jxRqzRBCbTHji+s3HxxbxtoymuK4OadEpgotI8zQ5+GEEH9sUEQ==",
+      "type": "package",
+      "path": "system.drawing.common/4.5.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net461/System.Drawing.Common.dll",
+        "lib/netstandard2.0/System.Drawing.Common.dll",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net461/System.Drawing.Common.dll",
+        "ref/netstandard2.0/System.Drawing.Common.dll",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "runtimes/unix/lib/netcoreapp2.0/System.Drawing.Common.dll",
+        "runtimes/win/lib/netcoreapp2.0/System.Drawing.Common.dll",
+        "system.drawing.common.4.5.1.nupkg.sha512",
+        "system.drawing.common.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "System.Drawing.Primitives/4.3.0": {
+      "sha512": "1QU/c35gwdhvj77fkScXQQbjiVAqIL3fEYn/19NE0CV/ic5TN5PyWAft8HsrbRd4SBLEoErNCkWSzMDc0MmbRw==",
+      "type": "package",
+      "path": "system.drawing.primitives/4.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/System.Drawing.Primitives.dll",
+        "lib/netstandard1.1/System.Drawing.Primitives.dll",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/System.Drawing.Primitives.dll",
+        "ref/netstandard1.1/System.Drawing.Primitives.dll",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.drawing.primitives.4.3.0.nupkg.sha512",
+        "system.drawing.primitives.nuspec"
+      ]
+    },
+    "Common/1.0.0": {
+      "type": "project",
+      "path": "../Common/Common.csproj",
+      "msbuildProject": "../Common/Common.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.7.2": [
+      "Common >= 1.0.0",
+      "FreeImage.Standard >= 4.3.8",
+      "SevenZip >= 19.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\ole_k\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj",
+      "projectName": "Filetypes",
+      "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj",
+      "packagesPath": "C:\\Users\\ole_k\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\obj\\",
+      "projectStyle": "PackageReference",
+      "skipContentFileWrite": true,
+      "configFilePaths": [
+        "C:\\Users\\ole_k\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net472"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net472": {
+          "projectReferences": {
+            "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj": {
+              "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj"
+            }
+          }
+        }
+      }
+    },
+    "frameworks": {
+      "net472": {
+        "dependencies": {
+          "FreeImage.Standard": {
+            "target": "Package",
+            "version": "[4.3.8, )"
+          },
+          "SevenZip": {
+            "target": "Package",
+            "version": "[19.0.0, )"
+          }
+        }
+      }
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      },
+      "win-x64": {
+        "#import": []
+      },
+      "win-x86": {
+        "#import": []
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Common;
 using Filetypes;
 using CommonDialogs;
+using Filetypes.Codecs;
 
 namespace PackFileManager {
     public class GroupformationEditor : PackedFileEditor<GroupformationFile> {

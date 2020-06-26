@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Common;
 using Filetypes;
+using Filetypes.Codecs;
 
 namespace PackFileTest {
     class PackTest {

@@ -3,6 +3,7 @@
     using BrightIdeasSoftware;
     using Common;
     using Filetypes;
+    using Filetypes.Codecs;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;

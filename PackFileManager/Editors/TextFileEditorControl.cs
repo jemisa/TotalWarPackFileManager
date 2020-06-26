@@ -1,5 +1,6 @@
 ﻿using Common;
 using Filetypes;
+using Filetypes.Codecs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -107,28 +108,6 @@ namespace PackFileManager {
             base.Name = "TextFileEditorControl";
             base.Size = new Size(0x4a2, 0x28c);
             base.ResumeLayout(false);
-        }
-    }
-    
-    /*
-     * Lightweight codec to read data as ASCII string from the stream.
-     */
-    public class TextCodec : Codec<string> {
-        public static readonly TextCodec Instance = new TextCodec();
-        public string Decode(Stream file) {
-            string result = "";
-            using (var reader = new StreamReader(file, Encoding.ASCII)) {
-                result = reader.ReadToEnd();
-            }
-#if DEBUG
-            Console.WriteLine("read string\n{0}", result);
-#endif
-            return result;
-        }
-        public void Encode(Stream stream, string toEncode) {
-            using (var writer = new StreamWriter(stream)) {
-                writer.Write(toEncode);
-            }
         }
     }
 }

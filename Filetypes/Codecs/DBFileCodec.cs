@@ -4,11 +4,11 @@ using System.IO;
 using System.Text;
 using Common;
 
-namespace Filetypes {
+namespace Filetypes.Codecs {
     /*
      * A class parsing dbfiles from and to data streams in packed file format.
      */
-    public class PackedFileDbCodec : Codec<DBFile> {
+    public class PackedFileDbCodec : ICodec<DBFile> {
         string typeName;
 
         /*

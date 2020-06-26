@@ -1,5 +1,6 @@
 using Common;
 using Filetypes;
+using Filetypes.Codecs;
 using System;
 using System.IO;
 

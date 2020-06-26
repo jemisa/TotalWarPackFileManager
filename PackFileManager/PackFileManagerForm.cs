@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using CommonDialogs;
 using CommonUtilities;
 using System.Linq;
+using Filetypes.Codecs;
 
 namespace PackFileManager
 {

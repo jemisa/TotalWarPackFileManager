@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 
-namespace Filetypes {
+namespace Filetypes.Codecs {
     /*
      * Decodes a DBFile to the format used by CA's Assembly Kit.
      */
-    public class ModToolDBCodec : Codec<DBFile> {
+    public class ModToolDBCodec : ICodec<DBFile> {
         const string DATE_FORMAT = "ddd d. MMM HH:mm:ss yyyy";
         static readonly CultureInfo GB_CULTURE = CultureInfo.CreateSpecificCulture("en-GB");
         

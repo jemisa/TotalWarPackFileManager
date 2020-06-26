@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Filetypes;
+using Filetypes.Codecs;
 
 namespace PackFileTest {
     public class GroupformationTest {

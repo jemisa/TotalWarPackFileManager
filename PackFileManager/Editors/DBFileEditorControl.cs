@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using CommonDialogs;
 using CommonUtilities;
+using Filetypes.Codecs;
 
 namespace PackFileManager {
     public partial class DBFileEditorControl : UserControl, IPackedFileEditor {

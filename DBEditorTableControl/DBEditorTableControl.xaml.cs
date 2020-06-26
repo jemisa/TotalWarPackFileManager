@@ -18,6 +18,7 @@ using Common;
 using CommonDialogs;
 using CommonUtilities;
 using Filetypes;
+using Filetypes.Codecs;
 
 namespace DBTableControl
 {

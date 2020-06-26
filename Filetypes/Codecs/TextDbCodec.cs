@@ -1,17 +1,18 @@
+using Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Filetypes {
+namespace Filetypes.Codecs {
     /*
      * TSV import/export.
      */
-    public class TextDbCodec : Codec<DBFile> {
+    public class TextDbCodec : ICodec<DBFile> {
         static char[] QUOTES = { '"' };
         static char[] TABS = { '\t' };
         static char[] GUID_SEPARATOR = { ':' };
         
-        public static readonly Codec<DBFile> Instance = new TextDbCodec();
+        public static readonly ICodec<DBFile> Instance = new TextDbCodec();
         
         public static byte[] Encode(DBFile file) {
             using (MemoryStream stream = new MemoryStream()) {

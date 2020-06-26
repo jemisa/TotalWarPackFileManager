@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Filetypes;
+using Filetypes.Codecs;
 
 namespace PackFileManager {
     //public partial class DBFileEditorTree : UserControl {
@@ -403,18 +404,7 @@ namespace PackFileManager {
         }
         #endregion
     }
- 
-    #region Codec
-    class DelegatingDbFileCodec : Codec<DBFile> {
-        public Codec<DBFile> Codec { get; set; }
-        public void Encode(Stream stream, DBFile file) {
-            Codec.Encode(stream, file);
-        }
-        public DBFile Decode(Stream stream) {
-            return Codec.Decode(stream);
-        }
-    }
-    #endregion
+
  
     /*
      * Node representing a field containing field lists.

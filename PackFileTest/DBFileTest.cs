@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Common;
 using Filetypes;
+using Filetypes.Codecs;
 
 namespace PackFileTest {
     public class DBFileTest : PackedFileTest {

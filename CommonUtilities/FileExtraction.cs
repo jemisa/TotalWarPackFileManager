@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CommonDialogs;
+using Filetypes.Codecs;
 
 namespace CommonUtilities
 {

@@ -9,6 +9,7 @@ using SchemaIntegration.Mapping;
 //using ValueList = System.Collections.Generic.List<string>;
 //using Table = System.Tuple<string, System.Collections.Generic.List<string>>;
 using NameMapping = System.Tuple<string, string>;
+using Filetypes.Codecs;
 
 namespace SchemaIntegration {
     /*

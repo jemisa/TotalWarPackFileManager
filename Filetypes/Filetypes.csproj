@@ -40,12 +40,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Atlas\AtlasCodec.cs" />
     <Compile Include="Atlas\AtlasFile.cs" />
     <Compile Include="Atlas\AtlasObject.cs" />
-    <Compile Include="Codec.cs" />
+    <Compile Include="Codecs\GroupformationCodec.cs" />
+    <Compile Include="Codecs\ICodec.cs" />
+    <Compile Include="Codecs\AtlasCodec.cs" />
+    <Compile Include="Codecs\BitmapCodec.cs" />
+    <Compile Include="Codecs\CaXmlDbFileCodec.cs" />
+    <Compile Include="Codecs\DelegatingDbFileCodec.cs" />
+    <Compile Include="Codecs\DelegatingEsfCodec.cs" />
+    <Compile Include="Codecs\TextCodec.cs" />
+    <Compile Include="Codecs\UnitVariantCodec.cs" />
     <Compile Include="DB\DBFile.cs" />
-    <Compile Include="DB\DBFileCodec.cs" />
+    <Compile Include="Codecs\DBFileCodec.cs" />
     <Compile Include="DB\DBFileNotSupportedException.cs" />
     <Compile Include="DB\DBReferenceMap.cs" />
     <Compile Include="DB\DBTypeMap.cs" />
@@ -55,11 +62,27 @@
     <Compile Include="DB\SchemaXml.cs" />
     <Compile Include="DB\TypeInfo.cs" />
     <Compile Include="DB\XsdParser.cs" />
-    <Compile Include="Loc\LocCodec.cs" />
+    <Compile Include="Codecs\LocCodec.cs" />
+    <Compile Include="Esf\AbcaCodec.cs" />
+    <Compile Include="Esf\AbceCodec.cs" />
+    <Compile Include="Esf\AbcfCodec.cs" />
+    <Compile Include="Esf\ArrayNodes.cs" />
+    <Compile Include="Esf\ComplexNodes.cs" />
+    <Compile Include="Esf\CompressedNode.cs" />
+    <Compile Include="Esf\EsfFileCodec.cs" />
+    <Compile Include="Esf\EsfNode.cs" />
+    <Compile Include="Esf\MemoryMappedRecordNode.cs" />
+    <Compile Include="Esf\NodeIteration.cs" />
+    <Compile Include="Esf\Nodes\DelegatingDecoderNode.cs" />
+    <Compile Include="Esf\Nodes\Type26Node.cs" />
+    <Compile Include="Esf\OptimizedNodes.cs" />
+    <Compile Include="Esf\SimpleNodes.cs" />
+    <Compile Include="Esf\TypeCodes.cs" />
+    <Compile Include="Esf\Underlying Types\Type26.cs" />
+    <Compile Include="Esf\Util.cs" />
     <Compile Include="Loc\LocFile.cs" />
     <Compile Include="PackedFileEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnitVariant\UnitVariantCodec.cs" />
     <Compile Include="UnitVariant\UnitVariantFile.cs" />
     <Compile Include="UnitVariant\UnitVariantObject.cs" />
     <Compile Include="Groupformations\Groupformation.cs" />
@@ -69,10 +92,9 @@
     <Compile Include="Models\Naval.cs" />
     <Compile Include="DB\DBFileUpdate.cs" />
     <Compile Include="DB\SchemaOptimizer.cs" />
-    <Compile Include="DB\TextDbCodec.cs" />
-    <Compile Include="DB\ModToolDBCodec.cs" />
+    <Compile Include="Codecs\TextDbCodec.cs" />
+    <Compile Include="Codecs\ModToolDBCodec.cs" />
     <Compile Include="DB\FieldMappingManager.cs" />
-    <Compile Include="DB\CaXmlDbFileCodec.cs" />
     <Compile Include="DB\DBRow.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -89,5 +111,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="FreeImage.Standard">
+      <Version>4.3.8</Version>
+    </PackageReference>
+    <PackageReference Include="SevenZip">
+      <Version>19.0.0</Version>
+    </PackageReference>
+  </ItemGroup>
 </Project>

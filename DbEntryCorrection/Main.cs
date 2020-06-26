@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using Common;
 using Filetypes;
-
+using Filetypes.Codecs;
 
 namespace DbEntryCorrection {
     class MainClass {

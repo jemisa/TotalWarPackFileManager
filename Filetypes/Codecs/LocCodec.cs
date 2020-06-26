@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using Common;
 
-namespace Filetypes {
-	public class LocCodec : Codec<LocFile> {
+namespace Filetypes.Codecs {
+	public class LocCodec : ICodec<LocFile> {
 		public static readonly LocCodec Instance = new LocCodec();
 		
 		// static helper to set pack file data

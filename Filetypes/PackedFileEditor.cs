@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using Common;
+using Filetypes.Codecs;
 
 namespace Filetypes {
     /*
@@ -46,7 +47,7 @@ namespace Filetypes {
      * An abstract implementation of the IPackedFileEditor interface, able to edit type T.
      */
     public abstract class PackedFileEditor<T> : UserControl, IPackedFileEditor {
-        protected readonly Codec<T> codec;
+        protected readonly ICodec<T> codec;
         public virtual T EditedFile { get; set; }
         PackedFile currentPacked;
   
@@ -61,7 +62,7 @@ namespace Filetypes {
         /*
          * Use the given codec to decode files.
          */
-        protected PackedFileEditor(Codec<T> c) {
+        protected PackedFileEditor(ICodec<T> c) {
             codec = c;
         }
         

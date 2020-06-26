@@ -10,6 +10,7 @@ using CommonDialogs;
 using Filetypes;
 
 using TableRow = System.Collections.Generic.List<Filetypes.FieldInstance>;
+using Filetypes.Codecs;
 
 namespace DecodeTool {
     public partial class DecodeTool : Form {

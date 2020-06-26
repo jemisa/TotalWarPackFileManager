@@ -1,21 +1,33 @@
-﻿using System;
+﻿using Common;
+using Filetypes;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using Common;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Filetypes {
-    public class AtlasCodec : Codec<AtlasFile> {
+namespace Filetypes.Codecs
+{
+    public class AtlasCodec : ICodec<AtlasFile>
+    {
         public static readonly AtlasCodec Instance = new AtlasCodec();
 
-        public AtlasFile Decode(Stream file) {
-            using (BinaryReader reader = new BinaryReader(file)) {
-                if (reader.ReadInt32() != 1) {
+        public AtlasFile Decode(Stream file)
+        {
+            using (BinaryReader reader = new BinaryReader(file))
+            {
+                if (reader.ReadInt32() != 1)
+                {
                     throw new FileLoadException("Illegal atlas file: Does not start with '1'");
                 }
                 reader.ReadBytes(4);
                 int numEntries = reader.ReadInt32();
                 AtlasFile result = new AtlasFile();
-                for (int i = 0; i < numEntries; i++) {
-                    AtlasObject item = new AtlasObject {
+                for (int i = 0; i < numEntries; i++)
+                {
+                    AtlasObject item = new AtlasObject
+                    {
                         Container1 = IOFunctions.ReadZeroTerminatedUnicode(reader),
                         Container2 = IOFunctions.ReadZeroTerminatedUnicode(reader),
                         X1 = reader.ReadSingle(),
@@ -30,13 +42,16 @@ namespace Filetypes {
                 return result;
             }
         }
-        public void Encode(Stream stream, AtlasFile toEncode) {
-            using (BinaryWriter writer = new BinaryWriter(stream)) {
+        public void Encode(Stream stream, AtlasFile toEncode)
+        {
+            using (BinaryWriter writer = new BinaryWriter(stream))
+            {
                 writer.Write((uint)1);
                 writer.Write((uint)0);
                 int numEntries = toEncode.Entries.Count;
                 writer.Write(numEntries);
-                for (int i = 0; i < numEntries; i++) {
+                for (int i = 0; i < numEntries; i++)
+                {
                     IOFunctions.WriteZeroTerminatedUnicode(writer, toEncode.Entries[i].Container1);
                     IOFunctions.WriteZeroTerminatedUnicode(writer, toEncode.Entries[i].Container2);
                     writer.Write(toEncode.Entries[i].X1);

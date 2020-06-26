@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
-using EsfLibrary;
 using CommonDialogs;
+using Filetypes;
 
 namespace EsfControl {
     public partial class EditEsfComponent : UserControl {

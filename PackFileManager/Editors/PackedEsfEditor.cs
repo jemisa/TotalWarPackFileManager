@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Filetypes;
 using Common;
-using EsfLibrary;
 using EsfControl;
+using Filetypes.Codecs;
 
 namespace PackFileManager {
     public partial class PackedEsfEditor : PackedFileEditor<EsfNode> {
@@ -119,16 +119,5 @@ namespace PackFileManager {
         #endregion
     }
     
-    class DelegatingEsfCodec : Codec<EsfNode> {
-        EsfCodec codecDelegate;
-        public EsfNode Decode(Stream stream) {
-            codecDelegate = EsfCodecUtil.GetCodec(stream);
-            return codecDelegate.Parse(stream);
-        }
-        public void Encode(Stream encodeTo, EsfNode node) {
-            using (var writer = new BinaryWriter(encodeTo)) {
-                codecDelegate.EncodeRootNode(writer, node);
-            }
-        }
-    }
+    
 }

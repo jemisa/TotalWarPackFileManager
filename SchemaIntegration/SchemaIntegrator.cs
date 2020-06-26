@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Common;
 using Filetypes;
+using Filetypes.Codecs;
 
 namespace SchemaIntegration {
     /**

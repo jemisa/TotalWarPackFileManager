@@ -102,6 +102,10 @@
       <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
       <Name>Filetypes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PackFileManager\PackFileManager.csproj">
+      <Project>{BED0F2F6-BD7B-4D6D-8959-98A6E9B6F88A}</Project>
+      <Name>PackFileManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
