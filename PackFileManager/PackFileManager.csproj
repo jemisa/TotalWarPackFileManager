@@ -82,12 +82,6 @@
     <Compile Include="Editors\DBFileEditorControl.Designer.cs">
       <DependentUpon>DBFileEditorControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\DBFileEditorTree.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editors\DBFileEditorTree.Designer.cs">
-      <DependentUpon>DBFileEditorTree.cs</DependentUpon>
-    </Compile>
     <Compile Include="Editors\FormationPreview.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -139,9 +133,6 @@
     <EmbeddedResource Include="Editors\DBFileEditorControl.resx">
       <DependentUpon>DBFileEditorControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\DBFileEditorTree.resx">
-      <DependentUpon>DBFileEditorTree.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Editors\FormationPreview.resx">
       <DependentUpon>FormationPreview.cs</DependentUpon>
     </EmbeddedResource>
@@ -166,6 +157,8 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <DependentUpon>Resources.cs</DependentUpon>
     </EmbeddedResource>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -206,6 +199,7 @@
     </Compile>
     <Compile Include="Editors\ExternalEditor.cs" />
     <Compile Include="GameManager.cs" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonDialogs\CommonDialogs.csproj">
@@ -219,6 +213,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DBEditorTableControl\DBEditorTableControl.csproj">
+      <Project>{3b928c9e-a55f-4912-9880-ff134e68afca}</Project>
+      <Name>DBEditorTableControl</Name>
     </ProjectReference>
     <ProjectReference Include="..\DecodeTool\DecodeTool.csproj">
       <Project>{B7E18A8E-7797-4865-97CD-97B2915AA774}</Project>

@@ -87,7 +87,7 @@
       <DependentUpon>ManageFiltersWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DBEditorTableHost.cs" />
+    <Compile Include="WpfPackedFileEditorHost.cs" />
     <Compile Include="DBUtil.cs" />
   </ItemGroup>
   <ItemGroup>

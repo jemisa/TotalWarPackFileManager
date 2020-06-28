@@ -46,7 +46,7 @@ namespace Filetypes {
     /*
      * An abstract implementation of the IPackedFileEditor interface, able to edit type T.
      */
-    public abstract class PackedFileEditor<T> : UserControl, IPackedFileEditor {
+    public  class PackedFileEditor<T> : UserControl, IPackedFileEditor {
         protected readonly ICodec<T> codec;
         public virtual T EditedFile { get; set; }
         PackedFile currentPacked;
@@ -62,10 +62,12 @@ namespace Filetypes {
         /*
          * Use the given codec to decode files.
          */
-        protected PackedFileEditor(ICodec<T> c) {
+        protected PackedFileEditor(ICodec<T> c = null) {
             codec = c;
         }
-        
+
+        public PackedFileEditor() { }
+
         bool readOnly = true;
         public virtual bool ReadOnly {
             get {
@@ -99,7 +101,7 @@ namespace Filetypes {
         }
 
         // interface to query if given file can be edited
-        public abstract bool CanEdit(PackedFile file);
+        public virtual bool CanEdit(PackedFile file) { return false; }
 
         // interface method to save to pack if data has changed in this editor
         public void Commit() {

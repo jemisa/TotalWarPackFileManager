@@ -13,6 +13,7 @@ using CommonDialogs;
 using CommonUtilities;
 using System.Linq;
 using Filetypes.Codecs;
+using DBTableControl;
 
 namespace PackFileManager
 {
@@ -43,67 +44,29 @@ namespace PackFileManager
         DBFileUpdate dbUpdater = new DBFileUpdate();
         PackTreeViewFilterService _packTreeFilterService;
 
-        #region Editors
-
-        private readonly DBFileEditorControl dbFileEditorControl = new DBFileEditorControl {
-            Dock = DockStyle.Fill
-        };
         private TextFileEditorControl textFileEditorControl = new TextFileEditorControl { 
             Dock = DockStyle.Fill };
         ExternalEditor externalEditor = new ExternalEditor();
 
         private void CreateEditors()
-        {  
-#if __MonoCS__
-#else
-            // relies on win32 dll, so can't use it on Linux
-            PackedFileEditorRegistry.Editors.Add(new AtlasFileEditorControl { Dock = DockStyle.Fill });
-            try
+        {
+            if (OSHelper.IsWindows())
             {
-                string dbeLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                dbeLocation = Path.Combine(dbeLocation, "DBEditorTableControl.dll");
-                Assembly dbeAssembly = Assembly.LoadFile(dbeLocation);
-                Type dbeType = dbeAssembly.GetType("DBTableControl.DBEditorTableControl");
-                MethodInfo registerMethodInfo = dbeType.GetMethod("RegisterDbEditor", BindingFlags.Public | BindingFlags.Static);
-                object registered = registerMethodInfo.Invoke(null, null);
-                string newDir = ModManager.Instance.CurrentModDirectory;
-                PropertyInfo modDirProperty = dbeType.GetProperty("ModDirectory");
-                modDirProperty.SetValue(registered, newDir, null);
-                ModManager.Instance.CurrentModChanged += delegate() {
-                    newDir = ModManager.Instance.CurrentModDirectory;
-                    modDirProperty.SetValue(registered, newDir, null);
-                };
+                // relies on win32 dll, so can't use it on Linux
+                PackedFileEditorRegistry.Editors.Add(new AtlasFileEditorControl { Dock = DockStyle.Fill });
+                PackedFileEditorRegistry.Editors.Add(WpfPackedFileEditorHost.Create<DBEditorTableControl>());
             }
-            catch (Exception e)
-            {
-                string message = string.Format("Failed to load DBE: {0}", e.Message);
-                if (e.Message.Contains("80131515")) {
-                    message += "For a workaround:\n" +
-                        "- right-click the DBEditorTableControl.dll\n" +
-                            "- select Properties\n" +
-                            "- click the \"Unblock\" button.\n\n" +
-                            "- Do you want to go to the install directory now?";
-                    string dllPath = Path.Combine(Assembly.GetExecutingAssembly().Location, "DBEditorTableControl.dll");
-                    if (MessageBox.Show(message, "Failed to load dll", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                        string arguments = string.Format("/select {0}", dllPath);
-                        Process.Start("explorer.exe", arguments);
-                    }
-                } else {
-                    MessageBox.Show(string.Format("failed to load DBE: {0}", e.Message));
-                }
-            }
-#endif
-            PackedFileEditorRegistry.Editors.Add(dbFileEditorControl);
+
+            PackedFileEditorRegistry.Editors.Add(new DBFileEditorControl{Dock = DockStyle.Fill});
             PackedFileEditorRegistry.Editors.Add(new ImageViewerControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new LocFileEditorControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new GroupformationEditor { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new UnitVariantFileEditorControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new PackedEsfEditor { Dock = DockStyle.Fill });
-            PackedFileEditorRegistry.Editors.Add(new DBFileEditorTree { Dock = DockStyle.Fill });
             // new ReadmeEditorControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(textFileEditorControl);
         }
-        #endregion
+   
 
         public PackFileManagerForm (string[] args) {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Application.ExecutablePath));

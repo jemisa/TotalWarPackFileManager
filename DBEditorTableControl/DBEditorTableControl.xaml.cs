@@ -27,15 +27,6 @@ namespace DBTableControl
     /// </summary>
     public partial class DBEditorTableControl : UserControl, INotifyPropertyChanged, IPackedFileEditor
     {
-        public static DBEditorTableControl RegisterDbEditor() {
-            DBEditorTableControl control = new DBEditorTableControl();
-            DBEditorTableHost host = new DBEditorTableHost {
-                Child = control,
-                Dock = System.Windows.Forms.DockStyle.Fill
-            };
-            PackedFileEditorRegistry.Editors.Add(host);
-			return control;
-        }
         
         DataSet loadedDataSet;
 
@@ -259,11 +250,6 @@ namespace DBTableControl
         bool dataChanged;
         public bool DataChanged { get { return dataChanged; } }
 
-        // Import Export default directory
-		public string ModDirectory {
-            get;
-            set;
-        }
         string importDirectory;
         public string ImportDirectory 
         { 
@@ -897,7 +883,7 @@ namespace DBTableControl
 
         private void ExportTSVMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            string extractTo = ModDirectory;
+            string extractTo = null;
             // TODO: Add support for ModManager
             //extractTo = ModManager.Instance.CurrentModSet ? ModManager.Instance.CurrentModDirectory : null;
             if (extractTo == null)
@@ -986,7 +972,7 @@ namespace DBTableControl
 
         private void ImportTSVMenuItem_Click(object sender, RoutedEventArgs e)
         {
-			string initialDirectory = ModDirectory != null ? ModDirectory : exportDirectory;
+            string initialDirectory = exportDirectory;
             System.Windows.Forms.OpenFileDialog openDBFileDialog = new System.Windows.Forms.OpenFileDialog
             {
                 InitialDirectory = initialDirectory,
