@@ -54,7 +54,7 @@ namespace PackFileManager
             {
                 // relies on win32 dll, so can't use it on Linux
                 PackedFileEditorRegistry.Editors.Add(new AtlasFileEditorControl { Dock = DockStyle.Fill });
-                PackedFileEditorRegistry.Editors.Add(WpfPackedFileEditorHost.Create<DBEditorTableControl>());
+                PackedFileEditorRegistry.Editors.Add(WpfPackedFileEditorHost.Create<DBTableControl.DBEditorTableControl>());
             }
 
             PackedFileEditorRegistry.Editors.Add(new DBFileEditorControl{Dock = DockStyle.Fill});

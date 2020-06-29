@@ -17,6 +17,8 @@ using System.Windows.Threading;
 using Common;
 using CommonDialogs;
 using CommonUtilities;
+using DBEditorTableControl;
+using DBEditorTableControl.Dialogs;
 using Filetypes;
 using Filetypes.Codecs;
 
@@ -28,7 +30,7 @@ namespace DBTableControl
     public partial class DBEditorTableControl : UserControl, INotifyPropertyChanged, IPackedFileEditor
     {
         
-        DataSet loadedDataSet;
+        DataSet _loadedDataSet;
 
         // Data Source Properties
         DataTable currentTable;
@@ -61,8 +63,9 @@ namespace DBTableControl
                 errorList.Clear();
                 UpdateErrorView();
 
-                // Load table filters from saved data.
-                LoadFilters();
+                // Filters
+                var filterController = filterDockPanel.Children[0] as FilterController;
+                filterController.LoadFilters(this);
 
                 // Make sure the control knows it's table has changed.
                 NotifyPropertyChanged(this, "CurrentTable");
@@ -149,7 +152,7 @@ namespace DBTableControl
             get { return readOnly; }
             set 
             { 
-                readOnly = value; 
+                readOnly = false; 
                 NotifyPropertyChanged(this, "TableReadOnly");
 
                 // Set whether we can add rows via button based on readonly.
@@ -273,12 +276,12 @@ namespace DBTableControl
         }
 
         // Configuration data
-        private DBTableEditorConfig savedconfig;
+        public DBTableEditorConfig savedconfig;
 
         private List<string> hiddenColumns;
-        private List<Visibility> visibleRows;
-        private ObservableCollection<DBFilter> filterList;
-        private List<DBFilter> autofilterList;
+        public List<Visibility> visibleRows;
+       
+        public List<DBFilter> autofilterList;
 		private ObservableCollection<DBError> errorList;
 
         FindAndReplaceWindow findReplaceWindow;
@@ -293,14 +296,12 @@ namespace DBTableControl
 
             // Instantiate default datatable, and others.
             currentTable = new DataTable();
-            loadedDataSet = new DataSet("Loaded Tables");
-            loadedDataSet.EnforceConstraints = false;
+            _loadedDataSet = new DataSet("Loaded Tables");
+            _loadedDataSet.EnforceConstraints = false;
             hiddenColumns = new List<string>();
             visibleRows = new List<System.Windows.Visibility>();
-            filterList = new ObservableCollection<DBFilter>();
             autofilterList = new List<DBFilter>();
 			errorList = new ObservableCollection<DBError>();
-            filterListView.ItemsSource = filterList;
             dberrorsListView.ItemsSource = errorList;
 
             // Transfer saved settings.
@@ -350,8 +351,7 @@ namespace DBTableControl
         #region IPackedFileEditor Implementation
         public bool CanEdit(PackedFile file)
         {
-            String unused;
-            return PackedFileDbCodec.CanDecode(file, out unused);
+            return PackedFileDbCodec.CanDecode(file, out _);
         }
 
         public void Commit()
@@ -572,8 +572,8 @@ namespace DBTableControl
             DataTable constructionTable = new DataTable(currentPackedFile.Name);
 
             // Clear the dataset and create the data table.
-            loadedDataSet.Tables.Clear();
-            loadedDataSet.Tables.Add(constructionTable);
+            _loadedDataSet.Tables.Clear();
+            _loadedDataSet.Tables.Add(constructionTable);
 
             DataColumn constructionColumn;
             List<DataColumn> keyList = new List<DataColumn>();
@@ -634,27 +634,6 @@ namespace DBTableControl
             return constructionTable;
         }
 
-        public void LoadFilters()
-        {
-            filterList.Clear();
-            autofilterList.Clear();
-
-            // If the saved config has not filters, skip.
-            if (!savedconfig.Filters.ContainsKey(editedFile.CurrentType.Name))
-            {
-                return;
-            }
-
-            // Load saved filters, attaching activation listeners for each one.
-            foreach (DBFilter filter in savedconfig.Filters[editedFile.CurrentType.Name])
-            {
-                // Always load filters as inactive.
-                filter.IsActive = false;
-                filter.FilterToggled += new EventHandler(filter_FilterToggled);
-                filterList.Add(filter);
-            }
-        }
-        
         private void Import(DBFile importfile)
         {
             // If we are here, then importfile has already been imported into editfile, so no need to do any type checking.
@@ -713,55 +692,7 @@ namespace DBTableControl
 
         private void dbeControl_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-#if DEBUG
-            // Set Ctrl-B as testing key;
-            if (e.Key == Key.B && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
-            {
-                string rowswitherrors = "Rows that have logged errors: \n\n";
-                for (int i = 0; i < currentTable.Rows.Count; i++)
-                {
-                    if (currentTable.Rows[i].HasErrors)
-                    {
-                        rowswitherrors = rowswitherrors + i + "\n";
-                    }
-                }
-
-                MessageBox.Show(rowswitherrors);
-            }
-            else if (e.Key == Key.D && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
-            {
-                var test = editedFile.Entries[0];
-                var type = editedFile.CurrentType;
-            }
-            else if (e.Key == Key.Z && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
-            {
-                string clipboardtext = GetClipboardText();
-
-                clipboardtext = clipboardtext.Replace("\t", "\\t");
-                clipboardtext = clipboardtext.Replace("\r", "\\r");
-                clipboardtext = clipboardtext.Replace("\n", "\\n");
-
-                MessageBox.Show(clipboardtext);
-            }
-            else if (e.Key == Key.X && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
-            {
-                DataGridCell cell = GetCell(0, 0);
-                string outputstring = "";
-
-                for (int i = 0; i < dbDataGrid.Items.Count; i++)
-                {
-                    if (!(dbDataGrid.Items[i] is DataRowView))
-                    {
-                        continue;
-                    }
-
-                    int datarow = currentTable.Rows.IndexOf((dbDataGrid.Items[i] as DataRowView).Row);
-                    outputstring = outputstring + String.Format("Visual row {0}, stored at CurrentTable[{1}].\n\r", i, datarow);
-                }
-
-                MessageBox.Show(outputstring);
-            }
-#endif
+            DebugHelper.PreviewKeyDown(this, e);
         }
 
         private void TableControl_Unloaded(object sender, RoutedEventArgs e)
@@ -908,34 +839,6 @@ namespace DBTableControl
             }
         }
 
-        private void ExportCSVMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            /*
-            string extractTo = null;
-            // TODO: Add support for ModManager
-            //extractTo = ModManager.Instance.CurrentModSet ? ModManager.Instance.CurrentModDirectory : null;
-            if (extractTo == null)
-            {
-                DirectoryDialog dialog = new DirectoryDialog
-                {
-                    Description = "Please point to folder to extract to",
-                    SelectedPath = String.IsNullOrEmpty(importExportDirectory)
-                                    ? System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)
-                                    : importExportDirectory
-                };
-                extractTo = dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? dialog.SelectedPath : null;
-                importExportDirectory = dialog.SelectedPath;
-            }
-            if (!string.IsNullOrEmpty(extractTo))
-            {
-                List<PackedFile> files = new List<PackedFile>();
-                files.Add(CurrentPackedFile);
-                FileExtractor extractor = new FileExtractor(extractTo) { Preprocessor = new CsvExtractionPreprocessor() };
-                extractor.ExtractFiles(files);
-                MessageBox.Show(string.Format("File exported to CSV."));
-            }
-             */
-        }
 
         private void ExportBinaryMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1453,6 +1356,7 @@ namespace DBTableControl
                 newfilter.IsActive = true;
                 newfilter.Name = String.Format("Auto_{0}_{1}", colname, filtervalue);
                 newfilter.FilterValue = filtervalue;
+                newfilter.MatchMode = MatchType.Exact;
 
                 if (filtervalue.Equals("Any Value"))
                 {
@@ -1464,7 +1368,7 @@ namespace DBTableControl
                 }
                 else
                 {
-                    newfilter.MatchMode = MatchType.Exact;
+                    
                 }
 
                 autofilterList.Add(newfilter);
@@ -1657,340 +1561,12 @@ namespace DBTableControl
 
         protected virtual void OnExecutedPaste(object sender, ExecutedRoutedEventArgs args)
         {
-            string clipboarddata = GetClipboardText();
-            int rowindex;
-            int datarowindex;
-            int columnindex;
-            int datacolumnindex;
-
-            if (ClipboardIsEmpty())
-            {
-                // Clipboard Empty
-            }
-            else if (ClipboardContainsSingleCell())
-            {
-                // Single Cell Paste
-                string pastevalue = clipboarddata.Trim();
-
-                foreach (DataGridCellInfo cellinfo in dbDataGrid.SelectedCells)
-                {
-                    // Get both visible and data row index
-                    rowindex = dbDataGrid.Items.IndexOf(cellinfo.Item);
-                    datarowindex = currentTable.Rows.IndexOf((cellinfo.Item as DataRowView).Row);
-
-                    // Additional error checking for the visibleRows internal list.
-                    if (datarowindex >= visibleRows.Count)
-                    {
-                        UpdateVisibleRows();
-                    }
-
-                    // Selecting cells while the table is filtered will select collapsed rows, so skip them here.
-                    if (visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
-                    {
-                        continue;
-                    }
-
-                    // Get both visible and data column index
-                    columnindex = dbDataGrid.Columns.IndexOf(cellinfo.Column);
-                    datacolumnindex = currentTable.Columns.IndexOf((string)cellinfo.Column.Header);
-
-                    CurrentTable.Rows[datarowindex].BeginEdit();
-
-                    if (!TryPasteValue(datarowindex, datacolumnindex, pastevalue))
-                    {
-                        // Paste Error
-                    }
-
-                    CurrentTable.Rows[datarowindex].EndEdit();
-                    RefreshCell(rowindex, columnindex);
-                }
-            }
-            else if (!ClipboardContainsOnlyRows())
-            {
-                if (dbDataGrid.SelectedItems.OfType<DataRowView>().Count() != dbDataGrid.SelectedItems.Count)
-                {
-                    // The blank row is selected, abort.
-                    MessageBox.Show("Only select the blank row when pasting rows.", "Selection Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                // Use -1 values to indicate that nothing is selected, and to paste any full rows the
-                // clipboard might contain as new rows.
-                int basecolumnindex = -1;
-                rowindex = -1;
-                if (dbDataGrid.SelectedCells.Count > 1)
-                {
-                    // User has more than 1 cells selected, therefore the selection must match the clipboard data.
-                    if (!PasteMatchesSelection(clipboarddata))
-                    {
-                        // Warn user
-                        if (MessageBox.Show("Warning! Cell selection does not match copied data, attempt to paste anyway?",
-                                           "Selection Error", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
-                        {
-                            return;
-                        }
-                    }
-
-                    // Set values to the first cell's coordinates
-                    // Get both visible and data row index
-                    rowindex = dbDataGrid.Items.IndexOf(dbDataGrid.SelectedCells[0].Item);
-                    basecolumnindex = dbDataGrid.SelectedCells[0].Column.DisplayIndex;
-
-                    // Determine upper left corner of selection
-                    foreach (DataGridCellInfo cellinfo in dbDataGrid.SelectedCells)
-                    {
-                        rowindex = Math.Min(rowindex, dbDataGrid.Items.IndexOf(cellinfo.Item));
-                        basecolumnindex = Math.Min(basecolumnindex, cellinfo.Column.DisplayIndex);
-                    }
-                }
-                else if (dbDataGrid.SelectedCells.Count == 1)
-                {
-                    // User has 1 cell selected, assume it is the top left corner and attempt to paste.
-                    rowindex = dbDataGrid.Items.IndexOf(dbDataGrid.SelectedCells[0].Item);
-                    basecolumnindex = dbDataGrid.SelectedCells[0].Column.DisplayIndex;
-                }
-
-                List<string> pasteinstructions = new List<string>();
-
-                foreach (string line in clipboarddata.Split('\n'))
-                {
-                    columnindex = basecolumnindex;
-
-                    if (rowindex > CurrentTable.Rows.Count - 1 || columnindex == -1)
-                    {
-                        if (IsLineARow(line))
-                        {
-                            // We have a full row, but no where to paste it, so add it as a new row.
-                            DataRow newrow = currentTable.NewRow();
-
-                            if (moveAndFreezeKeys)
-                            {
-                                // Data is being displayed with keys moved, so assume the clipboard data matches the visual appearance and not
-                                // the order of the data source.
-                                object tempitem;
-                                List<object> itemarray = line.Split('\t').Take(editedFile.CurrentType.Fields.Count).ToList<object>();
-                                for (int i = currentTable.PrimaryKey.Count() - 1; i >= 0; i--)
-                                {
-                                    tempitem = itemarray[i];
-                                    itemarray.RemoveAt(i);
-                                    itemarray.Insert(currentTable.Columns.IndexOf(currentTable.PrimaryKey[i]), tempitem);
-                                }
-
-                                // Once we have reordered the clipboard data to match the data source, convert to an object[]
-                                newrow.ItemArray = itemarray.ToArray();
-                            }
-                            else
-                            {
-                                // Data is displayed as it is stored, so assume the clipboard data is ordered the same way.
-                                newrow.ItemArray = line.Split('\t').Take(editedFile.CurrentType.Fields.Count).ToArray<object>();
-                            }
-                            
-                            currentTable.Rows.Add(newrow);
-                        }
-
-                        rowindex++;
-                        continue;
-                    }
-
-                    if (String.IsNullOrEmpty(line.Trim()))
-                    {
-                        rowindex++;
-                        continue;
-                    }
-
-                    // Convert visual row and column index to data row and column index.
-                    datarowindex = currentTable.Rows.IndexOf((dbDataGrid.Items[rowindex] as DataRowView).Row);
-
-                    // Additional error checking for the visibleRows internal list.
-                    if (datarowindex >= visibleRows.Count)
-                    {
-                        UpdateVisibleRows();
-                    }
-
-                    // Skip past any collapsed (filtered) rows.
-                    while (visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
-                    {
-                        rowindex++;
-                        datarowindex = currentTable.Rows.IndexOf((dbDataGrid.Items[rowindex] as DataRowView).Row);
-
-                        if (rowindex >= currentTable.Rows.Count)
-                        {
-                            break;
-                        }
-                    }
-
-                    foreach (string cell in line.Replace("\r", "").Split('\t'))
-                    {
-                        if (columnindex > CurrentTable.Columns.Count - 1)
-                        {
-                            break;
-                        }
-
-                        if (String.IsNullOrEmpty(cell.Trim()))
-                        {
-                            columnindex++;
-                            continue;
-                        }
-
-                        // Convert visual column index, the display index not its location in the datagrid's collection, to data column index.
-                        datacolumnindex = currentTable.Columns.IndexOf((string)dbDataGrid.Columns.Single(n => n.DisplayIndex == columnindex).Header);
-
-                        // Since refresh works on the visual tree, and the visual tree is not affected by DisplayIndex, find the columns location
-                        // in the datagrid's column collection to pass on.
-                        int refreshcolumnindex = dbDataGrid.Columns.IndexOf(dbDataGrid.Columns.Single(n => n.DisplayIndex == columnindex));
-
-                        // Rather than attempting to modify cells as we go, we should modify them in batches
-                        // since any kind of sorting may interfere with paste order in real time.
-                        pasteinstructions.Add(String.Format("{0};{1};{2};{3};{4}", datarowindex, rowindex, datacolumnindex, refreshcolumnindex, cell));
-
-                        columnindex++;
-                    }
-
-                    rowindex++;
-                }
-
-                // Now that we have a list of paste instructions, execute them simultaneously across the data source
-                // to avoid interference from any visual resorting.
-                // Instruction Format: Data Row index;Visual Row index;Data Column index;Visual Column index;value
-                foreach (string instruction in pasteinstructions)
-                {
-                    // Parse out the instructions.
-                    string[] parameters = instruction.Split(';');
-                    datarowindex = int.Parse(parameters[0]);
-                    rowindex = int.Parse(parameters[1]);
-                    datacolumnindex = int.Parse(parameters[2]);
-                    columnindex = int.Parse(parameters[3]);
-
-                    // Edit currentTable
-                    currentTable.Rows[datarowindex].BeginEdit();
-                    currentTable.Rows[datarowindex][datacolumnindex] = parameters[4];
-                    currentTable.Rows[datarowindex].EndEdit();
-
-                    // Refresh the visual cell
-                    RefreshCell(rowindex, columnindex);
-                }
-            }
-            else
-            {
-                // Paste Rows, with no floater cells.
-                if (dbDataGrid.SelectedCells.Count == (dbDataGrid.SelectedItems.Count * EditedFile.CurrentType.Fields.Count))
-                {
-                    // Only rows are selected.
-                    // Since the SelectedItems list is in the order of selection and NOT in the order of appearance we need
-                    // to create a custom sorted list of indicies to paste to.
-                    List<int> indiciesToPaste = new List<int>();
-                    List<int> dataindiciesToPaste = new List<int>();
-                    int testindex;
-                    foreach (DataRowView rowview in dbDataGrid.SelectedItems.OfType<DataRowView>())
-                    {
-                        testindex = currentTable.Rows.IndexOf(rowview.Row);
-
-                        // Additional error checking for the visibleRows internal list.
-                        if (testindex >= visibleRows.Count)
-                        {
-                            UpdateVisibleRows();
-                        }
-
-                        // Skip any collapsed (filtered) rows.
-                        if (visibleRows[testindex] == System.Windows.Visibility.Visible)
-                        {
-                            indiciesToPaste.Add(dbDataGrid.Items.IndexOf(rowview));
-                        }
-                    }
-                    indiciesToPaste.Sort();
-
-                    // Now that we have the selected rows visual locations, we need to determine their locations in our data source.
-                    foreach (int i in indiciesToPaste)
-                    {
-                        dataindiciesToPaste.Add(currentTable.Rows.IndexOf((dbDataGrid.Items[i] as DataRowView).Row));
-                    }
-
-                    // We now have a list of data indicies sorted in visual order.
-                    int currentindex = 0;
-
-                    foreach (string line in clipboarddata.Replace("\r", "").Split('\n'))
-                    {
-                        if (!IsLineARow(line) || String.IsNullOrEmpty(line) || !IsRowValid(line))
-                        {
-                            currentindex++;
-                            continue;
-                        }
-
-                        if (currentindex >= dataindiciesToPaste.Count)
-                        {
-                            // Add new row
-                            DataRow newrow = currentTable.NewRow(); 
-                            if (moveAndFreezeKeys)
-                            {
-                                // Data is being displayed with keys moved, so assume the clipboard data matches the visual appearance and not
-                                // the order of the data source.
-                                object tempitem;
-                                List<object> itemarray = line.Split('\t').Take(editedFile.CurrentType.Fields.Count).ToList<object>();
-                                for (int i = currentTable.PrimaryKey.Count() - 1; i >= 0; i--)
-                                {
-                                    tempitem = itemarray[i];
-                                    itemarray.RemoveAt(i);
-                                    itemarray.Insert(currentTable.Columns.IndexOf(currentTable.PrimaryKey[i]), tempitem);
-                                }
-
-                                // Once we have reordered the clipboard data to match the data source, convert to an object[]
-                                newrow.ItemArray = itemarray.ToArray();
-                            }
-                            else
-                            {
-                                // Data is displayed as it is stored, so assume the clipboard data is ordered the same way.
-                                newrow.ItemArray = line.Split('\t').Take(editedFile.CurrentType.Fields.Count).ToArray<object>();
-                            }
-
-                            currentTable.Rows.Add(newrow);
-
-                            currentindex++;
-                            continue;
-                        }
-
-                        CurrentTable.Rows[dataindiciesToPaste[currentindex]].BeginEdit();
-                        if (moveAndFreezeKeys)
-                        {
-                            // Data is being displayed with keys moved, so assume the clipboard data matches the visual appearance and not
-                            // the order of the data source.
-                            object tempitem;
-                            List<object> itemarray = line.Split('\t').Take(editedFile.CurrentType.Fields.Count).ToList<object>();
-                            for (int i = currentTable.PrimaryKey.Count() - 1; i >= 0; i--)
-                            {
-                                tempitem = itemarray[i];
-                                itemarray.RemoveAt(i);
-                                itemarray.Insert(currentTable.Columns.IndexOf(currentTable.PrimaryKey[i]), tempitem);
-                            }
-
-                            // Once we have reordered the clipboard data to match the data source, convert to an object[]
-                            CurrentTable.Rows[dataindiciesToPaste[currentindex]].ItemArray = itemarray.ToArray();
-                        }
-                        else
-                        {
-                            // Data is displayed as it is stored, so assume the clipboard data is ordered the same way.
-                            CurrentTable.Rows[dataindiciesToPaste[currentindex]].ItemArray = line.Split('\t').Take(editedFile.CurrentType.Fields.Count).ToArray<object>();
-                        }
-
-                        CurrentTable.Rows[dataindiciesToPaste[currentindex]].EndEdit();
-                        currentindex++;
-                    }
-
-                    Refresh(true);
-                }
-                else
-                {
-                    // Please select rows.
-                    MessageBox.Show("When pasting rows, please use the row header button to select entire rows only.", 
-                                    "Selection Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
+            ClipboardHelper.OnExecutedPaste(this);
         }
 
         protected virtual void OnCanExecutePaste(object sender, CanExecuteRoutedEventArgs args)
         {
-            args.CanExecute = dbDataGrid.CurrentCell != null;
-            args.CanExecute = !readOnly;
-            args.Handled = true;
+            ClipboardHelper.OnCanExecutePaste(this, args);
         }
 
         #endregion
@@ -2037,22 +1613,6 @@ namespace DBTableControl
                         item.IsEnabled = false;
                     }
                 }
-                
-                // Hide <--> Unhide based on current hidden status.
-                if (item.Header.Equals("Hide Column") || item.Header.Equals("Unhide Column"))
-                {
-                    if (currentTable.Columns[colname].ExtendedProperties.ContainsKey("Hidden"))
-                    {
-                        if ((bool)currentTable.Columns[colname].ExtendedProperties["Hidden"])
-                        {
-                            item.Header = "Unhide Column";
-                        }
-                        else
-                        {
-                            item.Header = "Hide Column";
-                        }
-                    }
-                }
             }
         }
 
@@ -2075,9 +1635,7 @@ namespace DBTableControl
         private void RemoveSortingMenuItem_Click(object sender, RoutedEventArgs e)
         {
             DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-
             col.SortDirection = null;
-
             Refresh();
         }
 
@@ -2198,87 +1756,10 @@ namespace DBTableControl
             RefreshColumn(dbDataGrid.Columns.IndexOf(col));
         }
 
-        private void HideColumnMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-            string colname = (string)col.Header;
-
-            if (!CurrentTable.Columns[colname].ExtendedProperties.ContainsKey("Hidden"))
-            {
-                CurrentTable.Columns[colname].ExtendedProperties.Add("Hidden", false);
-            }
-
-            // 3 possible scenarios:
-            if (col.Visibility == Visibility.Visible && !(bool)CurrentTable.Columns[colname].ExtendedProperties["Hidden"])
-            {
-                // 1. Column is visible and is not set as hidden
-                // If we are not showing hidden columns, set actual visibility
-                if (!showAllColumns)
-                {
-                    col.Visibility = Visibility.Hidden;
-                }
-
-                // Consider the column as hidden.
-                CurrentTable.Columns[colname].ExtendedProperties["Hidden"] = true;
-
-                // Add the column to the internal hidden columns list.
-                if (!hiddenColumns.Contains(colname))
-                {
-                    hiddenColumns.Add(colname);
-                }
-            }
-            else if (col.Visibility == Visibility.Visible && (bool)CurrentTable.Columns[colname].ExtendedProperties["Hidden"])
-            {
-                // 2. Column is visible, but considered hidden, meaning we are showing hidden columns.
-                // Consider the column as visible, but do not change actual visibility.
-                CurrentTable.Columns[colname].ExtendedProperties["Hidden"] = false;
-
-                // Remove the column from the internal hidden columns list.
-                if (hiddenColumns.Contains(colname))
-                {
-                    hiddenColumns.Remove(colname);
-                }
-            }
-            else if (col.Visibility == Visibility.Hidden)
-            {
-                // 3. Column is hidden, meaning we are not showing all hidden columns.
-                // Set actual visibility.
-                col.Visibility = Visibility.Visible;
-
-                // Consider the column as hidden.
-                CurrentTable.Columns[colname].ExtendedProperties["Hidden"] = false;
-
-                // Remove the column from the internal hidden columns list.
-                if (hiddenColumns.Contains(colname))
-                {
-                    hiddenColumns.Remove(colname);
-                }
-            }
-
-            UpdateConfig();
-
-            if (showAllColumns)
-            {
-                Refresh();
-            }
-        }
 
         private void EditVisibleListMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // Get clicked column.
-            DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-
-            ListEditor hiddencolumnslisteditor = new ListEditor();
-            hiddencolumnslisteditor.LeftLabel = "Visible Columns:";
-            hiddencolumnslisteditor.RightLabel = "Hidden Columns:";
-            hiddencolumnslisteditor.OriginalOrder = dbDataGrid.Columns.Select(n => (string)n.Header).ToList<string>();
-            hiddencolumnslisteditor.LeftList = currentTable.Columns.OfType<DataColumn>()
-                                                                   .Where(n => !(bool)n.ExtendedProperties["Hidden"])
-                                                                   .Select(n => n.ColumnName).ToList();
-            hiddencolumnslisteditor.RightList = currentTable.Columns.OfType<DataColumn>()
-                                                                   .Where(n => (bool)n.ExtendedProperties["Hidden"])
-                                                                   .Select(n => n.ColumnName).ToList();
-
+            var hiddencolumnslisteditor = ColumnVisiblityHelper.Show(this);
             System.Windows.Forms.DialogResult result = hiddencolumnslisteditor.ShowDialog();
 
             if (result == System.Windows.Forms.DialogResult.OK)
@@ -2808,10 +2289,11 @@ namespace DBTableControl
             RefreshCell(rowIndex, colIndex);
         }
 
-        
+
 
         #endregion
 
+        #region INotifyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(object sender, string propertyName)
@@ -2821,7 +2303,7 @@ namespace DBTableControl
                 PropertyChanged(sender, new PropertyChangedEventArgs(propertyName));
             }
         }
-
+        
         private void SendDataChanged()
         {
             // This method is used to trip the packedFile's data changed notification, so that the PFM tree list updates
@@ -2831,6 +2313,7 @@ namespace DBTableControl
                 currentPackedFile.Modified = true;
             }
         }
+        #endregion
 
         #region UI Helper Methods
 
@@ -2976,7 +2459,7 @@ namespace DBTableControl
             yield break;
         }
 
-        private void Refresh(bool onlyvisible = false)
+        public void Refresh(bool onlyvisible = false)
         {
             if (!onlyvisible)
             {
@@ -3027,7 +2510,7 @@ namespace DBTableControl
             }
         }
 
-        private void RefreshCell(int row, int column)
+        public void RefreshCell(int row, int column)
         {
             DataGridCell cell = GetCell(row, column, true);
 
@@ -3082,14 +2565,6 @@ namespace DBTableControl
 
         #region Utility Functions
 
-        private IEnumerable<IEnumerable<string>> GetTableKeySequences()
-        {
-            for (int i = 0; i < currentTable.Rows.Count; i++)
-            {
-                yield return GetPrimaryKeySequence(i);
-            }
-        }
-
         private List<string> GetPrimaryKeySequence(int rowindex)
         {
             List<string> pksequence = new List<string>();
@@ -3135,7 +2610,7 @@ namespace DBTableControl
             }
         }
 
-        private void UpdateConfig()
+        public void UpdateConfig()
         {
             if (EditedFile == null)
             {
@@ -3149,34 +2624,6 @@ namespace DBTableControl
             savedconfig.ImportDirectory = importDirectory;
             savedconfig.ExportDirectory = exportDirectory;
             savedconfig.ShowFilters = showFilters;
-
-            if (editedFile != null)
-            {
-                if (savedconfig.HiddenColumns.ContainsKey(editedFile.CurrentType.Name))
-                {
-                    // Overwrite the old hidden column list for this table.
-                    savedconfig.HiddenColumns[editedFile.CurrentType.Name].Clear();
-                    savedconfig.HiddenColumns[editedFile.CurrentType.Name].AddRange(hiddenColumns);
-                }
-                else
-                {
-                    // Create a new list for the table.
-                    savedconfig.HiddenColumns.Add(new KeyValuePair<string, List<string>>(editedFile.CurrentType.Name, new List<string>(hiddenColumns)));
-                }
-
-                if (savedconfig.Filters.ContainsKey(editedFile.CurrentType.Name))
-                {
-                    // Also overwrite the filter list.
-                    savedconfig.Filters[editedFile.CurrentType.Name].Clear();
-                    savedconfig.Filters[editedFile.CurrentType.Name].AddRange(filterList);
-                }
-                else
-                {
-                    // Create a new list for the table.
-                    savedconfig.Filters.Add(new KeyValuePair<string, List<DBFilter>>(editedFile.CurrentType.Name, new List<DBFilter>(filterList)));
-                }
-            }
-            savedconfig.HiddenColumns.Sort();
             savedconfig.Save();
         }
 
@@ -3258,174 +2705,9 @@ namespace DBTableControl
             return null;
         }
 
-        private bool ClipboardIsEmpty()
-        {
-            string clipboardText = GetClipboardText();
-
-            foreach (string line in clipboardText.Split('\n'))
-            {
-                foreach (string cell in line.Split('\t'))
-                {
-                    if (!String.IsNullOrEmpty(cell))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private bool ClipboardContainsOnlyRows()
-        {
-            string clipboardText = GetClipboardText();
-
-            foreach (string line in clipboardText.Split('\n'))
-            {
-                if (String.IsNullOrEmpty(line))
-                {
-                    continue;
-                }
-
-                if (!IsLineARow(line))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private bool IsLineARow(string line)
-        {
-            if (line.Count(n => n == '\t') >= editedFile.CurrentType.Fields.Count - 1)
-            {
-                bool fullrow = true;
-                string[] cells = line.Split('\t').Take(EditedFile.CurrentType.Fields.Count).ToArray();
-                for (int i = 0; i < cells.Length; i++)
-                {
-                    if (String.IsNullOrEmpty(cells[i]) &&
-                        (editedFile.CurrentType.Fields[i].TypeCode != TypeCode.String) && !editedFile.CurrentType.Fields[i].TypeName.Contains("optstring"))
-                    {
-                        fullrow = false;
-                        break;
-                    }
-                }
-
-                if (fullrow)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool ClipboardContainsSingleCell()
-        {
-            return !GetClipboardText().Contains('\t') && GetClipboardText().Count(n => n == '\n') == 1;
-        }
-
-        private string GetClipboardText()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                try
-                {
-                    return Clipboard.GetText(TextDataFormat.Text);
-                }
-                catch 
-                {
- 
-                }
-                System.Threading.Thread.Sleep(10);
-            }
-
-            return null;
-        }
-
-        private bool TryPasteValue(int rowIndex, int columnIndex, string value)
-        {
-            bool retval = true;
-
-            try
-            {
-                currentTable.Rows[rowIndex][columnIndex] = value.Trim();
-            }
-            catch (Exception ex)
-            {
-#if DEBUG
-                ErrorDialog.ShowDialog(ex);
-#endif
-            }
-
-            return retval;
-        }
-
-        private bool PasteMatchesSelection(string clipboardData)
-        {
-            // Build a blank clipboard copy from selected cells to compare to clipboardData
-            string testSelection = "";
-            for (int i = 0; i < currentTable.Rows.Count; i++)
-            {
-                // Additional error checking for the visibleRows internal list.
-                if (i >= visibleRows.Count)
-                {
-                    UpdateVisibleRows();
-                }
-
-                // Ignore collapsed (filtered) rows when building our test string.
-                if (visibleRows[i] == System.Windows.Visibility.Collapsed)
-                {
-                    continue;
-                }
-
-                bool writeEndofLine = false;
-                int minColumnIndex = dbDataGrid.SelectedCells.Min(n => n.Column.DisplayIndex);
-                int maxColumnIndex = dbDataGrid.SelectedCells.Max(n => n.Column.DisplayIndex);
-
-                foreach (DataGridCellInfo cellinfo in dbDataGrid.SelectedCells.Where(n => currentTable.Rows.IndexOf((n.Item as DataRowView).Row) == i))
-                {
-                    for (int j = minColumnIndex; j < maxColumnIndex; j++)
-                    {
-                        testSelection += "\t";
-                    }
-                    writeEndofLine = true;
-                    break;
-                }
-
-                if (writeEndofLine)
-                {
-                    testSelection += "\r\n";
-                }
-            }
-
-            // If the number of lines don't match return false
-            if (testSelection.Count(n => n == '\n') != clipboardData.Count(n => n == '\n'))
-            {
-                return false;
-            }
-
-            // If the number of lines match, test each line for the same number of 'cells'
-            foreach (string line in clipboardData.Split('\n'))
-            {
-                if (testSelection.Count(n => n == '\t') != clipboardData.Count(n => n == '\t'))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private void PasteError(string error)
-        {
-            MessageBox.Show(error, "Paste Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
         private void BuiltTablesSetReadOnly(bool tablesreadonly)
         {
-            foreach (DataTable table in loadedDataSet.Tables)
+            foreach (DataTable table in _loadedDataSet.Tables)
             {
                 foreach (DataColumn column in table.Columns)
                 {
@@ -3442,74 +2724,6 @@ namespace DBTableControl
             }
 
             return false;
-        }
-
-        private bool IsRowValid(string line)
-        {
-            List<string> fields = line.Split('\t').ToList();
-            List<int> fieldorder = new List<int>();
-
-            if (fields.Count < currentTable.Columns.Count)
-            {
-                PasteError("Error: could not paste following row into table, too few fields.\n\n" + line);
-                return false;
-            }
-
-            if (moveAndFreezeKeys)
-            {
-                // Fields may be in altered visual order from data source.
-                fieldorder.AddRange(dbDataGrid.Columns.OrderBy(n => n.DisplayIndex).Select(n => dbDataGrid.Columns.IndexOf(n)));
-            }
-            else
-            {
-                // Fields are displayed in original data order.
-                for(int i = 0; i < currentTable.Columns.Count; i++)
-                {
-                    fieldorder.Add(i);
-                }
-            }
-
-            for (int i = 0; i < currentTable.Columns.Count; i++)
-            {
-                TypeCode fieldtypecode = editedFile.CurrentType.Fields[fieldorder[i]].TypeCode;
-
-                if (fieldtypecode == TypeCode.String)
-                {
-                    continue;
-                }
-                else if (fieldtypecode == TypeCode.Single)
-                {
-                    float temp;
-                    if (!float.TryParse(fields[i], out temp))
-                    {
-                        PasteError(String.Format("Error: could not paste line into table, as '{0}' is not a valid value for '{1}'.\n\n{2}",
-                                                    fields[i], currentTable.Columns[fieldorder[i]].ColumnName, line));
-                        return false;
-                    }
-                }
-                else if (fieldtypecode == TypeCode.Int32)
-                {
-                    int temp;
-                    if (!int.TryParse(fields[i], out temp))
-                    {
-                        PasteError(String.Format("Error: could not paste line into table, as '{0}' is not a valid value for '{1}'.\n\n{2}",
-                                                    fields[i], currentTable.Columns[fieldorder[i]].ColumnName, line));
-                        return false;
-                    }
-                }
-                else if (fieldtypecode == TypeCode.Int16)
-                {
-                    short temp;
-                    if (!short.TryParse(fields[i], out temp))
-                    {
-                        PasteError(String.Format("Error: could not paste line into table, as '{0}' is not a valid value for '{1}'.\n\n{2}",
-                                                    fields[i], currentTable.Columns[fieldorder[i]].ColumnName, line));
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
 
         private object GetDefaultValue(int colindex)
@@ -3578,237 +2792,7 @@ namespace DBTableControl
         #endregion
 
         #region Filter Methods
-
-        private void manageFiltersButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (filterListView.Visibility == System.Windows.Visibility.Collapsed)
-            {
-                filterListView.Visibility = System.Windows.Visibility.Visible;
-            }
-            else if (filterListView.Visibility == System.Windows.Visibility.Visible)
-            {
-                filterListView.Visibility = System.Windows.Visibility.Collapsed;
-            }
-        }
-
-        private void filterListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var test = sender;
-            if (filterListView.SelectedItems.Count == 1)
-            {
-                // Test to enable/disable filter management buttons.
-                DBFilter selecteditem = (DBFilter)filterListView.SelectedItem;
-                deleteFilterButton.IsEnabled = true;
-                editFilterButton.IsEnabled = true;
-                cloneFilterButton.IsEnabled = true;
-            }
-            else
-            {
-                deleteFilterButton.IsEnabled = false;
-                editFilterButton.IsEnabled = false;
-                cloneFilterButton.IsEnabled = false;
-            }
-        }
-
-        private void filterListView_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left && filterListView.SelectedItems.Count == 1)
-            {
-                // User double left clicked a filter, do an edit.
-                ManageFiltersWindow filterWindow = new ManageFiltersWindow(filterList.Select(n => n.Name).ToList());
-                System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(filterWindow);
-                filterWindow.CurrentTable = currentTable;
-                filterWindow.Filter = (DBFilter)filterListView.SelectedItem;
-                filterWindow.ShowDialog();
-
-                if (filterWindow.DialogResult.Value)
-                {
-                    DBFilter editedfilter = filterWindow.Filter;
-                    // Save the edited filter data.
-                    int index = filterList.IndexOf((DBFilter)filterListView.SelectedItem);
-                    filterList[index].Name = editedfilter.Name;
-                    filterList[index].ApplyToColumn = editedfilter.ApplyToColumn;
-                    filterList[index].FilterValue = editedfilter.FilterValue;
-                    filterList[index].MatchMode = editedfilter.MatchMode;
-
-                    if (editedfilter.IsActive)
-                    {
-                        UpdateVisibleRows();
-                        dbDataGrid.Items.Refresh();
-                    }
-
-                    UpdateConfig();
-                }
-            }
-        }
-
-        private void filterListView_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete && filterListView.SelectedItems.Count == 1)
-            {
-                // User hit the delete key on a filter, so delete it.
-                DBFilter filter = (DBFilter)filterListView.SelectedItem;
-                filterList.RemoveAt(filterList.IndexOf(filter));
-
-                if (filter.IsActive)
-                {
-                    UpdateVisibleRows();
-                    dbDataGrid.Items.Refresh();
-                }
-            }
-            
-        }
-
-        private void filterListView_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            if (sender is ListViewItem && e.LeftButton == MouseButtonState.Pressed)
-            {
-                // Drag drop code, TODO: differentiate between a drag and a click some how.
-                ListViewItem draggedItem = sender as ListViewItem;
-                //DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
-                //draggedItem.IsSelected = true;
-            }
-        }
-
-        private void filterListView_Drop(object sender, DragEventArgs e)
-        {
-            DBFilter droppedData = e.Data.GetData(typeof(DBFilter)) as DBFilter;
-            DBFilter target = ((ListBoxItem)(sender)).DataContext as DBFilter;
-
-            // Ignore request until an actual drop is requested.
-            if (droppedData == target)
-            {
-                return;
-            }
-
-            int removedIdx = filterListView.Items.IndexOf(droppedData);
-            int targetIdx = filterListView.Items.IndexOf(target);
-
-            if (removedIdx < targetIdx)
-            {
-                filterList.Insert(targetIdx + 1, droppedData);
-                filterList.RemoveAt(removedIdx);
-            }
-            else
-            {
-                int remIdx = removedIdx + 1;
-                if (filterList.Count + 1 > remIdx)
-                {
-                    filterList.Insert(targetIdx, droppedData);
-                    filterList.RemoveAt(remIdx);
-                }
-            }
-        }
-
-        private void editFilterButton_Click(object sender, RoutedEventArgs e)
-        {
-            ManageFiltersWindow filterWindow = new ManageFiltersWindow(filterList.Select(n => n.Name).ToList());
-            System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(filterWindow);
-            filterWindow.CurrentTable = currentTable;
-
-            if (filterListView.SelectedItems.Count == 1)
-            {
-                filterWindow.Filter = (DBFilter)filterListView.SelectedItem;
-            }
-
-            filterWindow.ShowDialog();
-
-            if (filterWindow.DialogResult.Value)
-            {
-                DBFilter editedfilter = filterWindow.Filter;
-                // Save the edited filter data.
-                int index = filterList.IndexOf((DBFilter)filterListView.SelectedItem);
-                filterList[index].Name = editedfilter.Name;
-                filterList[index].ApplyToColumn = editedfilter.ApplyToColumn;
-                filterList[index].FilterValue = editedfilter.FilterValue;
-                filterList[index].MatchMode = editedfilter.MatchMode;
-
-                if (editedfilter.IsActive)
-                {
-                    UpdateVisibleRows();
-                    dbDataGrid.Items.Refresh();
-                }
-
-                UpdateConfig();
-            }
-        }
-
-        private void addFilterButton_Click(object sender, RoutedEventArgs e)
-        {
-            ManageFiltersWindow filterWindow = new ManageFiltersWindow(filterList.Select(n => n.Name).ToList());
-            System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(filterWindow);
-            filterWindow.CurrentTable = currentTable;
-            filterWindow.Filter = new DBFilter();
-            filterWindow.ShowDialog();
-
-            if (filterWindow.DialogResult.Value)
-            {
-                DBFilter filter = filterWindow.Filter;
-                // Attach event handler for checked/unchecked toggle.
-                filter.FilterToggled += new EventHandler(filter_FilterToggled);
-                // Only add the filter if the name is unique.
-                filterList.Add(filter);
-
-                UpdateConfig();
-            }
-        }
-
-        private void deleteFilterButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (filterListView.SelectedItems.Count == 1)
-            {
-                DBFilter filter = (DBFilter)filterListView.SelectedItem;
-                filterList.RemoveAt(filterList.IndexOf(filter));
-
-                if (filter.IsActive)
-                {
-                    UpdateVisibleRows();
-                    dbDataGrid.Items.Refresh();
-                }
-
-                UpdateConfig();
-            }
-        }
-
-        private void cloneFilterButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (filterListView.SelectedItems.Count == 1)
-            {
-                DBFilter filter = (DBFilter)filterListView.SelectedItem;
-
-                for (int i = 0; i < 1000; i++)
-                {
-                    string testname = String.Format("{0}_clone_{1}", filter.Name, i);
-                    if (filterList.Count(n => n.Name.Equals(testname)) > 0)
-                    {
-                        continue;
-                    }
-                    else if (filterList.Count(n => n.Name.Equals(testname)) == 0)
-                    {
-                        DBFilter newfilter = new DBFilter();
-                        newfilter.Name = testname;
-                        newfilter.IsActive = false;
-                        newfilter.ApplyToColumn = filter.ApplyToColumn;
-                        newfilter.MatchMode = filter.MatchMode;
-                        newfilter.FilterValue = filter.FilterValue;
-
-                        newfilter.FilterToggled += new EventHandler(filter_FilterToggled);
-                        filterList.Add(newfilter);
-
-                        UpdateConfig();
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void filter_FilterToggled(object sender, EventArgs e)
-        {
-            UpdateVisibleRows();
-            dbDataGrid.Items.Refresh();
-        }
-
-        private void UpdateVisibleRows()
+        public void UpdateVisibleRows()
         {
             for (int i = 0; i < currentTable.Rows.Count; i++)
             {
@@ -3844,7 +2828,7 @@ namespace DBTableControl
             int colindex;
 
             // Test row against active advanced filters.
-            foreach (DBFilter filter in filterList)
+            foreach (DBFilter filter in (filterDockPanel.Children[0] as FilterController).filterList)
             {
                 if (!filter.IsActive)
                 {

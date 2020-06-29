@@ -63,9 +63,12 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClipboardHelper.cs" />
+    <Compile Include="ColumnVisiblityHelper.cs" />
     <Compile Include="DBTypes\DBDataGrid.cs" />
     <Compile Include="DBTypes\DBError.cs" />
     <Compile Include="DBTypes\DBFilter.cs" />
+    <Compile Include="DebugHelper.cs" />
     <Compile Include="Dialogs\ApplyExpressionWindow.xaml.cs">
       <DependentUpon>ApplyExpressionWindow.xaml</DependentUpon>
     </Compile>
@@ -79,6 +82,9 @@
     </Compile>
     <Compile Include="Dialogs\ErrorDialog.Designer.cs">
       <DependentUpon>ErrorDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\FilterController.xaml.cs">
+      <DependentUpon>FilterController.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\FindAndReplaceWindow.xaml.cs">
       <DependentUpon>FindAndReplaceWindow.xaml</DependentUpon>
@@ -98,6 +104,10 @@
     <Page Include="DBEditorTableControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\FilterController.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\FindAndReplaceWindow.xaml">
       <SubType>Designer</SubType>

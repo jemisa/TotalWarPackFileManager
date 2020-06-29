@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="DBTableControl.DBEditorTableControl"
+﻿<UserControl xmlns:Dialogs="clr-namespace:DBEditorTableControl.Dialogs"  x:Class="DBTableControl.DBEditorTableControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -59,7 +59,6 @@
             <MenuItem Header="Mass Edit" Click="ColumnMassEditMenuItem_Click" />
             <MenuItem Header="Renumber Cells" Click="RenumberMenuItem_Click" />
             <Separator/>
-            <MenuItem Header="Hide Column" Click="HideColumnMenuItem_Click"/>
             <MenuItem Header="Edit Visible List" Click="EditVisibleListMenuItem_Click" />
             <MenuItem Header="Clear Table Hidden Columns" Click="ClearTableHiddenMenuItem_Click" />
             <MenuItem Header="Clear All Hidden Columns" Click="ClearAllHiddenMenuItem_Click" />
@@ -135,7 +134,7 @@
                     <Button.ContextMenu>
                         <ContextMenu x:Name="ExportContextMenu">
                             <MenuItem Header="TSV" Click="ExportTSVMenuItem_Click" />
-                            <MenuItem Header="CSV" Click="ExportCSVMenuItem_Click" Visibility="Collapsed" />
+                            <MenuItem Header="CSV" />
                             <MenuItem Header="Binary" Click="ExportBinaryMenuItem_Click" />
                             <MenuItem Header="CA Xml" Click="ExportCAXmlMenuItem_Click" Visibility="Collapsed" />
                         </ContextMenu>
@@ -176,7 +175,6 @@
                               Margin="20,0,0,0" />
                 </StackPanel>
                 <Separator Margin="10,0,3,0" />
-                <Button Name="manageFiltersButton" Content="Manage Filters" Padding="3,4" Click="manageFiltersButton_Click" Visibility="Collapsed" />
                 <StackPanel Name="showfiltersStackPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <CheckBox Name="showfilterlistCheckBox"
                               Content="Show Filter List"
@@ -186,46 +184,7 @@
                 </StackPanel>
             </ToolBar>
             <DockPanel Name="filterDockPanel" DockPanel.Dock="Right" >
-                <Grid Name="filterButtonGrid" DockPanel.Dock="Top" MaxHeight="70">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Button Name="editFilterButton" Content="Edit Filter" Grid.Column="0" Grid.Row="0" Margin="5" Click="editFilterButton_Click" IsEnabled="False" />
-                    <Button Name="cloneFilterButton" Content="Clone Filter" Grid.Column="0" Grid.Row="1" Margin="5" Click="cloneFilterButton_Click" IsEnabled="False" />
-                    <Button Name="addFilterButton" Content="Add Filter" Grid.Column="1" Grid.Row="0" Margin="5" Click="addFilterButton_Click" />
-                    <Button Name="deleteFilterButton" Content="Delete Filter" Grid.Column="1" Grid.Row="1" Margin="5" Click="deleteFilterButton_Click" IsEnabled="False" />
-                </Grid>
-                <ListView Name="filterListView"
-                          DockPanel.Dock="Bottom"
-                          AllowDrop="True"
-                          SelectionMode="Single"
-                          SelectionChanged="filterListView_SelectionChanged" 
-                          PreviewMouseDoubleClick="filterListView_PreviewMouseDoubleClick"
-                          PreviewKeyDown="filterListView_PreviewKeyDown">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Enabled" >
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding Path=IsActive}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Filter Name" Width="125" DisplayMemberBinding="{Binding Path=Name}" />
-                        </GridView>
-                    </ListView.View>
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListViewItem}">
-                            <EventSetter Event="PreviewMouseMove" Handler="filterListView_PreviewMouseMove" />
-                            <EventSetter Event="Drop" Handler="filterListView_Drop" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
+                <Dialogs:FilterController/>
             </DockPanel>
             <DockPanel Name="dberrorsDockPanel" LastChildFill="True" DockPanel.Dock="Bottom" Visibility="Collapsed">
                 <Label Content="Error List:" DockPanel.Dock="Top" Foreground="White" Background="DarkRed" />
