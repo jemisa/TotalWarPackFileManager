@@ -21,6 +21,7 @@ using DBEditorTableControl;
 using DBEditorTableControl.Dialogs;
 using Filetypes;
 using Filetypes.Codecs;
+using static DBEditorTableControl.FilterHelper;
 
 namespace DBTableControl
 {
@@ -29,19 +30,18 @@ namespace DBTableControl
     /// </summary>
     public partial class DBEditorTableControl : UserControl, INotifyPropertyChanged, IPackedFileEditor
     {
-        
         DataSet _loadedDataSet;
 
         // Data Source Properties
-        DataTable currentTable;
+        DataTable _currentTable;
         public DataTable CurrentTable
         {
-            get { return currentTable; }
+            get { return _currentTable; }
             set
             {
                 dbDataGrid.ItemsSource = null;
 
-                currentTable = value;
+                _currentTable = value;
 
                 // Reset event handlers
                 CurrentTable.ColumnChanged -= new DataColumnChangeEventHandler(CurrentTable_ColumnChanged);
@@ -60,7 +60,7 @@ namespace DBTableControl
                 exportAsButton.IsEnabled = true;
 
                 // Clear and regenerate the observable error list for the new table.
-                errorList.Clear();
+                _errorList.Clear();
                 UpdateErrorView();
 
                 // Filters
@@ -74,19 +74,19 @@ namespace DBTableControl
             }
         }
 
-        bool moveAndFreezeKeys;
+        bool _moveAndFreezeKeys;
         public bool MoveAndFreezeKeys
         {
-            get { return moveAndFreezeKeys; }
+            get { return _moveAndFreezeKeys; }
             set
             {
-                moveAndFreezeKeys = value;
+                _moveAndFreezeKeys = value;
                 NotifyPropertyChanged(this, "MoveAndFreezeKeys");
                 UpdateConfig();
 
-                if (editedFile != null)
+                if (EditedFile != null)
                 {
-                    if (moveAndFreezeKeys)
+                    if (_moveAndFreezeKeys)
                     {
                         FreezeKeys();
                     }
@@ -98,13 +98,13 @@ namespace DBTableControl
             }
         }
 
-        bool useComboBoxes;
+        bool _useComboBoxes;
         public bool UseComboBoxes
         {
-            get { return useComboBoxes; }
+            get { return _useComboBoxes; }
             set 
             { 
-                useComboBoxes = value; 
+                _useComboBoxes = value; 
                 NotifyPropertyChanged(this, "UseComboBoxes");
                 UpdateConfig();
 
@@ -116,24 +116,24 @@ namespace DBTableControl
             }
         }
 
-        bool showAllColumns;
+        bool _showAllColumns;
         public bool ShowAllColumns
         {
-            get { return showAllColumns; }
+            get { return _showAllColumns; }
             set
             {
-                showAllColumns = value; 
+                _showAllColumns = value; 
                 NotifyPropertyChanged(this, "ShowAllColumns");
                 UpdateConfig();
 
                 // Set all columns to visible, but do not reset currentTable's extended properties.
                 foreach (DataGridColumn col in dbDataGrid.Columns)
                 {
-                    if (currentTable.Columns[(string)col.Header].ExtendedProperties.ContainsKey("Hidden"))
+                    if (_currentTable.Columns[(string)col.Header].ExtendedProperties.ContainsKey("Hidden"))
                     {
-                        bool ishidden = (bool)currentTable.Columns[(string)col.Header].ExtendedProperties["Hidden"];
+                        bool ishidden = (bool)_currentTable.Columns[(string)col.Header].ExtendedProperties["Hidden"];
 
-                        if (ishidden && !showAllColumns)
+                        if (ishidden && !_showAllColumns)
                         {
                             col.Visibility = Visibility.Hidden;
                         }
@@ -146,41 +146,41 @@ namespace DBTableControl
             }
         }
 
-        bool readOnly;
+        bool _readOnly;
         public bool ReadOnly
         {
-            get { return readOnly; }
+            get { return _readOnly; }
             set 
             { 
-                readOnly = false; 
+                _readOnly = value; 
                 NotifyPropertyChanged(this, "TableReadOnly");
 
                 // Set whether we can add rows via button based on readonly.
-                addRowButton.IsEnabled = !readOnly;
-                importFromButton.IsEnabled = !readOnly;
-                dbDataGrid.CanUserAddRows = !readOnly;
-                dbDataGrid.CanUserDeleteRows = !readOnly;
+                addRowButton.IsEnabled = !_readOnly;
+                importFromButton.IsEnabled = !_readOnly;
+                dbDataGrid.CanUserAddRows = !_readOnly;
+                dbDataGrid.CanUserDeleteRows = !_readOnly;
 
                 if (findButton.IsEnabled)
                 {
-                    replaceButton.IsEnabled = !readOnly;
+                    replaceButton.IsEnabled = !_readOnly;
                 }
 
-                BuiltTablesSetReadOnly(readOnly);
+                BuiltTablesSetReadOnly(_readOnly);
             }
         }
 
-        bool showFilters;
+        bool _showFilters;
         public bool ShowFilters 
         { 
-            get { return showFilters; } 
+            get { return _showFilters; } 
             set 
             { 
-                showFilters = value;
+                _showFilters = value;
                 NotifyPropertyChanged(this, "ShowFilters");
                 UpdateConfig();
 
-                if (showFilters)
+                if (_showFilters)
                 {
                     filterDockPanel.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -192,27 +192,27 @@ namespace DBTableControl
         }
 
         // PFM needed Properties
-        PackedFile currentPackedFile;
+        PackedFile _currentPackedFile;
         public PackedFile CurrentPackedFile
         {
-            get { return currentPackedFile; }
+            get { return _currentPackedFile; }
             set
             {
-                if (currentPackedFile != null && DataChanged)
+                if (_currentPackedFile != null && DataChanged)
                 {
                     Commit();
                 }
 
-                if (editedFile != null)
+                if (EditedFile != null)
                 {
                     // Save off the editor configuration.
                     UpdateConfig();
                 }
                 
-                dataChanged = false;
-                currentPackedFile = value;
+                DataChanged = false;
+                _currentPackedFile = value;
 
-                if (currentPackedFile != null)
+                if (_currentPackedFile != null)
                 {
                     try
                     {
@@ -220,8 +220,8 @@ namespace DBTableControl
                         CurrentPackedFile.RenameEvent -= new PackEntry.Renamed(CurrentPackedFile_RenameEvent);
                         CurrentPackedFile.RenameEvent += new PackEntry.Renamed(CurrentPackedFile_RenameEvent);
 
-                        codec = PackedFileDbCodec.FromFilename(currentPackedFile.FullPath);
-                        editedFile = PackedFileDbCodec.Decode(currentPackedFile);
+                        _codec = PackedFileDbCodec.FromFilename(_currentPackedFile.FullPath);
+                        EditedFile = PackedFileDbCodec.Decode(_currentPackedFile);
                     }
                     catch (DBFileNotSupportedException exception)
                     {
@@ -230,7 +230,7 @@ namespace DBTableControl
                 }
 
                 // Create and set CurrentTable
-                CurrentTable = CreateTable(editedFile);
+                CurrentTable = CreateTable(EditedFile);
 
                 NotifyPropertyChanged(this, "CurrentPackedFile");
 
@@ -245,77 +245,54 @@ namespace DBTableControl
             }
         }
 
-        PackedFileDbCodec codec;
+        public PackedFileDbCodec _codec;
 
-        DBFile editedFile;
-        public DBFile EditedFile { get { return editedFile; } }
+        public DBFile EditedFile { get; private set; }
+        public bool DataChanged { get; private set; }
 
-        bool dataChanged;
-        public bool DataChanged { get { return dataChanged; } }
-
-        string importDirectory;
-        public string ImportDirectory 
-        { 
-            get { return importDirectory; } 
-            set 
-            { 
-                importDirectory = value; 
-                UpdateConfig(); 
-            } 
-        }
-
-        string exportDirectory;
-        public string ExportDirectory
-        {
-            get { return exportDirectory; }
-            set
-            {
-                exportDirectory = value;
-                UpdateConfig();
-            }
-        }
+        public string _importDirectory;
+        public string _exportDirectory;
 
         // Configuration data
-        public DBTableEditorConfig savedconfig;
+        public DBTableEditorConfig _savedconfig;
+        public List<string> _hiddenColumns;
+        public List<Visibility> _visibleRows;
+        public List<DBFilter> _autofilterList;
+		public ObservableCollection<DBError> _errorList;
 
-        private List<string> hiddenColumns;
-        public List<Visibility> visibleRows;
-       
-        public List<DBFilter> autofilterList;
-		private ObservableCollection<DBError> errorList;
-
-        FindAndReplaceWindow findReplaceWindow;
+        //FindAndReplaceWindow _findReplaceWindow;
+        FindReplaceHelper _findReplaceHelper;
 
         public DBEditorTableControl()
         {
             InitializeComponent();
 
             // Attempt to load configuration settings, loading default values if config file doesn't exist.
-            savedconfig = new DBTableEditorConfig();
-            savedconfig.Load();
+            _savedconfig = new DBTableEditorConfig();
+            _savedconfig.Load();
 
             // Instantiate default datatable, and others.
-            currentTable = new DataTable();
+            _currentTable = new DataTable();
             _loadedDataSet = new DataSet("Loaded Tables");
             _loadedDataSet.EnforceConstraints = false;
-            hiddenColumns = new List<string>();
-            visibleRows = new List<System.Windows.Visibility>();
-            autofilterList = new List<DBFilter>();
-			errorList = new ObservableCollection<DBError>();
-            dberrorsListView.ItemsSource = errorList;
+            _hiddenColumns = new List<string>();
+            _visibleRows = new List<System.Windows.Visibility>();
+            _autofilterList = new List<DBFilter>();
+			_errorList = new ObservableCollection<DBError>();
+            dberrorsListView.ItemsSource = _errorList;
 
             // Transfer saved settings.
-            moveAndFreezeKeys = savedconfig.FreezeKeyColumns;
-            useComboBoxes = savedconfig.UseComboBoxes;
-            showAllColumns = savedconfig.ShowAllColumns;
-            importDirectory = savedconfig.ImportDirectory;
-            exportDirectory = savedconfig.ExportDirectory;
-            ShowFilters = savedconfig.ShowFilters;
+            _moveAndFreezeKeys = _savedconfig.FreezeKeyColumns;
+            _useComboBoxes = _savedconfig.UseComboBoxes;
+            _showAllColumns = _savedconfig.ShowAllColumns;
+            _importDirectory = _savedconfig.ImportDirectory;
+            _exportDirectory = _savedconfig.ExportDirectory;
+            ShowFilters = _savedconfig.ShowFilters;
 
             // Set Initial checked status.
-            moveAndFreezeKeysCheckBox.IsChecked = moveAndFreezeKeys;
-            useComboBoxesCheckBox.IsChecked = useComboBoxes;
-            showAllColumnsCheckBox.IsChecked = showAllColumns;
+            moveAndFreezeKeysCheckBox.IsChecked = _moveAndFreezeKeys;
+            useComboBoxesCheckBox.IsChecked = _useComboBoxes;
+            showAllColumnsCheckBox.IsChecked = _showAllColumns;
 
             // Register for Datatable events
             CurrentTable.ColumnChanged += new DataColumnChangeEventHandler(CurrentTable_ColumnChanged);
@@ -323,15 +300,7 @@ namespace DBTableControl
             CurrentTable.RowDeleted += new DataRowChangeEventHandler(CurrentTable_RowDeleted);
             CurrentTable.TableNewRow += new DataTableNewRowEventHandler(CurrentTable_TableNewRow);
 
-            // Register for FindAndReplaceWindowEvents
-            findReplaceWindow = new FindAndReplaceWindow();
-            findReplaceWindow.FindNext += new EventHandler(findWindow_FindNext);
-            findReplaceWindow.FindAll += new EventHandler(findReplaceWindow_FindAll);
-            findReplaceWindow.Replace += new EventHandler(replaceWindow_Replace);
-            findReplaceWindow.ReplaceAll += new EventHandler(replaceWindow_ReplaceAll);
-
-            // Enable keyboard interop for the findReplaceWindow, otherwise WinForms will intercept all keyboard input.
-            System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(findReplaceWindow);
+            _findReplaceHelper = new FindReplaceHelper(this);
 
             // Default the below buttons to false for all tables.
             cloneRowButton.IsEnabled = false;
@@ -357,7 +326,7 @@ namespace DBTableControl
         public void Commit()
         {
             // Ignore Commit call if there is nothing to commit, or if the user simply wandered to another table.
-            if (EditedFile == null || (!dataChanged))
+            if (EditedFile == null || (!DataChanged))
             {
                 return;
             }
@@ -366,14 +335,14 @@ namespace DBTableControl
             {
                 using (MemoryStream stream = new MemoryStream())
                 {
-                    codec.Encode(stream, editedFile);
-                    currentPackedFile.Data = stream.ToArray();
+                    _codec.Encode(stream, EditedFile);
+                    _currentPackedFile.Data = stream.ToArray();
                 }
 
                 // Also save off the configuration.
                 UpdateConfig();
 
-                dataChanged = false;
+                DataChanged = false;
             }
             catch (Exception ex)
             {
@@ -384,6 +353,7 @@ namespace DBTableControl
         }
         #endregion
 
+        #region Create Table
         /********************************************************************************************
          * This function uses the schema of currentTable to generate dbDataGrid's columns           *
          * programmatically.  This is necessary to not only create the combo box cells properly     *
@@ -395,11 +365,11 @@ namespace DBTableControl
 
             if (clearHidden)
             {
-                hiddenColumns.Clear();
+                _hiddenColumns.Clear();
 
-                if (savedconfig.HiddenColumns.ContainsKey(editedFile.CurrentType.Name))
+                if (_savedconfig.HiddenColumns.ContainsKey(EditedFile.CurrentType.Name))
                 {
-                    hiddenColumns = new List<string>(savedconfig.HiddenColumns[editedFile.CurrentType.Name]);
+                    _hiddenColumns = new List<string>(_savedconfig.HiddenColumns[EditedFile.CurrentType.Name]);
                 }
             }
 
@@ -415,9 +385,9 @@ namespace DBTableControl
                     column.ExtendedProperties.Add("Hidden", false);
                 }
 
-                if (hiddenColumns.Contains(column.ColumnName))
+                if (_hiddenColumns.Contains(column.ColumnName))
                 {
-                    if (!showAllColumns)
+                    if (!_showAllColumns)
                     {
                         columnvisibility = System.Windows.Visibility.Hidden;
                     }
@@ -426,7 +396,7 @@ namespace DBTableControl
                 }
 
                 // Determine relations as assigned by PFM
-                if (column.ExtendedProperties.ContainsKey("FKey") && useComboBoxes && !readOnly)
+                if (column.ExtendedProperties.ContainsKey("FKey") && _useComboBoxes && !_readOnly)
                 {
                     referencevalues = DBReferenceMap.Instance.ResolveReference(column.ExtendedProperties["FKey"].ToString()).ToList();
 
@@ -445,7 +415,7 @@ namespace DBTableControl
 
                     // Setup the column header's tooltip.
                     string headertooltip = String.Format("Column Data Type: {0}\nReference Table: {1}\nReference Column: {2}",
-                                                    editedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString(),
+                                                    EditedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString(),
                                                     column.ExtendedProperties["FKey"].ToString().Split('.')[0],
                                                     column.ExtendedProperties["FKey"].ToString().Split('.')[1]);
 
@@ -473,7 +443,7 @@ namespace DBTableControl
 
                     dbDataGrid.Columns.Add(constructionColumn);
                 }
-                else if(editedFile.CurrentType.Fields.First(n => n.Name.Equals(column.ColumnName)).TypeCode == TypeCode.Boolean)
+                else if(EditedFile.CurrentType.Fields.First(n => n.Name.Equals(column.ColumnName)).TypeCode == TypeCode.Boolean)
                 {
                     // Checkbox Column
                     DataGridCheckBoxColumn constructionColumn = new DataGridCheckBoxColumn();
@@ -482,7 +452,7 @@ namespace DBTableControl
 
                     // Setup the column header's tooltip.
                     string headertooltip = String.Format("Column Data Type: {0}",
-                                                    editedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString());
+                                                    EditedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString());
 
                     Binding constructionBinding = new Binding(String.Format("{0}", column.ColumnName));
                     if (!column.ReadOnly)
@@ -522,7 +492,7 @@ namespace DBTableControl
 
                     // Setup the column header's tooltip.
                     string headertooltip = String.Format("Column Data Type: {0}",
-                                                    editedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString());
+                                                    EditedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString());
 
                     Binding constructionBinding = new Binding(String.Format("{0}", column.ColumnName));
                     if (!column.ReadOnly)
@@ -554,9 +524,9 @@ namespace DBTableControl
             }
 
             // Finally, based on whether we are moving and freezing columns, rearrange their order.
-            if (editedFile != null)
+            if (EditedFile != null)
             {
-                if (moveAndFreezeKeys)
+                if (_moveAndFreezeKeys)
                 {
                     FreezeKeys();
                 }
@@ -569,7 +539,7 @@ namespace DBTableControl
          ********************************************************************************************/
         private DataTable CreateTable(DBFile table)
         {
-            DataTable constructionTable = new DataTable(currentPackedFile.Name);
+            DataTable constructionTable = new DataTable(_currentPackedFile.Name);
 
             // Clear the dataset and create the data table.
             _loadedDataSet.Tables.Clear();
@@ -592,7 +562,7 @@ namespace DBTableControl
 
                 constructionColumn.AllowDBNull = true;
                 constructionColumn.Unique = false;
-                constructionColumn.ReadOnly = readOnly;
+                constructionColumn.ReadOnly = _readOnly;
 
                 // Save the FKey if it exists
                 if (!String.IsNullOrEmpty(columnInfo.ForeignReference))
@@ -625,16 +595,16 @@ namespace DBTableControl
             constructionTable.AcceptChanges();
 
             // Finally, generate the visibleRows list based on total number of rows in the new table.
-            visibleRows.Clear();
+            _visibleRows.Clear();
             for (int i = 0; i < constructionTable.Rows.Count; i++)
             {
-                visibleRows.Add(System.Windows.Visibility.Visible);
+                _visibleRows.Add(System.Windows.Visibility.Visible);
             }
 
             return constructionTable;
         }
 
-        private void Import(DBFile importfile)
+        public void Import(DBFile importfile)
         {
             // If we are here, then importfile has already been imported into editfile, so no need to do any type checking.
             // The old DBE would check for matching keys and overwrite any it found, data validation means this is no longer
@@ -642,7 +612,7 @@ namespace DBTableControl
             
             // Unbind the GUI datasource, and tell currentTable to get ready for new data.
             dbDataGrid.ItemsSource = null;
-            currentTable.BeginLoadData();
+            _currentTable.BeginLoadData();
 
 			MessageBoxResult question = MessageBox.Show("Replace the current data?", "Replace data?", 
                                                     MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
@@ -650,18 +620,18 @@ namespace DBTableControl
                 return;
             } else if (question == MessageBoxResult.Yes) {
                 EditedFile.Entries.Clear();
-                currentTable.Clear();
+                _currentTable.Clear();
             }
 
             // Since Data.Rows lacks an AddRange method, enumerate through the entries manually.
             foreach (List<FieldInstance> entry in importfile.Entries)
             {
-                DataRow row = currentTable.NewRow();
+                DataRow row = _currentTable.NewRow();
                 row.ItemArray = entry.Select(n => n.Value).ToArray();
                 CurrentTable.Rows.Add(row);
             }
 
-            currentTable.EndLoadData();
+            _currentTable.EndLoadData();
             dbDataGrid.ItemsSource = CurrentTable.DefaultView;
         }
 
@@ -677,13 +647,14 @@ namespace DBTableControl
 
             return true;
         }
+        #endregion
 
         #region PackedFile Events
 
         // When a packed file is renamed, update the cached table name.
         void CurrentPackedFile_RenameEvent(PackEntry dir, string newName)
         {
-            currentTable.TableName = newName;
+            _currentTable.TableName = newName;
         }
 
         #endregion
@@ -706,19 +677,19 @@ namespace DBTableControl
         private void AddRowButton_Clicked(object sender, RoutedEventArgs e)
         {
             // Add a new row with default values.
-            DataRow row = currentTable.NewRow();
+            DataRow row = _currentTable.NewRow();
             List<object> items = new List<object>();
             
-            for (int i = 0; i < editedFile.CurrentType.Fields.Count; i++)
+            for (int i = 0; i < EditedFile.CurrentType.Fields.Count; i++)
             {
                 items.Add(GetDefaultValue(i));
             }
 
             row.ItemArray = items.ToArray();
-            currentTable.Rows.Add(row);
-            CheckRowForErrors(currentTable.Rows.Count - 1);
+            _currentTable.Rows.Add(row);
+            CheckRowForErrors(_currentTable.Rows.Count - 1);
 
-            dataChanged = true;
+            DataChanged = true;
             SendDataChanged();
         }
 
@@ -729,7 +700,7 @@ namespace DBTableControl
             {
                 foreach (DataRowView rowview in dbDataGrid.SelectedItems.OfType<DataRowView>())
                 {
-                    DataRow row = currentTable.NewRow();
+                    DataRow row = _currentTable.NewRow();
                     List<object> items = new List<object>();
                     items.AddRange(rowview.Row.ItemArray);
 
@@ -744,19 +715,17 @@ namespace DBTableControl
                     }
 
                     row.ItemArray = items.ToArray();
-                    currentTable.Rows.Add(row);
-                    CheckRowForErrors(currentTable.Rows.Count - 1);
+                    _currentTable.Rows.Add(row);
+                    CheckRowForErrors(_currentTable.Rows.Count - 1);
                 }
             }
 
-            dataChanged = true;
+            DataChanged = true;
             SendDataChanged();
         }
 
         private void insertRowButton_Click(object sender, RoutedEventArgs e)
         {
-            DataRow newrow = CurrentTable.NewRow();
-
             if (dbDataGrid.SelectedItems.OfType<DataRowView>().Count() > 0)
             {
                 int datarowindex = -1;
@@ -768,14 +737,14 @@ namespace DBTableControl
                     if (visualrowindex == -1)
                     {
                         visualrowindex = dbDataGrid.Items.IndexOf(rowview);
-                        datarowindex = currentTable.Rows.IndexOf(rowview.Row);
+                        datarowindex = _currentTable.Rows.IndexOf(rowview.Row);
                         continue;
                     }
 
                     if (visualrowindex > dbDataGrid.Items.IndexOf(rowview))
                     {
                         visualrowindex = dbDataGrid.Items.IndexOf(rowview);
-                        datarowindex = currentTable.Rows.IndexOf(rowview.Row);
+                        datarowindex = _currentTable.Rows.IndexOf(rowview.Row);
                     }
                 }
 
@@ -792,247 +761,58 @@ namespace DBTableControl
 
         private void findButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.SendKeys.Send("^f");
+            _findReplaceHelper.ShowSearch();
         }
 
         private void replaceButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.SendKeys.Send("^h");
+            _findReplaceHelper.ShowReplace();
         }
 
         private void ExportAsButton_Clicked(object sender, RoutedEventArgs e)
         {
-            ExportContextMenu.PlacementTarget = (Button)sender;
             ExportContextMenu.IsOpen = true;
         }
 
         private void ImportFromButton_Clicked(object sender, RoutedEventArgs e)
         {
-            ImportContextMenu.PlacementTarget = (Button)sender;
             ImportContextMenu.IsOpen = true;
         }
 
         private void ExportTSVMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            string extractTo = null;
-            // TODO: Add support for ModManager
-            //extractTo = ModManager.Instance.CurrentModSet ? ModManager.Instance.CurrentModDirectory : null;
-            if (extractTo == null)
-            {
-                DirectoryDialog dialog = new DirectoryDialog
-                {
-                    Description = "Please point to folder to extract to",
-                    SelectedPath = String.IsNullOrEmpty(exportDirectory)
-                                    ? System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)
-                                    : exportDirectory
-                };
-                extractTo = dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? dialog.SelectedPath : null;
-                exportDirectory = dialog.SelectedPath;
-            }
-            if (!string.IsNullOrEmpty(extractTo))
-            {
-                List<PackedFile> files = new List<PackedFile>();
-                files.Add(CurrentPackedFile);
-                FileExtractor extractor = new FileExtractor(extractTo) { Preprocessor = new TsvExtractionPreprocessor() };
-                extractor.ExtractFiles(files);
-                MessageBox.Show(string.Format("File exported to TSV."));
-            }
+            ImportExportHelper.ExportTSVMenu(CurrentPackedFile, _exportDirectory);
         }
-
 
         private void ExportBinaryMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            string extractTo = null;
-            // TODO: Add support for ModManager
-            //extractTo = ModManager.Instance.CurrentModSet ? ModManager.Instance.CurrentModDirectory : null;
-            if (extractTo == null)
-            {
-                DirectoryDialog dialog = new DirectoryDialog
-                {
-                    Description = "Please point to folder to extract to",
-                    SelectedPath = String.IsNullOrEmpty(exportDirectory) 
-                                    ? System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName) 
-                                    : exportDirectory
-                };
-                extractTo = dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? dialog.SelectedPath : null;
-                exportDirectory = dialog.SelectedPath;
-            }
-            if (!string.IsNullOrEmpty(extractTo))
-            {
-                List<PackedFile> files = new List<PackedFile>();
-                files.Add(CurrentPackedFile);
-                FileExtractor extractor = new FileExtractor(extractTo);
-                extractor.ExtractFiles(files);
-                MessageBox.Show(string.Format("File exported as binary."));
-            }
+            ImportExportHelper.ExportBinary(CurrentPackedFile, _exportDirectory);
         }
 
         private void ExportCAXmlMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Write PackedFile EncodeasCAXml()
-            Refresh();
+            ImportExportHelper.ExportCAXml(CurrentPackedFile, _exportDirectory);
         }
 
         private void ImportTSVMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            string initialDirectory = exportDirectory;
-            System.Windows.Forms.OpenFileDialog openDBFileDialog = new System.Windows.Forms.OpenFileDialog
-            {
-                InitialDirectory = initialDirectory,
-                FileName = String.Format("{0}.tsv", EditedFile.CurrentType.Name)
-            };
-
-            DBFile loadedfile = null;
-            bool tryAgain = false;
-            if (openDBFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                importDirectory = System.IO.Path.GetDirectoryName(openDBFileDialog.FileName);
-                do
-                {
-                    try
-                    {
-                        try
-                        {
-                            using (var stream = new MemoryStream(File.ReadAllBytes(openDBFileDialog.FileName)))
-                            {
-                                loadedfile = new TextDbCodec().Decode(stream);
-                                // No need to import to editedFile directly, since it will be handled in the 
-                                // CurrentTable_TableNewRow event handler.
-                                //editedFile.Import(loadedfile);
-                                Import(loadedfile);
-                            }
-
-                        }
-                        catch (DBFileNotSupportedException exception)
-                        {
-                            showDBFileNotSupportedMessage(exception.Message);
-                        }
-
-                        currentPackedFile.Data = (codec.Encode(EditedFile));
-                    }
-                    catch (Exception ex)
-                    {
-                        tryAgain = (System.Windows.Forms.MessageBox.Show(string.Format("Import failed: {0}", ex.Message),
-                            "Import failed",
-                            System.Windows.Forms.MessageBoxButtons.RetryCancel)
-                            == System.Windows.Forms.DialogResult.Retry);
-                    }
-                } while (tryAgain);
-            }
+            ImportExportHelper.ImportTSV(this);
         }
 
         private void ImportCSVMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.OpenFileDialog openDBFileDialog = new System.Windows.Forms.OpenFileDialog
-            {
-                InitialDirectory = exportDirectory,
-                FileName = String.Format("{0}.csv", EditedFile.CurrentType.Name)
-            };
-
-            DBFile loadedfile = null;
-            bool tryAgain = false;
-            if (openDBFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                importDirectory = System.IO.Path.GetDirectoryName(openDBFileDialog.FileName);
-                do
-                {
-                    try
-                    {
-                        try
-                        {
-                            using (var stream = new MemoryStream(File.ReadAllBytes(openDBFileDialog.FileName)))
-                            {
-                                loadedfile = new TextDbCodec().Decode(stream);
-                                // No need to import to editedFile directly, since it will be handled in the 
-                                // CurrentTable_TableNewRow event handler.
-                                //editedFile.Import(loadedfile);
-                                Import(loadedfile);
-                            }
-
-                        }
-                        catch (DBFileNotSupportedException exception)
-                        {
-                            showDBFileNotSupportedMessage(exception.Message);
-                        }
-
-                        currentPackedFile.Data = (codec.Encode(EditedFile));
-                    }
-                    catch (Exception ex)
-                    {
-                        tryAgain = (System.Windows.Forms.MessageBox.Show(string.Format("Import failed: {0}", ex.Message),
-                            "Import failed",
-                            System.Windows.Forms.MessageBoxButtons.RetryCancel)
-                            == System.Windows.Forms.DialogResult.Retry);
-                    }
-                } while (tryAgain);
-            }
+            ImportExportHelper.ImportCSV(this);
         }
 
         private void ImportBinaryMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.OpenFileDialog openDBFileDialog = new System.Windows.Forms.OpenFileDialog
-            {
-                InitialDirectory = exportDirectory,
-                FileName = EditedFile.CurrentType.Name
-            };
-
-            DBFile loadedfile = null;
-            bool tryAgain = false;
-            if (openDBFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                importDirectory = System.IO.Path.GetDirectoryName(openDBFileDialog.FileName);
-                do
-                {
-                    try
-                    {
-                        try
-                        {
-                            using (var stream = new MemoryStream(File.ReadAllBytes(openDBFileDialog.FileName)))
-                            {
-                                loadedfile = codec.Decode(stream);
-                                // No need to import to editedFile directly, since it will be handled in the 
-                                // CurrentTable_TableNewRow event handler.
-                                //editedFile.Import(loadedfile);
-                                Import(loadedfile);
-                            }
-
-                        }
-                        catch (DBFileNotSupportedException exception)
-                        {
-                            showDBFileNotSupportedMessage(exception.Message);
-                        }
-
-                        currentPackedFile.Data = (codec.Encode(EditedFile));
-                    }
-                    catch (Exception ex)
-                    {
-                        tryAgain = (System.Windows.Forms.MessageBox.Show(string.Format("Import failed: {0}", ex.Message),
-                            "Import failed",
-                            System.Windows.Forms.MessageBoxButtons.RetryCancel)
-                            == System.Windows.Forms.DialogResult.Retry);
-                    }
-                } while (tryAgain);
-            }
+            ImportExportHelper.ImportBinary(this);
         }
 
         private void ImportCAXmlMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Implement
+            ImportExportHelper.ImportCAXml(this);
         }
-
-        private void checktableforerrorsButton_Click(object sender, RoutedEventArgs e)
-        {
-            errorList.Clear();
-            currentTable.ClearErrors();
-            CheckTableForErrors();
-
-            if (errorList.Count == 0)
-            {
-                // We didn't find any errors, inform the user.
-                MessageBox.Show("No errors found in the current table!");
-            }
-        }
-
         #endregion
 
         #region DataGrid Events
@@ -1046,8 +826,8 @@ namespace DBTableControl
             // causing the visual grid to only commit changes the editedFile and table state once the user navigates to another row.
             if (e.Row.Item is DataRowView)
             {
-                int colindex = currentTable.Columns.IndexOf((string)e.Column.Header);
-                int rowindex = currentTable.Rows.IndexOf((e.Row.Item as DataRowView).Row);
+                int colindex = _currentTable.Columns.IndexOf((string)e.Column.Header);
+                int rowindex = _currentTable.Rows.IndexOf((e.Row.Item as DataRowView).Row);
                 string proposedvalue = "";
 
                 if (cell.Content is TextBox)
@@ -1069,16 +849,16 @@ namespace DBTableControl
                 {
                     if (ValueIsValid(proposedvalue, colindex))
                     {
-                        currentTable.Rows[rowindex].BeginEdit();
-                        currentTable.Rows[rowindex][colindex] = proposedvalue;
-                        currentTable.Rows[rowindex].EndEdit();
+                        _currentTable.Rows[rowindex].BeginEdit();
+                        _currentTable.Rows[rowindex][colindex] = proposedvalue;
+                        _currentTable.Rows[rowindex].EndEdit();
                     }
                     else
                     {
                         // If the proposed value for this cell is invalid we should add an error here manually for the user since it will not
                         // always generate one if the DataGrid's data validation catches it.
                         AddError(rowindex, colindex, String.Format("'{0}' is not a valid value for '{1}'", proposedvalue,
-                                                                                                        currentTable.Columns[colindex].ColumnName));
+                                                                                                        _currentTable.Columns[colindex].ColumnName));
                     }
                 }
             }
@@ -1105,7 +885,7 @@ namespace DBTableControl
             if (!findButton.IsEnabled)
             {
                 findButton.IsEnabled = true;
-                replaceButton.IsEnabled = !readOnly;
+                replaceButton.IsEnabled = !_readOnly;
             }
         }
 
@@ -1122,7 +902,7 @@ namespace DBTableControl
         private void dbDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Enable/Disable Clone Row button based on current selection.
-            if (!readOnly)
+            if (!_readOnly)
             {
                 cloneRowButton.IsEnabled = dbDataGrid.SelectedItems.Count > 0;
                 insertRowButton.IsEnabled = dbDataGrid.SelectedItems.Count > 0;
@@ -1143,59 +923,34 @@ namespace DBTableControl
                 e.Row.Header = datarowindex + 1;
 
                 // Additional error checking on the visibleRows internal list.
-                if (datarowindex >= visibleRows.Count)
+                if (datarowindex >= _visibleRows.Count)
                 {
                     UpdateVisibleRows();
                 }
-                e.Row.Visibility = visibleRows[datarowindex];
+                e.Row.Visibility = _visibleRows[datarowindex];
             }// The user just tried to modify the blank row, adding a new detached row to our collection, act accordingly.
             else if ((e.Row.Item as DataRowView).Row.RowState == DataRowState.Detached)
             {
-                int datarowindex = currentTable.Rows.Count;
+                int datarowindex = _currentTable.Rows.Count;
                 e.Row.Header = datarowindex + 1;
 
                 // Additional error checking on the visibleRows internal list.
-                if (datarowindex >= visibleRows.Count)
+                if (datarowindex >= _visibleRows.Count)
                 {
                     UpdateVisibleRows();
                 }
-                e.Row.Visibility = visibleRows[datarowindex];
+                e.Row.Visibility = _visibleRows[datarowindex];
             }
         }
 
         private void dbDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            // Look for Ctrl-F, for Find shortcut.
-            if (e.Key == Key.F && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
-            {
-                if (dbDataGrid.SelectedCells.Count == 1 && dbDataGrid.SelectedCells.First().Item is DataRowView)
-                {
-                    findReplaceWindow.UpdateFindText(currentTable.Rows[dbDataGrid.Items.IndexOf(dbDataGrid.SelectedCells.First().Item)]
-                                                                      [(string)dbDataGrid.SelectedCells.First().Column.Header].ToString());
-                }
-
-                findReplaceWindow.CurrentMode = FindAndReplaceWindow.FindReplaceMode.FindMode;
-                findReplaceWindow.ReadOnly = readOnly;
-                findReplaceWindow.Show();
-            }
-
-            // Look for Ctrl-H, for Replace shortcut.
-            if (e.Key == Key.H && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) && !readOnly)
-            {
-                findReplaceWindow.CurrentMode = FindAndReplaceWindow.FindReplaceMode.ReplaceMode;
-                findReplaceWindow.Show();
-            }
-
-            // Look for F3, shortcut for Find Next.
-            if (e.Key == Key.F3)
-            {
-                FindNext(findReplaceWindow.FindValue);
-            }
+            _findReplaceHelper.dbDataGrid_PreviewKeyDown(sender, e);
 
             // Look for Insert key press, and check if a row is selected.
-            if (!readOnly && e.Key == Key.Insert && dbDataGrid.SelectedItems.Count > 0)
+            if (!_readOnly && e.Key == Key.Insert && dbDataGrid.SelectedItems.Count > 0)
             {
-                DataRow newrow = currentTable.NewRow();
+                DataRow newrow = _currentTable.NewRow();
 
                 if (dbDataGrid.SelectedItems.OfType<DataRowView>().Count() > 0)
                 {
@@ -1208,14 +963,14 @@ namespace DBTableControl
                         if (visualrowindex == -1)
                         {
                             visualrowindex = dbDataGrid.Items.IndexOf(rowview);
-                            datarowindex = currentTable.Rows.IndexOf(rowview.Row);
+                            datarowindex = _currentTable.Rows.IndexOf(rowview.Row);
                             continue;
                         }
 
                         if (visualrowindex > dbDataGrid.Items.IndexOf(rowview))
                         {
                             visualrowindex = dbDataGrid.Items.IndexOf(rowview);
-                            datarowindex = currentTable.Rows.IndexOf(rowview.Row);
+                            datarowindex = _currentTable.Rows.IndexOf(rowview.Row);
                         }
                     }
 
@@ -1239,10 +994,10 @@ namespace DBTableControl
             }
 
             // F6 and F7 will be the shortcut to check for errors.
-            if (!readOnly && (e.Key == Key.F6 || e.Key == Key.F7))
+            if (!_readOnly && (e.Key == Key.F6 || e.Key == Key.F7))
             {
-                errorList.Clear();
-                currentTable.ClearErrors();
+                _errorList.Clear();
+                _currentTable.ClearErrors();
                 CheckTableForErrors();
             }
         }
@@ -1252,13 +1007,13 @@ namespace DBTableControl
             if (e.Item is DataRowView)
             {
                 // Clear copy data if row is collapsed from filtering.
-                int datarowindex = currentTable.Rows.IndexOf((e.Item as DataRowView).Row);
-                if (datarowindex >= visibleRows.Count)
+                int datarowindex = _currentTable.Rows.IndexOf((e.Item as DataRowView).Row);
+                if (datarowindex >= _visibleRows.Count)
                 {
                     UpdateVisibleRows();
                 }
 
-                if (visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
+                if (_visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
                 {
                     e.ClipboardRowContent.Clear();
                 }
@@ -1267,39 +1022,6 @@ namespace DBTableControl
 
         private void dbDataGrid_Sorting(object sender, DataGridSortingEventArgs e)
         {
-            /*
-            DataGridColumn column = e.Column;
-
-            // Prevent the built-in sort from sorting
-            e.Handled = true;
-
-            // Determine the direction of the sort.
-            ListSortDirection direction = (column.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
-
-            // Set the sort order on the column
-            column.SortDirection = direction;
-
-            // Determine what kind of column this is.
-            ColumnType coltype;
-            int colindex = dbDataGrid.Columns.IndexOf(column);
-            TypeCode coltypecode = editedFile.CurrentType.Fields[colindex].TypeCode;
-            if (coltypecode == TypeCode.Boolean || coltypecode == TypeCode.String)
-            {
-                coltype = ColumnType.Text;
-            }
-            else
-            {
-                coltype = ColumnType.Number;
-            }
-
-            // Use a ListCollectionView to do the sort.
-            BindingListCollectionView view = (BindingListCollectionView)CollectionViewSource.GetDefaultView(dbDataGrid.ItemsSource);
-            var test = CollectionViewSource.GetDefaultView(dbDataGrid.ItemsSource);
-
-            // Instantiate custom comparer and assign as sort algorithm.
-            ColumnComparer customcomparer = new ColumnComparer(direction, coltype);
-            //view.CustomSort = customcomparer;
-            */
         }
 
         private void dbDataGridColumnFilterComboBox_DropDownOpened(object sender, EventArgs e)
@@ -1312,7 +1034,7 @@ namespace DBTableControl
             filtervalues.Add("");
 
             // If we are dealing with an optional column, add the options to filter by cells that either have any, or no value.
-            if (editedFile.CurrentType.Fields[currentTable.Columns.IndexOf(colname)].TypeName.Contains("optstring"))
+            if (EditedFile.CurrentType.Fields[_currentTable.Columns.IndexOf(colname)].TypeName.Contains("optstring"))
             {
                 filtervalues.Add("Any Value");
                 filtervalues.Add("No Value");
@@ -1327,7 +1049,7 @@ namespace DBTableControl
             else
             {
                 // We have a regular column, get the existing values for the list.
-                List<object> possiblevalues = currentTable.Columns[colname].GetItemArray(false).Distinct().ToList();
+                List<object> possiblevalues = _currentTable.Columns[colname].GetItemArray(false).Distinct().ToList();
                 filtervalues.AddRange(possiblevalues.Select(n => n.ToString()));
             }
 
@@ -1342,9 +1064,9 @@ namespace DBTableControl
             string filtervalue = (string)autofilter.SelectedValue;
 
             // Remove any previously set autofilters.
-            if (autofilterList.Count(n => n.ApplyToColumn.Equals(colname)) > 0)
+            if (_autofilterList.Count(n => n.ApplyToColumn.Equals(colname)) > 0)
             {
-                autofilterList.RemoveAll(n => n.ApplyToColumn.Equals(colname));
+                _autofilterList.RemoveAll(n => n.ApplyToColumn.Equals(colname));
             }
 
             // If the user selects the blank item, simply remove the existing filter.
@@ -1371,7 +1093,7 @@ namespace DBTableControl
                     
                 }
 
-                autofilterList.Add(newfilter);
+                _autofilterList.Add(newfilter);
             }
 
             UpdateVisibleRows();
@@ -1380,185 +1102,7 @@ namespace DBTableControl
 
         #endregion
 
-        #region Find and Replace
-
-        private void findWindow_FindNext(object sender, EventArgs e)
-        {
-            FindNext(findReplaceWindow.FindValue);
-        }
-
-        private void findReplaceWindow_FindAll(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void replaceWindow_Replace(object sender, EventArgs e)
-        {
-            // If nothing is selected, then find something to replace first.
-            if (dbDataGrid.SelectedCells.Count == 0)
-            {
-                // If we fail to find a match, return.
-                if (!FindNext(findReplaceWindow.FindValue))
-                {
-                    return;
-                }
-            }
-
-            // If nothing is STILL selected, then we found nothing to replace.
-            // Or, if more than 1 cell is selected, we have a problem.
-            if (dbDataGrid.SelectedCells.Count == 0 || dbDataGrid.SelectedCells.Count > 1)
-            {
-                return;
-            }
-
-            int rowindex = dbDataGrid.Items.IndexOf(dbDataGrid.SelectedCells.First().Item);
-            int colindex = dbDataGrid.Columns.IndexOf(dbDataGrid.SelectedCells.First().Column);
-
-            while (findReplaceWindow.ReplaceValue.Equals(currentTable.Rows[rowindex][colindex].ToString()))
-            {
-                // If what is selected has already been replaced, move on to the next match, returning if we fail.
-                if (!FindNext(findReplaceWindow.FindValue))
-                {
-                    return;
-                }
-
-                // Update current coordinates.
-                rowindex = dbDataGrid.Items.IndexOf(dbDataGrid.SelectedCells.First().Item);
-                colindex = dbDataGrid.Columns.IndexOf(dbDataGrid.SelectedCells.First().Column);
-            }
-            
-            if (findReplaceWindow.FindValue.Equals(currentTable.Rows[rowindex][colindex].ToString()))
-            {
-                // Test for a combobox comlumn.
-                if (dbDataGrid.Columns[colindex] is DataGridComboBoxColumn)
-                {
-                    if (ComboBoxColumnContainsValue((DataGridComboBoxColumn)dbDataGrid.Columns[colindex], findReplaceWindow.ReplaceValue))
-                    {
-                        // The value in the Replace field is not valid for this column, alert user and return.
-                        MessageBox.Show(String.Format("The value '{0}', is not a valid value for Column '{1}'", 
-                                                      findReplaceWindow.ReplaceValue, 
-                                                      (string)dbDataGrid.Columns[colindex].Header));
-
-                        return;
-                    }
-                }
-
-                // Assign the value, and update the UI
-                currentTable.Rows[rowindex][colindex] = findReplaceWindow.ReplaceValue;
-                RefreshCell(rowindex, colindex);
-            }
-        }
-
-        private void replaceWindow_ReplaceAll(object sender, EventArgs e)
-        {
-            // Clear selection, so that FindNext() starts at the beginning of the table.
-            dbDataGrid.SelectedCells.Clear();
-
-            int rowindex;
-            int colindex;
-
-            while (FindNext(findReplaceWindow.FindValue))
-            {
-                // Update current coordinates.
-                rowindex = dbDataGrid.Items.IndexOf(dbDataGrid.SelectedCells.First().Item);
-                colindex = dbDataGrid.Columns.IndexOf(dbDataGrid.SelectedCells.First().Column);
-
-                if (dbDataGrid.Columns[colindex] is DataGridComboBoxColumn)
-                {
-                    if (ComboBoxColumnContainsValue((DataGridComboBoxColumn)dbDataGrid.Columns[colindex], findReplaceWindow.ReplaceValue))
-                    {
-                        // The value in the Replace field is not valid for this column, alert user and continue.
-                        MessageBox.Show(String.Format("The value '{0}', is not a valid value for Column '{1}'",
-                                                      findReplaceWindow.ReplaceValue,
-                                                      (string)dbDataGrid.Columns[colindex].Header));
-                        continue;
-                    }
-                }
-
-                // Assign the value, and update the UI
-                currentTable.Rows[rowindex][colindex] = findReplaceWindow.ReplaceValue;
-                RefreshCell(rowindex, colindex);
-            }
-        }
-
-        private bool FindNext(string findthis)
-        {
-            if (String.IsNullOrEmpty(findthis))
-            {
-                MessageBox.Show("Nothing entered in Find bar!");
-                return false;
-            }
-
-            // Set starting point at table upper left.
-            int rowstartindex = 0;
-            int colstartindex = 0;
-
-            // If the user has a single cell selected, assume this as starting point.
-            if (dbDataGrid.SelectedCells.Count == 1)
-            {
-                rowstartindex = currentTable.Rows.IndexOf((dbDataGrid.SelectedCells.First().Item as DataRowView).Row);
-                colstartindex = currentTable.Columns.IndexOf((string)dbDataGrid.SelectedCells.First().Column.Header);
-            }
-
-            bool foundmatch = false;
-            bool atstart = true;
-            for (int i = rowstartindex; i < dbDataGrid.Items.Count; i++)
-            {
-                // Additional error checking on the visibleRows internal list.
-                if (i >= visibleRows.Count)
-                {
-                    UpdateVisibleRows();
-                }
-
-                // Ignore the blank row, and any collapsed (filtered) rows.
-                if (!(dbDataGrid.Items[i] is DataRowView) || visibleRows[i] == System.Windows.Visibility.Collapsed)
-                {
-                    continue;
-                }
-
-                for (int j = 0; j < dbDataGrid.Columns.Count; j++)
-                {
-                    if (atstart)
-                    {
-                        j = colstartindex;
-                        atstart = false;
-                    }
-
-                    // Skip current cell.
-                    if (i == rowstartindex && j == colstartindex)
-                    {
-                        continue;
-                    }
-
-                    foundmatch = DBUtil.isMatch(currentTable.Rows[i][j].ToString(), findthis);
-
-                    if (foundmatch)
-                    {
-                        // Clears current selection for new selection.
-                        dbDataGrid.SelectedCells.Clear();
-                        SelectCell(i, j, true);
-                        break;
-                    }
-                }
-
-                if (foundmatch)
-                {
-                    break;
-                }
-            }
-
-            if (!foundmatch)
-            {
-                MessageBox.Show("No More Matches Found.");
-            }
-
-            return foundmatch;
-        }
-
-        #endregion
-
         #region Paste Code
-
         protected virtual void OnExecutedPaste(object sender, ExecutedRoutedEventArgs args)
         {
             ClipboardHelper.OnExecutedPaste(this);
@@ -1575,584 +1119,92 @@ namespace DBTableControl
 
         private void ColumnHeaderContextMenu_Opened(object sender, RoutedEventArgs e)
         {
-            DataGridColumn col = ((sender as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-            string colname = (string)col.Header;
-            ContextMenu currentmenu = (ContextMenu)sender;
-
-            Type columntype = GetTypeFromCode(editedFile.CurrentType.Fields[currentTable.Columns.IndexOf(colname)].TypeCode);
-            foreach (MenuItem item in currentmenu.Items.OfType<MenuItem>())
-            {
-                // Enable/Disable Remove Sorting item based on if the column is actually sorted or not.
-                if(item.Header.Equals("Remove Sorting"))
-                {
-                    item.IsEnabled = col.SortDirection != null;
-                }
-
-                // Enable/Disable Apply expression and renumber based on column type.
-                if (item.Header.Equals("Apply Expression") || item.Header.Equals("Renumber Cells"))
-                {
-                    if (!col.IsReadOnly && (columntype.Name.Equals("Single") || columntype.Name.Equals("Int32") || columntype.Name.Equals("Int16")))
-                    {
-                        item.IsEnabled = true;
-                    }
-                    else
-                    {
-                        item.IsEnabled = false;
-                    }
-                }
-
-                // Enable.Disable Mass edit, limiting it to string columns only.
-                if (item.Header.Equals("Mass Edit"))
-                {
-                    if (!readOnly && editedFile.CurrentType.Fields[currentTable.Columns.IndexOf(colname)].TypeCode == TypeCode.String)
-                    {
-                        item.IsEnabled = true;
-                    }
-                    else
-                    {
-                        item.IsEnabled = false;
-                    }
-                }
-            }
+            ContextMenuHelper.Open(sender, this);
         }
 
         private void SelectColumnMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-
-            int columnindex = dbDataGrid.Columns.IndexOf(col);
-            for (int i = 0; i < dbDataGrid.Items.Count; i++)
-            {
-                // Test if the cell is already contained in SelectedCells
-                DataGridCellInfo cellinfo = new DataGridCellInfo(dbDataGrid.Items[i], col);
-                if (!dbDataGrid.SelectedCells.Contains(cellinfo))
-                {
-                    dbDataGrid.SelectedCells.Add(cellinfo);
-                }
-            }
+            ContextMenuHelper.SelectColumn(sender, this);
         }
 
         private void RemoveSortingMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-            col.SortDirection = null;
-            Refresh();
+            ContextMenuHelper.RemoveSorting(sender, this);
         }
 
         private void ColumnApplyExpressionMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-            string colname = (string)col.Header;
-
-            ApplyExpressionWindow getexpwindow = new ApplyExpressionWindow();
-            getexpwindow.ShowDialog();
-
-            if (getexpwindow.DialogResult != null && (bool)getexpwindow.DialogResult)
-            {
-                for (int i = 0; i < currentTable.Rows.Count; i++)
-                {
-                    // Skip any filtered rows, or any rows with an error in the column we are computing.
-                    UpdateVisibleRows();
-                    if (visibleRows[i] == System.Windows.Visibility.Collapsed ||
-                        errorList.Count(n => n.RowIndex == i && n.ColumnName.Equals(colname)) > 0)
-                    {
-                        continue;
-                    }
-
-                    // Grab the given expression, modifying it for each cell.
-                    string expression = getexpwindow.EnteredExpression.Replace("x", string.Format("{0}", currentTable.Rows[i][colname]));
-                    object newvalue = currentTable.Compute(expression, "");
-                    int colindex = currentTable.Columns.IndexOf(colname);
-
-                    // For integer based columns, do a round first if necessary.
-                    if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32 || 
-                        editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
-                    {
-                        int newintvalue;
-                        if(!Int32.TryParse(newvalue.ToString(), out newintvalue))
-                        {
-                            double tempvalue = Double.Parse(newvalue.ToString());
-                            tempvalue = Math.Round(tempvalue, 0);
-                            newintvalue = (int)tempvalue;
-                        }
-
-                        newvalue = newintvalue;
-                    }
-                    currentTable.Rows[i][colname] = newvalue;
-                }
-            }
-
-            RefreshColumn(dbDataGrid.Columns.IndexOf(col));
+            ContextMenuHelper.ColumnApplyExpression(sender, this);
         }
 
         private void ColumnMassEditMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-            string colname = (string)col.Header;
-
-            InputBox stringeditbox = new InputBox();
-            stringeditbox.Input = "{cell}";
-            stringeditbox.ShowDialog();
-
-            if (stringeditbox.DialogResult == System.Windows.Forms.DialogResult.OK)
-            {
-                int datacolindex = currentTable.Columns.IndexOf(colname);
-                for (int i = 0; i < currentTable.Rows.Count; i++)
-                {
-                    // Make sure our visible rows are up to date and skip any currently filtered rows.
-                    if (visibleRows.Count <= currentTable.Rows.Count)
-                    {
-                        UpdateVisibleRows();
-                    }
-                    if (visibleRows[i] == System.Windows.Visibility.Collapsed)
-                    {
-                        continue;
-                    }
-
-                    currentTable.Rows[i][datacolindex] = stringeditbox.Input.Replace("{cell}", currentTable.Rows[i][datacolindex].ToString());
-
-                    // Refresh the cell in the UI, using its visual coordinates.
-                    RefreshCell(dbDataGrid.Items.IndexOf(currentTable.DefaultView[i]), dbDataGrid.Columns.IndexOf(col));
-                }
-            }
+            ContextMenuHelper.ColumnMassEdit(sender, this);
         }
 
         private void RenumberMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // Get the column index this context menu was called from.
-            DataGridColumn col = (((sender as MenuItem).Parent as ContextMenu).PlacementTarget as DataGridColumnHeader).Column;
-            string colname = (string)col.Header;
-            List<int> visualroworder = new List<int>();
-
-            InputBox renumberInputBox = new InputBox { Text = "Re-Number from", Input = "1" };
-            if (renumberInputBox.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                try
-                {
-                    int parsedNumber = int.Parse(renumberInputBox.Input);
-                    for (int i = 0; i < dbDataGrid.Items.Count; i++)
-                    {
-                        // Skip any non DataRowView, which should only be the blank row at the bottom.
-                        if (!(dbDataGrid.Items[i] is DataRowView))
-                        {
-                            continue;
-                        }
-                        // Store the data row index associated with the current visual row to account for column sorting.
-                        visualroworder.Add(currentTable.Rows.IndexOf((dbDataGrid.Items[i] as DataRowView).Row));
-                    }
-
-                    // Now that we have a set order, we can assign values.
-                    for (int i = 0; i < visualroworder.Count; i++)
-                    {
-                        currentTable.Rows[visualroworder[i]][colname] = parsedNumber + i;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(string.Format("Could not apply values: {0}", ex.Message), "You fail!");
-                }
-            }
-
-            RefreshColumn(dbDataGrid.Columns.IndexOf(col));
+            ContextMenuHelper.RenumberMenuItem(sender, this);
         }
-
 
         private void EditVisibleListMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var hiddencolumnslisteditor = ColumnVisiblityHelper.Show(this);
-            System.Windows.Forms.DialogResult result = hiddencolumnslisteditor.ShowDialog();
-
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                hiddenColumns.Clear();
-                hiddenColumns = hiddencolumnslisteditor.RightList;
-
-                foreach (DataColumn column in CurrentTable.Columns)
-                {
-                    if (hiddencolumnslisteditor.LeftList.Contains(column.ColumnName))
-                    {
-                        column.ExtendedProperties["Hidden"] = false;
-                        dbDataGrid.Columns[column.Ordinal].Visibility = System.Windows.Visibility.Visible;
-                    }
-                    else
-                    {
-                        column.ExtendedProperties["Hidden"] = true;
-
-                        if (showAllColumns)
-                        {
-                            dbDataGrid.Columns[column.Ordinal].Visibility = System.Windows.Visibility.Visible;
-                        }
-                        else
-                        {
-                            dbDataGrid.Columns[column.Ordinal].Visibility = System.Windows.Visibility.Hidden;
-                        }
-                    }
-                }
-
-                UpdateConfig();
-
-                if (showAllColumns)
-                {
-                    Refresh();
-                }
-            }
+            ContextMenuHelper.EditVisibleListMenuItem(sender, this);
         }
 
         private void ClearTableHiddenMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            foreach (DataGridColumn column in dbDataGrid.Columns)
-            {
-                DataColumn datacolumn = currentTable.Columns[(string)column.Header];
-
-                if (!datacolumn.ExtendedProperties.ContainsKey("Hidden"))
-                {
-                    datacolumn.ExtendedProperties.Add("Hidden", false);
-                }
-                datacolumn.ExtendedProperties["Hidden"] = false;
-
-                column.Visibility = Visibility.Visible;
-            }
-
-            // Clear the internal hidden columns list.
-            hiddenColumns.Clear();
-            UpdateConfig();
-
-            if (showAllColumns)
-            {
-                Refresh();
-            }
+            ContextMenuHelper.ClearTableHiddenMenuItem(this);
         }
 
         private void ClearAllHiddenMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //Prompt for confirmation.
-            string text = "Are you sure you want to clear all saved hidden column information?";
-            string caption = "Clear Confirmation";
-            MessageBoxButton button = MessageBoxButton.YesNo;
-            MessageBoxImage image = MessageBoxImage.Question;
-
-            MessageBoxResult result = MessageBox.Show(text, caption, button, image);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                // Clear internal list.
-                hiddenColumns.Clear();
-
-                // Clear saved list.
-                savedconfig.HiddenColumns.Clear();
-            }
-            UpdateConfig();
-
-            if (showAllColumns)
-            {
-                Refresh();
-            }
+            ContextMenuHelper.ClearAllHiddenMenuItem(this);
         }
 
         private void RowHeaderContextMenu_Opened(object sender, RoutedEventArgs e)
         {
-            if (sender is ContextMenu)
-            {
-                bool insertrowsavailable = true;
-                if ((sender as ContextMenu).DataContext is DataRowView)
-                {
-                    insertrowsavailable = true;
-                }
-
-                foreach (MenuItem item in (sender as ContextMenu).Items)
-                {
-                    string itemheader = item.Header.ToString();
-                    if (itemheader.Equals("Insert Row") || itemheader.Equals("Insert Multiple Rows"))
-                    {
-                        item.IsEnabled = insertrowsavailable;
-                    }
-                }
-            }
+            ContextMenuHelper.RowHeaderContextMenu(sender);
         }
 
         private void RowHeaderInsertRow_Click(object sender, RoutedEventArgs e)
         {
-            if (!readOnly && sender is MenuItem)
-            {
-                // Double check that whant triggered the event is what we expect.
-                if ((sender as MenuItem).DataContext is DataRowView)
-                {
-                    // Determine visual and data index of calling row.
-                    int datarowindex = dbDataGrid.Items.IndexOf(((sender as MenuItem).DataContext as DataRowView));
-                    InsertRow(datarowindex);
-                }
-                else
-                {
-                    // We'll end up here if the user is attempting to insert a row in front of the blank row, so we will simply add a new row
-                    // at the end of the table, still we'll use a try block in case something unforseen happens.
-                    try
-                    {
-                        InsertRow();
-                    }
-                    catch (Exception ex)
-                    {
-#if DEBUG
-                        ErrorDialog.ShowDialog(ex);
-#endif
-                    }
-                }
-            }
+            ContextMenuHelper.RowHeaderInsertRow(sender, this);
         }
 
         private void RowHeaderInsertManyRows_Click(object sender, RoutedEventArgs e)
         {
-            if (!readOnly && sender is MenuItem)
-            {
-                // Request how many rows should be inserted from the user.
-                InputBox insertrowsInputBox = new InputBox();
-                insertrowsInputBox.ShowDialog();
-
-                // Double check that whant triggered the event is what we expect.
-                if (insertrowsInputBox.DialogResult == System.Windows.Forms.DialogResult.OK)
-                {
-                    // Determine how many rows the user wants to add.
-                    int numrows = 0;
-                    try
-                    {
-                        numrows = int.Parse(insertrowsInputBox.Input);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is FormatException)
-                        {
-                            MessageBox.Show(String.Format("Input: {0}, is not a valid number of rows, please enter a whole number.", insertrowsInputBox.Input));
-                        }
-                        else
-                        {
-#if DEBUG
-                            ErrorDialog.ShowDialog(ex);
-#endif
-                        }
-                    }
-
-                    for (int i = 0; i < numrows; i++)
-                    {
-                        DataRow newrow = currentTable.NewRow();
-                        if ((sender as MenuItem).DataContext is DataRowView)
-                        {
-                            InsertRow(i);
-                        }
-                        else
-                        {
-                            try
-                            {
-                                // If the blank row is calling us, add to the end of the table.
-                                InsertRow();
-                            }
-                            catch (Exception ex)
-                            {
-#if DEBUG
-                                ErrorDialog.ShowDialog(ex);
-#endif
-                            }
-                        }
-                    }
-
-                    UpdateVisibleRows();
-                    dbDataGrid.Items.Refresh();
-                }
-            }
+            ContextMenuHelper.RowHeaderInsertManyRows(sender, this);
         }
 
         void DataGridContextMenu_Opened(object sender, RoutedEventArgs e)
         {
-            bool cellsselected = false;
-
-            if (dbDataGrid.SelectedCells.Count > 0)
-            {
-                cellsselected = true;
-            }
-
-            ContextMenu menu = (ContextMenu)sender;
-
-            foreach (MenuItem item in menu.Items.OfType<MenuItem>())
-            {
-                if (item.Header.Equals("Copy"))
-                {
-                    item.IsEnabled = cellsselected;
-                }
-                else if (item.Header.Equals("Paste"))
-                {
-                    if (readOnly)
-                    {
-                        item.IsEnabled = false;
-                    }
-                    else
-                    {
-                        item.IsEnabled = cellsselected;
-                    }
-                }
-                else if (item.Header.Equals("Apply Expression to Selected Cells"))
-                {
-                    item.IsEnabled = cellsselected;
-                    if (cellsselected)
-                    {
-                        Type columntype;
-                        foreach (DataGridCellInfo cellinfo in dbDataGrid.SelectedCells)
-                        {
-                            columntype = GetTypeFromCode(editedFile.CurrentType.Fields[currentTable.Columns.IndexOf((string)cellinfo.Column.Header)].TypeCode);
-                            if (readOnly || !(columntype.Name.Equals("Single") || columntype.Name.Equals("Int32") || columntype.Name.Equals("Int16")))
-                            {
-                                item.IsEnabled = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else if (item.Header.Equals("Mass Edit String Cells"))
-                {
-                    item.IsEnabled = cellsselected;
-                    if (cellsselected)
-                    {
-                        foreach (int colindex in dbDataGrid.SelectedCells.Select(n => currentTable.Columns[(string)n.Column.Header].Ordinal).Distinct())
-                        {
-                            if (editedFile.CurrentType.Fields[colindex].TypeCode != TypeCode.String)
-                            {
-                                item.IsEnabled = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else if (item.Header.Equals("Revert Cell to Original Value"))
-                {
-                    if (readOnly)
-                    {
-                        item.IsEnabled = false;
-                    }
-                    else
-                    {
-                        item.IsEnabled = cellsselected;
-                    }
-                }
-            }
+            ContextMenuHelper.DataGridContextMenu(sender, this);
         }
 
         private void DataGridCopyMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // Programmatically send a copy shortcut key event.
-            System.Windows.Forms.SendKeys.Send("^c");
+            ContextMenuHelper.DataGridCopyMenuItem();
         }
 
         private void DataGridPasteMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // Programmatically send a paste shortcut key event.
-            System.Windows.Forms.SendKeys.Send("^v");
+            ContextMenuHelper.DataGridPasteMenuItem();
         }
 
         private void DataGridApplyExpressionMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            ApplyExpressionWindow getexpwindow = new ApplyExpressionWindow();
-            getexpwindow.ShowDialog();
-
-            if (getexpwindow.DialogResult != null && (bool)getexpwindow.DialogResult)
-            {
-                foreach (DataGridCellInfo cellinfo in dbDataGrid.SelectedCells)
-                {
-                    // Determine current cells indecies, row and column
-                    int columnindex = currentTable.Columns.IndexOf((string)cellinfo.Column.Header);
-                    int rowindex = currentTable.Rows.IndexOf((cellinfo.Item as DataRowView).Row);
-
-                    // Skip any filtered rows, or any rows with an error in the column we are computing.
-                    UpdateVisibleRows();
-                    if (visibleRows[rowindex] == System.Windows.Visibility.Collapsed ||
-                        errorList.Count(n => n.RowIndex == rowindex && n.ColumnName.Equals((string)cellinfo.Column.Header)) > 0)
-                    {
-                        continue;
-                    }
-
-                    // Get the expression, replacing x for the current cell's value.
-                    string expression = getexpwindow.EnteredExpression.Replace("x", string.Format("{0}", currentTable.Rows[rowindex][columnindex]));
-
-                    // Compute spits out the new value after the current value is applied to the expression given.
-                    object newvalue = currentTable.Compute(expression, "");
-
-                    // For integer based columns, do a round first if necessary.
-                    if (editedFile.CurrentType.Fields[columnindex].TypeCode == TypeCode.Int32 ||
-                        editedFile.CurrentType.Fields[columnindex].TypeCode == TypeCode.Int16)
-                    {
-                        int newintvalue;
-                        if (!Int32.TryParse(newvalue.ToString(), out newintvalue))
-                        {
-                            double tempvalue = Double.Parse(newvalue.ToString());
-                            tempvalue = Math.Round(tempvalue, 0);
-                            newintvalue = (int)tempvalue;
-                        }
-
-                        newvalue = newintvalue;
-                    }
-                    currentTable.Rows[rowindex][columnindex] = newvalue;
-
-                    // Refresh the cell in the UI, using its visual coordinates.
-                    RefreshCell(dbDataGrid.Items.IndexOf(cellinfo.Item), dbDataGrid.Columns.IndexOf(cellinfo.Column));
-                }
-            }
+            ContextMenuHelper.DataGridApplyExpressionMenuItem(sender, this);
         }
 
         private void DataGridMassEditStringsMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            InputBox stringeditbox = new InputBox();
-            stringeditbox.Input = "{cell}";
-            stringeditbox.ShowDialog();
-
-            if (stringeditbox.DialogResult == System.Windows.Forms.DialogResult.OK)
-            {
-                int datarowindex = -1;
-                int datacolindex = -1;
-                foreach (DataGridCellInfo cellinfo in dbDataGrid.SelectedCells.Where(n => n.Item is DataRowView))
-                {
-                    datarowindex = currentTable.Rows.IndexOf((cellinfo.Item as DataRowView).Row);
-                    datacolindex = currentTable.Columns.IndexOf((string)cellinfo.Column.Header);
-
-                    // Make sure our visible rows are up to date and skip any currently filtered rows.
-                    if (visibleRows.Count <= currentTable.Rows.Count)
-                    {
-                        UpdateVisibleRows();
-                    }
-                    if (visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
-                    {
-                        continue;
-                    }
-
-                    currentTable.Rows[datarowindex][datacolindex] = stringeditbox.Input.Replace("{cell}", currentTable.Rows[datarowindex][datacolindex].ToString());
-
-                    // Refresh the cell in the UI, using its visual coordinates.
-                    RefreshCell(dbDataGrid.Items.IndexOf(cellinfo.Item), dbDataGrid.Columns.IndexOf(cellinfo.Column));
-                }
-            }
+            ContextMenuHelper.DataGridMassEditStringsMenuItem(sender, this);
         }
 
         private void DataGridRevertCellMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            foreach (DataGridCellInfo cellinfo in dbDataGrid.SelectedCells.Where(n => n.Item is DataRowView))
-            {
-                // Ignore added or detached cells since they have no original values and will instead throw an error.
-                if ((cellinfo.Item as DataRowView).Row.RowState == DataRowState.Detached ||
-                    (cellinfo.Item as DataRowView).Row.RowState == DataRowState.Added)
-                {
-                    continue;
-                }
-
-                int datarowindex = currentTable.Rows.IndexOf((cellinfo.Item as DataRowView).Row);
-                int datacolindex = currentTable.Columns.IndexOf((string)cellinfo.Column.Header);
-
-                // Make sure our visible rows are up to date and skip any currently filtered rows.
-                if (visibleRows.Count <= currentTable.Rows.Count)
-                {
-                    UpdateVisibleRows();
-                }
-                if (visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
-                {
-                    continue;
-                }
-
-                currentTable.Rows[datarowindex][datacolindex] =  currentTable.Rows[datarowindex][datacolindex, DataRowVersion.Original];
-            }
+            ContextMenuHelper.DataGridRevertCellMenuItem(sender, this);
         }
 
         #endregion
@@ -2165,43 +1217,43 @@ namespace DBTableControl
             List<FieldInstance> dbfileconstructionRow = new List<FieldInstance>();
             for (int i = 0; i < e.Row.ItemArray.Length; i++)
             {
-                dbfileconstructionRow.Add(editedFile.CurrentType.Fields[i].CreateInstance());
+                dbfileconstructionRow.Add(EditedFile.CurrentType.Fields[i].CreateInstance());
             }
 
             // Modify the new row to have default data initially.
             List<object> vals = new List<object>();
-            for (int i = 0; i < editedFile.CurrentType.Fields.Count; i++)
+            for (int i = 0; i < EditedFile.CurrentType.Fields.Count; i++)
             {
                 vals.Add(GetDefaultValue(i));
             }
 
             // Since we have no idea where a new row should go yet, append it and rely on others to move it.
-            editedFile.Entries.Add(new DBRow(editedFile.CurrentType, dbfileconstructionRow));
-            visibleRows.Add(System.Windows.Visibility.Visible);
+            EditedFile.Entries.Add(new DBRow(EditedFile.CurrentType, dbfileconstructionRow));
+            _visibleRows.Add(System.Windows.Visibility.Visible);
 
             // Do not set the new itemarray until editedFile has been updated.
             e.Row.ItemArray = vals.ToArray();
 
-            dataChanged = true;
+            DataChanged = true;
             SendDataChanged();
         }
 
         private int deletingindex = -1;
         void CurrentTable_RowDeleting(object sender, DataRowChangeEventArgs e)
         {
-            deletingindex = currentTable.Rows.IndexOf(e.Row);
+            deletingindex = _currentTable.Rows.IndexOf(e.Row);
 
-            editedFile.Entries.RemoveAt(deletingindex);
+            EditedFile.Entries.RemoveAt(deletingindex);
 
             // Additional error checking for the visibleRows internal list.
-            if (deletingindex >= visibleRows.Count)
+            if (deletingindex >= _visibleRows.Count)
             {
                 UpdateVisibleRows();
             }
 
-            visibleRows.RemoveAt(deletingindex);
+            _visibleRows.RemoveAt(deletingindex);
 
-            dataChanged = true;
+            DataChanged = true;
             SendDataChanged();
         }
 
@@ -2209,46 +1261,46 @@ namespace DBTableControl
         {
             if (e.Row.RowState != DataRowState.Detached)
             {
-                int removalindex = currentTable.Rows.IndexOf(e.Row);
+                int removalindex = _currentTable.Rows.IndexOf(e.Row);
                 // Remove the row, because otherwise there will be indexing issues due to how the DataTable class handles row deletion.
-                currentTable.Rows.Remove(e.Row);
+                _currentTable.Rows.Remove(e.Row);
             }
 
             // Grab the deleting error's error message if it is a key warning.
             string errormessage = "";
-            if (errorList.Count(n => n.ErrorMessage.Contains("key sequence") && n.RowIndex == deletingindex) > 0)
+            if (_errorList.Count(n => n.ErrorMessage.Contains("key sequence") && n.RowIndex == deletingindex) > 0)
             {
-                errormessage = errorList.First(n => n.ErrorMessage.Contains("key sequence") && n.RowIndex == deletingindex).ErrorMessage;
+                errormessage = _errorList.First(n => n.ErrorMessage.Contains("key sequence") && n.RowIndex == deletingindex).ErrorMessage;
             }
 
             // Next remove any errors generated by the deleting row in our observable collection.
             List<int> errorindicies = new List<int>();
-            errorindicies.AddRange(errorList.Where(n => n.RowIndex == deletingindex).Select(n => errorList.IndexOf(n)).Distinct());
+            errorindicies.AddRange(_errorList.Where(n => n.RowIndex == deletingindex).Select(n => _errorList.IndexOf(n)).Distinct());
             errorindicies.Sort();
             errorindicies.Reverse();
-            errorindicies.ForEach(n => errorList.RemoveAt(n));
+            errorindicies.ForEach(n => _errorList.RemoveAt(n));
 
             // If we have a key warning in the row, update it and test the original key for uniqueness, but only if it hasn't already been deleted.
-            if (!String.IsNullOrEmpty(errormessage) && errorList.Count(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != deletingindex) > 0)
+            if (!String.IsNullOrEmpty(errormessage) && _errorList.Count(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != deletingindex) > 0)
             {
                 // We then need to call CheckCellForWarnings again to test if the original (first appearance of) key is now unique.
-                int firstrowindex = errorList.Where(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != deletingindex).Select(n => n.RowIndex).Min();
+                int firstrowindex = _errorList.Where(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != deletingindex).Select(n => n.RowIndex).Min();
                 if (firstrowindex < deletingindex)
                 {
                     // Only check for warnings if the deleting row isn't the first occurence of the key.
-                    int firstcolindex = currentTable.Columns.IndexOf(currentTable.PrimaryKey[0]);
+                    int firstcolindex = _currentTable.Columns.IndexOf(_currentTable.PrimaryKey[0]);
                     CheckCellForWarnings(firstrowindex, firstcolindex);
                 }
             }
 
             // Update every error whose row index just changed.
-            foreach (DBError err in errorList.Where(n => n.RowIndex > deletingindex))
+            foreach (DBError err in _errorList.Where(n => n.RowIndex > deletingindex))
             {
                 err.RowIndex = err.RowIndex - 1;
             }
 
             deletingindex = -1;
-            dataChanged = true;
+            DataChanged = true;
             SendDataChanged();
             RefreshRowHeaders();
         }
@@ -2264,11 +1316,11 @@ namespace DBTableControl
             {
                 if (ValueIsValid(e.ProposedValue, colIndex))
                 {
-                    editedFile.Entries[rowIndex][colIndex].Value = e.ProposedValue.ToString();
+                    EditedFile.Entries[rowIndex][colIndex].Value = e.ProposedValue.ToString();
                 }
                 else
                 {
-                    editedFile.Entries[rowIndex][colIndex].Value = GetDefaultValue(colIndex).ToString();
+                    EditedFile.Entries[rowIndex][colIndex].Value = GetDefaultValue(colIndex).ToString();
                     List<object> templist = new List<object>();
                     templist.AddRange(e.Row.ItemArray);
                     templist[colIndex] = GetDefaultValue(colIndex);
@@ -2280,11 +1332,11 @@ namespace DBTableControl
                 // Only modify editedFile if the cell does not have an error.
                 if (!CheckCellForErrors(rowIndex, colIndex))
                 {
-                    editedFile.Entries[rowIndex][colIndex].Value = e.ProposedValue.ToString();
+                    EditedFile.Entries[rowIndex][colIndex].Value = e.ProposedValue.ToString();
                 }
             }
 
-            dataChanged = true;
+            DataChanged = true;
             SendDataChanged();
             RefreshCell(rowIndex, colIndex);
         }
@@ -2308,9 +1360,9 @@ namespace DBTableControl
         {
             // This method is used to trip the packedFile's data changed notification, so that the PFM tree list updates
             // when data is changed, instead of once a user navigates away.
-            if (dataChanged)
+            if (DataChanged)
             {
-                currentPackedFile.Modified = true;
+                _currentPackedFile.Modified = true;
             }
         }
         #endregion
@@ -2423,19 +1475,6 @@ namespace DBTableControl
             return returnlist;
         }
 
-        public DependencyObject FindFirstControlInChildren(DependencyObject obj, string controlType)
-        {
-            if (obj == null)
-                return null;
-
-            // Get a list of all occurrences of a particular type of control (eg "CheckBox") 
-            IEnumerable<DependencyObject> ctrls = FindInVisualTreeDown(obj, controlType);
-            if (ctrls.Count() == 0)
-                return null;
-
-            return ctrls.First();
-        }
-
         public IEnumerable<DependencyObject> FindInVisualTreeDown(DependencyObject obj, string type)
         {
             if (obj != null)
@@ -2487,14 +1526,14 @@ namespace DBTableControl
             }
             else // Refresh only visible elements, column by column.
             {
-                for (int i = 0; i < currentTable.Columns.Count; i++)
+                for (int i = 0; i < _currentTable.Columns.Count; i++)
                 {
                     RefreshColumn(i);
                 }
             }
         }
 
-        private void RefreshColumn(int column)
+        public void RefreshColumn(int column)
         {
             for (int i = 0; i < dbDataGrid.Items.Count; i++)
             {
@@ -2523,7 +1562,7 @@ namespace DBTableControl
             }
         }
 
-        private void SelectCell(int rowindex, int colindex, bool scrollview = false)
+        public void SelectCell(int rowindex, int colindex, bool scrollview = false)
         {
             // Add the cell to the selected cells list.
             DataGridCellInfo cellinfo = new DataGridCellInfo(dbDataGrid.Items[rowindex], dbDataGrid.Columns[colindex]);
@@ -2552,7 +1591,7 @@ namespace DBTableControl
 
                 if (dbDataGrid.Items[i] is DataRowView)
                 {
-                    row.Header = currentTable.Rows.IndexOf((dbDataGrid.Items[i] as DataRowView).Row) + 1;
+                    row.Header = _currentTable.Rows.IndexOf((dbDataGrid.Items[i] as DataRowView).Row) + 1;
                 }
                 else
                 {
@@ -2569,11 +1608,11 @@ namespace DBTableControl
         {
             List<string> pksequence = new List<string>();
 
-            for (int i = 0; i < currentTable.Columns.Count; i++)
+            for (int i = 0; i < _currentTable.Columns.Count; i++)
             {
-                if (editedFile.CurrentType.Fields[i].PrimaryKey)
+                if (EditedFile.CurrentType.Fields[i].PrimaryKey)
                 {
-                    pksequence.Add(currentTable.Rows[rowindex][i].ToString());
+                    pksequence.Add(_currentTable.Rows[rowindex][i].ToString());
                 }
             }
 
@@ -2585,7 +1624,7 @@ namespace DBTableControl
             List<List<string>> pklist = new List<List<string>>();
 
             // Construct a list of pk sequences in the table.
-            for (int i = 0; i < currentTable.Rows.Count; i++)
+            for (int i = 0; i < _currentTable.Rows.Count; i++)
             {
                 pklist.Add(GetPrimaryKeySequence(i));
             }
@@ -2601,7 +1640,7 @@ namespace DBTableControl
 
         private IEnumerable<int> GetMatchingKeyIndicies(List<string> pksequence)
         {
-            for (int i = 0; i < currentTable.Rows.Count; i++)
+            for (int i = 0; i < _currentTable.Rows.Count; i++)
             {
                 if (GetPrimaryKeySequence(i).SequenceEqual(pksequence))
                 {
@@ -2618,16 +1657,30 @@ namespace DBTableControl
             }
 
             // Save off any required information before changing anything.
-            savedconfig.FreezeKeyColumns = moveAndFreezeKeys;
-            savedconfig.UseComboBoxes = useComboBoxes;
-            savedconfig.ShowAllColumns = showAllColumns;
-            savedconfig.ImportDirectory = importDirectory;
-            savedconfig.ExportDirectory = exportDirectory;
-            savedconfig.ShowFilters = showFilters;
-            savedconfig.Save();
+            _savedconfig.FreezeKeyColumns = _moveAndFreezeKeys;
+            _savedconfig.UseComboBoxes = _useComboBoxes;
+            _savedconfig.ShowAllColumns = _showAllColumns;
+            _savedconfig.ImportDirectory = _importDirectory;
+            _savedconfig.ExportDirectory = _exportDirectory;
+            _savedconfig.ShowFilters = _showFilters;
+
+            if (_savedconfig.HiddenColumns.ContainsKey(EditedFile.CurrentType.Name))
+            {
+                // Overwrite the old hidden column list for this table.
+                _savedconfig.HiddenColumns[EditedFile.CurrentType.Name].Clear();
+                _savedconfig.HiddenColumns[EditedFile.CurrentType.Name].AddRange(_hiddenColumns);
+            }
+            else
+            {
+                // Create a new list for the table.
+                _savedconfig.HiddenColumns.Add(new KeyValuePair<string, List<string>>(EditedFile.CurrentType.Name, new List<string>(_hiddenColumns)));
+            }
+          
+
+            _savedconfig.Save();
         }
 
-        private void showDBFileNotSupportedMessage(string message)
+        public void showDBFileNotSupportedMessage(string message)
         {
             // Set the warning box as visible.
             dbDataGrid.Visibility = System.Windows.Visibility.Hidden;
@@ -2638,12 +1691,12 @@ namespace DBTableControl
 
             // Modify controls accordingly
             // Most controls useability are bound by TableReadOnly, so set it.
-            readOnly = true;
+            _readOnly = true;
             // Modify the remaining controls manually.
             exportAsButton.IsEnabled = false;
         }
 
-        private Type GetTypeFromCode(TypeCode code)
+        static public Type GetTypeFromCode(TypeCode code)
         {
             switch (code)
             {
@@ -2716,21 +1769,13 @@ namespace DBTableControl
             }
         }
 
-        private bool ComboBoxColumnContainsValue(DataGridComboBoxColumn column, string tocheck)
-        {
-            if (column.ItemsSource.OfType<object>().Count(n => n.ToString().Equals(tocheck)) != 0)
-            {
-                return true;
-            }
 
-            return false;
-        }
 
         private object GetDefaultValue(int colindex)
         {
-            if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.String)
+            if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.String)
             {
-                if (editedFile.CurrentType.Fields[colindex].TypeName.Contains("optstring"))
+                if (EditedFile.CurrentType.Fields[colindex].TypeName.Contains("optstring"))
                 {
                     return "";
                 }// We have a combo box column, so default any non optional string to the first value in the list.
@@ -2744,7 +1789,7 @@ namespace DBTableControl
                     return "";
                 }
             }
-            else if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
+            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
             {
                 return false;
             }
@@ -2754,12 +1799,12 @@ namespace DBTableControl
             }
         }
 
-        private void InsertRow(int rowindex = -1)
+        public void InsertRow(int rowindex = -1)
         {
             // Create a new row with default values.
-            DataRow newrow = currentTable.NewRow();
+            DataRow newrow = _currentTable.NewRow();
             List<object> defaultvalues = new List<object>();
-            for (int i = 0; i < editedFile.CurrentType.Fields.Count; i++)
+            for (int i = 0; i < EditedFile.CurrentType.Fields.Count; i++)
             {
                 defaultvalues.Add(GetDefaultValue(i));
             }
@@ -2768,12 +1813,12 @@ namespace DBTableControl
 
             if (rowindex > -1)
             {
-                currentTable.Rows.InsertAt(newrow, rowindex);
+                _currentTable.Rows.InsertAt(newrow, rowindex);
 
                 // Once the new row is added to the table, we need to move the row in the editedFile.
-                DBRow temprow = editedFile.Entries[editedFile.Entries.Count - 1];
-                editedFile.Entries.Remove(temprow);
-                editedFile.Entries.Insert(rowindex, temprow);
+                DBRow temprow = EditedFile.Entries[EditedFile.Entries.Count - 1];
+                EditedFile.Entries.Remove(temprow);
+                EditedFile.Entries.Insert(rowindex, temprow);
 
                 // Now that everything is in its proper place, check for errors.
                 CheckRowForErrors(rowindex);
@@ -2781,8 +1826,8 @@ namespace DBTableControl
             else
             {
                 // If the blank row is calling us, add to the end of the table.
-                currentTable.Rows.Add(newrow);
-                CheckRowForErrors(currentTable.Rows.Count - 1);
+                _currentTable.Rows.Add(newrow);
+                CheckRowForErrors(_currentTable.Rows.Count - 1);
             }
 
             UpdateVisibleRows();
@@ -2794,144 +1839,17 @@ namespace DBTableControl
         #region Filter Methods
         public void UpdateVisibleRows()
         {
-            for (int i = 0; i < currentTable.Rows.Count; i++)
+            FilterSettings settings = new FilterSettings()
             {
-                if (i >= visibleRows.Count)
-                {
-                    // We have a problem. Append additional items until we are ok again.
-                    while (i >= visibleRows.Count)
-                    {
-                        visibleRows.Add(System.Windows.Visibility.Visible);
-                    }
-                }
+                ErrorDockPanelVisible = dberrorsDockPanel.Visibility == System.Windows.Visibility.Visible,
+                ErrorFilter = dberrorfilterCheckBox.IsChecked.Value,
+                WarningFilter = dbwarningfilterCheckBox.IsChecked.Value
+            };
 
-                // If there are more rows in the datagrid than currentTable we are adding a new row by modifying the blank row, so
-                // we should add rows to the list until we max out.
-                while (dbDataGrid.Items.Count > visibleRows.Count)
-                {
-                    visibleRows.Add(System.Windows.Visibility.Visible);
-                }
+            var filterList = (filterDockPanel.Children[0] as FilterController).filterList;
+            FilterHelper.UpdateVisibleRows(this, filterList, settings);
 
-                if (FilterTestRow(i))
-                {
-                    visibleRows[i] = System.Windows.Visibility.Visible;
-                }
-                else
-                {
-                    visibleRows[i] = System.Windows.Visibility.Collapsed;
-                }
-            }
         }
-
-        private bool FilterTestRow(int rowindex)
-        {
-            int colindex;
-
-            // Test row against active advanced filters.
-            foreach (DBFilter filter in (filterDockPanel.Children[0] as FilterController).filterList)
-            {
-                if (!filter.IsActive)
-                {
-                    continue;
-                }
-
-                colindex = currentTable.Columns.IndexOf(filter.ApplyToColumn);
-
-                if (!FilterTestValue(currentTable.Rows[rowindex][colindex], filter.FilterValue, filter.MatchMode))
-                {
-                    return false;
-                }
-            }
-
-            // Test row against currently active column autofilters.
-            foreach (DBFilter filter in autofilterList)
-            {
-                if (!filter.IsActive)
-                {
-                    continue;
-                }
-
-                colindex = currentTable.Columns.IndexOf(filter.ApplyToColumn);
-
-                if (!FilterTestValue(currentTable.Rows[rowindex][colindex], filter.FilterValue, filter.MatchMode))
-                {
-                    return false;
-                }
-            }
-
-            // If either the error or warning filter is engaged test the row agains them as well.
-            if (dberrorsDockPanel.Visibility == System.Windows.Visibility.Visible)
-            {
-                // If both filters are engaged either or will pass.
-                if (dberrorfilterCheckBox.IsChecked.Value && dbwarningfilterCheckBox.IsChecked.Value)
-                {
-                    if (errorList.Count(n => n.RowIndex == rowindex && n.ErrorMessage.Contains("Error:")) == 0 &&
-                        errorList.Count(n => n.RowIndex == rowindex && n.ErrorMessage.Contains("Warning:")) == 0)
-                    {
-                        return false;
-                    }
-                }// If only the Warnings filter is engaged, only warnings pass.
-                else if (!dberrorfilterCheckBox.IsChecked.Value && dbwarningfilterCheckBox.IsChecked.Value)
-                {
-                    if (errorList.Count(n => n.RowIndex == rowindex && n.ErrorMessage.Contains("Warning:")) == 0)
-                    {
-                        return false;
-                    }
-                }// If only the Errors filter is engaged, only errors pass.
-                else if (dberrorfilterCheckBox.IsChecked.Value && !dbwarningfilterCheckBox.IsChecked.Value)
-                {
-                    if (errorList.Count(n => n.RowIndex == rowindex && n.ErrorMessage.Contains("Error:")) == 0)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private bool FilterTestValue(object totest, string filtervalue, MatchType matchtype)
-        {
-            // Match the value exactly.
-            if (matchtype == MatchType.Exact)
-            {
-                if (!totest.ToString().Equals(filtervalue))
-                {
-                    return false;
-                }
-            }// Check for partial match.
-            else if (matchtype == MatchType.Partial)
-            {
-                if (!totest.ToString().Contains(filtervalue))
-                {
-                    return false;
-                }
-            }// Run a Regex match.
-            else if (matchtype == MatchType.Regex)
-            {
-                if (!Regex.IsMatch(totest.ToString(), filtervalue))
-                {
-                    return false;
-                }
-            }// Check for empty values.
-            else if (matchtype == MatchType.Empty)
-            {
-                if (!String.IsNullOrEmpty(totest.ToString()))
-                {
-                    return false;
-                }
-            }// Check for not empty values.
-            else if (matchtype == MatchType.NotEmpty)
-            {
-                if (String.IsNullOrEmpty(totest.ToString()))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         #endregion
 
         #region Frozen Key Column Methods
@@ -2939,14 +1857,14 @@ namespace DBTableControl
         private void FreezeKeys()
         {
             // If there are no keys columns specified, return.
-            if (currentTable.PrimaryKey.Count() == 0)
+            if (_currentTable.PrimaryKey.Count() == 0)
             {
                 return;
             }
 
             // Figure out which columns are key columns.
             List<string> keycolumns = new List<string>();
-            keycolumns.AddRange(currentTable.PrimaryKey.Select(n => n.ColumnName));
+            keycolumns.AddRange(_currentTable.PrimaryKey.Select(n => n.ColumnName));
 
             for (int i = 0; i < keycolumns.Count; i++)
             {
@@ -2960,19 +1878,19 @@ namespace DBTableControl
         private void UnfreezeKeys()
         {
             // If there are no keys columns specified, return.
-            if (currentTable.PrimaryKey.Count() == 0)
+            if (_currentTable.PrimaryKey.Count() == 0)
             {
                 return;
             }
 
             // Figure out which columns are key columns.
             List<string> keycolumns = new List<string>();
-            keycolumns.AddRange(currentTable.PrimaryKey.Select(n => n.ColumnName));
+            keycolumns.AddRange(_currentTable.PrimaryKey.Select(n => n.ColumnName));
 
             for (int i = 0; i < keycolumns.Count; i++)
             {
                 // Reset the display index of the key columns back to their original positions.
-                dbDataGrid.Columns.Single(n => keycolumns[i].Equals((string)n.Header)).DisplayIndex = currentTable.Columns.IndexOf(keycolumns[i]);
+                dbDataGrid.Columns.Single(n => keycolumns[i].Equals((string)n.Header)).DisplayIndex = _currentTable.Columns.IndexOf(keycolumns[i]);
             }
 
             dbDataGrid.FrozenColumnCount = 0;
@@ -2982,40 +1900,53 @@ namespace DBTableControl
 
         #region Error Checking and Data Validation Methods
 
+        private void checktableforerrorsButton_Click(object sender, RoutedEventArgs e)
+        {
+            _errorList.Clear();
+            _currentTable.ClearErrors();
+            CheckTableForErrors();
+
+            if (_errorList.Count == 0)
+            {
+                // We didn't find any errors, inform the user.
+                MessageBox.Show("No errors found in the current table!");
+            }
+        }
+
         // This method will be called when a table is loaded, generating an observable error list from the cached error data.
         private void RegenerateErrorList()
         {
             // If the table has no errors it either hasn't been checked or is fine, so skip it.
-            if (!currentTable.HasErrors)
+            if (!_currentTable.HasErrors)
             {
                 return;
             }
 
-            foreach (DataRow row in currentTable.Rows)
+            foreach (DataRow row in _currentTable.Rows)
             {
                 if (!row.HasErrors)
                 {
                     continue;
                 }
 
-                int rowindex = currentTable.Rows.IndexOf(row);
+                int rowindex = _currentTable.Rows.IndexOf(row);
                 bool handledduplicatekey = false;
                 foreach (DataColumn column in row.GetColumnsInError())
                 {
-                    DBError error = new DBError(rowindex, currentTable.DefaultView[rowindex], column.ColumnName, row.GetColumnError(column));
+                    DBError error = new DBError(rowindex, _currentTable.DefaultView[rowindex], column.ColumnName, row.GetColumnError(column));
 
                     if (error.ErrorMessage.Contains("key sequence"))
                     {
                         if (!handledduplicatekey)
                         {
-                            errorList.Add(error);
+                            _errorList.Add(error);
                         }
 
                         handledduplicatekey = true;
                     }
                     else
                     {
-                        errorList.Add(error);
+                        _errorList.Add(error);
                     }
                 }
             }
@@ -3024,12 +1955,12 @@ namespace DBTableControl
         private bool CheckTableForErrors(bool checkwarnings = true)
         {
             bool haserrors = false;
-            currentTable.ClearErrors();
-            errorList.Clear();
+            _currentTable.ClearErrors();
+            _errorList.Clear();
 
-            for (int i = 0; i < currentTable.Rows.Count; i++)
+            for (int i = 0; i < _currentTable.Rows.Count; i++)
             {
-                for (int j = 0; j < currentTable.Columns.Count; j++)
+                for (int j = 0; j < _currentTable.Columns.Count; j++)
                 {
                     if (CheckCellForErrors(i, j, checkwarnings))
                     {
@@ -3046,7 +1977,7 @@ namespace DBTableControl
         {
             bool haserrors = false;
 
-            for (int i = 0; i < currentTable.Columns.Count; i++)
+            for (int i = 0; i < _currentTable.Columns.Count; i++)
             {
                 if (CheckCellForErrors(rowindex, i, checkwarnings))
                 {
@@ -3062,10 +1993,10 @@ namespace DBTableControl
         private bool CheckCellForErrors(int rowindex, int colindex, bool checkwarnings = true)
         {
             bool haserrors = false;
-            object currentvalue = currentTable.Rows[rowindex][colindex];
+            object currentvalue = _currentTable.Rows[rowindex][colindex];
 
             // Test value against required data type.
-            if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
+            if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
             {
                 short test;
                 haserrors = !short.TryParse(currentvalue.ToString(), out test);
@@ -3074,11 +2005,11 @@ namespace DBTableControl
                 {
                     // Add an error to our internal list for display.
                     string errormessage = String.Format("Error: '{0}' is not a valid value for '{1}', it needs a whole number between -32,768 and 32,767.",
-                                                        currentvalue, currentTable.Columns[colindex].ColumnName);
+                                                        currentvalue, _currentTable.Columns[colindex].ColumnName);
                     AddError(rowindex, colindex, errormessage);
                 }
             }
-            else if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32)
+            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32)
             {
                 int test;
                 haserrors = !int.TryParse(currentvalue.ToString(), out test);
@@ -3087,11 +2018,11 @@ namespace DBTableControl
                 {
                     // Add an error to our internal list for display.
                     string errormessage = String.Format("Error: '{0}' is not a valid value for '{1}', it needs a whole number.",
-                                                        currentvalue, currentTable.Columns[colindex].ColumnName);
+                                                        currentvalue, _currentTable.Columns[colindex].ColumnName);
                     AddError(rowindex, colindex, errormessage);
                 }
             }
-            else if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Single)
+            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Single)
             {
                 float test;
                 haserrors = !float.TryParse(currentvalue.ToString(), out test);
@@ -3100,11 +2031,11 @@ namespace DBTableControl
                 {
                     // Add an error to our internal list for display.
                     string errormessage = String.Format("Error: '{0}' is not a valid value for '{1}', it needs a number (can have decimal point).",
-                                                        currentvalue, currentTable.Columns[colindex].ColumnName);
+                                                        currentvalue, _currentTable.Columns[colindex].ColumnName);
                     AddError(rowindex, colindex, errormessage);
                 }
             }
-            else if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
+            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
             {
                 if(!(currentvalue.ToString().Equals("True") || currentvalue.ToString().Equals("False")))
                 {
@@ -3112,7 +2043,7 @@ namespace DBTableControl
 
                     // Add an error to our internal list for display.
                     string errormessage = String.Format("Error: '{0}' is not a valid value for '{1}', it needs 'True' or 'False'.",
-                                                        currentvalue, currentTable.Columns[colindex].ColumnName);
+                                                        currentvalue, _currentTable.Columns[colindex].ColumnName);
                     AddError(rowindex, colindex, errormessage);
                 }
             }
@@ -3125,9 +2056,9 @@ namespace DBTableControl
                     haserrors = true;
 
                     // Add an error to our internal list for display.
-                    List<string> fkey = currentTable.Columns[colindex].ExtendedProperties["FKey"].ToString().Split('.').ToList();
+                    List<string> fkey = _currentTable.Columns[colindex].ExtendedProperties["FKey"].ToString().Split('.').ToList();
                     string errormessage = String.Format("Error: '{0}' is not a valid value for '{1}', no matching value in column:'{3}' of '{2}' tables found.",
-                                                        currentvalue, currentTable.Columns[colindex].ColumnName, fkey[0], fkey[1]);
+                                                        currentvalue, _currentTable.Columns[colindex].ColumnName, fkey[0], fkey[1]);
                     AddError(rowindex, colindex, errormessage);
                 }
             }
@@ -3149,7 +2080,7 @@ namespace DBTableControl
         private bool CheckCellForWarnings(int rowindex, int colindex, bool haserrors = false)
         {
             // Check for duplications if this cell is a key.
-            if (currentTable.PrimaryKey.Contains(currentTable.Columns[colindex]))
+            if (_currentTable.PrimaryKey.Contains(_currentTable.Columns[colindex]))
             {
                 if (TableContainsKeySequence(GetPrimaryKeySequence(rowindex)))
                 {
@@ -3165,19 +2096,19 @@ namespace DBTableControl
                     foreach (int keyindex in GetMatchingKeyIndicies(GetPrimaryKeySequence(rowindex)))
                     {
                         // If the observable error list already has this error leave it be.
-                        if (errorList.Count(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex == keyindex) == 0)
+                        if (_errorList.Count(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex == keyindex) == 0)
                         {
                             AddError(keyindex, colindex, errormessage);
 
                             // There are more than 1 primary key, we need to create an internal error for each.
-                            if (currentTable.PrimaryKey.Count() > 1)
+                            if (_currentTable.PrimaryKey.Count() > 1)
                             {
                                 // Enumerate through the key columns that we have not added an error to yet.
-                                foreach (DataColumn column in currentTable.PrimaryKey)
+                                foreach (DataColumn column in _currentTable.PrimaryKey)
                                 {
                                     if (column.Ordinal != colindex)
                                     {
-                                        currentTable.Rows[keyindex].SetColumnError(column, errormessage);
+                                        _currentTable.Rows[keyindex].SetColumnError(column, errormessage);
                                     }
 
                                     // Also, refresh those additional cells.
@@ -3206,22 +2137,22 @@ namespace DBTableControl
         private bool ValueIsValid(object testval, int colindex)
         {
             // Test value against required data type.
-            if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
+            if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
             {
                 short test;
                 return short.TryParse(testval.ToString(), out test);
             }
-            else if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32)
+            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32)
             {
                 int test;
                 return int.TryParse(testval.ToString(), out test);
             }
-            else if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Single)
+            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Single)
             {
                 float test;
                 return float.TryParse(testval.ToString(), out test);
             }
-            else if (editedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
+            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
             {
                 if (!(testval.ToString().Equals("True") || testval.ToString().Equals("False")))
                 {
@@ -3249,26 +2180,26 @@ namespace DBTableControl
         private void AddError(int rowindex, int colindex, string errormessage)
         {
             // First, determine we have an error already logged for this cell and clear it.
-            if (currentTable.Rows[rowindex].GetColumnsInError().Contains(currentTable.Columns[colindex]) &&
-                errorList.Count(n => n.ColumnName.Equals(currentTable.Columns[colindex].ColumnName) && n.RowIndex == rowindex) > 0)
+            if (_currentTable.Rows[rowindex].GetColumnsInError().Contains(_currentTable.Columns[colindex]) &&
+                _errorList.Count(n => n.ColumnName.Equals(_currentTable.Columns[colindex].ColumnName) && n.RowIndex == rowindex) > 0)
             {
-                int errorindex = errorList.IndexOf(errorList.First(n => n.ColumnName.Equals(currentTable.Columns[colindex].ColumnName) && n.RowIndex == rowindex));
-                currentTable.Rows[rowindex].RemoveColumnError(currentTable.Columns[colindex].ColumnName);
-                errorList.RemoveAt(errorindex);
+                int errorindex = _errorList.IndexOf(_errorList.First(n => n.ColumnName.Equals(_currentTable.Columns[colindex].ColumnName) && n.RowIndex == rowindex));
+                _currentTable.Rows[rowindex].RemoveColumnError(_currentTable.Columns[colindex].ColumnName);
+                _errorList.RemoveAt(errorindex);
 
                 // If we have an error, re-add the new error to the same location as the old one.
-                DBError error = new DBError(rowindex, currentTable.DefaultView[rowindex], currentTable.Columns[colindex].ColumnName, errormessage);
-                errorList.Insert(errorindex, error);
+                DBError error = new DBError(rowindex, _currentTable.DefaultView[rowindex], _currentTable.Columns[colindex].ColumnName, errormessage);
+                _errorList.Insert(errorindex, error);
             }
             else
             {
                 // Add an error to our internal list for display.
-                DBError error = new DBError(rowindex, currentTable.DefaultView[rowindex], currentTable.Columns[colindex].ColumnName, errormessage);
-                errorList.Add(error);
+                DBError error = new DBError(rowindex, _currentTable.DefaultView[rowindex], _currentTable.Columns[colindex].ColumnName, errormessage);
+                _errorList.Add(error);
             }
 
             // Add an error into currentTable so that the background is updated accordingly.
-            currentTable.Rows[rowindex].SetColumnError(currentTable.Columns[colindex], errormessage);
+            _currentTable.Rows[rowindex].SetColumnError(_currentTable.Columns[colindex], errormessage);
 
             UpdateErrorView();
         }
@@ -3276,52 +2207,44 @@ namespace DBTableControl
         private void RemoveError(int rowindex, int colindex)
         {
             // If this cell has an error, remove it.
-            if (currentTable.Rows[rowindex].GetColumnsInError().Contains(currentTable.Columns[colindex]) &&
-                (errorList.Count(n => currentTable.Rows[rowindex].GetColumnsInError().Count(t => t.ColumnName.Equals(n.ColumnName) && t.Ordinal == colindex) > 0) > 0))
+            if (_currentTable.Rows[rowindex].GetColumnsInError().Contains(_currentTable.Columns[colindex]) &&
+                (_errorList.Count(n => _currentTable.Rows[rowindex].GetColumnsInError().Count(t => t.ColumnName.Equals(n.ColumnName) && t.Ordinal == colindex) > 0) > 0))
             {
-                string errormessage = currentTable.Rows[rowindex].GetColumnError(colindex);
-                if (currentTable.PrimaryKey.Count() > 1 && errormessage.Contains("key sequence"))
+                string errormessage = _currentTable.Rows[rowindex].GetColumnError(colindex);
+                if (_currentTable.PrimaryKey.Count() > 1 && errormessage.Contains("key sequence"))
                 {
                     // If we are dealing with a duplicate key error in a table with multiple primary keys, we need to clear all key errors from the row.
-                    foreach (string columnname in currentTable.PrimaryKey.Select(n => n.ColumnName))
+                    foreach (string columnname in _currentTable.PrimaryKey.Select(n => n.ColumnName))
                     {
-                        currentTable.Rows[rowindex].RemoveColumnError(columnname);
-                        RefreshCell(rowindex, currentTable.Columns.IndexOf(columnname));
+                        _currentTable.Rows[rowindex].RemoveColumnError(columnname);
+                        RefreshCell(rowindex, _currentTable.Columns.IndexOf(columnname));
                     }
                 }
                 else
                 {
                     // Other wise just remove the error.
-                    currentTable.Rows[rowindex].RemoveColumnError(currentTable.Columns[colindex].ColumnName);
+                    _currentTable.Rows[rowindex].RemoveColumnError(_currentTable.Columns[colindex].ColumnName);
                     RefreshCell(rowindex, colindex);
                 }
 
                 // Check to see if there are any observable errors that match our current error and check them again.
-                if (errorList.Count(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != rowindex) > 0)
+                if (_errorList.Count(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != rowindex) > 0)
                 {
                     // We then need to call CheckCellForWarnings again to test if the original (first appearance of) key is now unique.
-                    int firstrowindex = errorList.Where(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != rowindex).Select(n => n.RowIndex).Min();
-                    int firstcolindex = currentTable.Columns.IndexOf(currentTable.PrimaryKey[0]);
+                    int firstrowindex = _errorList.Where(n => n.ErrorMessage.Equals(errormessage) && n.RowIndex != rowindex).Select(n => n.RowIndex).Min();
+                    int firstcolindex = _currentTable.Columns.IndexOf(_currentTable.PrimaryKey[0]);
                     CheckCellForWarnings(firstrowindex, firstcolindex);
                 }
 
                 // Remove the error from the observable list.
-                errorList.Remove(errorList.First(n => n.ColumnName.Equals(currentTable.Columns[colindex].ColumnName) && n.RowIndex == rowindex));
-            }
-        }
-
-        private void RemoveRowErrors(int rowindex)
-        {
-            for (int i = 0; i < editedFile.CurrentType.Fields.Count; i++)
-            {
-                RemoveError(rowindex, i);
+                _errorList.Remove(_errorList.First(n => n.ColumnName.Equals(_currentTable.Columns[colindex].ColumnName) && n.RowIndex == rowindex));
             }
         }
 
         private void UpdateErrorView()
         {
             // Update our visual error list, collapsing and expanding it as necessary.
-            if (errorList.Count == 0)
+            if (_errorList.Count == 0)
             {
                 errornumberTextBlock.Text = "0";
                 warningnumberTextBlock.Text = "0";
@@ -3331,8 +2254,8 @@ namespace DBTableControl
             }
             else
             {
-                errornumberTextBlock.Text = errorList.Count(n => n.ErrorMessage.Contains("Error:")).ToString();
-                warningnumberTextBlock.Text = errorList.Count(n => n.ErrorMessage.Contains("Warning:")).ToString();
+                errornumberTextBlock.Text = _errorList.Count(n => n.ErrorMessage.Contains("Error:")).ToString();
+                warningnumberTextBlock.Text = _errorList.Count(n => n.ErrorMessage.Contains("Warning:")).ToString();
                 dberrorsDockPanel.Visibility = System.Windows.Visibility.Visible;
             }
         }

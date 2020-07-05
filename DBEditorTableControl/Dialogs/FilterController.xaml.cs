@@ -36,16 +36,16 @@ namespace DBEditorTableControl.Dialogs
         {
             _parentDbController = parentDbController;
             filterList.Clear();
-            _parentDbController.autofilterList.Clear();
+            _parentDbController._autofilterList.Clear();
 
             string tableName = parentDbController.EditedFile.CurrentType.Name;
 
             // If the saved config has not filters, skip.
-            if (!_parentDbController.savedconfig.Filters.ContainsKey(tableName))
+            if (!_parentDbController._savedconfig.Filters.ContainsKey(tableName))
                 return;
 
             // Load saved filters, attaching activation listeners for each one.
-            foreach (DBFilter filter in _parentDbController.savedconfig.Filters[tableName])
+            foreach (DBFilter filter in _parentDbController._savedconfig.Filters[tableName])
             {
                 // Always load filters as inactive.
                 filter.IsActive = false;
@@ -57,17 +57,17 @@ namespace DBEditorTableControl.Dialogs
         void SaveFilters()
         {
             var tableName = _parentDbController.EditedFile.CurrentType.Name;
-            if (_parentDbController.savedconfig.Filters.ContainsKey(tableName))
+            if (_parentDbController._savedconfig.Filters.ContainsKey(tableName))
             {
-                _parentDbController.savedconfig.Filters[tableName].Clear();
-                _parentDbController.savedconfig.Filters[tableName].AddRange(filterList);
+                _parentDbController._savedconfig.Filters[tableName].Clear();
+                _parentDbController._savedconfig.Filters[tableName].AddRange(filterList);
             }
             else
             {
                 // Create a new list for the table.
-                _parentDbController.savedconfig.Filters.Add(new DBTableControl.KeyValuePair<string, List<DBFilter>>(tableName, new List<DBFilter>(filterList)));
+                _parentDbController._savedconfig.Filters.Add(new DBTableControl.KeyValuePair<string, List<DBFilter>>(tableName, new List<DBFilter>(filterList)));
             }
-            _parentDbController.savedconfig.Save();
+            _parentDbController._savedconfig.Save();
         }
 
         private void addFilterButton_Click(object sender, RoutedEventArgs e)

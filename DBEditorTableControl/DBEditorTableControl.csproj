@@ -63,12 +63,13 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClipboardHelper.cs" />
-    <Compile Include="ColumnVisiblityHelper.cs" />
+    <Compile Include="Helpers\ClipboardHelper.cs" />
+    <Compile Include="Helpers\ColumnVisiblityHelper.cs" />
+    <Compile Include="Helpers\ContextMenuHelper.cs" />
     <Compile Include="DBTypes\DBDataGrid.cs" />
     <Compile Include="DBTypes\DBError.cs" />
     <Compile Include="DBTypes\DBFilter.cs" />
-    <Compile Include="DebugHelper.cs" />
+    <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Dialogs\ApplyExpressionWindow.xaml.cs">
       <DependentUpon>ApplyExpressionWindow.xaml</DependentUpon>
     </Compile>
@@ -92,6 +93,9 @@
     <Compile Include="Dialogs\ManageFiltersWindow.xaml.cs">
       <DependentUpon>ManageFiltersWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\FilterHelper.cs" />
+    <Compile Include="Helpers\FindReplaceHelper.cs" />
+    <Compile Include="Helpers\ImportExportHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WpfPackedFileEditorHost.cs" />
     <Compile Include="DBUtil.cs" />

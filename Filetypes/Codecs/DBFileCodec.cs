@@ -78,7 +78,7 @@ namespace Filetypes.Codecs {
 #endif
                     DBFile result = ReadFile(reader, header, realInfo);
                     return result;
-                } catch (Exception) { }
+                } catch (Exception e) { }
             }
             return null;
             // throw new DBFileNotSupportedException(string.Format("No applicable type definition found"));

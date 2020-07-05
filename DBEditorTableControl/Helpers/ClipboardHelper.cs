@@ -126,13 +126,13 @@ namespace DBEditorTableControl
             for (int i = 0; i < mainTable.CurrentTable.Rows.Count; i++)
             {
                 // Additional error checking for the visibleRows internal list.
-                if (i >= mainTable.visibleRows.Count)
+                if (i >= mainTable._visibleRows.Count)
                 {
                     mainTable.UpdateVisibleRows();
                 }
 
                 // Ignore collapsed (filtered) rows when building our test string.
-                if (mainTable.visibleRows[i] == System.Windows.Visibility.Collapsed)
+                if (mainTable._visibleRows[i] == System.Windows.Visibility.Collapsed)
                 {
                     continue;
                 }
@@ -279,13 +279,13 @@ namespace DBEditorTableControl
                     datarowindex = mainTable.CurrentTable.Rows.IndexOf((cellinfo.Item as DataRowView).Row);
 
                     // Additional error checking for the visibleRows internal list.
-                    if (datarowindex >= mainTable.visibleRows.Count)
+                    if (datarowindex >= mainTable._visibleRows.Count)
                     {
                         mainTable.UpdateVisibleRows();
                     }
 
                     // Selecting cells while the table is filtered will select collapsed rows, so skip them here.
-                    if (mainTable.visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
+                    if (mainTable._visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
                     {
                         continue;
                     }
@@ -402,13 +402,13 @@ namespace DBEditorTableControl
                     datarowindex = mainTable.CurrentTable.Rows.IndexOf((mainTable.dbDataGrid.Items[rowindex] as DataRowView).Row);
 
                     // Additional error checking for the visibleRows internal list.
-                    if (datarowindex >= mainTable.visibleRows.Count)
+                    if (datarowindex >= mainTable._visibleRows.Count)
                     {
                         mainTable.UpdateVisibleRows();
                     }
 
                     // Skip past any collapsed (filtered) rows.
-                    while (mainTable.visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
+                    while (mainTable._visibleRows[datarowindex] == System.Windows.Visibility.Collapsed)
                     {
                         rowindex++;
                         datarowindex = mainTable.CurrentTable.Rows.IndexOf((mainTable.dbDataGrid.Items[rowindex] as DataRowView).Row);
@@ -486,13 +486,13 @@ namespace DBEditorTableControl
                         testindex = mainTable.CurrentTable.Rows.IndexOf(rowview.Row);
 
                         // Additional error checking for the visibleRows internal list.
-                        if (testindex >= mainTable.visibleRows.Count)
+                        if (testindex >= mainTable._visibleRows.Count)
                         {
                             mainTable.UpdateVisibleRows();
                         }
 
                         // Skip any collapsed (filtered) rows.
-                        if (mainTable.visibleRows[testindex] == System.Windows.Visibility.Visible)
+                        if (mainTable._visibleRows[testindex] == System.Windows.Visibility.Visible)
                         {
                             indiciesToPaste.Add(mainTable.dbDataGrid.Items.IndexOf(rowview));
                         }
