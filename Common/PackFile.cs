@@ -315,6 +315,7 @@ namespace Common {
         public long AdditionalInfo {
             get; set;
         }
+
     }
  
     /*

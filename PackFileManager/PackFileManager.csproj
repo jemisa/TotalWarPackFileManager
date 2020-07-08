@@ -107,6 +107,12 @@
     <Compile Include="Editors\UnitVariantFileEditorControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="PackedTreeView\PackedTreeView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PackedTreeView\PackedTreeView.Designer.cs">
+      <DependentUpon>PackedTreeView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mods.cs" />
     <Compile Include="PackBrowseDialog.cs">
       <SubType>Form</SubType>
@@ -121,14 +127,8 @@
       <DependentUpon>PackFileManagerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="PackFileManagerSettings.cs" />
-    <Compile Include="PackFileTree.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="PackFileTree.Designer.cs">
-      <DependentUpon>PackFileTree.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PackTree.cs" />
-    <Compile Include="PackTreeViewFilterService.cs" />
+    <Compile Include="PackedTreeView\PackTreeNodes.cs" />
+    <Compile Include="PackedTreeView\PackTreeViewFilterService.cs" />
     <Compile Include="Program.cs" />
     <EmbeddedResource Include="Editors\DBFileEditorControl.resx">
       <DependentUpon>DBFileEditorControl.cs</DependentUpon>
@@ -145,14 +145,14 @@
     <EmbeddedResource Include="Editors\PackedEsfEditor.resx">
       <DependentUpon>PackedEsfEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="PackedTreeView\PackedTreeView.resx">
+      <DependentUpon>PackedTreeView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PackBrowseDialog.resx">
       <DependentUpon>PackBrowseDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PackFileManagerForm.resx">
       <DependentUpon>PackFileManagerForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PackFileTree.resx">
-      <DependentUpon>PackFileTree.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <DependentUpon>Resources.cs</DependentUpon>

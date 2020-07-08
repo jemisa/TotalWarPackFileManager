@@ -28,7 +28,6 @@ namespace PackFileManager
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PackFileManagerForm));
-            this.packTreeView = new System.Windows.Forms.TreeView();
             this.packActionMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextAddMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextAddFromPackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,7 +58,6 @@ namespace PackFileManager
             this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importTSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.packTreeSearchTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -149,7 +147,7 @@ namespace PackFileManager
             this.packStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.packActionProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.packTreeViewToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.FilterLabel = new System.Windows.Forms.Label();
+            this._packTreeView = new PackFileManager.ExtentedTreeView.ExtendedTreeView();
             this.packActionMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -157,27 +155,6 @@ namespace PackFileManager
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // packTreeView
-            // 
-            this.packTreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.packTreeView.ContextMenuStrip = this.packActionMenuStrip;
-            this.packTreeView.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.packTreeView.HideSelection = false;
-            this.packTreeView.Indent = 19;
-            this.packTreeView.Location = new System.Drawing.Point(0, 30);
-            this.packTreeView.Name = "packTreeView";
-            this.packTreeView.Size = new System.Drawing.Size(210, 484);
-            this.packTreeView.TabIndex = 2;
-            this.packTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.packTreeView_AfterLabelEdit);
-            this.packTreeView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.packTreeView_ItemDrag);
-            this.packTreeView.NodeMouseHover += new System.Windows.Forms.TreeNodeMouseHoverEventHandler(this.PackTreeView_NodeMouseHover);
-            this.packTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.packTreeView_AfterSelect);
-            this.packTreeView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.packTreeView_MouseDoubleClick);
-            this.packTreeView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.packTreeView_MouseDown);
-            this.packTreeView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.packTreeView_PreviewKeyDown);
             // 
             // packActionMenuStrip
             // 
@@ -421,23 +398,11 @@ namespace PackFileManager
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.FilterLabel);
-            this.splitContainer1.Panel1.Controls.Add(this.packTreeSearchTextBox);
-            this.splitContainer1.Panel1.Controls.Add(this.packTreeView);
+            this.splitContainer1.Panel1.Controls.Add(this._packTreeView);
             this.splitContainer1.Size = new System.Drawing.Size(964, 518);
             this.splitContainer1.SplitterDistance = 214;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 9;
-            // 
-            // packTreeSearchTextBox
-            // 
-            this.packTreeSearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.packTreeSearchTextBox.Location = new System.Drawing.Point(36, 4);
-            this.packTreeSearchTextBox.Name = "packTreeSearchTextBox";
-            this.packTreeSearchTextBox.Size = new System.Drawing.Size(174, 20);
-            this.packTreeSearchTextBox.TabIndex = 3;
-            this.packTreeSearchTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnSearchKeyUp);
             // 
             // menuStrip
             // 
@@ -771,7 +736,7 @@ namespace PackFileManager
             this.searchFileToolStripMenuItem.Name = "searchFileToolStripMenuItem";
             this.searchFileToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.searchFileToolStripMenuItem.Text = "Search Files...";
-            this.searchFileToolStripMenuItem.Click += new System.EventHandler(this.searchFileToolStripMenuItem_Click);
+            this.searchFileToolStripMenuItem.Enabled = false;
             // 
             // postProcessToolStripMenuItem
             // 
@@ -1149,14 +1114,13 @@ namespace PackFileManager
             this.packActionProgressBar.Name = "packActionProgressBar";
             this.packActionProgressBar.Size = new System.Drawing.Size(120, 16);
             // 
-            // FilterLabel
+            // _packTreeView
             // 
-            this.FilterLabel.AutoSize = true;
-            this.FilterLabel.Location = new System.Drawing.Point(3, 7);
-            this.FilterLabel.Name = "FilterLabel";
-            this.FilterLabel.Size = new System.Drawing.Size(29, 13);
-            this.FilterLabel.TabIndex = 4;
-            this.FilterLabel.Text = "Filter";
+            this._packTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._packTreeView.Location = new System.Drawing.Point(0, 0);
+            this._packTreeView.Name = "_packTreeView";
+            this._packTreeView.Size = new System.Drawing.Size(210, 514);
+            this._packTreeView.TabIndex = 0;
             // 
             // PackFileManagerForm
             // 
@@ -1174,11 +1138,9 @@ namespace PackFileManager
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Pack File Manager";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Activated += new System.EventHandler(this.PackFileManagerForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PackFileManagerForm_FormClosing);
             this.packActionMenuStrip.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.menuStrip.ResumeLayout(false);
@@ -1207,7 +1169,6 @@ namespace PackFileManager
         private System.Windows.Forms.ContextMenuStrip packActionMenuStrip;
         private System.Windows.Forms.ToolStripProgressBar packActionProgressBar;
         private System.Windows.Forms.ToolStripStatusLabel packStatusLabel;
-        public System.Windows.Forms.TreeView packTreeView;
         private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
@@ -1311,7 +1272,6 @@ namespace PackFileManager
         private System.Windows.Forms.ToolStripMenuItem recentFilesMenuItem;
         private System.Windows.Forms.ToolStripMenuItem expandToolStripMenuItem;
         private System.Windows.Forms.ToolTip packTreeViewToolTip;
-        private System.Windows.Forms.TextBox packTreeSearchTextBox;
-        private System.Windows.Forms.Label FilterLabel;
+        private ExtentedTreeView.ExtendedTreeView _packTreeView;
     }
 }
