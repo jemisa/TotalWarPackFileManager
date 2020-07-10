@@ -55,3 +55,5 @@
 /CommonDialogs/obj/Release
 /PackFileManager/obj/Release
 /PackFileManager/obj
+/PackFileManagerUnitTests/obj
+/PackFileManagerUnitTests/bin/Debug

@@ -435,8 +435,6 @@ namespace PackFileManager
             PackFileManagerSettingManager.Save();
         }
 
-        //class PackFileManagerSettings
-
         private void ChangeGameIcon() {
             if(GameManager.Instance.CurrentGame == Game.STW)
                 this.Icon = Resources.Shogun;

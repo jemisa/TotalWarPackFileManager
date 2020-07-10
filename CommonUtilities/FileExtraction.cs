@@ -44,7 +44,7 @@ namespace CommonUtilities
          * If a file exists already, the user is queried what to do, with the options
          * to not extract, overwrite, or rename; also to keep the answer for the remaining conflicts.
          */
-        public void ExtractFiles(ICollection<PackedFile> packedFiles) {
+        public void ExtractFiles(ICollection<PackedFile> packedFiles, bool flatStructure = false) {
             if (!string.IsNullOrEmpty(exportDirectory)) {
                 FileAlreadyExistsDialog.Action action = FileAlreadyExistsDialog.Action.Ask;
                 FileAlreadyExistsDialog.Action defaultAction = FileAlreadyExistsDialog.Action.Ask;
@@ -63,7 +63,17 @@ namespace CommonUtilities
                         skippedCount++;
                         continue;
                     }
-                    string path = Path.Combine(exportDirectory, Preprocessor.GetFileName(file));
+                    string filePath = Preprocessor.GetFileName(file);
+                    string path = "";
+                    if (flatStructure)
+                    {
+                        var filename = Path.GetFileName(filePath);
+                        path = Path.Combine(exportDirectory, filename);
+                    }
+                    else
+                    {
+                        path = Path.Combine(exportDirectory, filePath);
+                    }
                     if (File.Exists(path)) {
                         // file with that name already present: ask user what to do
                         string renamedFilename;
