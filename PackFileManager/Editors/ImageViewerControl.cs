@@ -39,7 +39,7 @@
             ".psd"
                                      };
         public override bool CanEdit(PackedFile packedFile) {
-            return HasExtension(packedFile, EXTENSIONS);
+            return PackedFileEditorHelper.HasExtension(packedFile, EXTENSIONS);
         }
 
         public override Bitmap EditedFile {

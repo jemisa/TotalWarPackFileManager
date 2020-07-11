@@ -10,7 +10,6 @@ namespace Filetypes.Codecs
     */
     public class TextCodec : ICodec<string>
     {
-        public static readonly TextCodec Instance = new TextCodec();
         public string Decode(Stream file)
         {
             string result = "";

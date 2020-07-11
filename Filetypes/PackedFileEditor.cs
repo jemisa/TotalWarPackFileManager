@@ -10,21 +10,12 @@ namespace Filetypes {
     /*
      * An interface for classes able to edit a file type contained in a pack file.
      */
-    public interface IPackedFileEditor {
-        /*
-         * Get and set the current file being edited.
-         */
-        PackedFile CurrentPackedFile {
-            get; set;
-        }
+    public interface IPackedFileEditor 
+    {
+        PackedFile CurrentPackedFile { get; set;}
         
-        bool ReadOnly {
-            get;
-            set;
-        }
+        bool ReadOnly { get;set;}
 
-		
-        /* Query if this editor can edit the given packed file. */
         bool CanEdit(PackedFile file);
 
         /* Write back changes after finished editing. */
@@ -119,28 +110,42 @@ namespace Filetypes {
             }
         }
         
+
+    }
+
+    public static class PackedFileEditorHelper
+    {
         // utility method for tsv export
-        public static void WriteToTSVFile(List<string> strings) {
-            SaveFileDialog dialog = new SaveFileDialog {
+        public static void WriteToTSVFile(List<string> strings)
+        {
+            SaveFileDialog dialog = new SaveFileDialog
+            {
                 Filter = IOFunctions.TSV_FILTER
             };
-            if (dialog.ShowDialog() == DialogResult.OK) {
-                using (StreamWriter writer = new StreamWriter(dialog.FileName)) {
-                    foreach (string str in strings) {
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter writer = new StreamWriter(dialog.FileName))
+                {
+                    foreach (string str in strings)
+                    {
                         writer.WriteLine(str);
                     }
                 }
             }
         }
-  
+
         /*
          * Utility method to determine if the given file has one of the given extensions.
          */
-        public static bool HasExtension(PackedFile file, IEnumerable<string> extensions) {
+        public static bool HasExtension(PackedFile file, IEnumerable<string> extensions)
+        {
             bool result = false;
-            if (file != null) {
-                foreach (string ext in extensions) {
-                    if (Path.GetExtension(file.FullPath).Equals(ext.Trim())) {
+            if (file != null)
+            {
+                foreach (string ext in extensions)
+                {
+                    if (Path.GetExtension(file.FullPath).Equals(ext.Trim()))
+                    {
                         result = true;
                         break;
                     }

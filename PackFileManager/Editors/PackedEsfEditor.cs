@@ -36,7 +36,7 @@ namespace PackFileManager {
 
         string[] EXTENSIONS = { ".esf" };
         public override bool CanEdit(PackedFile file) {
-            return HasExtension(file, EXTENSIONS);
+            return PackedFileEditorHelper.HasExtension(file, EXTENSIONS);
         }
 
         public override EsfNode EditedFile {

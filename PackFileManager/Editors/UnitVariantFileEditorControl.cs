@@ -55,7 +55,7 @@
 
         string[] EXTENSIONS = { ".unit_variant" };
         public override bool CanEdit(PackedFile file) {
-            return HasExtension(file, EXTENSIONS);
+            return PackedFileEditorHelper.HasExtension(file, EXTENSIONS);
         }
 
         public override UnitVariantFile EditedFile {
@@ -115,7 +115,7 @@
                     }
                 }
             }
-            WriteToTSVFile(strings);
+            PackedFileEditorHelper.WriteToTSVFile(strings);
         }
 
         private void InitializeComponent() {

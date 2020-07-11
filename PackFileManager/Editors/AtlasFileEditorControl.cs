@@ -53,7 +53,7 @@
 
         string[] EXTENSIONS = { ".atlas" };
         public override bool CanEdit(PackedFile file) {
-            return HasExtension(file, EXTENSIONS);
+            return PackedFileEditorHelper.HasExtension(file, EXTENSIONS);
         }
 
         public override AtlasFile EditedFile {
@@ -147,7 +147,7 @@
                             rowObject.X3.ToString() + "\t" + 
                             rowObject.Y3.ToString());
             }
-            WriteToTSVFile(strings);
+            PackedFileEditorHelper.WriteToTSVFile(strings);
         }
 
         private void InitializeComponent()

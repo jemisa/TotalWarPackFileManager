@@ -12,6 +12,7 @@ using CommonDialogs;
 using CommonUtilities;
 using Filetypes.Codecs;
 using DBTableControl;
+using PackFileManager.Editors;
 
 namespace PackFileManager
 {
@@ -39,7 +40,7 @@ namespace PackFileManager
         }
 
         DBFileUpdate dbUpdater = new DBFileUpdate();
-        private TextFileEditorControl textFileEditorControl = null;
+        private WpfPackedFileEditorHost textFileEditorControl = null;
         ExternalEditor externalEditor = new ExternalEditor();
 
         private void CreateEditors()
@@ -51,17 +52,16 @@ namespace PackFileManager
                 PackedFileEditorRegistry.Editors.Add(WpfPackedFileEditorHost.Create<DBTableControl.DBEditorTableControl>());
             }
 
-            PackedFileEditorRegistry.Editors.Add(new DBFileEditorControl{Dock = DockStyle.Fill});
             PackedFileEditorRegistry.Editors.Add(new ImageViewerControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new LocFileEditorControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new GroupformationEditor { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new UnitVariantFileEditorControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new PackedEsfEditor { Dock = DockStyle.Fill });
-            textFileEditorControl = new TextFileEditorControl {Dock = DockStyle.Fill};
+
+            textFileEditorControl = WpfPackedFileEditorHost.Create<AdvancedTextFileEditorControl>();
             PackedFileEditorRegistry.Editors.Add(textFileEditorControl);
         }
    
-
         public PackFileManagerForm (string[] args) 
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Application.ExecutablePath));

@@ -69,18 +69,12 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="DataGridViewExtended.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="DBFileTypesUpdater.cs" />
+    <Compile Include="Editors\AdvancedTextFileEditorControl.xaml.cs">
+      <DependentUpon>AdvancedTextFileEditorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Editors\AtlasFileEditorControl.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editors\DBFileEditorControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editors\DBFileEditorControl.Designer.cs">
-      <DependentUpon>DBFileEditorControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\FormationPreview.cs">
       <SubType>UserControl</SubType>
@@ -100,9 +94,6 @@
     </Compile>
     <Compile Include="Editors\PackedEsfEditor.Designer.cs">
       <DependentUpon>PackedEsfEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\TextFileEditorControl.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Editors\UnitVariantFileEditorControl.cs">
       <SubType>UserControl</SubType>
@@ -130,9 +121,6 @@
     <Compile Include="PackedTreeView\PackTreeNodes.cs" />
     <Compile Include="PackedTreeView\PackTreeViewFilterService.cs" />
     <Compile Include="Program.cs" />
-    <EmbeddedResource Include="Editors\DBFileEditorControl.resx">
-      <DependentUpon>DBFileEditorControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Editors\FormationPreview.resx">
       <DependentUpon>FormationPreview.cs</DependentUpon>
     </EmbeddedResource>
@@ -167,6 +155,7 @@
     <Compile Include="Properties\Resources.cs" />
     <Compile Include="Properties\Settings.cs" />
     <Compile Include="ToolTipRegion.cs" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\Files\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -263,15 +252,33 @@
   <ItemGroup>
     <None Include="Resources\Britannia.ico" />
     <None Include="Resources\ThreeKingdoms.ico" />
+    <Resource Include="Resources\Editor\Copy.png" />
+    <Resource Include="Resources\Editor\Cut.png" />
+    <Resource Include="Resources\Editor\Delete.png" />
+    <Resource Include="Resources\Editor\Open.png" />
+    <Resource Include="Resources\Editor\Paste.png" />
+    <Resource Include="Resources\Editor\Redo.png" />
+    <Resource Include="Resources\Editor\Save.png" />
+    <Resource Include="Resources\Editor\Undo.png" />
+    <Resource Include="Resources\Editor\WordWrap.png" />
     <Content Include="Resources\Warhammer2.ico" />
     <None Include="Resources\Warhammer.ico" />
     <None Include="Resources\Attila.ico" />
     <Content Include="Resources\Rome2.ico" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AvalonEdit">
+      <Version>6.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Editors\AdvancedTextFileEditorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
