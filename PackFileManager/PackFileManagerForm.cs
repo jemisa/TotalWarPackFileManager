@@ -556,7 +556,7 @@ namespace PackFileManager
                 CurrentPackFile = codec.Open(filepath);
             } catch (Exception exception) {
                 MessageBox.Show(exception.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                _packTreeView.GetTreeView().Enabled = true;
+                _packTreeView.Enabled = true;
             }
 #if DEBUG
             Console.WriteLine("{0}allowing label edit", (CanWriteCurrentPack ? "" : "dis"));
@@ -831,8 +831,7 @@ namespace PackFileManager
                 return;
 
             var packedFiles = new List<PackedFile>();
-            if (_packTreeView.IsSelectedNodeRoot() || 
-                _packTreeView.GetTreeView().SelectedNode.Children.Count > 0)
+            if (_packTreeView.IsSelectedNodeRoot() || !_packTreeView.IsSelectedNoodLeaf())
             {
                 getPackedFilesFromBranch(packedFiles, _packTreeView.GetTreeView().SelectedNode.Children);
             } 
@@ -1355,7 +1354,6 @@ namespace PackFileManager
                 bool canBeEdited = _packTreeView.IsSelectedNoodLeaf() && !_packTreeView.IsSelectedNodeRoot();
                 _packTreeView.LabelEdit(canBeEdited);
 
-                var selectedNode = _packTreeView.GetTreeView().SelectedNode;
                 if (_packTreeView.GetSelectedNodeContent() is PackedFile) 
                 {
                     OpenPackedFileEditor(_packTreeView.GetSelectedNodeContent() as PackedFile);
@@ -1451,11 +1449,10 @@ namespace PackFileManager
 
         public override void Refresh() 
         {
-            
-            var selectedNode = _packTreeView.GetTreeView().SelectedNode;
-            if (selectedNode != null)
+            var nodeContent = _packTreeView.GetSelectedNodeContent();
+            if (nodeContent != null)
             {
-                if (_packTreeView.GetSelectedNodeContent() is PackedFile nodeAsPackedFile)
+                if (nodeContent is PackedFile nodeAsPackedFile)
                     OpenPackedFileEditor(nodeAsPackedFile);
             }
 
