@@ -8,12 +8,31 @@ using System.Text;
 using System.Drawing;
 using System.Linq;
 using Filetypes.Codecs;
+using Aga.Controls.Tree;
 
 namespace PackFileManager {
     /*
      * Base class for any kind of entry (directory of file).
      */
-    abstract class PackEntryNode : TreeNode {
+    abstract class PackEntryNode : Node
+    {
+        public Color Color { get; set; }
+        public string ToolTipText { get; set; }
+        public override string Text
+        {
+            get
+            {
+                return base.Text;
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentNullException();
+
+                base.Text = value;
+            }
+        }
+
         protected bool renamed;
         private bool added;
         public bool Added {
@@ -27,25 +46,27 @@ namespace PackFileManager {
             : base(entry.Name) {
             Tag = entry;
             entry.ModifiedEvent += delegate(PackEntry p) { ChangeColor(); };
-            entry.RenameEvent += (e, name) => { renamed = true; ChangeColor(); };
+            entry.RenameEvent += (e, name) => { renamed = true;  ChangeColor(); };
             ChangeColor();
         }
-        public virtual void ChangeColor() {
+
+        public virtual void ChangeColor() 
+        {
             PackEntry e = Tag as PackEntry;
-            ForeColor = Color.Black;
+            Color = Color.Black;
             if (added) {
-                ForeColor = Color.Green;
+                Color = Color.Green;
             } else if (renamed) {
-                ForeColor = Color.LimeGreen;
+                Color = Color.LimeGreen;
             } else if (e.Deleted) {
-                ForeColor = Color.LightGray;
+                Color = Color.LightGray;
             } else if (e.Modified) {
-                ForeColor = Color.Red;
+                Color = Color.Red;
             }
         }
         public void Reset() {
             renamed = added = false;
-            foreach (TreeNode node in Nodes) {
+            foreach (var node in Nodes) {
                 PackEntryNode packNode = node as PackEntryNode;
                 packNode.Reset();
             }
@@ -55,7 +76,23 @@ namespace PackFileManager {
     /*
      * A tree node representing an actual data file.
      */
-    class PackedFileNode : PackEntryNode {
+    class PackedFileNode : PackEntryNode 
+    {
+        public override string Text
+        {
+            get
+            {
+                return base.Text;
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentNullException();
+
+                base.Text = value;
+            }
+        }
+
         public PackedFileNode(PackedFile file)
             : base(file) {
                 if (file.FullPath.StartsWith("db")) {
@@ -69,9 +106,10 @@ namespace PackFileManager {
         /*
          * Overridden to adjust to color depending on we have DB type information.
          */
-        public override void ChangeColor() {
+        public override void ChangeColor() 
+        {
             base.ChangeColor();
-
+           
             PackedFile packedFile = Tag as PackedFile;
             string text = Path.GetFileName(packedFile.Name);
             if (packedFile != null && packedFile.FullPath.StartsWith("db")) {
@@ -85,21 +123,22 @@ namespace PackFileManager {
                         // text = string.Format("{0} - version {1}", text, header.Version);
                         if (header.EntryCount == 0) {
                             // empty db file
-                            ForeColor = Color.Blue;
+                            Color = Color.Blue;
                             if (Parent != null) {
-                                Parent.ForeColor = Color.Blue;
+                                (Parent as PackEntryNode).Color = Color.Blue;
                             }
                         } else if (!PackedFileDbCodec.CanDecode(packedFile, out mouseover)) {
-                            if (Parent != null) {                             
-                                Parent.ForeColor = Color.Red;
+                            if (Parent != null) {
+                                (Parent as PackEntryNode).Color = Color.Red;
                             }
-                            ForeColor = Color.Red;
+                            Color = Color.Red;
                             ToolTipText = mouseover;
                         } else if (HeaderVersionObsolete(packedFile)) {
                             if (Parent != null) {
-                                Parent.BackColor = Color.Yellow;
+                                (Parent as PackEntryNode).Color = Color.Yellow;
                             }
-                            BackColor = Color.Yellow;
+
+                            Color = Color.Yellow;
                         }
                     } catch { }
                 }
@@ -118,32 +157,30 @@ namespace PackFileManager {
     /*
      * A tree node representing a directory.
      */
-    class DirEntryNode : PackEntryNode {
+    class DirEntryNode : PackEntryNode 
+    {
+        public override string Text
+        {
+            get
+            {
+                return base.Text;
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentNullException();
+
+                base.Text = value;
+            }
+        }
+
         public DirEntryNode(VirtualDirectory nodeDir)
             : base(nodeDir) 
         {
-            // Check if the node is a directory with only one subfolder and one file.This happens a lot when there are database tables.
-            // Instead of creating a node with this relation Folder->File we then create a single node with the name Folder/File.
-            // Less clicking for the user
-            var subDirsWithoutParents = nodeDir.Subdirectories.Where(x => x.Subdirectories.Count == 0 && x.Files.Count() == 1);
-            if(subDirsWithoutParents.Count() == nodeDir.Subdirectories.Count())
+            foreach (VirtualDirectory dir in nodeDir.Subdirectories)
             {
-                foreach (var item in subDirsWithoutParents)
-                {
-                    PackEntryNode node = new PackedFileNode(item.Files.First());
-                    Nodes.Add(node);
-                    node.ChangeColor();
-                    node.Text = item.Name +"\\" + item.Files.First().Name;
-                }
+                Nodes.Add(new DirEntryNode(dir));
             }
-            else
-            {
-                foreach (VirtualDirectory dir in nodeDir.Subdirectories)
-                {
-                    Nodes.Add(new DirEntryNode(dir));
-                }
-            }
-
             foreach (PackedFile file in nodeDir.Files)
             {
                 PackEntryNode node = new PackedFileNode(file);
@@ -156,8 +193,8 @@ namespace PackFileManager {
             nodeDir.FileRemoved += RemoveEntry;
         }
         private void RemoveEntry(PackEntry entry) {
-            TreeNode remove = null;
-            foreach (TreeNode node in Nodes) {
+            Node remove = null;
+            foreach (var node in Nodes) {
                 if (node.Tag == entry) {
                     remove = node;
                     break;
@@ -192,7 +229,6 @@ namespace PackFileManager {
                 parent = parent.Parent as PackEntryNode;
             }
 
-            Expand();
         }
     }
 }

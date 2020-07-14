@@ -13,6 +13,9 @@ using CommonUtilities;
 using Filetypes.Codecs;
 using DBTableControl;
 using PackFileManager.Editors;
+using System.Linq;
+using System.Collections.ObjectModel;
+using Aga.Controls.Tree;
 
 namespace PackFileManager
 {
@@ -34,7 +37,7 @@ namespace PackFileManager
                 currentPackFile.Modified += EnableMenuItems;
 
                 DBReferenceMap.Instance.CurrentPack = value;
-                
+                _packTreeView.BuildTreeFromPackFile(CurrentPackFile);
                 Refresh();
             }
         }
@@ -171,7 +174,7 @@ namespace PackFileManager
 
             RefreshTitle();
             _packTreeView._parentRef = this;
-            _packTreeView.GetTreeView().AfterSelect += this.packTreeView_AfterSelect;
+            _packTreeView.GetTreeView().SelectionChanged += this.packTreeView_AfterSelect;
             _packTreeView.GetTreeView().PreviewKeyDown += packTreeView_PreviewKeyDown;
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
             
@@ -507,10 +510,10 @@ namespace PackFileManager
             renameSelectedToolStripMenuItem.Enabled = nodeSelected;
             openMenuItem.Enabled = nodeSelected;
 
-            bool isLeafNode = nodeSelected && (_packTreeView.GetTreeView().SelectedNode.Nodes.Count == 0);
+            bool isLeafNode = nodeSelected && _packTreeView.IsSelectedNoodLeaf();
             replaceFileToolStripMenuItem.Enabled = CanWriteCurrentPack && isLeafNode;
 
-            bool isRootNode = nodeSelected && _packTreeView.GetTreeView().SelectedNode == _packTreeView.GetTreeView().Nodes[0];
+            bool isRootNode = nodeSelected && _packTreeView.IsSelectedNodeRoot();
             renameToolStripMenuItem.Enabled = CanWriteCurrentPack && nodeSelected && !isRootNode;
             deleteFileToolStripMenuItem.Enabled = CanWriteCurrentPack && nodeSelected && !isRootNode;
         }
@@ -560,7 +563,7 @@ namespace PackFileManager
 #endif
 
             AddNewRecentFile(filepath);
-            _packTreeView.GetTreeView().LabelEdit = CanWriteCurrentPack;
+            _packTreeView.LabelEdit(CanWriteCurrentPack);
         }
         #endregion
 
@@ -755,8 +758,8 @@ namespace PackFileManager
                 if (_packTreeView.GetTreeView().SelectedNode == null) {
                     addTo = CurrentPackFile.Root;
                 } else {
-                    addTo = _packTreeView.GetTreeView().SelectedNode.Tag as VirtualDirectory 
-                        ?? _packTreeView.GetTreeView().SelectedNode.Parent.Tag as VirtualDirectory;
+                    addTo = _packTreeView.GetSelectedNodeContent() as VirtualDirectory 
+                        ?? _packTreeView.GetNodeContent(_packTreeView.GetTreeView().SelectedNode.Parent) as VirtualDirectory;
                 }
                 return addTo;
             }
@@ -822,29 +825,37 @@ namespace PackFileManager
             }
         }
 
-        public void deleteFileToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (_packTreeView.GetTreeView().SelectedNode == null) {
+        public void deleteFileToolStripMenuItem_Click(object sender, EventArgs e) 
+        {
+            if (_packTreeView.GetTreeView().SelectedNode == null)
                 return;
-            }
+
             var packedFiles = new List<PackedFile>();
-            if ((_packTreeView.GetTreeView().SelectedNode == _packTreeView.GetTreeView().Nodes[0]) || (_packTreeView.GetTreeView().SelectedNode.Nodes.Count > 0)) {
-                getPackedFilesFromBranch(packedFiles, _packTreeView.GetTreeView().SelectedNode.Nodes);
-            } else {
-                packedFiles.Add(_packTreeView.GetTreeView().SelectedNode.Tag as PackedFile);
+            if (_packTreeView.IsSelectedNodeRoot() || 
+                _packTreeView.GetTreeView().SelectedNode.Children.Count > 0)
+            {
+                getPackedFilesFromBranch(packedFiles, _packTreeView.GetTreeView().SelectedNode.Children);
+            } 
+            else 
+            {
+                packedFiles.Add(_packTreeView.GetSelectedNodeContent() as PackedFile);
             }
             foreach (PackedFile file in packedFiles) {
                 file.Deleted = true;
             }
         }
 
-        private void getPackedFilesFromBranch(List<PackedFile> packedFiles, TreeNodeCollection trunk, Predicate<PackedFile> filter = null) {
-            foreach (TreeNode node in trunk)
+        private void getPackedFilesFromBranch(List<PackedFile> packedFiles, ReadOnlyCollection<TreeNodeAdv> trunk) 
+        {
+            foreach (var node in trunk)
             {
-                if (node.Nodes.Count > 0) {
-                    getPackedFilesFromBranch(packedFiles, node.Nodes, filter);
+                if (node.Children.Count > 0) 
+                {
+                    getPackedFilesFromBranch(packedFiles, node.Children);
                 }
-                else if (filter == null || filter(node.Tag as PackedFile)) {
-                    packedFiles.Add(node.Tag as PackedFile);
+                else 
+                {
+                    packedFiles.Add(_packTreeView.GetNodeContent(node) as PackedFile);
                 }
             }
         }
@@ -881,8 +892,9 @@ namespace PackFileManager
             OpenPackedFileEditor(readme);
         }
 
-        private void renameToolStripMenuItem_Click(object sender, EventArgs e) {
-            _packTreeView.GetTreeView().SelectedNode.BeginEdit();
+        private void renameToolStripMenuItem_Click(object sender, EventArgs e) 
+        {
+            _packTreeView.ShowRenameSelectedNodeDialog();
         }
 
         private void replaceFileToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -892,25 +904,21 @@ namespace PackFileManager
             };
             if (replaceFileDialog.ShowDialog() == DialogResult.OK) {
                 Settings.Default.ImportExportDirectory = Path.GetDirectoryName(replaceFileDialog.FileName);
-                PackedFile tag = _packTreeView.GetTreeView().SelectedNode.Tag as PackedFile;
+                PackedFile tag = _packTreeView.GetSelectedNodeContent() as PackedFile;
                 tag.Source = new FileSystemSource(replaceFileDialog.FileName);
             }
         }
         
-        private void emptyDirectoryToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void emptyDirectoryToolStripMenuItem_Click(object sender, EventArgs e) 
+        {
             VirtualDirectory dir = 
-                (_packTreeView.GetTreeView().SelectedNode != null) ? _packTreeView.GetTreeView().SelectedNode.Tag as VirtualDirectory : CurrentPackFile.Root;
-            if (dir != null) {
-                try {
+                (_packTreeView.GetTreeView().SelectedNode != null) ? _packTreeView.GetSelectedNodeContent() as VirtualDirectory : CurrentPackFile.Root;
+            if (dir != null) 
+            {
+                try 
+                {
                     VirtualDirectory newDir = new VirtualDirectory() { Name = "empty" };
                     dir.Add(newDir);
-                    foreach (TreeNode node in _packTreeView.GetTreeView().SelectedNode.Nodes) {
-                        if (node.Tag == newDir) {
-                            node.EnsureVisible();
-                            node.BeginEdit();
-                            break;
-                        }
-                    }
                 } catch { }
             }
         }
@@ -923,7 +931,8 @@ namespace PackFileManager
             }
         }
 
-        private void dBFileFromTSVToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void dBFileFromTSVToolStripMenuItem_Click(object sender, EventArgs e) 
+        {
             VirtualDirectory addToBase = (ModManager.Instance.CurrentModSet)
                 ? currentPackFile.Root : AddTo;
             if (addToBase != null) {
@@ -956,14 +965,16 @@ namespace PackFileManager
 
                             PackedFile packedFile = new PackedFile { Data = data, Name = filename };
                             addToBase.Add(addBase, packedFile);
-                            foreach(TreeNode node in _packTreeView.GetAllContainedNodes()) {
-                                if (node.Tag == packedFile) {
+                            /*foreach(var node in _packTreeView.GetAllContainedNodes()) 
+                            {
+                                if (node.Tag == packedFile) 
+                                {
                                     node.Expand();
                                     _packTreeView.GetTreeView().SelectedNode = node;
                                     OpenPackedFileEditor(packedFile);
                                     break;
                                 }
-                            }
+                            }*/
                         }
                     } catch (Exception x) {
                         MessageBox.Show(x.Message);
@@ -977,7 +988,7 @@ namespace PackFileManager
 
         #region Open Packed File
         private void openAsTextMenuItem_Click(object sender, EventArgs e) {
-            OpenPackedFile(textFileEditorControl, _packTreeView.GetTreeView().SelectedNode.Tag as PackedFile);
+            OpenPackedFile(textFileEditorControl, _packTreeView.GetSelectedNodeContent() as PackedFile);
         }
 
         private void openFileToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -985,7 +996,7 @@ namespace PackFileManager
         }
 
         private void openDecodeToolMenuItem_Click(object sender, EventArgs e) {
-            PackedFile packedFile = _packTreeView.GetTreeView().SelectedNode.Tag as PackedFile;
+            PackedFile packedFile = _packTreeView.GetSelectedNodeContent() as PackedFile;
             if (packedFile != null) {
                 DecodeTool.DecodeTool decoder = null;
                 // best used if a db file...
@@ -1057,7 +1068,7 @@ namespace PackFileManager
 
         private void OpenExternal() 
         {
-            PackedFile packed = _packTreeView.GetTreeView().SelectedNode.Tag as PackedFile;
+            PackedFile packed = _packTreeView.GetSelectedNodeContent() as PackedFile;
             if (externalEditor.CanEdit(packed)) 
             {
                 Activated += PackFileManagerForm_GotFocus;
@@ -1085,11 +1096,14 @@ namespace PackFileManager
         private ICollection<PackedFile> FilesInSelection {
             get {
                 List<PackedFile> result = new List<PackedFile>();
-                VirtualDirectory collectFrom = _packTreeView.GetTreeView().SelectedNode.Tag as VirtualDirectory;
-                if (collectFrom != null) {
+                VirtualDirectory collectFrom = _packTreeView.GetSelectedNodeContent() as VirtualDirectory;
+                if (collectFrom != null)
+                {
                     result.AddRange(collectFrom.AllFiles);
-                } else if (_packTreeView.GetTreeView().SelectedNode.Tag is PackedFile) {
-                    result.Add(_packTreeView.GetTreeView().SelectedNode.Tag as PackedFile);
+                }
+                else if (_packTreeView.GetSelectedNodeContent() is PackedFile) 
+                {
+                    result.Add(_packTreeView.GetSelectedNodeContent() as PackedFile);
                 }
                 return result;
             }
@@ -1277,9 +1291,9 @@ namespace PackFileManager
             EnableMenuItems();
             
             if (_packTreeView.GetTreeView().SelectedNode != null) {
-                OpenPackedFileEditor(_packTreeView.GetTreeView().SelectedNode.Tag as PackedFile);
+                OpenPackedFileEditor(_packTreeView.GetSelectedNodeContent() as PackedFile);
             }
-            _packTreeView.GetTreeView().LabelEdit = CanWriteCurrentPack;
+            _packTreeView.LabelEdit(CanWriteCurrentPack);
         }
 
         private void updateOnStartupToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -1331,18 +1345,20 @@ namespace PackFileManager
         #endregion
 
 
-        private void packTreeView_AfterSelect(object sender, TreeViewEventArgs e) 
+        private void packTreeView_AfterSelect(object sender, EventArgs e) 
         {
             CloseEditors();
             splitContainer1.Panel2.Controls.Clear();
          
             if (_packTreeView.GetTreeView().SelectedNode != null) 
             {
-                bool canBeEdited = _packTreeView.GetTreeView().Nodes.Count > 0 && _packTreeView.GetTreeView().SelectedNode != _packTreeView.GetTreeView().Nodes[0];
-                _packTreeView.GetTreeView().LabelEdit = canBeEdited;
-                if (_packTreeView.GetTreeView().SelectedNode.Tag is PackedFile) 
+                bool canBeEdited = _packTreeView.IsSelectedNoodLeaf() && !_packTreeView.IsSelectedNodeRoot();
+                _packTreeView.LabelEdit(canBeEdited);
+
+                var selectedNode = _packTreeView.GetTreeView().SelectedNode;
+                if (_packTreeView.GetSelectedNodeContent() is PackedFile) 
                 {
-                    OpenPackedFileEditor(_packTreeView.GetTreeView().SelectedNode.Tag as PackedFile);
+                    OpenPackedFileEditor(_packTreeView.GetSelectedNodeContent() as PackedFile);
                 }
             }
             EnableMenuItems();
@@ -1435,11 +1451,11 @@ namespace PackFileManager
 
         public override void Refresh() 
         {
-            _packTreeView.Refresh(CurrentPackFile);
+            
             var selectedNode = _packTreeView.GetTreeView().SelectedNode;
             if (selectedNode != null)
             {
-                if (selectedNode.Tag is PackedFile nodeAsPackedFile)
+                if (_packTreeView.GetSelectedNodeContent() is PackedFile nodeAsPackedFile)
                     OpenPackedFileEditor(nodeAsPackedFile);
             }
 

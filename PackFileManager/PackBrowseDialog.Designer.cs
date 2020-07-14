@@ -23,10 +23,11 @@
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.packFileTree = new System.Windows.Forms.TreeView();
+            this.packFileTree = new Aga.Controls.Tree.TreeViewAdv();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
+            this.nodeTextBox1 = new Aga.Controls.Tree.NodeControls.NodeTextBox();
             this.SuspendLayout();
             // 
             // packFileTree
@@ -34,8 +35,20 @@
             this.packFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.packFileTree.BackColor = System.Drawing.SystemColors.Window;
+            this.packFileTree.ColumnHeaderHeight = 0;
+            this.packFileTree.DefaultToolTipProvider = null;
+            this.packFileTree.DragDropMarkColor = System.Drawing.Color.Black;
+            this.packFileTree.FullRowSelectActiveColor = System.Drawing.Color.Empty;
+            this.packFileTree.FullRowSelectInactiveColor = System.Drawing.Color.Empty;
+            this.packFileTree.LineColor = System.Drawing.SystemColors.ControlDark;
+            this.packFileTree.LoadOnDemand = true;
             this.packFileTree.Location = new System.Drawing.Point(13, 13);
+            this.packFileTree.Model = null;
             this.packFileTree.Name = "packFileTree";
+            this.packFileTree.NodeControls.Add(this.nodeTextBox1);
+            this.packFileTree.NodeFilter = null;
+            this.packFileTree.SelectedNode = null;
             this.packFileTree.Size = new System.Drawing.Size(433, 533);
             this.packFileTree.TabIndex = 0;
             // 
@@ -63,12 +76,20 @@
             // 
             // statusLabel
             // 
-            this.statusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.statusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.statusLabel.Location = new System.Drawing.Point(13, 555);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(290, 23);
+            this.statusLabel.TabIndex = 3;
             this.statusLabel.Text = "Double click to select";
-            this.statusLabel.Visible = true;
+            // 
+            // nodeTextBox1
+            // 
+            this.nodeTextBox1.DataPropertyName = "Text";
+            this.nodeTextBox1.IncrementalSearchEnabled = true;
+            this.nodeTextBox1.LeftMargin = 3;
+            this.nodeTextBox1.ParentColumn = null;
             // 
             // PackBrowseDialog
             // 
@@ -82,13 +103,15 @@
             this.Name = "PackBrowseDialog";
             this.Text = "PackBrowseDialog";
             this.ResumeLayout(false);
+
         }
 
         #endregion
 
-        private System.Windows.Forms.TreeView packFileTree;
+        private Aga.Controls.Tree.TreeViewAdv packFileTree;
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Label statusLabel;
+        private Aga.Controls.Tree.NodeControls.NodeTextBox nodeTextBox1;
     }
 }

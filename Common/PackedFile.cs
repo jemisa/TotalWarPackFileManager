@@ -29,10 +29,11 @@ namespace Common {
                 return name;
             }
             set {
+                name = value;
                 if (RenameEvent != null) {
                     RenameEvent(this, value);
                 }
-                name = value;
+                
             }
         }
 

@@ -1,150 +1,174 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Common;
 using System.Text.RegularExpressions;
 using System.IO;
+using Aga.Controls.Tree;
+using CommonDialogs;
+using Aga.Controls.Tree.NodeControls;
 
 namespace PackFileManager.ExtentedTreeView
 {
     public partial class ExtendedTreeView : UserControl
     {
-        PackTreeViewFilterService _packTreeFilterService;
+        private class ToolTipProvider : IToolTipProvider
+        {
+            public string GetToolTip(TreeNodeAdv node, NodeControl nodeControl)
+            {
+                var valueNode = node.Tag as PackEntryNode;
+                if(valueNode != null)
+                    return valueNode.ToolTipText;
+                return "";
+            }
+        }
 
         public PackFileManagerForm _parentRef;
+        TreeModel _treeModel;
 
         public ExtendedTreeView()
         {
             InitializeComponent();
+            _treeModel = new TreeModel();
 
-            _treeViewSearchBox.KeyUp += OnSearchKeyUp;
-            _packTreeFilterService = new PackTreeViewFilterService(_treeView);
-            _treeView.NodeMouseHover += new System.Windows.Forms.TreeNodeMouseHoverEventHandler(this.PackTreeView_NodeMouseHover);
-            _treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.packTreeView_AfterLabelEdit);
-            _treeView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.packTreeView_ItemDrag);
-            _treeView.NodeMouseClick += (sender, args) => _treeView.SelectedNode = args.Node;
+            treeViewAdv1.ItemDrag += new ItemDragEventHandler(this.packTreeView_ItemDrag);
+            treeViewAdv1.NodeMouseClick += (sender, args) => treeViewAdv1.SelectedNode = args.Node;
+            treeViewAdv1.Expanded += TreeViewAdv1_Expanded;
+            
+            treeViewAdv1.Model = _treeModel;
+            treeViewAdv1.NodeFilter = filter;
+
+            nodeTextBox1.ToolTipProvider = new ToolTipProvider();
+            nodeTextBox1.DrawText += new EventHandler<DrawTextEventArgs>(_nodeTextBox_DrawText);
         }
 
-        public TreeView GetTreeView()
+        void _nodeTextBox_DrawText(object sender, DrawTextEventArgs e)
         {
-            return _treeView;
-        }
-
-        public List<TreeNode> GetAllContainedNodes()
-        {
-            List<TreeNode> nodes = new List<TreeNode>();
-            GetAllContainedNodes(ref nodes, GetTreeView().Nodes);
-            return nodes;
-        }
-
-        private void GetAllContainedNodes(ref List<TreeNode> nodes, TreeNodeCollection trunk)
-        {
-            foreach (TreeNode node in trunk)
+            var node = e.Node.Tag as PackEntryNode;
+            if (node != null)
             {
-                nodes.Add(node);
-                GetAllContainedNodes(ref nodes, node.Nodes);
+                e.TextColor = node.Color;
             }
+        }
+
+        private void TreeViewAdv1_Expanded(object sender, TreeViewAdvEventArgs e)
+        {
+            var content = e.Node.Tag as DirEntryNode;
+            if (content != null)
+            {
+                var children = e.Node.Children;
+                foreach (var child in children)
+                {
+                    var file = child.Tag as PackedFileNode;
+                    if (file != null)
+                        child.Expand(true);
+                }
+            }
+        }
+
+        public void LabelEdit(bool state)
+        {
+        }
+
+
+        public TreeViewAdv GetTreeView()
+        {
+            return treeViewAdv1;
+        }
+
+        public object GetNodeContent(TreeNodeAdv node)
+        {
+            var outerNode = node.Tag as Node;
+            return outerNode.Tag;
+        }
+
+        public object GetSelectedNodeContent()
+        {
+            if (treeViewAdv1.SelectedNode == null)
+                return null;
+
+            var outerNode = treeViewAdv1.SelectedNode.Tag as Node;
+            return outerNode.Tag;
+        }
+
+        public bool IsSelectedNodeRoot()
+        {
+            return treeViewAdv1.SelectedNode == treeViewAdv1.Root;
+        }
+
+        public bool IsSelectedNoodLeaf()
+        {
+            if (treeViewAdv1.SelectedNode == null)
+                return false;
+            return treeViewAdv1.SelectedNode.IsLeaf;
         }
 
         public void ExpandSelectedNode()
         {
-            if (GetTreeView().SelectedNode == null)
+            if (treeViewAdv1.SelectedNode == null)
                 return;
 
-            GetTreeView().BeginUpdate();
-            if (!GetTreeView().SelectedNode.IsExpanded)
-                GetTreeView().SelectedNode.ExpandAll();
+            treeViewAdv1.BeginUpdate();
+            if (!treeViewAdv1.SelectedNode.IsExpanded)
+                treeViewAdv1.SelectedNode.ExpandAll();
             else
-                GetTreeView().SelectedNode.Collapse(false);
-            GetTreeView().EndUpdate();
+                treeViewAdv1.SelectedNode.Collapse(false);
+            treeViewAdv1.EndUpdate();
         }
 
-        public void Refresh(PackFile currentPackFile)
+        public void BuildTreeFromPackFile(PackFile currentPackFile)
         {
-            // save currently opened nodes
-            var expandedNodes = new List<string>();
-            foreach (TreeNode node in GetAllContainedNodes())
-            {
-                if (node.IsExpanded && node is PackEntryNode)
-                {
-                    expandedNodes.Add((node.Tag as PackEntry).FullPath);
-                }
-            }
-            string selectedNode = (GetTreeView().SelectedNode != null)
-                ? (GetTreeView().SelectedNode.Tag as PackEntry).FullPath : "";
-
-            // rebuild tree
-            GetTreeView().Nodes.Clear();
             if (currentPackFile == null)
+                return;
+
+            var node2 = new DirEntryNode(currentPackFile.Root);
+            treeViewAdv1.BeginUpdate();
+            _treeModel.Nodes.Clear();
+            _treeModel.Nodes.Add(node2);
+            treeViewAdv1.EndUpdate();
+        }
+
+
+        public void ShowRenameSelectedNodeDialog()
+        {
+            if (!_parentRef.CanWriteCurrentPack)
             {
+                MessageBox.Show("Unable to edit current pack as it is read only");
                 return;
             }
-            TreeNode node2 = new DirEntryNode(currentPackFile.Root);
-            GetTreeView().BeginUpdate();
-            GetTreeView().Nodes.Add(node2);
-            GetTreeView().EndUpdate();
 
-            // recover opened nodes and selection
-            foreach (TreeNode node in GetAllContainedNodes())
+            PackEntry entry = GetSelectedNodeContent() as PackEntry;
+            if (entry == null)
             {
-                string path = (node.Tag as PackEntry).FullPath;
-                if (expandedNodes.Contains(path))
+                MessageBox.Show("Can only rename Pack Entries");
+                return;
+            }
+
+            var inputDialog = new InputBox() { Text = "Rename file:" };
+            inputDialog.StartPosition = FormStartPosition.CenterParent;
+            inputDialog.ShowDialog(this);
+
+            if (inputDialog.DialogResult == System.Windows.Forms.DialogResult.OK)
+            {
+                string newName = inputDialog.Input;
+                if (versionedRegex.IsMatch(newName))
                 {
-                    node.Expand();
+                    newName = versionedRegex.Match(newName).Groups[1].Value;
                 }
+                    
+                entry.Name = newName;
             }
         }
-
 
         static readonly Regex versionedRegex = new Regex("(.*) - version.*");
-        private void packTreeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+
+        private bool filter(object obj)
         {
-            if (_parentRef.CanWriteCurrentPack)
-            {
-                PackEntry entry = e.Node.Tag as PackEntry;
-                if ((e.Label != null) && (e.Label != e.Node.Text) && (entry != null))
-                {
-                    string newName = e.Label;
-                    if (versionedRegex.IsMatch(newName))
-                    {
-                        newName = versionedRegex.Match(newName).Groups[1].Value;
-                    }
-                    entry.Name = newName;
-                }
-            }
-            e.CancelEdit = true;
+            TreeNodeAdv viewNode = obj as TreeNodeAdv;
+            Node n = viewNode != null ? viewNode.Tag as Node : obj as Node;
+            return n == null || n.Text.ToUpper().Contains(this._treeViewSearchBox.Text.ToUpper()) || n.Nodes.Any(filter);
         }
 
-        private void PackTreeView_NodeMouseHover(object sender, TreeNodeMouseHoverEventArgs e)
-        {
-            packTreeViewToolTip.RemoveAll();
-            var pos = GetTreeView().PointToClient(Cursor.Position);
-            TreeNode selNode = (TreeNode)GetTreeView().GetNodeAt(pos);
-
-            if (selNode != null)
-            {
-                var toolTip = selNode.ToolTipText;
-                if (selNode.Tag != null)
-                {
-                    var directory = selNode.Tag as VirtualDirectory;
-                    if (directory != null)
-                    {
-                        var fileCount = directory.AllFiles.Count;
-                        toolTip += "File count = " + fileCount;
-                    }
-                }
-
-                if (!string.IsNullOrWhiteSpace(selNode.ToolTipText))
-                    toolTip += "\n" + selNode.ToolTipText;
-                packTreeViewToolTip.SetToolTip(GetTreeView(), toolTip);
-            }
-        }
 
         private void packTreeView_ItemDrag(object sender, ItemDragEventArgs e)
         {
@@ -171,28 +195,9 @@ namespace PackFileManager.ExtentedTreeView
             }
         }
 
-
-        // Search
-        private void OnSearchKeyUp(object sender, KeyEventArgs e)
+        private void _treeViewSearchBox_TextChanged(object sender, EventArgs e)
         {
-            var searchText = _treeViewSearchBox.Text;
-            if (searchText.Length >= 3)
-            {
-                if (e.KeyCode == Keys.Enter)
-                {
-                    _packTreeFilterService.Search(searchText);
-                }
-                else
-                {
-                    _packTreeFilterService.DeplayedSearch(_treeView.Text);
-                }
-            }
-
-            if (searchText.Length == 0)
-            {
-                _packTreeFilterService.ClearSearch();
-            }
-
+            treeViewAdv1.UpdateNodeFilter();
         }
     }
 }
