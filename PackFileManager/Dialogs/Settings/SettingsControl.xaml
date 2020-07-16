@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="PackFileManager.Dialogs.Settings.SettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PackFileManager"
+             mc:Ignorable="d" 
+             d:DesignHeight="500.5" d:DesignWidth="692" HorizontalAlignment="Center">
+    <Grid Margin="0,0,-0,0 ">
+        <GroupBox Header="Paths" Margin="0,0,0,0" VerticalAlignment="Top" >
+            <Grid VerticalAlignment="Stretch" Margin="0,-10,0,-4">
+                <Label x:Name="_gameLabel" Content="My mod's" HorizontalAlignment="Left" Margin="10,9,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="445,16,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseModDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,13,66,0" TextWrapping="Wrap" Text="Mod directory" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy" Content="Arena" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,44,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,41,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy1" Content="Attila" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy1" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,72,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy1" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,69,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy2" Content="Empire" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy2" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,100,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy2" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,97,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy3" Content="Napoleon" HorizontalAlignment="Left" Margin="10,121,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy3" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,128,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy3" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,125,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy4" Content="Rome 2" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy4" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,156,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy4" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,153,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy5" Content="Shogun 2" HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy5" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,184,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy5" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,181,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy6" Content="Tree Kingdoms" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy6" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,212,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy6" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,209,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy7" Content="Thrones of Britannia" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy7" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,240,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy7" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,237,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy8" Content="Warhammer 1" HorizontalAlignment="Left" Margin="10,260,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy8" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,267,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy8" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,264,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+                <Label x:Name="_gameLabel_Copy9" Content="Warhammer 2" HorizontalAlignment="Left" Margin="10,288,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="_gameBrowseButton_Copy9" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,295,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
+                <TextBox x:Name="_gamePathTextBox_Copy9" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,292,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top"/>
+
+
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Text Editor" Margin="0,329,0,0" VerticalAlignment="Top">
+            <Grid>
+                <Button Content="File formats" HorizontalAlignment="Right" Margin="206,0,0,0" Width="75" Click="Button_Click"/>
+                <CheckBox Content="Use Texteditor for unknown formats" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Misc" Margin="0,382,0,0" VerticalAlignment="Top" Height="108">
+            <Grid>
+                <CheckBox Content="Allow saving of CA packfiles" Margin="0,10,88,0" VerticalAlignment="Top"></CheckBox>
+                <ComboBox HorizontalAlignment="Left" Margin="88,33,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.517,1.227"/>
+                <Label Content="Default Game" HorizontalAlignment="Left" Margin="-4,29,0,0" VerticalAlignment="Top"/>
+                <CheckBox Content="Save Session&#xD;&#xA;" Margin="0,60,88,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

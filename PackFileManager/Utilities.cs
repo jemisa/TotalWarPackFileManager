@@ -7,6 +7,21 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace PackFileManager {
+
+    public enum GameTypeEnum
+    { 
+        Arena = 0,
+        Attila,
+        Empire,
+        Napoleon,
+        Rome_2,
+        Shogun_2,
+        ThreeKingdoms,
+        ThronesOfBritannia,
+        Warhammer1,
+        Warhammer2 
+    }
+    
     public static class Utilities {
         public static void DisposeHandlers(Control targetControl) {
 			EventInfo[] events = targetControl.GetType ().GetEvents ();

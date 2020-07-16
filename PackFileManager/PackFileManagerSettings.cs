@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace PackFileManager
 {
-    class PackFileManagerSettings
+    public class PackFileManagerSettings
     {
         public class GamePathPair
         {
@@ -17,8 +17,15 @@ namespace PackFileManager
             public string Path { get; set; }
         }
 
+         public class CustomFileExtentionHighlightsMapping
+         {
+             public string Extention { get; set; }
+             public string HighlightMapping { get; set; }
+         }
+
         public List<string> RecentUsedFiles { get; set; } = new List<string>();
         public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
+        public List<CustomFileExtentionHighlightsMapping> CustomFileExtentionHighlightsMappings { get; set; } = new List<CustomFileExtentionHighlightsMapping>();
     }
 
     class PackFileManagerSettingManager

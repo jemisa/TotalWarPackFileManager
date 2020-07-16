@@ -70,6 +70,22 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="DBFileTypesUpdater.cs" />
+    <Compile Include="Dialogs\Settings\FileExtentionSyntaxMappingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Settings\FileExtentionSyntaxMappingForm.Designer.cs">
+      <DependentUpon>FileExtentionSyntaxMappingForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Settings\SettingsControl.xaml.cs">
+      <DependentUpon>SettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Settings\SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Settings\SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Settings\SettingsFormInput.cs" />
     <Compile Include="Editors\AdvancedTextFileEditorControl.xaml.cs">
       <DependentUpon>AdvancedTextFileEditorControl.xaml</DependentUpon>
     </Compile>
@@ -120,6 +136,12 @@
     <Compile Include="PackFileManagerSettings.cs" />
     <Compile Include="PackedTreeView\PackTreeNodes.cs" />
     <Compile Include="Program.cs" />
+    <EmbeddedResource Include="Dialogs\Settings\FileExtentionSyntaxMappingForm.resx">
+      <DependentUpon>FileExtentionSyntaxMappingForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Settings\SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editors\FormationPreview.resx">
       <DependentUpon>FormationPreview.cs</DependentUpon>
     </EmbeddedResource>
@@ -241,6 +263,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\DataSources\PackFileManager.Dialogs.Settings.FileExtentionTableEntry.datasource" />
+    <None Include="Properties\DataSources\PackFileManager.Dialogs.Settings.Form1.datasource" />
     <None Include="Resources\Empire.ico" />
     <None Include="Resources\Napoleon.ico" />
     <None Include="Resources\Shogun.ico" />
@@ -277,6 +301,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Dialogs\Settings\SettingsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Editors\AdvancedTextFileEditorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

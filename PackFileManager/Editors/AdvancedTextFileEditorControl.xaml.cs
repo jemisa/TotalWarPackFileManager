@@ -6,7 +6,9 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Search;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -91,7 +93,10 @@ namespace PackFileManager.Editors
                     var codec = new TextCodec();
                     var decodedData = codec.Decode(stream);
                     textEditor.Text = decodedData;
-                    var extention = System.IO.Path.GetExtension(_packedFile.Name);
+                    var extention = Path.GetExtension(_packedFile.Name);
+
+                    
+
                     textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(extention);
                     HighlightingComboBox_SelectionChanged(null, null);
                 }

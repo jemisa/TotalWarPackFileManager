@@ -16,6 +16,7 @@ using PackFileManager.Editors;
 using System.Linq;
 using System.Collections.ObjectModel;
 using Aga.Controls.Tree;
+using PackFileManager.Dialogs.Settings;
 
 namespace PackFileManager
 {
@@ -1045,13 +1046,16 @@ namespace PackFileManager
         
         private void OpenPackedFile(IPackedFileEditor editor, PackedFile packedFile) {
             if (editor != null) {
-                try {
+                try 
+                {
                     editor.ReadOnly = !CanWriteCurrentPack;
                     editor.CurrentPackedFile = packedFile;
                     if (!splitContainer1.Panel2.Controls.Contains(editor as Control)) {
                         splitContainer1.Panel2.Controls.Add(editor as Control);
                     }
-                } catch (Exception ex) {
+                } 
+                catch (Exception ex) 
+                {
                     MessageBox.Show(string.Format("Failed to open {0}: {1}", Path.GetFileName(packedFile.FullPath), ex));
                 }
             }
@@ -1347,7 +1351,6 @@ namespace PackFileManager
         private void packTreeView_AfterSelect(object sender, EventArgs e) 
         {
             CloseEditors();
-            splitContainer1.Panel2.Controls.Clear();
          
             if (_packTreeView.GetTreeView().SelectedNode != null) 
             {
@@ -1481,6 +1484,26 @@ namespace PackFileManager
         private void expandToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _packTreeView.ExpandSelectedNode();
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            SettingsFormInput input = new SettingsFormInput();
+            var files = AllFiles;
+            if (files != null)
+            {
+                var extentions = files
+                    .Select(x => x.FileExtention)
+                    .Where(x=>string.IsNullOrWhiteSpace(x) == false)
+                    .Distinct()
+                    .Select(x=> "." + x);
+                input.FileExtentions = extentions.ToList();
+            }
+
+            using (var form = new SettingsForm(input))
+            {
+                form.ShowDialog();
+            }
         }
     }
 }

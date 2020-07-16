@@ -58,6 +58,7 @@ namespace PackFileManager
             this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importTSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this._packTreeView = new PackFileManager.ExtentedTreeView.ExtendedTreeView();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -147,7 +148,8 @@ namespace PackFileManager
             this.packStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.packActionProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.packTreeViewToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this._packTreeView = new PackFileManager.ExtentedTreeView.ExtendedTreeView();
+            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.packActionMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -404,6 +406,14 @@ namespace PackFileManager
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 9;
             // 
+            // _packTreeView
+            // 
+            this._packTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._packTreeView.Location = new System.Drawing.Point(0, 0);
+            this._packTreeView.Name = "_packTreeView";
+            this._packTreeView.Size = new System.Drawing.Size(210, 514);
+            this._packTreeView.TabIndex = 0;
+            // 
             // menuStrip
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -437,6 +447,8 @@ namespace PackFileManager
             this.toolStripSeparator9,
             this.exportFileListToolStripMenuItem,
             this.toolStripSeparator7,
+            this.toolStripMenuItem1,
+            this.toolStripSeparator12,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -448,7 +460,7 @@ namespace PackFileManager
             this.newToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -457,7 +469,7 @@ namespace PackFileManager
             this.openToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "&Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -473,7 +485,7 @@ namespace PackFileManager
             this.uninstallModMenuItem,
             this.openModPathToolStripMenuItem});
             this.modsToolStripMenuItem.Name = "modsToolStripMenuItem";
-            this.modsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.modsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.modsToolStripMenuItem.Text = "My Mods";
             // 
             // toolStripSeparator13
@@ -533,19 +545,19 @@ namespace PackFileManager
             this.openCAToolStripMenuItem.Enabled = false;
             this.openCAToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.openCAToolStripMenuItem.Name = "openCAToolStripMenuItem";
-            this.openCAToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.openCAToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openCAToolStripMenuItem.Text = "Open CA pack...";
             // 
             // recentFilesMenuItem
             // 
             this.recentFilesMenuItem.Name = "recentFilesMenuItem";
-            this.recentFilesMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.recentFilesMenuItem.Size = new System.Drawing.Size(180, 22);
             this.recentFilesMenuItem.Text = "Recent Files";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(167, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // saveToolStripMenuItem
             // 
@@ -553,7 +565,7 @@ namespace PackFileManager
             this.saveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveCurrentPack);
             // 
@@ -561,14 +573,14 @@ namespace PackFileManager
             // 
             this.saveAsToolStripMenuItem.Enabled = false;
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save &As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.QueryNameAndSave);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(167, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // changePackTypeToolStripMenuItem
             // 
@@ -577,7 +589,7 @@ namespace PackFileManager
             this.setShaderToolStripMenuItem});
             this.changePackTypeToolStripMenuItem.Enabled = false;
             this.changePackTypeToolStripMenuItem.Name = "changePackTypeToolStripMenuItem";
-            this.changePackTypeToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.changePackTypeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.changePackTypeToolStripMenuItem.Text = "Change Pack &Type";
             // 
             // shaderItemSeparator
@@ -595,25 +607,25 @@ namespace PackFileManager
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(167, 6);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(177, 6);
             // 
             // exportFileListToolStripMenuItem
             // 
             this.exportFileListToolStripMenuItem.Enabled = false;
             this.exportFileListToolStripMenuItem.Name = "exportFileListToolStripMenuItem";
-            this.exportFileListToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.exportFileListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportFileListToolStripMenuItem.Text = "Export File &List...";
             this.exportFileListToolStripMenuItem.Click += new System.EventHandler(this.ExportFileList);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(167, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -733,10 +745,10 @@ namespace PackFileManager
             // 
             // searchFileToolStripMenuItem
             // 
+            this.searchFileToolStripMenuItem.Enabled = false;
             this.searchFileToolStripMenuItem.Name = "searchFileToolStripMenuItem";
             this.searchFileToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.searchFileToolStripMenuItem.Text = "Search Files...";
-            this.searchFileToolStripMenuItem.Enabled = false;
             // 
             // postProcessToolStripMenuItem
             // 
@@ -1114,13 +1126,17 @@ namespace PackFileManager
             this.packActionProgressBar.Name = "packActionProgressBar";
             this.packActionProgressBar.Size = new System.Drawing.Size(120, 16);
             // 
-            // _packTreeView
+            // toolStripSeparator12
             // 
-            this._packTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._packTreeView.Location = new System.Drawing.Point(0, 0);
-            this._packTreeView.Name = "_packTreeView";
-            this._packTreeView.Size = new System.Drawing.Size(210, 514);
-            this._packTreeView.TabIndex = 0;
+            this.toolStripSeparator12.Name = "toolStripSeparator12";
+            this.toolStripSeparator12.Size = new System.Drawing.Size(177, 6);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem1.Text = "Settings";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // PackFileManagerForm
             // 
@@ -1273,5 +1289,7 @@ namespace PackFileManager
         private System.Windows.Forms.ToolStripMenuItem expandToolStripMenuItem;
         private System.Windows.Forms.ToolTip packTreeViewToolTip;
         private ExtentedTreeView.ExtendedTreeView _packTreeView;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
     }
 }
