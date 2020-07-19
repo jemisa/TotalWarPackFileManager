@@ -405,9 +405,9 @@ namespace PackFileManager
         void FillRecentFilesList()
         {
             recentFilesMenuItem.DropDownItems.Clear();
-            for (int i = 0; i < PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.Count; i++)
+            for (int i = 0; i < PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.Count; i++)
             {
-                var file = PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles[i];
+                var file = PackFileManagerSettingService.CurrentSettings.RecentUsedFiles[i];
                 var item = new ToolStripMenuItem($"{i+1} {file}", null,
                             delegate (object s, EventArgs a)
                             {
@@ -423,20 +423,20 @@ namespace PackFileManager
             int maxRecentFiles = 5;
 
             // Remove the file if it is add already
-            var index = PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.IndexOf(filePath);
+            var index = PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.IndexOf(filePath);
             if (index != -1)
-                PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.RemoveAt(index);
+                PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.RemoveAt(index);
 
             // Add the file
-            PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.Insert(0, filePath);
+            PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.Insert(0, filePath);
 
             // Ensure we only have maxRecentFiles in the list
-            var currentFileCount = PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.Count;
+            var currentFileCount = PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.Count;
             if (currentFileCount > maxRecentFiles)
             {
-                PackFileManagerSettingManager.CurrentSettings.RecentUsedFiles.RemoveRange(maxRecentFiles, currentFileCount - maxRecentFiles);
+                PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.RemoveRange(maxRecentFiles, currentFileCount - maxRecentFiles);
             }
-            PackFileManagerSettingManager.Save();
+            PackFileManagerSettingService.Save();
         }
 
         //class PackFileManagerSettings

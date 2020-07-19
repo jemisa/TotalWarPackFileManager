@@ -1,43 +1,60 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Management.Instrumentation;
 using Microsoft.Win32;
 
 namespace Common {
+
+    public enum GameTypeEnum
+    {
+        Arena = 0,
+        Attila,
+        Empire,
+        Napoleon,
+        Rome_2,
+        Shogun_2,
+        ThreeKingdoms,
+        ThronesOfBritannia,
+        Warhammer1,
+        Warhammer2
+    }
+
     /*
      * Represents a single Warscape game along with some of its paths and settings.
      * Also keeps a collection of all Warscape games.
      */
     public class Game {
         private static string ROME_INSTALL_DIR = @"C:\Program Files (x86)\Steam\steamapps\common\Total War Rome II";
-        public static readonly Game R2TW = new Game("R2TW", "214950", "Rome 2") {
+        public static readonly Game R2TW = new Game(GameTypeEnum.Rome_2, "R2TW", "214950", "Rome 2") {
             DefaultPfhType = "PFH4",
             GameDirectory = Directory.Exists(ROME_INSTALL_DIR) ? ROME_INSTALL_DIR : null,
             UserDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                    "The Creative Assembly", "Rome2")
         };
-        public static readonly Game STW = new Game("STW", "34330", "Shogun2");
-        public static readonly Game NTW = new Game("NTW", "34030", "Napoleon");
-        public static readonly Game ETW = new Game("ETW", "10500", "Empire") {
+        public static readonly Game STW = new Game(GameTypeEnum.Shogun_2,"STW", "34330", "Shogun2");
+        public static readonly Game NTW = new Game(GameTypeEnum.Napoleon,"NTW", "34030", "Napoleon");
+        public static readonly Game ETW = new Game(GameTypeEnum.Empire, "ETW", "10500", "Empire") {
             ScriptFilename = "user.empire_script.txt"
         };
-        public static readonly Game ATW = new Game("ATW", "325610", "Attila") {
+        public static readonly Game ATW = new Game(GameTypeEnum.Attila, "ATW", "325610", "Attila") {
             DefaultPfhType = "PFH4"
         };
-        public static readonly Game TWH = new Game("TWH", "459420", "Warhammer")
+        public static readonly Game TWH = new Game(GameTypeEnum.Warhammer1, "TWH", "459420", "Warhammer")
         {
             DefaultPfhType = "PFH4"
         };
-        public static readonly Game TWH2 = new Game("TWH2", "594570", "Warhammer2")
+        public static readonly Game TWH2 = new Game(GameTypeEnum.Warhammer2, "TWH2", "594570", "Warhammer2")
         {
             DefaultPfhType = "PFH5"
         };
-        public static readonly Game TOB = new Game("ToB", "712100", "ThronesofBritannia")
+        public static readonly Game TOB = new Game(GameTypeEnum.ThronesOfBritannia, "ToB", "712100", "ThronesofBritannia")
         {
             DefaultPfhType = "PFH4"
         };
 
-        public static readonly Game TW3K = new Game("TW3K", "779340", "ThreeKingdoms")
+        public static readonly Game TW3K = new Game(GameTypeEnum.ThreeKingdoms,"TW3K", "779340", "ThreeKingdoms")
         {
             DefaultPfhType = "PFH5"
         };
@@ -53,7 +70,8 @@ namespace Common {
          * <param name="gameDir">game pathname below user dir</param>
          * <param name="scriptFile">name of the script file containing mod entries</param>
          */
-        public Game(string gameId, string steam, string gameDir, string scriptFile = "user.script.txt") {
+        public Game(GameTypeEnum gameType, string gameId, string steam, string gameDir, string scriptFile = "user.script.txt") {
+            GameType = gameType;
             Id = gameId;
             steamId = steam;
             UserDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -96,6 +114,8 @@ namespace Common {
         public string Id {
             get; private set;
         }
+
+        public GameTypeEnum GameType { get; private set; }
         /*
          * Retrieve this game's settings directory below the user directory.
          */

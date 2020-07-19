@@ -18,5 +18,9 @@ namespace PackFileManager.Dialogs.Settings
             this.settingsControl1.Configure(settings);
         }
 
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            settingsControl1.Save();
+        }
     }
 }

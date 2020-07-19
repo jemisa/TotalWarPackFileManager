@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PackFileManager
@@ -23,12 +19,13 @@ namespace PackFileManager
              public string HighlightMapping { get; set; }
          }
 
+        public string MyModDirectory { get; set; }
         public List<string> RecentUsedFiles { get; set; } = new List<string>();
         public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
         public List<CustomFileExtentionHighlightsMapping> CustomFileExtentionHighlightsMappings { get; set; } = new List<CustomFileExtentionHighlightsMapping>();
     }
 
-    class PackFileManagerSettingManager
+    class PackFileManagerSettingService
     {
         public static string InstallationPath
         {
@@ -37,14 +34,7 @@ namespace PackFileManager
                 return Path.GetDirectoryName(Application.ExecutablePath);
             }
         }
-        // path to save game directories in
-        public static string GameDirFilepath
-        {
-            get
-            {
-                return Path.Combine(InstallationPath, "gamedirs.txt");
-            }
-        }
+
 
         public static string SettingsFile
         {

@@ -34,10 +34,10 @@ namespace PackFileManager
         }
         private GameManager() {
             if (!DBTypeMap.Instance.Initialized) {
-                DBTypeMap.Instance.InitializeTypeMap(PackFileManagerSettingManager.InstallationPath);
+                DBTypeMap.Instance.InitializeTypeMap(PackFileManagerSettingService.InstallationPath);
             }
 
-            PackFileManagerSettingManager.Load();
+            PackFileManagerSettingService.Load();
 
             // correct game install directories 
             // (should be needed for first start only)
@@ -71,7 +71,7 @@ namespace PackFileManager
         // load the given game's directory from the gamedirs file
         public static void LoadGameLocationFromFile(Game g)
         {
-            var savedGameDirectories = PackFileManagerSettingManager.CurrentSettings.GameDirectories;
+            var savedGameDirectories = PackFileManagerSettingService.CurrentSettings.GameDirectories;
             var gameDir = savedGameDirectories.FirstOrDefault(x => x.Game == g.Id);
             g.GameDirectory = gameDir?.Path;
         }
@@ -82,14 +82,14 @@ namespace PackFileManager
             foreach (var game in Game.Games)
             {
                 var dir = game.GameDirectory == null ? Game.NOT_INSTALLED : game.GameDirectory;
-                var currentEntry = PackFileManagerSettingManager.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Id);
+                var currentEntry = PackFileManagerSettingService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Id);
                 if (currentEntry != null)
                     currentEntry.Path = dir;
                 else
-                    PackFileManagerSettingManager.CurrentSettings.GameDirectories.Add(new PackFileManagerSettings.GamePathPair() { Game = game.Id,Path = dir});
+                    PackFileManagerSettingService.CurrentSettings.GameDirectories.Add(new PackFileManagerSettings.GamePathPair() { Game = game.Id,Path = dir});
             }
 
-            PackFileManagerSettingManager.Save();
+            PackFileManagerSettingService.Save();
         }
         
 
@@ -155,7 +155,7 @@ namespace PackFileManager
                 if (gameDbVersions.ContainsKey(game)) {
                     return;
                 }
-                string schemaFile = Path.Combine(PackFileManagerSettingManager.InstallationPath, game.MaxVersionFilename);
+                string schemaFile = Path.Combine(PackFileManagerSettingService.InstallationPath, game.MaxVersionFilename);
                 if (File.Exists(schemaFile)) {
                     SortedList<string, int> versions = SchemaOptimizer.ReadTypeVersions(schemaFile);
                     if (versions != null) {
@@ -168,7 +168,7 @@ namespace PackFileManager
             } catch { }
         }
         public void CreateSchemaFile(Game game) {
-            string filePath = Path.Combine(PackFileManagerSettingManager.InstallationPath, game.MaxVersionFilename);
+            string filePath = Path.Combine(PackFileManagerSettingService.InstallationPath, game.MaxVersionFilename);
             if (game.IsInstalled && !File.Exists(filePath)) {
                 SchemaOptimizer optimizer = new SchemaOptimizer() {
                     PackDirectory = Path.Combine(game.GameDirectory, "data"),
