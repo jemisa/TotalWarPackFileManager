@@ -9,6 +9,7 @@ namespace Common {
 
     public enum GameTypeEnum
     {
+        Unknown = -1,
         Arena = 0,
         Attila,
         Empire,
@@ -85,7 +86,17 @@ namespace Common {
                     delegate() { return GetInstallLocation(WIN_NODE); }
                 };
         }
-  
+
+
+        public static Game GetByEnum(GameTypeEnum gameEnum)
+        {
+            foreach (Game game in GAMES)
+            {
+                if (game.GameType == gameEnum)
+                    return game;
+            }
+            return null;
+        }
         /*
          * Retrieve list of all known games.
          */

@@ -22,6 +22,7 @@ namespace PackFileManager.Dialogs.Settings
 
         List<CustomFileExtentionHighlightsMapping> _updatedCustomFileExtentionHighlightsMappings;
         bool _modDirectoryUpdated = false;
+        bool _defaultGameChanged = false;
         
         public SettingsControl()
         {
@@ -50,7 +51,19 @@ namespace PackFileManager.Dialogs.Settings
                     if (matchingTextBox != null)
                         matchingTextBox.Text = gameDir.Path;
                 }
+            }
 
+            var defaultGame = PackFileManagerSettingService.CurrentSettings.CurrentGame;
+            foreach (var currentGame in Game.Games)
+            {
+                var idx = _defaultGameComboBox.Items.Add(currentGame.Id);
+                if (defaultGame != GameTypeEnum.Unknown)
+                {
+                    //var gameEnum = Game.GetByEnum(defaultGame).GameType;
+                    if(defaultGame == currentGame.GameType)
+                        _defaultGameComboBox.SelectedIndex = idx;
+                }
+                
             }
         }
 
@@ -201,8 +214,22 @@ namespace PackFileManager.Dialogs.Settings
             if (_updatedCustomFileExtentionHighlightsMappings != null)
                 PackFileManagerSettingService.CurrentSettings.CustomFileExtentionHighlightsMappings = _updatedCustomFileExtentionHighlightsMappings;
 
+            if (_defaultGameChanged)
+            {
+                var id = _defaultGameComboBox.SelectedItem as string;
+                if (id != null)
+                {
+                    var game = Game.ById(id);
+                    PackFileManagerSettingService.CurrentSettings.CurrentGame = game.GameType;
+                }
+            }
 
             PackFileManagerSettingService.Save();
+        }
+
+        private void OnDefaultGameChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _defaultGameChanged = true;
         }
     }
 }

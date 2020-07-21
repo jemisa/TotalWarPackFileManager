@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,6 +22,8 @@ namespace PackFileManager.Dialogs.Settings
         private void SaveButton_Click(object sender, EventArgs e)
         {
             settingsControl1.Save();
+            GameManager.Instance.CurrentGame = Game.GetByEnum(PackFileManagerSettingService.CurrentSettings.CurrentGame);
+            this.Close();
         }
     }
 }

@@ -257,17 +257,6 @@
                 Save();
             }
         }
-
-        [DebuggerNonUserCode, DefaultSettingValue(""), UserScopedSetting]
-        public string CurrentGame {
-            get {
-                return (string)this["CurrentGame"];
-            }
-            set {
-                this["CurrentGame"] = value;
-                Save();
-            }
-        }
     }
 }
 

@@ -43,11 +43,14 @@ namespace PackFileManager
             // (should be needed for first start only)
             Game.Games.ForEach(g => LoadGameLocationFromFile(g));
             CheckGameDirectories();
+
             
-            string gameName = Settings.Default.CurrentGame;
-            if (!string.IsNullOrEmpty(gameName)) {
-                CurrentGame = Game.ById(gameName);
+            var gameEnum = PackFileManagerSettingService.CurrentSettings.CurrentGame;
+            if (gameEnum != GameTypeEnum.Unknown)
+            {
+                CurrentGame = Game.GetByEnum(gameEnum);
             }
+
             foreach(Game game in Game.Games) {
                 if (CurrentGame != null) {
                     break;
@@ -102,8 +105,10 @@ namespace PackFileManager
             set {
                 if (current != value) {
                     current = value != null ? value : DefaultGame;
-                    if (current != null) {
-                        Settings.Default.CurrentGame = current.Id;
+                    if (current != null) 
+                    {
+                        PackFileManagerSettingService.CurrentSettings.CurrentGame = current.GameType;
+                        PackFileManagerSettingService.Save();
 
                         // load the appropriate type map
                         LoadGameMaxDbVersions();

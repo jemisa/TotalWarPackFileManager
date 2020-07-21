@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Common;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
@@ -19,6 +20,7 @@ namespace PackFileManager
              public string HighlightMapping { get; set; }
          }
 
+        public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Unknown;
         public string MyModDirectory { get; set; }
         public List<string> RecentUsedFiles { get; set; } = new List<string>();
         public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
