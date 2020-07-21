@@ -420,23 +420,7 @@ namespace PackFileManager
 
         void AddNewRecentFile(string filePath)
         {
-            int maxRecentFiles = 5;
-
-            // Remove the file if it is add already
-            var index = PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.IndexOf(filePath);
-            if (index != -1)
-                PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.RemoveAt(index);
-
-            // Add the file
-            PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.Insert(0, filePath);
-
-            // Ensure we only have maxRecentFiles in the list
-            var currentFileCount = PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.Count;
-            if (currentFileCount > maxRecentFiles)
-            {
-                PackFileManagerSettingService.CurrentSettings.RecentUsedFiles.RemoveRange(maxRecentFiles, currentFileCount - maxRecentFiles);
-            }
-            PackFileManagerSettingService.Save();
+            PackFileManagerSettingService.AddLastUsedFile(filePath);
         }
 
         //class PackFileManagerSettings

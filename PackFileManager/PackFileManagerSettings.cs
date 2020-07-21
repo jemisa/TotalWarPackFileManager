@@ -48,6 +48,29 @@ namespace PackFileManager
 
         public static PackFileManagerSettings CurrentSettings { get; set; }
 
+
+
+        public static void AddLastUsedFile(string filePath)
+        {
+            int maxRecentFiles = 5;
+
+            // Remove the file if it is add already
+            var index = CurrentSettings.RecentUsedFiles.IndexOf(filePath);
+            if (index != -1)
+                CurrentSettings.RecentUsedFiles.RemoveAt(index);
+
+            // Add the file
+            CurrentSettings.RecentUsedFiles.Insert(0, filePath);
+
+            // Ensure we only have maxRecentFiles in the list
+            var currentFileCount = CurrentSettings.RecentUsedFiles.Count;
+            if (currentFileCount > maxRecentFiles)
+            {
+                CurrentSettings.RecentUsedFiles.RemoveRange(maxRecentFiles, currentFileCount - maxRecentFiles);
+            }
+            Save();
+        }
+
         public static void Save()
         {
             var jsonStr = JsonConvert.SerializeObject(CurrentSettings, Formatting.Indented);
