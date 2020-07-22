@@ -24,7 +24,7 @@ namespace DbDecoding {
                         foreach (string packFileName in Directory.EnumerateFiles(game.DataDirectory, "*pack")) {
                             Console.WriteLine("checking {0}", packFileName);
                             PackFile packFile = new PackFileCodec().Open(packFileName);
-                            foreach (VirtualDirectory dir in packFile.Root.Subdirectories) {
+                            foreach (VirtualDirectory dir in packFile.Root.Subdirectories.Values) {
                                 if (dir.Name.Equals("db")) {
                                     foreach(PackedFile dbFile in dir.AllFiles) {
                                         if (dbFile.Name.Contains("models_naval")) {

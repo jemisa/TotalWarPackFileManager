@@ -93,14 +93,31 @@ namespace PackFileManager {
             }
         }
 
+
+
         public PackedFileNode(PackedFile file)
-            : base(file) {
-                if (file.FullPath.StartsWith("db")) {
-                    file.RenameEvent += Renamed;
-                }
+            : base(file) 
+        {
+           var hasDbParent = HasDbParent(file);
+           if(hasDbParent)
+                file.RenameEvent += Renamed;
         }
+
         void Renamed(PackEntry file, string val) {
             Text = val;
+        }
+
+        bool HasDbParent(PackEntry file)
+        {
+            PackEntry p = file;
+            if (p == null)
+                return false;
+
+            else if (p.Name == "db")
+                return true;
+
+            var res = HasDbParent(file.Parent);
+            return res;
         }
 
         /*
@@ -108,16 +125,21 @@ namespace PackFileManager {
          */
         public override void ChangeColor() 
         {
-            base.ChangeColor();
-           
             PackedFile packedFile = Tag as PackedFile;
             string text = Path.GetFileName(packedFile.Name);
-            if (packedFile != null && packedFile.FullPath.StartsWith("db")) {
-                if (packedFile.Data.Length == 0) {
+
+            base.ChangeColor();
+           
+            
+            if (packedFile.FullPath.StartsWith("db")) 
+            {
+                if (packedFile.Data.Length == 0) 
+                {
                     text = string.Format("{0} (empty)", packedFile.Name);
-                } else {
+                } 
+                else 
+                {
                     string mouseover;
-                    
                     try {
                         DBFileHeader header = PackedFileDbCodec.readHeader(packedFile);
                         // text = string.Format("{0} - version {1}", text, header.Version);
@@ -127,17 +149,18 @@ namespace PackFileManager {
                             if (Parent != null) {
                                 (Parent as PackEntryNode).Color = Color.Blue;
                             }
-                        } else if (!PackedFileDbCodec.CanDecode(packedFile, out mouseover)) {
-                            if (Parent != null) {
+                        } 
+                        else if (!PackedFileDbCodec.CanDecode(packedFile, out mouseover)) 
+                        {
+                            if (Parent != null) 
                                 (Parent as PackEntryNode).Color = Color.Red;
-                            }
                             Color = Color.Red;
                             ToolTipText = mouseover;
-                        } else if (HeaderVersionObsolete(packedFile)) {
-                            if (Parent != null) {
+                        } 
+                        else if (HeaderVersionObsolete(packedFile))
+                        {
+                            if (Parent != null)
                                 (Parent as PackEntryNode).Color = Color.Yellow;
-                            }
-
                             Color = Color.Yellow;
                         }
                     } catch { }
@@ -177,13 +200,14 @@ namespace PackFileManager {
         public DirEntryNode(VirtualDirectory nodeDir)
             : base(nodeDir) 
         {
-            foreach (VirtualDirectory dir in nodeDir.Subdirectories)
+            foreach (var dir in nodeDir.Subdirectories)
             {
-                Nodes.Add(new DirEntryNode(dir));
+                var newItem = new DirEntryNode(dir.Value);
+                Nodes.Add(newItem);
             }
-            foreach (PackedFile file in nodeDir.Files)
+            foreach (var file in nodeDir.Files)
             {
-                PackEntryNode node = new PackedFileNode(file);
+                PackEntryNode node = new PackedFileNode(file.Value);
                 Nodes.Add(node);
                 node.ChangeColor();
             }

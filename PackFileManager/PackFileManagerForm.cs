@@ -538,7 +538,8 @@ namespace PackFileManager
             try {
                 var codec = new PackFileCodec();
                 new LoadUpdater(codec, filepath, packStatusLabel, packActionProgressBar);
-                CurrentPackFile = codec.Open(filepath);
+                var loadResult = codec.Open(filepath);
+                CurrentPackFile = loadResult;
             } catch (Exception exception) {
                 MessageBox.Show(exception.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 _packTreeView.Enabled = true;

@@ -69,13 +69,14 @@ namespace Common {
             uint size = reader.ReadUInt32();
             //FIXME this is wrong, different PFH versions have different length additionalInfo
             //TODO this is mostly duplicated with PackFileCodec.  Reducing code duplication would be wise.
-            if (Header.HasAdditionalInfo) {
-                header.AdditionalInfo = reader.ReadInt64();
+            if (Header.HasAdditionalInfo) 
+            {
+                header.AdditionalInfo = reader.ReadUInt32();
             }
             if(Header.PackIdentifier == "PFH5")
                 reader.ReadByte();
             try {
-                string packedFileName = IOFunctions.ReadZeroTerminatedAscii(reader);
+                string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader);
                 // this is easier because we can use the Path methods
                 // under both Windows and Unix
                 packedFileName = packedFileName.Replace('\\', Path.DirectorySeparatorChar);

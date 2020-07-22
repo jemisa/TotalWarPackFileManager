@@ -24,23 +24,26 @@ namespace Common {
         public PackFile Open(string packFullPath) {
 			PackFile file;
 			long sizes = 0;
-			using (var reader = new BinaryReader(new FileStream(packFullPath, FileMode.Open), Encoding.ASCII)) {
+			using (var reader = new BinaryReader(new FileStream(packFullPath, FileMode.Open), Encoding.ASCII)) 
+            {
 				PFHeader header = ReadHeader (reader);
 				file = new PackFile (packFullPath, header);
 				OnHeaderLoaded (header);
 
 				long offset = file.Header.DataStart;
-				for (int i = 0; i < file.Header.FileCount; i++) {
+				for (int i = 0; i < file.Header.FileCount; i++) 
+                {
 					uint size = reader.ReadUInt32 ();
 					sizes += size;
-                    if (file.Header.HasAdditionalInfo) {
-                        header.AdditionalInfo = reader.ReadInt64();
-                    }
-                    if (file.Header.PackIdentifier == "PFH5")
+                    if (file.Header.HasAdditionalInfo)
                     {
-                        reader.ReadByte();
+                        header.AdditionalInfo = reader.ReadUInt32();
                     }
-                    string packedFileName = IOFunctions.ReadZeroTerminatedAscii(reader);
+
+                    if (file.Header.PackIdentifier == "PFH5")
+                        reader.ReadByte();
+
+                    string packedFileName = IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader);
                     // this is easier because we can use the Path methods
                     // under both Windows and Unix
                     packedFileName = packedFileName.Replace('\\', Path.DirectorySeparatorChar);
@@ -48,10 +51,10 @@ namespace Common {
 					PackedFile packed = new PackedFile (file.Filepath, packedFileName, offset, size);
 					file.Add (packed);
 					offset += size;
-					this.OnPackedFileLoaded (packed);
+					OnPackedFileLoaded (packed);
 				}
 			}
-			this.OnFinishedLoading (file);
+			OnFinishedLoading (file);
 			file.IsModified = false;
 			return file;
 		}
@@ -87,7 +90,7 @@ namespace Common {
 			// go to correct position
 			reader.BaseStream.Seek (header.Length, SeekOrigin.Begin);
             for (int i = 0; i < header.Version; i++) {
-                header.ReplacedPackFileNames.Add(IOFunctions.ReadZeroTerminatedAscii(reader));
+                header.ReplacedPackFileNames.Add(IOFunctions.TheadUnsafeReadZeroTerminatedAscii(reader));
             }
             header.DataStart += replacedPackFilenameLength;
 			return header;
@@ -111,7 +114,7 @@ namespace Common {
                             indexSize += 1;
                         }
                         if (packFile.Header.HasAdditionalInfo) {
-                            indexSize += 8;
+                            indexSize += 4;
                         }
                         toWrite.Add (file);
                     }

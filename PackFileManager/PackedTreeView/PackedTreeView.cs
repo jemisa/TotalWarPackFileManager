@@ -121,10 +121,10 @@ namespace PackFileManager.ExtentedTreeView
             if (currentPackFile == null)
                 return;
 
-            var node2 = new DirEntryNode(currentPackFile.Root);
             treeViewAdv1.BeginUpdate();
+            var nodes = new DirEntryNode(currentPackFile.Root);
             _treeModel.Nodes.Clear();
-            _treeModel.Nodes.Add(node2);
+            _treeModel.Nodes.Add(nodes);
             treeViewAdv1.EndUpdate();
         }
 

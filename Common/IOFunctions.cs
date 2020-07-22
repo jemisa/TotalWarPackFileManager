@@ -13,7 +13,7 @@ namespace Common {
         public static string TSV_FILTER = "TSV Files (*.csv,*.tsv)|*.csv;*.tsv|Text Files (*.txt)|*.txt|All Files|*.*";
         // filter string for pack files
         public static string PACKAGE_FILTER = "Package File (*.pack)|*.pack|Any File|*.*";
-  
+
         /*
          * Read a unicode string from the given reader.
          */
@@ -50,14 +50,18 @@ namespace Common {
         /*
          * Read a zero-terminated ASCII string.
          */
-        public static string ReadZeroTerminatedAscii(BinaryReader reader) {
-            StringBuilder builder2 = new StringBuilder();
+        static public byte[] staticBuffer = new byte[1024];
+        public static string TheadUnsafeReadZeroTerminatedAscii(BinaryReader reader) 
+        {
+            var index = 0;
             byte ch2 = reader.ReadByte();
-            while (ch2 != '\0') {
-                builder2.Append((char) ch2);
+            while (ch2 != '\0') 
+            {
+                staticBuffer[index++] = ch2;
                 ch2 = reader.ReadByte();
             }
-            return builder2.ToString();
+
+            return Encoding.ASCII.GetString(staticBuffer, 0, index);
         }
         /*
          * Write the given zero-terminated ASCII string to the given writer.

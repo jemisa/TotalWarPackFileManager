@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Common {
  
@@ -38,8 +39,13 @@ namespace Common {
         }
 
         // Path
-        public virtual string FullPath {
-            get {
+        string _fullPathCachedValue;
+        public virtual string FullPath 
+        {
+            get 
+            {
+                if (_fullPathCachedValue != null)
+                    return _fullPathCachedValue;
                 string result = Name;
                 PackEntry p = Parent;
                 while (p != null) {
@@ -50,6 +56,7 @@ namespace Common {
                 if (index != -1) {
                     result = result.Substring(index + 1);
                 }
+                _fullPathCachedValue = result;
                 return result;
             }
         }
@@ -214,16 +221,16 @@ namespace Common {
 
         #region Contained entry access
         // the contained directories
-        private SortedSet<VirtualDirectory> subdirectories = new SortedSet<VirtualDirectory> ();
-        public SortedSet<VirtualDirectory> Subdirectories {
+        private Dictionary<string, VirtualDirectory> subdirectories = new Dictionary<string, VirtualDirectory>();
+        public Dictionary<string, VirtualDirectory> Subdirectories {
             get {
                 return subdirectories;
             }
         }
 
         // the contained files
-        private SortedSet<PackedFile> containedFiles = new SortedSet<PackedFile> ();
-        public SortedSet<PackedFile> Files {
+        private Dictionary<string, PackedFile> containedFiles = new Dictionary<string, PackedFile>();
+        public Dictionary<string, PackedFile> Files {
             get {
                 return containedFiles;
             }
@@ -233,10 +240,9 @@ namespace Common {
         public List<PackedFile> AllFiles {
             get {
                 List<PackedFile> files = new List<PackedFile>();
-                foreach(VirtualDirectory subDirectory in Subdirectories) {
+                foreach(var subDirectory in Subdirectories.Values) 
                     files.AddRange(subDirectory.AllFiles);
-                }
-                files.AddRange(Files);
+                files.AddRange(Files.Values);
                 return files;
             }
         }
@@ -244,10 +250,9 @@ namespace Common {
             get {
                 List<PackEntry> result = new List<PackEntry>();
                 result.Add(this);
-                foreach(VirtualDirectory directory in Subdirectories) {
+                foreach(var directory in Subdirectories.Values) 
                     result.AddRange(directory.AllEntries);
-                }
-                result.AddRange(Files);
+                result.AddRange(Files.Values);
                 return result;
             }
         }
@@ -266,8 +271,8 @@ namespace Common {
         public List<PackEntry> Entries {
             get {
                 List<PackEntry> entries = new List<PackEntry> ();
-                entries.AddRange (containedFiles);
-                entries.AddRange (subdirectories);
+                entries.AddRange (containedFiles.Values);
+                entries.AddRange (subdirectories.Values);
                 return entries;
             }
         }
@@ -276,15 +281,11 @@ namespace Common {
          * Retrieve the directory with the given name.
          * Will create and add an empty one if it doesn't already exists.
          */
-        public VirtualDirectory GetSubdirectory(string subDir) {
-            VirtualDirectory result = null;
-            foreach (VirtualDirectory dir in subdirectories) {
-                if (dir.Name.Equals (subDir)) {
-                    result = dir;
-                    break;
-                }
-            }
-            if (result == null) {
+        public VirtualDirectory GetSubdirectory(string subDir) 
+        {
+            subdirectories.TryGetValue(subDir, out VirtualDirectory result);
+            if (result == null) 
+            {
                 result = new VirtualDirectory { Parent = this, Name = subDir };
                 Add (result);
             }
@@ -312,8 +313,9 @@ namespace Common {
          * Add the given directory to this.
          * Will notify the DirectoryAdded event after adding.
          */
-        public void Add(VirtualDirectory dir) {
-            subdirectories.Add(dir);
+        public void Add(VirtualDirectory dir) 
+        {
+            subdirectories.Add(dir.Name, dir);
             dir.Parent = this;
             if (DirectoryAdded != null) {
                 DirectoryAdded(dir);
@@ -327,26 +329,32 @@ namespace Common {
          * If a file with the given name already exists and is not deleted,
          * it will not be replaced unless the "overwrite" parameter is set to true.
          */
-        public void Add(PackedFile file, bool overwrite = false) {
-            if (containedFiles.Contains (file)) {
+        public void Add(PackedFile file, bool overwrite = false) 
+        {
+            if (containedFiles.ContainsKey(file.Name)) 
+            {
                 PackedFile contained = null;
-                foreach (PackedFile f in containedFiles) {
-                    if (f.Name.Equals (file.Name)) {
-                        contained = f;
+                foreach (var f in containedFiles) 
+                {
+                    if (f.Value.Name == file.Name) 
+                    {
+                        contained = f.Value;
                         break;
                     }
                 }
-                if (contained.Deleted || overwrite) {
-                    containedFiles.Remove (contained);
-                    if (FileRemoved != null) {
+                if (contained.Deleted || overwrite) 
+                {
+                    containedFiles.Remove (file.Name);
+                    if (FileRemoved != null)
                         FileRemoved (contained);
-                    }
-                } else {
+                } 
+                else 
+                {
                     // don't add the file
                     return;
                 }
             }
-            containedFiles.Add (file);
+            containedFiles.Add(file.Name, file);
             file.Parent = this;
             if (FileAdded != null) {
                 FileAdded (file);
@@ -366,14 +374,13 @@ namespace Common {
         /*
          * Adds the given file to the given path, relative to this directory.
          */
-        public void Add(string relativePath, PackedFile file, bool overwrite = false) {
-            char[] splitAt = { Path.DirectorySeparatorChar };
-            string baseDir = Path.GetDirectoryName(relativePath);
-            string[] dirs = baseDir != null ? baseDir.Split(splitAt, StringSplitOptions.RemoveEmptyEntries) : new string[0];
+        public void Add(string relativePath, PackedFile file, bool overwrite = false)
+        {
             VirtualDirectory current = this;
-            
-            foreach (string dir in dirs) 
-                current = current.GetSubdirectory(dir);
+            char[] splitAt = { Path.DirectorySeparatorChar };
+            var parts = relativePath.Split(splitAt);
+            for (int i = 0; i < parts.Count() - 1; i++)
+                current = current.GetSubdirectory(parts[i]);
 
             file.Parent = current;
             current.Add(file, overwrite);

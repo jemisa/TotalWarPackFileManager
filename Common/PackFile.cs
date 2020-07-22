@@ -312,7 +312,7 @@ namespace Common {
                 return result;
             }
         }
-        public long AdditionalInfo {
+        public UInt32 AdditionalInfo {
             get; set;
         }
 
