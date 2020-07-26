@@ -49,8 +49,9 @@ namespace Common {
                     packedFileName = packedFileName.Replace('\\', Path.DirectorySeparatorChar);
 
 					PackedFile packed = new PackedFile (file.Filepath, packedFileName, offset, size);
-					file.Add (packed);
-					offset += size;
+                    file.Add (packed);
+                    packed.IsAdded = false; // Reset the flag as the file is not really added as a new file, it is loaded for the first time
+                    offset += size;
 					OnPackedFileLoaded (packed);
 				}
 			}

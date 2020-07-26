@@ -24,10 +24,10 @@
         /// </summary>
         private void InitializeComponent() {
             this.packFileTree = new Aga.Controls.Tree.TreeViewAdv();
+            this.nodeTextBox1 = new Aga.Controls.Tree.NodeControls.NodeTextBox();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
-            this.nodeTextBox1 = new Aga.Controls.Tree.NodeControls.NodeTextBox();
             this.SuspendLayout();
             // 
             // packFileTree
@@ -52,27 +52,34 @@
             this.packFileTree.Size = new System.Drawing.Size(433, 533);
             this.packFileTree.TabIndex = 0;
             // 
+            // nodeTextBox1
+            // 
+            this.nodeTextBox1.DataPropertyName = "Text";
+            this.nodeTextBox1.IncrementalSearchEnabled = true;
+            this.nodeTextBox1.LeftMargin = 3;
+            this.nodeTextBox1.ParentColumn = null;
+            // 
             // okButton
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.okButton.Location = new System.Drawing.Point(294, 555);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 1;
             this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
-            this.okButton.Click += new System.EventHandler(this.CloseWithOk);
             // 
             // cancelButton
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cancelButton.Location = new System.Drawing.Point(374, 555);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 2;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
-            this.cancelButton.Click += new System.EventHandler(this.CloseWithCancel);
             // 
             // statusLabel
             // 
@@ -83,13 +90,6 @@
             this.statusLabel.Size = new System.Drawing.Size(290, 23);
             this.statusLabel.TabIndex = 3;
             this.statusLabel.Text = "Double click to select";
-            // 
-            // nodeTextBox1
-            // 
-            this.nodeTextBox1.DataPropertyName = "Text";
-            this.nodeTextBox1.IncrementalSearchEnabled = true;
-            this.nodeTextBox1.LeftMargin = 3;
-            this.nodeTextBox1.ParentColumn = null;
             // 
             // PackBrowseDialog
             // 

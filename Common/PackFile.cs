@@ -73,7 +73,7 @@ namespace Common {
         public PackFile(string path, PFHeader h) {
             header = h;
             Filepath = path;
-            Root = new VirtualDirectory() { Name = Path.GetFileName(path) };
+            Root = new VirtualDirectory() { Name = Path.GetFileName(path), IsRenamed = false };
             DirAdded(Root);
         }
         /*

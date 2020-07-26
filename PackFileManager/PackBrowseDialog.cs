@@ -1,5 +1,6 @@
 ﻿using Aga.Controls.Tree;
 using Common;
+using PackFileManager.PackedTreeView;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -75,7 +76,8 @@ namespace PackFileManager {
                 selectedFiles.Clear();
                 if (value != null) 
                 {
-                    _treeModel.Nodes.Add(new DirEntryNode(pack.Root));
+                    TreeViewModelCreator creator = new TreeViewModelCreator();
+                    _treeModel.Nodes.Add(creator.Create(pack.Root, null));
                 }
             }
         }
@@ -99,21 +101,6 @@ namespace PackFileManager {
                 }
                 return selectedFiles;
             }
-        }
-
-        // close dialog with result "OK"
-        private void CloseWithOk(object sender = null, EventArgs e = null) 
-        {
-            DialogResult = DialogResult.OK;
-            Close();
-        }
-
-        // close dialog with result "Cancel"
-        private void CloseWithCancel(object sender = null, EventArgs e = null) 
-        {
-            DialogResult = DialogResult.Cancel;
-            selectedFiles.Clear();
-            Close();
         }
     }
 }

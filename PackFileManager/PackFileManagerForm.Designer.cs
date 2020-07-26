@@ -58,7 +58,7 @@ namespace PackFileManager
             this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importTSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this._packTreeView = new PackFileManager.ExtentedTreeView.ExtendedTreeView();
+            this._packTreeView = new PackFileManager.PackedTreeView.PackedTreeView();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -1133,10 +1133,10 @@ namespace PackFileManager
             // 
             // toolStripMenuItem1
             // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Name = "toolStripMenuSettings";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem1.Text = "Settings";
-            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuSettings_Click);
             // 
             // PackFileManagerForm
             // 
@@ -1288,7 +1288,7 @@ namespace PackFileManager
         private System.Windows.Forms.ToolStripMenuItem recentFilesMenuItem;
         private System.Windows.Forms.ToolStripMenuItem expandToolStripMenuItem;
         private System.Windows.Forms.ToolTip packTreeViewToolTip;
-        private ExtentedTreeView.ExtendedTreeView _packTreeView;
+        private PackedTreeView.PackedTreeView _packTreeView;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
     }

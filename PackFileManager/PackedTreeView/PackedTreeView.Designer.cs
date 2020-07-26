@@ -1,6 +1,6 @@
-﻿namespace PackFileManager.ExtentedTreeView
+﻿namespace PackFileManager.PackedTreeView
 {
-    partial class ExtendedTreeView
+    partial class PackedTreeView
     {
         /// <summary> 
         /// Required designer variable.
@@ -31,6 +31,7 @@
             this._filterLabel = new System.Windows.Forms.Label();
             this._treeViewSearchBox = new System.Windows.Forms.TextBox();
             this.treeViewAdv1 = new Aga.Controls.Tree.TreeViewAdv();
+            this.nodeIcon1 = new Aga.Controls.Tree.NodeControls.NodeIcon();
             this.nodeTextBox1 = new Aga.Controls.Tree.NodeControls.NodeTextBox();
             this.SuspendLayout();
             // 
@@ -69,6 +70,7 @@
             this.treeViewAdv1.Location = new System.Drawing.Point(3, 27);
             this.treeViewAdv1.Model = null;
             this.treeViewAdv1.Name = "treeViewAdv1";
+            this.treeViewAdv1.NodeControls.Add(this.nodeIcon1);
             this.treeViewAdv1.NodeControls.Add(this.nodeTextBox1);
             this.treeViewAdv1.NodeFilter = null;
             this.treeViewAdv1.SelectedNode = null;
@@ -76,6 +78,13 @@
             this.treeViewAdv1.Size = new System.Drawing.Size(294, 570);
             this.treeViewAdv1.TabIndex = 8;
             this.treeViewAdv1.Text = "treeViewAdv1";
+            // 
+            // nodeIcon1
+            // 
+            this.nodeIcon1.DataPropertyName = "Image";
+            this.nodeIcon1.LeftMargin = 1;
+            this.nodeIcon1.ParentColumn = null;
+            this.nodeIcon1.ScaleMode = Aga.Controls.Tree.ImageScaleMode.ScaleDown;
             // 
             // nodeTextBox1
             // 
@@ -104,5 +113,6 @@
         private System.Windows.Forms.TextBox _treeViewSearchBox;
         private Aga.Controls.Tree.TreeViewAdv treeViewAdv1;
         private Aga.Controls.Tree.NodeControls.NodeTextBox nodeTextBox1;
+        private Aga.Controls.Tree.NodeControls.NodeIcon nodeIcon1;
     }
 }

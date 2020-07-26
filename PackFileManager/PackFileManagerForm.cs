@@ -175,7 +175,7 @@ namespace PackFileManager
 
             RefreshTitle();
             _packTreeView._parentRef = this;
-            _packTreeView.GetTreeView().SelectionChanged += this.packTreeView_AfterSelect;
+            _packTreeView.GetTreeView().SelectionChanged += packTreeView_AfterSelect;
             _packTreeView.GetTreeView().PreviewKeyDown += packTreeView_PreviewKeyDown;
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
             
@@ -490,7 +490,7 @@ namespace PackFileManager
             createReadMeToolStripMenuItem.Enabled = CanWriteCurrentPack;
 
             // selection-depending items
-            bool nodeSelected = _packTreeView.GetTreeView().SelectedNode != null;
+            bool nodeSelected = _packTreeView.GetSelectedNodeContent() != null;
             extractSelectedToolStripMenuItem.Enabled = nodeSelected;
             renameSelectedToolStripMenuItem.Enabled = nodeSelected;
             openMenuItem.Enabled = nodeSelected;
@@ -529,27 +529,33 @@ namespace PackFileManager
             }
         }
 
-        private void OpenExistingPackFile(string filepath, bool querySaveCurrent = false) {
-            if (querySaveCurrent && QuerySaveModifiedFile() == DialogResult.Cancel) {
+        private void OpenExistingPackFile(string filepath, bool querySaveCurrent = false) 
+        {
+            if (querySaveCurrent && QuerySaveModifiedFile() == DialogResult.Cancel) 
                 return;
-            }
 
             Settings.Default.LastPackDirectory = Path.GetDirectoryName(filepath);
-            try {
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
                 var codec = new PackFileCodec();
-                new LoadUpdater(codec, filepath, packStatusLabel, packActionProgressBar);
                 var loadResult = codec.Open(filepath);
                 CurrentPackFile = loadResult;
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 MessageBox.Show(exception.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 _packTreeView.Enabled = true;
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
             }
 #if DEBUG
             Console.WriteLine("{0}allowing label edit", (CanWriteCurrentPack ? "" : "dis"));
 #endif
 
             AddNewRecentFile(filepath);
-            _packTreeView.LabelEdit(CanWriteCurrentPack);
         }
         #endregion
 
@@ -639,30 +645,46 @@ namespace PackFileManager
         }
 
         #region Game Menu
-        private void loadGamePacksToolStripMenuItem_Click(object sender, EventArgs args) {
-            if (MessageBox.Show("Are you sure you want to do this?\nIt takes quite long.", "Can I Has Load Time?",
-                                MessageBoxButtons.YesNo) != DialogResult.Yes) {
+        private void loadGamePacksToolStripMenuItem_Click(object sender, EventArgs args) 
+        {
+            if (QuerySaveModifiedFile() == DialogResult.Cancel)
                 return;
+
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+
+                packStatusLabel.Text = "Collecting Game files";
+                PackLoadSequence allFiles = new PackLoadSequence
+                {
+                    IncludePacksContaining = delegate (string s) { return true; }
+                };
+
+                List<string> packPaths = allFiles.GetPacksLoadedFrom(GameManager.Instance.CurrentGame.GameDirectory);
+                packPaths.Reverse();
+                PackFile file = new PackFile("All Packs");
+                PackFileCodec codec = new PackFileCodec();
+                packActionProgressBar.Maximum = packPaths.Count + 1;    // +1 for the post processing done in setting currentPack
+                foreach (string path in packPaths)
+                {
+                    PackFile pack = codec.Open(path);
+                    pack.Files.ForEach(f =>
+                    {
+                        file.Add(f, true);
+                        f.IsAdded = false;
+                    });
+                    packActionProgressBar.PerformStep();
+                    packStatusLabel.Text = "Loading " + path;
+                }
+                CurrentPackFile = file;
+                CurrentPackFile.IsModified = false;
+                DBReferenceMap.Instance.CurrentPack = CurrentPackFile;
+                packActionProgressBar.Maximum = 0;
             }
-            if (QuerySaveModifiedFile() == DialogResult.Cancel) {
-                return;
+            finally
+            {
+                Cursor.Current = Cursors.Default;
             }
-            packStatusLabel.Text = "Collecting Game files";
-            PackLoadSequence allFiles = new PackLoadSequence {
-                IncludePacksContaining = delegate(string s) { return true; }
-            };
-            List<string> packPaths = allFiles.GetPacksLoadedFrom(GameManager.Instance.CurrentGame.GameDirectory);
-            packPaths.Reverse();
-            PackFile file = new PackFile("All Packs");
-            PackFileCodec codec = new PackFileCodec();
-            foreach(string path in packPaths) {
-                new LoadUpdater(codec, path, packStatusLabel, packActionProgressBar);
-                PackFile pack = codec.Open(path);
-                pack.Files.ForEach(f => file.Add(f, true));
-            }
-            CurrentPackFile = file;
-            CurrentPackFile.IsModified = false;
-            DBReferenceMap.Instance.CurrentPack = CurrentPackFile;
         }
         #endregion
         
@@ -741,9 +763,12 @@ namespace PackFileManager
         VirtualDirectory AddTo {
             get {
                 VirtualDirectory addTo;
-                if (_packTreeView.GetTreeView().SelectedNode == null) {
+                if (_packTreeView.GetTreeView().SelectedNode == null) 
+                {
                     addTo = CurrentPackFile.Root;
-                } else {
+                } 
+                else 
+                {
                     addTo = _packTreeView.GetSelectedNodeContent() as VirtualDirectory 
                         ?? _packTreeView.GetNodeContent(_packTreeView.GetTreeView().SelectedNode.Parent) as VirtualDirectory;
                 }
@@ -813,37 +838,11 @@ namespace PackFileManager
 
         public void deleteFileToolStripMenuItem_Click(object sender, EventArgs e) 
         {
-            if (_packTreeView.GetTreeView().SelectedNode == null)
-                return;
-
-            var packedFiles = new List<PackedFile>();
-            if (_packTreeView.IsSelectedNodeRoot() || !_packTreeView.IsSelectedNoodLeaf())
-            {
-                getPackedFilesFromBranch(packedFiles, _packTreeView.GetTreeView().SelectedNode.Children);
-            } 
-            else 
-            {
-                packedFiles.Add(_packTreeView.GetSelectedNodeContent() as PackedFile);
-            }
-            foreach (PackedFile file in packedFiles) {
+            var packedFiles = _packTreeView.GetPackedFilesInSelection();
+            foreach (var file in packedFiles)
                 file.Deleted = true;
-            }
         }
 
-        private void getPackedFilesFromBranch(List<PackedFile> packedFiles, ReadOnlyCollection<TreeNodeAdv> trunk) 
-        {
-            foreach (var node in trunk)
-            {
-                if (node.Children.Count > 0) 
-                {
-                    getPackedFilesFromBranch(packedFiles, node.Children);
-                }
-                else 
-                {
-                    packedFiles.Add(_packTreeView.GetNodeContent(node) as PackedFile);
-                }
-            }
-        }
         
         public void addDirectoryToolStripMenuItem_Click(object sender, EventArgs e) {
             DirectoryDialog addDirectoryDialog = new DirectoryDialog() {
@@ -902,7 +901,7 @@ namespace PackFileManager
             {
                 try 
                 {
-                    VirtualDirectory newDir = new VirtualDirectory() { Name = "empty" };
+                    VirtualDirectory newDir = new VirtualDirectory() { Name = "empty", IsRenamed = false };
                     dir.Add(newDir);
                 } catch { }
             }
@@ -1277,11 +1276,9 @@ namespace PackFileManager
                     (advisory.DialogResult == DialogResult.Yes) ? CheckState.Unchecked : CheckState.Checked;
             }
             EnableMenuItems();
-            
-            if (_packTreeView.GetTreeView().SelectedNode != null) {
+
+            if (_packTreeView.GetSelectedNodeContent() as PackedFile != null)
                 OpenPackedFileEditor(_packTreeView.GetSelectedNodeContent() as PackedFile);
-            }
-            _packTreeView.LabelEdit(CanWriteCurrentPack);
         }
 
         private void updateOnStartupToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -1336,17 +1333,10 @@ namespace PackFileManager
         private void packTreeView_AfterSelect(object sender, EventArgs e) 
         {
             CloseEditors();
-         
-            if (_packTreeView.GetTreeView().SelectedNode != null) 
-            {
-                bool canBeEdited = _packTreeView.IsSelectedNoodLeaf() && !_packTreeView.IsSelectedNodeRoot();
-                _packTreeView.LabelEdit(canBeEdited);
 
-                if (_packTreeView.GetSelectedNodeContent() is PackedFile) 
-                {
-                    OpenPackedFileEditor(_packTreeView.GetSelectedNodeContent() as PackedFile);
-                }
-            }
+            if (_packTreeView.GetSelectedNodeContent() is PackedFile) 
+                OpenPackedFileEditor(_packTreeView.GetSelectedNodeContent() as PackedFile);
+                
             EnableMenuItems();
         }
         
@@ -1372,7 +1362,7 @@ namespace PackFileManager
                     break;
 
                 case Keys.Delete:
-                    if (_packTreeView.GetTreeView().SelectedNode != null) {
+                    if (_packTreeView.GetSelectedNodeContent() != null) {
                         deleteFileToolStripMenuItem_Click(this, EventArgs.Empty);
                     }
                     break;
@@ -1471,7 +1461,7 @@ namespace PackFileManager
             _packTreeView.ExpandSelectedNode();
         }
 
-        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        private void toolStripMenuSettings_Click(object sender, EventArgs e)
         {
             SettingsFormInput input = new SettingsFormInput();
             var files = AllFiles;

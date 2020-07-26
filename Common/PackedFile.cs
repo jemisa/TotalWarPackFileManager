@@ -34,10 +34,12 @@ namespace Common {
                 if (RenameEvent != null) {
                     RenameEvent(this, value);
                 }
-                
+                IsRenamed = true;
             }
         }
 
+        public bool IsRenamed { get; set; } = false;
+        public bool IsAdded { get; set; } = false;
         // Path
         string _fullPathCachedValue;
         public virtual string FullPath 
@@ -78,7 +80,10 @@ namespace Common {
         public bool Modified {
             get { return modified; }
             set {
-                if (modified != value) {
+                if (modified != value) 
+                {
+                    if(modified == false)
+                        IsRenamed = false;
                     modified = value;
                     if (ModifiedEvent != null) {
                         ModifiedEvent(this);
@@ -206,6 +211,10 @@ namespace Common {
         // triggered when file is removed
         public event ContentsEvent FileRemoved;
 
+        public VirtualDirectory()
+        {
+        }
+
         // override deletion to tag all contained objects as deleted as well
         public override bool Deleted {
             get {
@@ -286,7 +295,7 @@ namespace Common {
             subdirectories.TryGetValue(subDir, out VirtualDirectory result);
             if (result == null) 
             {
-                result = new VirtualDirectory { Parent = this, Name = subDir };
+                result = new VirtualDirectory { Parent = this, Name = subDir, IsRenamed = false };
                 Add (result);
             }
             return result;
@@ -345,8 +354,7 @@ namespace Common {
                 if (contained.Deleted || overwrite) 
                 {
                     containedFiles.Remove (file.Name);
-                    if (FileRemoved != null)
-                        FileRemoved (contained);
+                    FileRemoved?.Invoke(contained);
                 } 
                 else 
                 {
@@ -355,10 +363,9 @@ namespace Common {
                 }
             }
             containedFiles.Add(file.Name, file);
+            file.IsAdded = true;
             file.Parent = this;
-            if (FileAdded != null) {
-                FileAdded (file);
-            }
+            FileAdded?.Invoke(file);
         }
 
         /*

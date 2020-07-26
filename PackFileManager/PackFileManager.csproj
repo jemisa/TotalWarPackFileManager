@@ -127,6 +127,9 @@
     <Compile Include="PackBrowseDialog.Designer.cs">
       <DependentUpon>PackBrowseDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="PackedTreeView\TreeViewIconCreator.cs" />
+    <Compile Include="PackedTreeView\TreeViewColourHelper.cs" />
+    <Compile Include="PackedTreeView\TreeViewModelCreator.cs" />
     <Compile Include="PackFileManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -134,7 +137,6 @@
       <DependentUpon>PackFileManagerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="PackFileManagerSettings.cs" />
-    <Compile Include="PackedTreeView\PackTreeNodes.cs" />
     <Compile Include="Program.cs" />
     <EmbeddedResource Include="Dialogs\Settings\FileExtentionSyntaxMappingForm.resx">
       <DependentUpon>FileExtentionSyntaxMappingForm.cs</DependentUpon>
@@ -284,6 +286,36 @@
     <Resource Include="Resources\Editor\Save.png" />
     <Resource Include="Resources\Editor\Undo.png" />
     <Resource Include="Resources\Editor\WordWrap.png" />
+    <None Include="Resources\TreeViewIcons\icons8-3d-object-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-audio-file-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-collectibles-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-database-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-file-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-folder-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-json-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-question-mark-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-txt-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\TreeViewIcons\icons8-xml-file-48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Resources\Warhammer2.ico" />
     <None Include="Resources\Warhammer.ico" />
     <None Include="Resources\Attila.ico" />
