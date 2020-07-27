@@ -3,9 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DbSchemaDecoder" xmlns:control="clr-namespace:WpfHexaEditor;assembly=WPFHexaEditor"
+             xmlns:local="clr-namespace:DbSchemaDecoder" 
+    xmlns:control="clr-namespace:WpfHexaEditor;assembly=WPFHexaEditor"
              xmlns:DisplayTableDefinitionView="clr-namespace:DbSchemaDecoder.DisplayTableDefinitionView" 
-            xmlns:local1="clr-namespace:DbSchemaDecoder.EditTableDefinitionView" x:Class="DbSchemaDecoder.DbSchemaDecoder"
+            xmlns:local1="clr-namespace:DbSchemaDecoder.EditTableDefinitionView"
+    x:Class="DbSchemaDecoder.DbSchemaDecoder"
              mc:Ignorable="d" 
              d:DesignHeight="574.058" d:DesignWidth="950.382">
 

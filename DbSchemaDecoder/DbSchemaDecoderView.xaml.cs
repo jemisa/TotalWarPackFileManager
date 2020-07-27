@@ -63,13 +63,7 @@ namespace DbSchemaDecoder
         //----Hex stuff
         private void _fileListController_MyEvent(object sender, TestItem e)
         {
-            //PackedFileDbCodec codec = new PackedFileDbCodec()
-            /*if (_currentStream != null)
-                _currentStream.Dispose();*/
-            //HexEdit.CloseProvider();
-            //_currentStream = new MemoryStream(e.DbFile.Data);
-            //HexEdit.Stream = _currentStream;
-            HexEdit.FileName = @"C:\Program Files (x86)\Steam\steamapps\common\Total War WARHAMMER II\data\audio_we.pack";
+            HexEdit.Stream = new MemoryStream(e.DbFile.Data);
         }
         //---
 

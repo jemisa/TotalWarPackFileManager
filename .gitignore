@@ -69,3 +69,5 @@
 /Release Build/obj/Release
 /DbSql/obj/Release
 /Filetypes/obj/Release
+/ExternalProjects/WPFHexaEditor/bin/Debug
+/ExternalProjects/WPFHexaEditor/obj

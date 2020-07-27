@@ -180,8 +180,12 @@ namespace PackFileManager
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
 
 
-            var form = new Form();
-            form.AutoSize = true;
+            var form = new Form()
+            { 
+            Width = 1400,
+            Height = 900
+            };
+           
             var r = WpfPackedFileEditorHost.Create<DbSchemaDecoder.DbSchemaDecoder>();
             r.Dock = DockStyle.Fill;
             form.Controls.Add(r);

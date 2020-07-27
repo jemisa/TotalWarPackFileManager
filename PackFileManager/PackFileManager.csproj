@@ -243,6 +243,10 @@
       <Project>{AD415480-8879-4271-B8A6-CB7391DEA78C}</Project>
       <Name>EsfControl</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ExternalProjects\WPFHexaEditor\WpfHexEditorCore.csproj">
+      <Project>{2dd7c02c-770f-40ac-9ce9-0f2258c49dc9}</Project>
+      <Name>WpfHexEditorCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Filetypes\Filetypes.csproj">
       <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
       <Name>Filetypes</Name>

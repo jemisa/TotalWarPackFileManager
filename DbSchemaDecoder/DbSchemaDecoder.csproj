@@ -156,14 +156,15 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
     </PackageReference>
-    <PackageReference Include="WPFHexaEditor">
-      <Version>2.0.2</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExternalProjects\WPFHexaEditor\WpfHexEditorCore.csproj">
+      <Project>{2DD7C02C-770F-40AC-9CE9-0F2258C49DC9}</Project>
+      <Name>WpfHexEditorCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\Filetypes\Filetypes.csproj">
       <Project>{2419c2af-48a3-40d2-980b-36ab2d81dc74}</Project>
