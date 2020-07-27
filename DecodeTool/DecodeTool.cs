@@ -593,13 +593,12 @@ namespace DecodeTool {
             }
         }
 
-        private void SaveSchemaFile(object sender, EventArgs e) {
+        private void SaveSchemaFile(object sender, EventArgs e) 
+        {
             SaveFileDialog dlg = new SaveFileDialog();
-            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                using (FileStream stream = File.OpenWrite(dlg.FileName)) {
-                    XmlExporter exporter = new XmlExporter(stream);
-                    exporter.Export(DBTypeMap.Instance.AllInfos);
-                }
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK) 
+            {
+                DBTypeMap.Instance.SaveToFile(dlg.FileName);
             }
         }
 
@@ -642,10 +641,12 @@ namespace DecodeTool {
             }
         }
 
-        private void showTypes_Click(object sender, EventArgs e) {
-            string text = XmlExporter.TableToString(TypeName, version, FieldTypes);
-			TextDisplay d = new TextDisplay (text);
-			d.ShowDialog ();
+        private void showTypes_Click(object sender, EventArgs e) 
+        {
+            throw new NotImplementedException();
+            //string text = XmlExporter.TableToString(TypeName, version, FieldTypes);
+			//TextDisplay d = new TextDisplay (text);
+			//d.ShowDialog ();
 		}
 
         private void setButton_Click(object sender, EventArgs e) {
@@ -654,7 +655,10 @@ namespace DecodeTool {
                 Version = version
             };
             info.Fields.AddRange(FieldTypes);
-            DBTypeMap.Instance.AllInfos.Add(info);
+
+            if (DBTypeMap.Instance.AllInfos.ContainsKey(info.Name) == false)
+                DBTypeMap.Instance.AllInfos.Add(info.Name, new List<TypeInfo>());
+            DBTypeMap.Instance.AllInfos[info.Name].Add(info);
             DBTypeMap.Instance.SaveToFile("schema_current.xml");
             Close();
         }

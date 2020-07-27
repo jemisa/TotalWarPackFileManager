@@ -230,6 +230,10 @@
       <Project>{3b928c9e-a55f-4912-9880-ff134e68afca}</Project>
       <Name>DBEditorTableControl</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DbSchemaDecoder\DbSchemaDecoder.csproj">
+      <Project>{1b953b8f-26da-4338-b613-b26b9630dc1f}</Project>
+      <Name>DbSchemaDecoder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DecodeTool\DecodeTool.csproj">
       <Project>{B7E18A8E-7797-4865-97CD-97B2915AA774}</Project>
       <Name>DecodeTool</Name>

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Filetypes {
+namespace Filetypes
+{
     public class TypeVersionTuple {
         public string Type { get; set; }
         public int MaxVersion { get; set; }
@@ -11,34 +11,19 @@ namespace Filetypes {
 
     [StructLayout(LayoutKind.Sequential)]
     public class TypeInfo : IComparable<TypeInfo> {
-		public string Name {
-            get; set;
-        }
-        int version = 0;
-        public int Version {
-            get {
-                return version;
-            }
-            set {
-                version = value;
-            }
-        }
-		List<FieldInfo> fields = new List<FieldInfo> ();
-        public List<FieldInfo> Fields {
-            get {
-                return fields;
-            }
-        }
+		public string Name { get; set;}
+        public int Version { get; set; }
+        public List<FieldInfo> Fields { get; private set; } = new List<FieldInfo>();
+
         public FieldInfo this[string name] {
-            get {
-                FieldInfo result = null;
-                foreach(FieldInfo field in fields) {
-                    if (field.Name.Equals(name)) {
-                        result = field;
-                        break;
-                    }
+            get 
+            {
+                foreach(FieldInfo field in Fields) 
+                {
+                    if (field.Name == name) 
+                        return field;
                 }
-                return result;
+                return null;
             }
         }
   
@@ -58,10 +43,10 @@ namespace Filetypes {
         #endregion
   
         public bool SameTypes(TypeInfo other) {
-            bool typesMatch = fields.Count == other.fields.Count;
+            bool typesMatch = Fields.Count == other.Fields.Count;
             if (typesMatch) {
-                for (int i = 0; i < fields.Count && typesMatch; i++) {
-                    if (!fields[i].TypeName.Equals(other.fields[i].TypeName)) {
+                for (int i = 0; i < Fields.Count && typesMatch; i++) {
+                    if (!Fields[i].TypeName.Equals(other.Fields[i].TypeName)) {
                         typesMatch = false;
                     }
                 }

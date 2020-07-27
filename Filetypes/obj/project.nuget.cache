@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "7pY+8A4Nub76VJOYLUzXgwslz1b5mb6mgIC9LMr/03P+cHm5HkBJZipTuxc6pf6gQ95176fxH37mjvoUTZ9p+g==",
+  "dgSpecHash": "DLxbvzdIw69v0TfWTWJaDZ24ub8x6W5s9UllhJATR0m3H0ZFrNoyL1XokcOdgRyzFTR9wsTOsTKyPK2/pwEpSg==",
   "success": true,
   "projectFilePath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ole_k\\.nuget\\packages\\freeimage.standard\\4.3.8\\freeimage.standard.4.3.8.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
     "C:\\Users\\ole_k\\.nuget\\packages\\sevenzip\\19.0.0\\sevenzip.19.0.0.nupkg.sha512",
     "C:\\Users\\ole_k\\.nuget\\packages\\system.drawing.common\\4.5.1\\system.drawing.common.4.5.1.nupkg.sha512",
     "C:\\Users\\ole_k\\.nuget\\packages\\system.drawing.primitives\\4.3.0\\system.drawing.primitives.4.3.0.nupkg.sha512"

@@ -32,10 +32,9 @@ namespace PackFileManager
                 return instance;
             }
         }
-        private GameManager() {
-            if (!DBTypeMap.Instance.Initialized) {
-                DBTypeMap.Instance.InitializeTypeMap(PackFileManagerSettingService.InstallationPath);
-            }
+        private GameManager()
+        {
+            DBTypeMap.Instance.InitializeTypeMap(PackFileManagerSettingService.InstallationPath);
 
             PackFileManagerSettingService.Load();
 
@@ -114,9 +113,8 @@ namespace PackFileManager
                         LoadGameMaxDbVersions();
 
                         // invalidate cache of reference map cache
-                        List<string> loaded = new PackLoadSequence() {
-                            IgnorePack = PackLoadSequence.IsDbCaPack
-                        }.GetPacksLoadedFrom(current.GameDirectory);
+                        var seq = new PackLoadSequence(){ IgnorePack = PackLoadSequence.IsDbCaPack };
+                        List<string> loaded = seq.GetPacksLoadedFrom(current.GameDirectory);
                         DBReferenceMap.Instance.GamePacks = loaded;
                     }
                     if (GameChanged != null) {
@@ -154,28 +152,36 @@ namespace PackFileManager
         }
         
         #region Game-specific schema (typemap) handling
-        private void LoadGameMaxDbVersions() {
-            try {
+        private void LoadGameMaxDbVersions() 
+        {
+            try 
+            {
                 Game game = CurrentGame;
-                if (gameDbVersions.ContainsKey(game)) {
+                if (_gameDbVersions.ContainsKey(game)) 
                     return;
-                }
+                
                 string schemaFile = Path.Combine(PackFileManagerSettingService.InstallationPath, game.MaxVersionFilename);
-                if (File.Exists(schemaFile)) {
-                    SortedList<string, int> versions = SchemaOptimizer.ReadTypeVersions(schemaFile);
-                    if (versions != null) {
-                        gameDbVersions.Add(game, versions);
-                    }
-                } else {
+                if (File.Exists(schemaFile)) 
+                {
+                    var versions = SchemaOptimizer.ReadTypeVersions(schemaFile);
+                    if (versions != null) 
+                        _gameDbVersions.Add(game, versions);
+                } 
+                else 
+                {
                     // rebuild from master schema
                     CreateSchemaFile(game);
                 }
             } catch { }
         }
-        public void CreateSchemaFile(Game game) {
+
+        public void CreateSchemaFile(Game game) 
+        {
             string filePath = Path.Combine(PackFileManagerSettingService.InstallationPath, game.MaxVersionFilename);
-            if (game.IsInstalled && !File.Exists(filePath)) {
-                SchemaOptimizer optimizer = new SchemaOptimizer() {
+            if (game.IsInstalled && !File.Exists(filePath)) 
+            {
+                SchemaOptimizer optimizer = new SchemaOptimizer()
+                {
                     PackDirectory = Path.Combine(game.GameDirectory, "data"),
                     SchemaFilename = filePath
                 };
@@ -187,14 +193,14 @@ namespace PackFileManager
             }
         }
         
-        private Dictionary<Game, TableVersions> gameDbVersions = new Dictionary<Game, TableVersions>();
-        public int GetMaxDbVersion(string tableName) {
+        private Dictionary<Game, TableVersions> _gameDbVersions = new Dictionary<Game, TableVersions>();
+        public int GetMaxDbVersion(string tableName) 
+        {
             int result = -1;
-            SortedList<string, int> tablesToVersion;
-            if (gameDbVersions.TryGetValue(CurrentGame, out tablesToVersion)) {
-                if (!tablesToVersion.TryGetValue(tableName, out result)) {
+            if (_gameDbVersions.TryGetValue(CurrentGame, out var tablesToVersion))
+            {
+                if (!tablesToVersion.TryGetValue(tableName, out result))
                     result = -1;
-                }
             }
             return result;
         }

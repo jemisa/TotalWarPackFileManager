@@ -51,9 +51,12 @@ namespace SchemaIntegration {
             }
             references = new Dictionary<string, List<FieldInfo>>();
             Console.WriteLine("building reference cache");
-            foreach(TypeInfo typeInfo in DBTypeMap.Instance) {
-                foreach(FieldInfo field in typeInfo.Fields) {
-                    if (!string.IsNullOrEmpty(field.ForeignReference)) {
+            foreach(TypeInfo typeInfo in DBTypeMap.Instance) 
+            {
+                foreach(FieldInfo field in typeInfo.Fields) 
+                {
+                    if (!string.IsNullOrEmpty(field.ForeignReference)) 
+                    {
                         List<FieldInfo> addTo;
                         if (!references.TryGetValue(field.ForeignReference, out addTo)) {
 #if DEBUG
@@ -109,9 +112,8 @@ namespace SchemaIntegration {
                             break;
                         }
                     }
-                    if (replaced != null) {
+                    if (replaced != null) 
                         DBTypeMap.Instance.AllInfos.Remove(replaced);
-                    }
                     DBTypeMap.Instance.AllInfos.Add(type);
                 }
             }

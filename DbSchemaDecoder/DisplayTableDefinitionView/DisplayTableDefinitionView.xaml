@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="DbSchemaDecoder.DisplayTableDefinitionView.DisplayTableDefinitionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DbSchemaDecoder.DisplayTableDefinitionView"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Table definitions">
+                <Grid Background="#FFE5E5E5">
+                    <local:TableDefinitionView></local:TableDefinitionView>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Enties">
+                <Grid Background="#FFE5E5E5">
+                    <local:DbTableView></local:DbTableView>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</UserControl>

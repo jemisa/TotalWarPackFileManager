@@ -63,53 +63,71 @@ namespace Filetypes.Codecs {
 		 * Reads a db file from stream, using the version information
 		 * contained in the header read from it.
 		 */
-        public DBFile Decode(Stream stream) {
-            BinaryReader reader = new BinaryReader(stream);
-            reader.BaseStream.Position = 0;
-            DBFileHeader header = readHeader(reader);
-            List<TypeInfo> infos = DBTypeMap.Instance.GetVersionedInfos(typeName, header.Version);
-            if (infos.Count == 0) {
-                infos.AddRange(DBTypeMap.Instance.GetAllInfos(typeName));
-            }
-            foreach (TypeInfo realInfo in infos) {
-                try {
+        public DBFile Decode(Stream stream) 
+        {
+            using (BinaryReader reader = new BinaryReader(stream))
+            {
+                reader.BaseStream.Position = 0;
+                DBFileHeader header = readHeader(reader);
+                List<TypeInfo> infos = DBTypeMap.Instance.GetVersionedInfos(typeName, header.Version);
+                if (infos.Count == 0)
+                    infos.AddRange(DBTypeMap.Instance.GetAllInfos(typeName));
+
+                foreach (TypeInfo realInfo in infos)
+                {
+                    try
+                    {
 #if DEBUG
-                    Console.WriteLine("Parsing version {1} with info {0}", string.Join(",", realInfo.Fields), header.Version);
+                        Console.WriteLine("Parsing version {1} with info {0}", string.Join(",", realInfo.Fields), header.Version);
 #endif
-                    DBFile result = ReadFile(reader, header, realInfo);
-                    return result;
-                } catch (Exception e) { }
+                        DBFile result = ReadFile(reader, header, realInfo);
+                        return result;
+                    }
+                    catch (Exception e)
+                    { }
+                }
+                return null;
             }
-            return null;
             // throw new DBFileNotSupportedException(string.Format("No applicable type definition found"));
         }
-        public DBFile ReadFile(BinaryReader reader, DBFileHeader header, TypeInfo info) {
+
+        public DBFile ReadFile(BinaryReader reader, DBFileHeader header, TypeInfo info) 
+        {
             reader.BaseStream.Position = header.Length;
             DBFile file = new DBFile(header, info);
             int i = 0;
-            while (reader.BaseStream.Position < reader.BaseStream.Length) {
-                try {
+            while (reader.BaseStream.Position < reader.BaseStream.Length) 
+            {
+                try 
+                {
                     file.Entries.Add(ReadFields(reader, info));
                     i++;
-                } catch (Exception x) {
+                } 
+                catch (Exception x) 
+                {
                     string message = string.Format("{2} at entry {0}, db version {1}", i, file.Header.Version, x.Message);
                     throw new DBFileNotSupportedException(message, x);
                 }
             }
-            if (file.Entries.Count != header.EntryCount) {
+
+            if (file.Entries.Count != header.EntryCount) 
                 throw new DBFileNotSupportedException(string.Format("Expected {0} entries, got {1}", header.EntryCount, file.Entries.Count));
-            } else if (reader.BaseStream.Position != reader.BaseStream.Length) {
+             else if (reader.BaseStream.Position != reader.BaseStream.Length) 
                 throw new DBFileNotSupportedException(string.Format("Expected {0} bytes, read {1}", header.Length, reader.BaseStream.Position));
-            }
+            
             return file;
         }
         /*
          * Decode from the given data array (usually retrieved from a packed file Data).
          */
-        public DBFile Decode(byte[] data) {
-            using (MemoryStream stream = new MemoryStream(data, 0, data.Length)) {
-                return Decode(stream);
+        public DBFile Decode(byte[] data) 
+        {
+            using (MemoryStream stream = new MemoryStream(data, 0, data.Length))
+            {
+                var file = Decode(stream);
+                return file;
             }
+            
         }
         #endregion
 
@@ -191,25 +209,30 @@ namespace Filetypes.Codecs {
 
         // creates a list of field values from the given type.
         // stream needs to be positioned at the beginning of the entry.
-        private DBRow ReadFields(BinaryReader reader, TypeInfo ttype, bool skipHeader = true) {
-            if (!skipHeader) {
+        private DBRow ReadFields(BinaryReader reader, TypeInfo type, bool skipHeader = true) 
+        {
+            if (!skipHeader) 
                 readHeader(reader);
-            }
+            
             List<FieldInstance> entry = new List<FieldInstance>();
-            for (int i = 0; i < ttype.Fields.Count; ++i) {
-                FieldInfo field = ttype.Fields[i];
+            for (int i = 0; i < type.Fields.Count; ++i) 
+            {
+                FieldInfo field = type.Fields[i];
 
                 FieldInstance instance = null;
-                try {
+                try 
+                {
                     instance = field.CreateInstance();
                     instance.Decode(reader);
                     entry.Add(instance);
-                } catch (Exception x) {
+                } 
+                catch (Exception x) 
+                {
                     throw new InvalidDataException(string.Format
-                        ("Failed to read field {0}/{1}, type {3} ({2})", i, ttype.Fields.Count, x.Message, instance.Info.TypeName));
+                        ("Failed to read field {0}/{1}, type {3} ({2})", i, type.Fields.Count, x.Message, instance.Info.TypeName));
                 }
             }
-            DBRow result = new DBRow(ttype, entry);
+            DBRow result = new DBRow(type, entry);
             return result;
         }
 

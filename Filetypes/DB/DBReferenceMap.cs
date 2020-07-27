@@ -121,10 +121,10 @@ namespace Filetypes {
          * Retrieve the values for the given reference table/field, with the parameter key
          * encoded as "table_name.field_name".
          */
-        public SortedSet<string> ResolveReference(string key) {
-            if (key.Length == 0) {
+        public SortedSet<string> ResolveReference(string key) 
+        {
+            if (key.Length == 0)
                 return null;
-            }
 #if DEBUG
             Console.WriteLine("resolving reference {0}", key);
 #endif
@@ -134,30 +134,33 @@ namespace Filetypes {
 
             List<string> result = new List<string>();
             SortedSet<string> fromPack = new SortedSet<string>();
-            if (!valueCache.TryGetValue(key, out fromPack)) {
+            if (!valueCache.TryGetValue(key, out fromPack)) 
+            {
                 fromPack = CollectValues(tableName, fieldName, CurrentPack);
                 valueCache.Add(key, fromPack);
             }
-            if (fromPack != null) {
+            if (fromPack != null) 
                 result.AddRange(fromPack);
-            }
+            
 
             SortedSet<string> fromGame;
-            if (!gamePackCache.TryGetValue(key, out fromGame)) {
+            if (!gamePackCache.TryGetValue(key, out fromGame)) 
+            {
                 IEnumerable<PackedFile> packedFiles;
-                if (typeToPackedCache.ContainsKey(tableName)) {
+
+                if (typeToPackedCache.ContainsKey(tableName)) 
                     packedFiles = typeToPackedCache[tableName];
-                } else {
+                else 
                     packedFiles = new MultiPackEnumerable(gamePacks);
-                }
+                
                 fromGame = CollectValues(tableName, fieldName, packedFiles);
-                if (fromGame != null) {
+                if (fromGame != null) 
                     gamePackCache.Add(key, fromGame);
-                }
             }
-            if (fromGame != null) {
+
+            if (fromGame != null)
                 result.AddRange(fromGame);
-            }
+            
             
             SortedSet<string> resultSet = new SortedSet<string>(result);
             return resultSet;

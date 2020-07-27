@@ -216,7 +216,7 @@ namespace DBTableControl
                         CurrentPackedFile.RenameEvent += new PackEntry.Renamed(CurrentPackedFile_RenameEvent);
 
                         _codec = PackedFileDbCodec.FromFilename(_currentPackedFile.FullPath);
-                        EditedFile = PackedFileDbCodec.Decode(_currentPackedFile);
+                        EditedFile = _codec.Decode(_currentPackedFile.Data);
                     }
                     catch (DBFileNotSupportedException exception)
                     {

@@ -118,8 +118,11 @@ namespace SchemaIntegration {
 
         #region Save Schema
         static readonly Regex NumberedFieldNameRe = new Regex("([^0-9]*)([0-9]+)");
-        void SaveSchema() {
-            DBTypeMap.Instance.AllInfos.ForEach(info => {
+        void SaveSchema() 
+        {
+            var items = DBTypeMap.Instance.AllInfos.SelectMany(x => x.Value).ToList();
+            items.ForEach(info => 
+            {
                 MakeFieldNamesUnique(info.Fields);
             });
             DBTypeMap.Instance.SaveToFile(Directory.GetCurrentDirectory(), "user");

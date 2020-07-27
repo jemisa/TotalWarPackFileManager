@@ -9,8 +9,61 @@ namespace Filetypes {
     /*
      * A collection of types that can be decoded from the db.
      */
-	public class Types {
-		public static FieldInfo FromTypeName(string typeName) {
+
+    public enum DbTypesEnum
+    { 
+        String,
+        String_ascii,
+        Optstring,
+        Optstring_ascii,
+        Int,
+        Integer,
+        Autonumber,
+        Short,
+        Float,
+        Single,
+        Decimal,
+        Double,
+        Boolean,
+        Yesno,
+        List,
+    }
+	public class Types 
+    {
+        public static FieldInfo FromEnum(DbTypesEnum typeEnum)
+        {
+            switch (typeEnum)
+            {
+                case DbTypesEnum.String:
+                    return StringType();
+                case DbTypesEnum.String_ascii:
+                    return StringTypeAscii();
+                case DbTypesEnum.Optstring:
+                    return OptStringType();
+                case DbTypesEnum.Optstring_ascii:
+                    return OptStringTypeAscii();
+                case DbTypesEnum.Int:
+                case DbTypesEnum.Integer:
+                case DbTypesEnum.Autonumber:
+                    return IntType();
+                case DbTypesEnum.Short:
+                    return ShortType();
+                case DbTypesEnum.Float:
+                case DbTypesEnum.Single:
+                case DbTypesEnum.Decimal:
+                case DbTypesEnum.Double:
+                    return SingleType();
+                // return DoubleType ();
+                case DbTypesEnum.Boolean:
+                case DbTypesEnum.Yesno:
+                    return BoolType();
+                case DbTypesEnum.List:
+                    return ListType();
+            }
+            throw new InvalidOperationException(String.Format("Cannot create field info from {0}", typeEnum.ToString()));
+        }
+
+        public static FieldInfo FromTypeName(string typeName) {
 			switch (typeName) {
 			case "string":
 				return StringType ();
@@ -74,10 +127,14 @@ namespace Filetypes {
         /*
          * Parse encoded reference (see #FormatReference).
          */
-        public FieldReference(string encoded) {
+        public FieldReference(string encoded) 
+        {
             string[] parts = encoded.Split(SEPARATOR);
-            Table = parts[0];
-            Field = parts[1];
+            if (parts.Length == 2)
+            {
+                Table = parts[0];
+                Field = parts[1];
+            }
         }
         /*
          * Create an empty reference.

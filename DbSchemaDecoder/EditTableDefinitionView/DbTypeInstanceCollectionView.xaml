@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="DbSchemaDecoder.EditTableDefinitionView.DecodeDbTypeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DbSchemaDecoder.EditTableDefinitionView"
+             mc:Ignorable="d" 
+             d:DesignHeight="247.385" d:DesignWidth="623.529">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <local:DbTypeInstanceView Grid.Row="0" VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView Grid.Row="1" VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView Grid.Row="2" VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView Grid.Row="3" VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView Grid.Row="4" VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView Grid.Row="5" VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <Button Content="&lt;&lt;" Grid.Row="6" HorizontalAlignment="Left"></Button>
+        <Button Content="&lt;" Grid.Row="6" HorizontalAlignment="Left" Margin="34,0,0,-1"></Button>
+        <Button Content="&gt;" Grid.Row="6" HorizontalAlignment="Right"></Button>
+        <Label Grid.Row="6" Content="0/10" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+    </Grid>
+</UserControl>

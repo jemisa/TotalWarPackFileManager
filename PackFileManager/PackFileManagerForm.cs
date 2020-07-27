@@ -178,7 +178,14 @@ namespace PackFileManager
             _packTreeView.GetTreeView().SelectionChanged += packTreeView_AfterSelect;
             _packTreeView.GetTreeView().PreviewKeyDown += packTreeView_PreviewKeyDown;
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
-            
+
+
+            var form = new Form();
+            form.AutoSize = true;
+            var r = WpfPackedFileEditorHost.Create<DbSchemaDecoder.DbSchemaDecoder>();
+            r.Dock = DockStyle.Fill;
+            form.Controls.Add(r);
+            form.Show();
         }
         
         #region Form Management

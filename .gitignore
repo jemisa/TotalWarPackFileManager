@@ -55,3 +55,17 @@
 /CommonDialogs/obj/Release
 /PackFileManager/obj/Release
 /PackFileManager/obj
+/DbSchemaDecoder/bin/Debug
+/DbSchemaDecoder/obj
+/Common/bin/Release
+/Common/obj/Release
+/DbEntryCorrection/obj/Release
+/DecodeTool/obj/Release
+/EsfControl/obj/Release
+/Filetypes/bin/Release
+/PackFileTest/obj/Release
+/PfmCL/obj/Release
+/PfmCL/obj/x86/Debug
+/Release Build/obj/Release
+/DbSql/obj/Release
+/Filetypes/obj/Release

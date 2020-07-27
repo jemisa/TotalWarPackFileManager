@@ -19,15 +19,18 @@ namespace Filetypes {
         // the filename to save the result in
         public string SchemaFilename { get; set; }
 
-        public SchemaOptimizer () {
+        public SchemaOptimizer () 
+        {
             PackDirectory = "";
             SchemaFilename = "schema_optimized.xml";
         }
         
         SortedList<string, int> maxVersion = new SortedList<string, int>();
 
-        public void FilterExistingPacks() {
-            if (Directory.Exists(PackDirectory)) {
+        public void FilterExistingPacks() 
+        {
+            if (Directory.Exists(PackDirectory)) 
+            {
                 DateTime start = DateTime.Now;
                 Console.WriteLine("Retrieving from {0}, storing to {1}", PackDirectory, SchemaFilename);
                 
@@ -38,25 +41,31 @@ namespace Filetypes {
                 // all files called "*patch*" for backed up earlier packs
                 // files.AddRange(Directory.EnumerateFiles(PackDirectory, "*.patch*"));
 
-                foreach (string path in files) {
-                    try {
+                foreach (string path in files) 
+                {
+                    try 
+                    {
                         PackFile pack = new PackFileCodec().Open(path);
                         // only use CA packs
-                        if (pack.Type != PackType.Release && pack.Type != PackType.Patch) {
+                        if (pack.Type != PackType.Release && pack.Type != PackType.Patch) 
+                        {
                             Console.WriteLine("not handling {0}", path);
                             continue;
                         }
                         GetUsedTypes(pack);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) 
+                    {
                         Console.WriteLine("Not able to include {0} into schema: {1}", path, e);
                     }
                 }
                 
                 List<TypeVersionTuple> asTuples = new List<TypeVersionTuple>();
-                foreach(string s in maxVersion.Keys) {
+                foreach(string s in maxVersion.Keys) 
                     asTuples.Add(new TypeVersionTuple { Type = s, MaxVersion = maxVersion[s] });
-                }
-                using (var stream = File.Create(SchemaFilename)) {
+                
+                using (var stream = File.Create(SchemaFilename)) 
+                {
                     XmlSerializer serializer = new XmlSerializer(asTuples.GetType());
                     serializer.Serialize(stream, asTuples);
                 }
@@ -66,32 +75,36 @@ namespace Filetypes {
             }
         }
 
-        private void GetUsedTypes(PackFile pack) {
-            foreach (PackedFile packed in pack.Files) {
-                if (packed.FullPath.StartsWith("db")) {
+        private void GetUsedTypes(PackFile pack) 
+        {
+            foreach (PackedFile packed in pack.Files) 
+            {
+                if (packed.FullPath.StartsWith("db")) 
                     AddFromPacked(packed);
-                }
             }
         }
 
-        private void AddFromPacked(PackedFile packed) {
-            if (packed.Size != 0) {
+        private void AddFromPacked(PackedFile packed) 
+        {
+            if (packed.Size != 0) 
+            {
                 string type = DBFile.Typename(packed.FullPath);
                 DBFileHeader header = PackedFileDbCodec.readHeader(packed);
                 int currentMaxVersion;
-                if (!maxVersion.TryGetValue(type, out currentMaxVersion)) {
+                if (!maxVersion.TryGetValue(type, out currentMaxVersion)) 
                     currentMaxVersion = header.Version;
-                } else {
+                else 
                     currentMaxVersion = Math.Max(header.Version, currentMaxVersion);
-                }
                 maxVersion[type] = currentMaxVersion;
             }
         }
         
-        public static SortedList<string, int> ReadTypeVersions(string filename) {
+        public static SortedList<string, int> ReadTypeVersions(string filename) 
+        {
             List<TypeVersionTuple> tuples = new List<TypeVersionTuple>();
             XmlSerializer ser = new XmlSerializer(tuples.GetType());
-            using (var stream = File.OpenRead(filename)) {
+            using (var stream = File.OpenRead(filename)) 
+            {
                 tuples = ser.Deserialize(stream) as List<TypeVersionTuple>;
             }
             SortedList<string, int> versions = new SortedList<string, int>();
