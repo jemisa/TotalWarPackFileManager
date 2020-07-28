@@ -7,13 +7,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListView>
+        <ListView ItemsSource="{Binding SelectedTableTypeInformations}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" Width="100"/>
-                    <GridViewColumn Header="WarriorName" Width="100"/>
-                    <GridViewColumn Header="Key" Width="100"/>
-                    <GridViewColumn Header="Age" Width="100"/>
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"  Width="auto"/>
+                    <GridViewColumn Header="TypeName" DisplayMemberBinding="{Binding TypeName}"  Width="auto"/>
+                    <GridViewColumn Header="PrimaryKey" DisplayMemberBinding="{Binding PrimaryKey}"  Width="auto"/>
+                    <GridViewColumn Header="Optional" DisplayMemberBinding="{Binding Optional}"  Width="auto"/>
+                    <GridViewColumn Header="ForeignReference" DisplayMemberBinding="{Binding ForeignReference}"  Width="auto"/>
+                    <GridViewColumn Header="ReferencedTable" DisplayMemberBinding="{Binding ReferencedTable}"  Width="auto"/>
+                    <GridViewColumn Header="ReferencedField" DisplayMemberBinding="{Binding ReferencedField}"  Width="auto"/>
                 </GridView>
             </ListView.View>
         </ListView>

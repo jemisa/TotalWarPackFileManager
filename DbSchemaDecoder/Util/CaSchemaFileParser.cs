@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,9 +10,38 @@ using System.Xml;
 
 namespace DbSchemaDecoder.Controllers
 {
+    public class SingleOrArrayConverter<T> : JsonConverter
+    {
+        public override bool CanConvert(Type objecType)
+        {
+            return (objecType == typeof(List<T>));
+        }
+
+        public override object ReadJson(JsonReader reader, Type objecType, object existingValue,
+            JsonSerializer serializer)
+        {
+            JToken token = JToken.Load(reader);
+            if (token.Type == JTokenType.Array)
+            {
+                return token.ToObject<List<T>>();
+            }
+            return new List<T> { token.ToObject<T>() };
+        }
+
+        public override bool CanWrite
+        {
+            get { return false; }
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     class CaSchemaEntry
     {
+        public int index { get; set; }
         public string field_uuid { get; set; }
         public string primary_key { get; set; }
         public string name { get; set; }
@@ -54,6 +84,7 @@ namespace DbSchemaDecoder.Controllers
         {
             public string edit_uuid { get; set; }
             public string include_all_records_in_retail { get; set; }
+            [JsonConverter(typeof(SingleOrArrayConverter<Field>))]
             public List<Field> field { get; set; }
 
         }
@@ -70,13 +101,16 @@ namespace DbSchemaDecoder.Controllers
 
         public class Field
         {
+            
             public string field_uuid { get; set; }
             public string primary_key { get; set; }
             public string name { get; set; }
             public string field_type { get; set; }
             public string required { get; set; }
             public string max_length { get; set; }
-            public string column_source_column { get; set; }
+
+            [JsonConverter(typeof(SingleOrArrayConverter<string>))]
+            public List<string> column_source_column { get; set; } = new List<string>();
             public string column_source_table { get; set; }
             public string encyclopaedia_export { get; set; }
             public string requires_startpos_reprocess { get; set; }
@@ -134,7 +168,7 @@ namespace DbSchemaDecoder.Controllers
                 var xmlContent = File.ReadAllText(path);
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xmlContent);
-                string jsonStr = JsonConvert.SerializeXmlNode(doc);
+                string jsonStr = JsonConvert.SerializeXmlNode(doc, Newtonsoft.Json.Formatting.Indented);
                 table = JsonConvert.DeserializeObject<CaSchemaTable>(jsonStr);
             }
             catch (Exception e)
@@ -143,20 +177,21 @@ namespace DbSchemaDecoder.Controllers
                 return output;
             }
 
-
             var filteredTables = table.root.field.Where(x => !_fieldsRemovedFromTheGameByCa.Contains(x.name));
             // Create the table
+            var index = 0;
             foreach (var item in filteredTables)
             {
                 CaSchemaEntry entry = new CaSchemaEntry();
 
+                entry.index = index++;
                 entry.field_uuid = item.field_uuid;
                 entry.primary_key = item.primary_key;
                 entry.name = item.name;
                 entry.field_type = item.field_type;
                 entry.required = item.required;
                 entry.max_length = item.max_length;
-                entry.column_source_column = item.column_source_column;
+                //entry.column_source_column = item.column_source_column;
                 entry.column_source_table = item.column_source_table;
                 entry.encyclopaedia_export = item.encyclopaedia_export;
                 entry.requires_startpos_reprocess = item.requires_startpos_reprocess;

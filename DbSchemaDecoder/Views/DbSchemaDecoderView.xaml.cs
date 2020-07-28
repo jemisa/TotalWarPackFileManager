@@ -1,4 +1,5 @@
 ﻿using DbSchemaDecoder.Controllers;
+using DbSchemaDecoder.DisplayTableDefinitionView;
 using DbSchemaDecoder.EditTableDefinitionView;
 using Filetypes.Codecs;
 using System;
@@ -52,6 +53,7 @@ namespace DbSchemaDecoder
             //FindController<ConfigureTableRowsView>().DataContext = _configureTableRowsController;
             FindController<InformationView>().DataContext = _mainController;
             FindController<ConfigureTableRowsView>().DataContext = _mainController;
+            FindController<DisplayTableDefinitionView2>().DataContext = _mainController;
         }
 
      

@@ -9,22 +9,42 @@
     <Grid>
         <ComboBox HorizontalAlignment="Left" Margin="52,0,0,0" VerticalAlignment="Top" Width="151"/>
         <Label Content="Version:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-        
+
         <Label 
-            Content="{Binding Path=SelectedFileHeaderInformation.TableName, UpdateSourceTrigger=PropertyChanged}"
-            HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top"/>
+            HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top">
+            <TextBlock>
+                <Run Text="Table Name: "/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformation.TableName, UpdateSourceTrigger=PropertyChanged}"/>
+            </TextBlock>
+        </Label>
         <Label 
-            Content="{Binding Path=SelectedFileHeaderInformation.HeaderSize, UpdateSourceTrigger=PropertyChanged}"
-            HorizontalAlignment="Left" Margin="0,50,0,0" VerticalAlignment="Top"/>
+            HorizontalAlignment="Left" Margin="0,50,0,0" VerticalAlignment="Top">
+            <TextBlock>
+                <Run Text="Header Size: "/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformation.HeaderSize, UpdateSourceTrigger=PropertyChanged}"/>
+            </TextBlock>
+        </Label>
         <Label 
-            Content="{Binding Path=SelectedFileHeaderInformation.TotalSize, UpdateSourceTrigger=PropertyChanged}"
-            HorizontalAlignment="Left" Margin="250,50,0,0" VerticalAlignment="Top"/>
+            HorizontalAlignment="Left" Margin="250,50,0,0" VerticalAlignment="Top">
+            <TextBlock>
+                <Run Text="Total Size: "/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformation.TotalSize, UpdateSourceTrigger=PropertyChanged}"/>
+            </TextBlock>
+        </Label>
         <Label 
-            Content="{Binding Path=SelectedFileHeaderInformation.Version, UpdateSourceTrigger=PropertyChanged}"
-            HorizontalAlignment="Left" Margin="250,75,0,0" VerticalAlignment="Top"/>
+            HorizontalAlignment="Left" Margin="250,75,0,0" VerticalAlignment="Top">
+            <TextBlock>
+                <Run Text="Version: "/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformation.Version, UpdateSourceTrigger=PropertyChanged}"/>
+            </TextBlock>
+        </Label>
         <Label 
-            Content="{Binding Path=SelectedFileHeaderInformation.ExpectedEntries, UpdateSourceTrigger=PropertyChanged}"
-            HorizontalAlignment="Left" Margin="0,75,0,0" VerticalAlignment="Top"/>
-        
+            HorizontalAlignment="Left" Margin="0,75,0,0" VerticalAlignment="Top">
+            <TextBlock>
+                <Run Text="Expected Entries: "/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformation.ExpectedEntries, UpdateSourceTrigger=PropertyChanged}"/>
+            </TextBlock>
+        </Label>
+
     </Grid>
 </UserControl>

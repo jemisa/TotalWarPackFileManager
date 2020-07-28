@@ -6,13 +6,16 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:DbSchemaDecoder"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="300">
     <Grid>
-        <ListView x:Name="FileListView1"  ItemsSource="{Binding FileListModels}" SelectedItem="{Binding SelectedItem}">
+        <ListView x:Name="FileListView1"  
+                  ItemsSource="{Binding FileList}" SelectedItem="{Binding SelectedItem}" 
+                  Margin="0,0,0,50">
+
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged" >
                     <i:InvokeCommandAction 
-                        Command="{Binding Command}"
+                        Command="{Binding FileSelectedCommand}"
                         CommandParameter="{Binding ElementName=FileListView1, Path=SelectedItem}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
@@ -20,11 +23,53 @@
             <ListView.View>
                 <GridView x:Name="grdTest">
                     <GridViewColumn Header="File" DisplayMemberBinding="{Binding TableType}"  Width="auto"/>
+                    <GridViewColumn Header="Error" DisplayMemberBinding="{Binding HasDefinitionError}"  Width="auto"/>
                 </GridView>
-
             </ListView.View>
 
         </ListView>
 
+        <TextBox 
+            Text="{Binding Path=SearchFilter, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap" 
+            HorizontalContentAlignment="Stretch" 
+            Height="25" 
+            Margin="0,400,74,25" 
+            VerticalAlignment="Bottom" FontSize="18">
+            
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding FilterButtonCommand}"/>
+            </TextBox.InputBindings>
+
+        </TextBox>
+            
+
+        <Button 
+            Content="Filter"
+            HorizontalAlignment="Right"
+            Margin="0,0,0,25" 
+            VerticalAlignment="Bottom" 
+            Width="74" 
+            Height="25"
+            Command="{Binding FilterButtonCommand}"
+            />
+        
+        <ToggleButton 
+            Content="Only errors" 
+            IsChecked="{Binding OnlyShowTablesWithErrors, Mode=TwoWay}"
+            HorizontalAlignment="Right" 
+            Margin="226,428,0,0" 
+            VerticalAlignment="Bottom" 
+            Width="74"
+            Command="{Binding OnlyShowTablesWithError}"/>
+
+        <Label  HorizontalAlignment="Left" Margin="0,425,0,0" VerticalAlignment="Bottom">
+            <TextBlock>
+                <Run Text="Total Tables: "></Run>
+                <Run Text="{Binding TotalDbFiles}"/>
+                <Run Text="   With error:"></Run>
+                <Run Text="{Binding DbFilesWithError}"/>
+            </TextBlock>
+        </Label>
     </Grid>
 </UserControl>

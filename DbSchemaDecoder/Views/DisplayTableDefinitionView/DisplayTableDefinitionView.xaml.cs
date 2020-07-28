@@ -18,9 +18,9 @@ namespace DbSchemaDecoder.DisplayTableDefinitionView
     /// <summary>
     /// Interaction logic for DisplayTableDefinitionView.xaml
     /// </summary>
-    public partial class DisplayTableDefinitionView : UserControl
+    public partial class DisplayTableDefinitionView2 : UserControl
     {
-        public DisplayTableDefinitionView()
+        public DisplayTableDefinitionView2()
         {
             InitializeComponent();
         }

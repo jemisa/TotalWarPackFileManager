@@ -22,6 +22,7 @@ namespace DbSchemaDecoder.Controllers
     {
         public SelectedFileHeaderInformation SelectedFileHeaderInformation { get; set; } = new SelectedFileHeaderInformation();
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
+        public ObservableCollection<FieldInfo> SelectedTableTypeInformations { get; set; } = new ObservableCollection<FieldInfo>();
 
         string _testValue;
         public string TestValue
@@ -34,6 +35,7 @@ namespace DbSchemaDecoder.Controllers
             }
         }
 
+        int _currentVersion = 0;
         // 
         CaSchemaFileParser caSchemaFileParser = new CaSchemaFileParser();
 
@@ -42,10 +44,6 @@ namespace DbSchemaDecoder.Controllers
 
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
-
-
-
-
         }
 
         private void OnDbFileSelected(object sender, DataBaseFile e)
@@ -57,13 +55,31 @@ namespace DbSchemaDecoder.Controllers
             TestValue = "MyString is cool2";
             // throw new NotImplementedException();
 
-            var res = caSchemaFileParser.Load(e.TableType);
+            ParseDatabaseFile(e);
+
+            LoadCurrentTableDefinition(e.TableType, _currentVersion);
+            LoadCaSchemaDefinition(e.TableType);
+            
+        }
+
+        void LoadCurrentTableDefinition(string tableName, int currentVersion)
+        {
+            var x = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
+            SelectedTableTypeInformations.Clear();
+
+            if (x == null || x.FirstOrDefault() == null)
+                return;
+        
+            foreach(var i in x.First().Fields)
+                SelectedTableTypeInformations.Add(i); 
+        }
+
+        void LoadCaSchemaDefinition(string tableName)
+        {
+            var res = caSchemaFileParser.Load(tableName);
             CaSchemaEntries.Clear();
             foreach (var x in res.Entries)
                 CaSchemaEntries.Add(x);
-                //CaSchemaEntries = new ObservableCollection<CaSchemaEntry>(res.Entries);
-
-            ParseDatabaseFile(e);
         }
 
         void ParseDatabaseFile(DataBaseFile item)
@@ -75,12 +91,70 @@ namespace DbSchemaDecoder.Controllers
             using (BinaryReader reader = new BinaryReader(new MemoryStream(bytes)))
             {
                 DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+                if (header != null)
+                {
+                    _currentVersion = header.Version;
+                }
                 SelectedFileHeaderInformation.Update(header, item);
             }
         }
 
-        public void ExtractHeaderInformation()
-        { 
+
+        void shitshat()
+        {
+            var fields = SelectedTableTypeInformations;
+
+
+            /*TypeSelection[] selections = new TypeSelection[] {
+                intType, stringType, boolType, singleType, optStringType, byteType
+            };*/
         }
+        /*
+         * 
+         * 
+         *             unicode = encodeUnicode;
+            
+            #region Type Selection Listener Initialization
+            // Add to the TypeSelection listeners. 
+            if (unicode) {
+                stringType.Factory = Types.StringType;
+                optStringType.Factory = Types.OptStringType;
+            } else {
+                stringType.Factory = Types.StringTypeAscii;
+                optStringType.Factory = Types.OptStringTypeAscii;
+            }
+stringType.Selected += AddType;
+
+            intType.Factory = Types.IntType;
+            intType.Selected += AddType;
+
+            boolType.Factory = Types.BoolType;
+            boolType.Selected += AddType;
+
+            singleType.Factory = Types.SingleType;
+            singleType.Selected += AddType;
+   
+            optStringType.Selected += AddType;
+
+            byteType.Factory = Types.ByteType;
+            byteType.Selected += AddType;
+         * 
+         * 
+         
+                     if (Bytes == null) {
+                return;
+            }
+           
+            long showFrom = CurrentCursorPosition;
+#if DEBUG
+            Console.WriteLine("parser position {0}", showFrom);
+#endif
+            using (var reader = new BinaryReader(new MemoryStream(Bytes))) {
+                foreach (TypeSelection selection in selections) {
+                    reader.BaseStream.Position = showFrom;
+                    selection.ShowPreview(reader);
+                }
+            }
+         */
     }
 }
