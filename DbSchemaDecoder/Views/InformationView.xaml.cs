@@ -23,6 +23,12 @@ namespace DbSchemaDecoder
         public InformationView()
         {
             InitializeComponent();
+            this.DataContextChanged += InformationView_DataContextChanged;
+        }
+
+        private void InformationView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+          //  throw new NotImplementedException();
         }
     }
 }

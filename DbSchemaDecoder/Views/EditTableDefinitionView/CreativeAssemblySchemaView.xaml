@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="DbSchemaDecoder.EditTableDefinitionView.CreativeAssemblySchemaExplorer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DbSchemaDecoder.EditTableDefinitionView"
+             mc:Ignorable="d" 
+             d:DesignHeight="428.101" d:DesignWidth="822.435">
+    <Grid>
+        <GroupBox Header="Creative Assembly Schema Explorer">
+            <Grid>
+                <ListView Margin="0,0,0,37" ItemsSource="{Binding CaSchemaEntries}"> 
+                    <ListView.View>
+                        <GridView x:Name="grdTest">
+                            <GridViewColumn Header="name" DisplayMemberBinding="{Binding name}"  Width="auto"/>
+                            <GridViewColumn Header="field_type" DisplayMemberBinding="{Binding field_type}"  Width="auto"/>
+                            <GridViewColumn Header="field_uuid" DisplayMemberBinding="{Binding field_uuid}"  Width="auto"/>
+                            <GridViewColumn Header="primary_key" DisplayMemberBinding="{Binding primary_key}"  Width="auto"/>
+                            <GridViewColumn Header="required" DisplayMemberBinding="{Binding required}"  Width="auto"/>
+                            <GridViewColumn Header="max_length" DisplayMemberBinding="{Binding max_length}"  Width="auto"/>
+                            <GridViewColumn Header="column_source_column" DisplayMemberBinding="{Binding column_source_column}"  Width="auto"/>
+                            <GridViewColumn Header="column_source_table" DisplayMemberBinding="{Binding column_source_table}"  Width="auto"/>
+                            <GridViewColumn Header="encyclopaedia_export" DisplayMemberBinding="{Binding encyclopaedia_export}"  Width="auto"/>
+                            <GridViewColumn Header="requires_startpos_reprocess" DisplayMemberBinding="{Binding requires_startpos_reprocess}"  Width="auto"/>
+                            <GridViewColumn Header="requires_campaign_map_reprocess" DisplayMemberBinding="{Binding requires_campaign_map_reprocess}"  Width="auto"/>
+                        </GridView>
+
+                    </ListView.View>
+                </ListView>
+                <Button Content="Use selected row" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="131"/>
+                <Label 
+                    Content="{Binding Path=TestValue, UpdateSourceTrigger=PropertyChanged}"
+                    HorizontalAlignment="Left" Margin="169,0,0,2" VerticalAlignment="Bottom" Width="131"></Label>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

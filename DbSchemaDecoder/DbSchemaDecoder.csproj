@@ -48,79 +48,82 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\ConfigureTableRowsController.cs" />
+    <Compile Include="Models\SelectedFileHeaderInformation.cs" />
+    <Compile Include="Util\CaSchemaFileParser.cs" />
+    <Compile Include="Controllers\DbSchemaDecoderController.cs" />
     <Compile Include="Controllers\FileListController.cs" />
-    <Compile Include="DisplayTableDefinitionView\DbTableView.xaml.cs">
+    <Compile Include="Util\NotifyPropertyChangedImpl.cs" />
+    <Compile Include="Views\DisplayTableDefinitionView\DbTableView.xaml.cs">
       <DependentUpon>DbTableView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DisplayTableDefinitionView\DisplayTableDefinitionView.xaml.cs">
+    <Compile Include="Views\DisplayTableDefinitionView\DisplayTableDefinitionView.xaml.cs">
       <DependentUpon>DisplayTableDefinitionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EditTableDefinitionView\EditTableDefinitionView.xaml.cs">
+    <Compile Include="Views\EditTableDefinitionView\EditTableDefinitionView.xaml.cs">
       <DependentUpon>EditTableDefinitionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EditTableDefinitionView\DbTypeInstanceView.xaml.cs">
+    <Compile Include="Views\EditTableDefinitionView\DbTypeInstanceView.xaml.cs">
       <DependentUpon>DbTypeInstanceView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DisplayTableDefinitionView\TableDefinitionView.xaml.cs">
+    <Compile Include="Views\DisplayTableDefinitionView\TableDefinitionView.xaml.cs">
       <DependentUpon>TableDefinitionView.xaml</DependentUpon>
     </Compile>
-    <Page Include="DisplayTableDefinitionView\DbTableView.xaml">
+    <Page Include="Views\DisplayTableDefinitionView\DbTableView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DisplayTableDefinitionView\DisplayTableDefinitionView.xaml">
+    <Page Include="Views\DisplayTableDefinitionView\DisplayTableDefinitionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditTableDefinitionView\EditTableDefinitionView.xaml">
+    <Page Include="Views\EditTableDefinitionView\EditTableDefinitionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditTableDefinitionView\CreativeAssemblySchemaView.xaml">
+    <Page Include="Views\EditTableDefinitionView\CreativeAssemblySchemaView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DbSchemaDecoderView.xaml">
+    <Page Include="Views\DbSchemaDecoderView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="EditTableDefinitionView\CreativeAssemblySchemaView.xaml.cs">
+    <Compile Include="Views\EditTableDefinitionView\CreativeAssemblySchemaView.xaml.cs">
       <DependentUpon>CreativeAssemblySchemaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DbSchemaDecoderView.xaml.cs">
+    <Compile Include="Views\DbSchemaDecoderView.xaml.cs">
       <DependentUpon>DbSchemaDecoderView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="EditTableDefinitionView\DbTypeInstanceView.xaml">
+    <Page Include="Views\EditTableDefinitionView\DbTypeInstanceView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditTableDefinitionView\DbTypeInstanceCollectionView.xaml">
+    <Page Include="Views\EditTableDefinitionView\DbTypeInstanceCollectionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FileListView.xaml">
+    <Page Include="Views\FileListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="InformationView.xaml">
+    <Page Include="Views\InformationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DisplayTableDefinitionView\TableDefinitionView.xaml">
+    <Page Include="Views\DisplayTableDefinitionView\TableDefinitionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EditTableDefinitionView\DbTypeInstanceCollectionView.xaml.cs">
+    <Compile Include="Views\EditTableDefinitionView\DbTypeInstanceCollectionView.xaml.cs">
       <DependentUpon>DbTypeInstanceCollectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileListView.xaml.cs">
+    <Compile Include="Views\FileListView.xaml.cs">
       <DependentUpon>FileListView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InformationView.xaml.cs">
+    <Compile Include="Views\InformationView.xaml.cs">
       <DependentUpon>InformationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\FileListModel.cs" />

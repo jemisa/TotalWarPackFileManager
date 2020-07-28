@@ -9,7 +9,7 @@
             xmlns:local1="clr-namespace:DbSchemaDecoder.EditTableDefinitionView"
     x:Class="DbSchemaDecoder.DbSchemaDecoder"
              mc:Ignorable="d" 
-             d:DesignHeight="574.058" d:DesignWidth="950.382">
+             d:DesignHeight="624.058" d:DesignWidth="1482.382">
 
     <Grid>
         <DockPanel  >
@@ -24,12 +24,13 @@
                     <Separator />
                 </MenuItem>
                 <Button Content="Show Filelist" Click="OnShowFileListClick"></Button>
+                <Button Content="Show Hex" Click="OnShowHexClick"></Button>
             </Menu>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition x:Name="FileListColumn" Width="200" />
-                    <ColumnDefinition Width="600"/>
-                    <ColumnDefinition Width="600"/>
+                    <ColumnDefinition x:Name="FileListColumn" Width="350" />
+                    <ColumnDefinition x:Name="HexViewColumn" Width="600"/>
+                    <ColumnDefinition Width="600*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition  Height="100" />
@@ -39,10 +40,6 @@
                 </Grid.RowDefinitions>
                 <local:FileListView Grid.Column="0" Grid.RowSpan="3"/>
                 <control:HexEditor
-                    
-                    
-                  
-
                     AllowByteCount="False"
                     AllowCustomBackgroundBlock="True"
                     AllowDrop="false"
@@ -50,7 +47,7 @@
                     AppendNeedConfirmation="True"
                     BorderThickness="1"
                     ByteGrouping="FourByte"
-    ReadOnlyMode="true"
+                    ReadOnlyMode="true"
                     ByteSpacerPositioning="HexBytePanel"
                     ByteSpacerVisualStyle="Dash"
                     ByteSpacerWidthTickness="Normal"
@@ -58,14 +55,15 @@
                     DefaultCopyToClipboardMode="HexaString"
                     ForegroundSecondColor="Blue"
                     OffSetStringVisual="Hexadecimal"
-                    AllowContextMenu="False"
+                    AllowContextMenu="false"
                     x:Name="HexEdit" HorizontalAlignment="Left" Width="585" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.RowSpan="3" Grid.Column="1"/>
-                <local:InformationView HorizontalAlignment="Left" Width="550" Grid.Column="2" Grid.Row="0" Padding="0,10"/>
-                <DisplayTableDefinitionView:DisplayTableDefinitionView HorizontalAlignment="Center"  Grid.Column="2" Grid.Row="1" Padding="0,10" HorizontalContentAlignment="Center"/>
-                <local1:ConfigureTableRowsView HorizontalAlignment="Left" Width="550" Grid.Column="2" Grid.Row="2" Padding="0,10"/>
+                <local:InformationView Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" />
+                
+                <DisplayTableDefinitionView:DisplayTableDefinitionView Grid.Column="2" Grid.Row="1"/>
+                <local1:ConfigureTableRowsView Grid.Column="2" Grid.Row="2"/>
 
             </Grid>
-            
+
         </DockPanel>
 
     </Grid>

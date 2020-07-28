@@ -25,9 +25,10 @@ namespace DbSchemaDecoder
     /// </summary>
     public partial class DbSchemaDecoder : UserControl
     {
+
+        DbSchemaDecoderController _mainController;
+
         FileListController _fileListController;
-        ConfigureTableRowsController _configureTableRowsController;
-        MemoryStream _currentStream;
 
         public DbSchemaDecoder()
         {
@@ -42,30 +43,35 @@ namespace DbSchemaDecoder
                 return;
 
             _fileListController = new FileListController();
-            _configureTableRowsController = new ConfigureTableRowsController(_fileListController);
-
-            var allListViews = FindVisualChildren<FileListView>(GetVisualChild(0));
-            var listView = allListViews.First();
-
-            listView.DataContext = _fileListController;
+            _mainController = new DbSchemaDecoderController(_fileListController);
 
             // Hex stuff
-            _fileListController.MyEvent += _fileListController_MyEvent;
+            _fileListController.OnFileSelectedEvent += _fileListController_MyEvent;
 
-            var allConfigureTableRowsView = FindVisualChildren<ConfigureTableRowsView>(GetVisualChild(0));
-            var configureView = allConfigureTableRowsView.First();
-            configureView.DataContext = _configureTableRowsController;
+            FindController<FileListView>().DataContext = _fileListController;
+            //FindController<ConfigureTableRowsView>().DataContext = _configureTableRowsController;
+            FindController<InformationView>().DataContext = _mainController;
+            FindController<ConfigureTableRowsView>().DataContext = _mainController;
         }
 
-
+     
 
 
         //----Hex stuff
-        private void _fileListController_MyEvent(object sender, TestItem e)
+        private void _fileListController_MyEvent(object sender, DataBaseFile e)
         {
             HexEdit.Stream = new MemoryStream(e.DbFile.Data);
+           // HexEdit.hex
         }
         //---
+
+        T FindController<T>() where T : DependencyObject
+        {
+            // Helper function to work around the issue that we can not set names in the xaml file becouse of ?
+
+            var allControllers = FindVisualChildren<T>(GetVisualChild(0));
+            return allControllers.First();
+        }
 
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
@@ -90,9 +96,17 @@ namespace DbSchemaDecoder
         private void OnShowFileListClick(object sender, RoutedEventArgs e)
         {
             if(FileListColumn.Width.Value == 0)
-                FileListColumn.Width = new GridLength(200);
+                FileListColumn.Width = new GridLength(350);
             else
                 FileListColumn.Width = new GridLength(0);
+        }
+
+        private void OnShowHexClick(object sender, RoutedEventArgs e)
+        {
+            if (HexViewColumn.Width.Value == 0)
+                HexViewColumn.Width = new GridLength(600);
+            else
+                HexViewColumn.Width = new GridLength(0);
         }
     }
 }

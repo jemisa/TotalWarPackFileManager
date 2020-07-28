@@ -19,7 +19,7 @@
 
             <ListView.View>
                 <GridView x:Name="grdTest">
-                    <GridViewColumn Header="File" DisplayMemberBinding="{Binding FileName}"  Width="auto"/>
+                    <GridViewColumn Header="File" DisplayMemberBinding="{Binding TableType}"  Width="auto"/>
                 </GridView>
 
             </ListView.View>

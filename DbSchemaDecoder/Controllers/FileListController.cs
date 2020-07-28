@@ -12,16 +12,15 @@ using System.Windows.Input;
 namespace DbSchemaDecoder.Controllers
 {
 
-    public class TestItem
+    public class DataBaseFile
     {
-        public string FileName { get; set; }
-        public bool ValidState { get; set; }
+        public string TableType { get; set; }
         public PackedFile DbFile { get; set; }
     }
     class FileListController
     {
-        public List<TestItem> FileListModels { get; set; } = new List<TestItem>();
-        public event EventHandler<TestItem> MyEvent;
+        public List<DataBaseFile> FileListModels { get; set; } = new List<DataBaseFile>();
+        public event EventHandler<DataBaseFile> OnFileSelectedEvent;
 
         public FileListController()
         {
@@ -36,15 +35,15 @@ namespace DbSchemaDecoder.Controllers
         {
             get
             {
-                return _command ?? (_command = new RelayCommand<TestItem>(CommandWithAParameter));
+                return _command ?? (_command = new RelayCommand<DataBaseFile>(CommandWithAParameter));
             }
         }
 
-        private void CommandWithAParameter(TestItem state)
+        private void CommandWithAParameter(DataBaseFile state)
         {
             //var str = state as string;
-            if (MyEvent != null)
-                MyEvent.Invoke(this, state);
+            if (OnFileSelectedEvent != null)
+                OnFileSelectedEvent.Invoke(this, state);
         }
 
         public void Load(string gameDir)
@@ -66,10 +65,9 @@ namespace DbSchemaDecoder.Controllers
                     var isDb = IsDb(f);
                     if (isDb.HasValue)
                     {
-                        FileListModels.Add(new TestItem()
+                        FileListModels.Add(new DataBaseFile()
                         {
-                            FileName = isDb.Value.Item1,
-                            ValidState = true,
+                            TableType = isDb.Value.Item1,
                             DbFile = isDb.Value.Item2
                         });
                     }
