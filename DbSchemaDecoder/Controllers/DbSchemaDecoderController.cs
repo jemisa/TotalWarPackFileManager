@@ -3,6 +3,7 @@ using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,11 +13,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
 {
-
-
 
     class DbSchemaDecoderController : NotifyPropertyChangedImpl
     {
@@ -35,20 +36,72 @@ namespace DbSchemaDecoder.Controllers
             }
         }
 
+        FieldInfo _selectedDbDefinition;
+        public FieldInfo SelectedDbDefinition
+        {
+            get { return _selectedDbDefinition; }
+            set
+            {
+                _selectedDbDefinition = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         int _currentVersion = 0;
+        DataBaseFile _selectedFile;
         // 
         CaSchemaFileParser caSchemaFileParser = new CaSchemaFileParser();
 
+        public ICommand DbDefinitionRemovedCommand { get; private set; }
+        public ICommand DbDefinitionMovedUpCommand { get; private set; }
+        public ICommand DbDefinitionMovedDownCommand { get; private set; }
+
         public DbSchemaDecoderController(FileListController fileListController)
         {
-
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
+
+            DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
+            DbDefinitionMovedUpCommand = new RelayCommand(OnDbDefinitionMovedUp);
+            DbDefinitionMovedDownCommand = new RelayCommand(OnDbDefinitionMovedDown);
+        }
+
+        private void OnDbDefinitionRemoved()
+        {
+            var x = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
+            var entry = x.First();
+            var index = entry.Fields.IndexOf(SelectedDbDefinition);
+            entry.Fields.RemoveAt(index);
+            LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
+        }
+
+        private void OnDbDefinitionMovedUp()
+        {
+            var x = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
+            var entry = x.First();
+            var index = entry.Fields.IndexOf(SelectedDbDefinition);
+            if (index == 0)
+                return;
+            entry.Fields.RemoveAt(index);
+            entry.Fields.Insert(index - 1, SelectedDbDefinition);
+            LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
+        }
+
+        private void OnDbDefinitionMovedDown()
+        {
+            var x = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
+            var entry = x.First();
+            var index = entry.Fields.IndexOf(SelectedDbDefinition);
+            if (index == entry.Fields.Count)
+                return;
+            entry.Fields.RemoveAt(index);
+            entry.Fields.Insert(index + 1, SelectedDbDefinition);
+            LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
         }
 
         private void OnDbFileSelected(object sender, DataBaseFile e)
         {
-            
+            _selectedFile = e;
 
             //NotifyPropertyChanged("CaSchemaEntries");
 
@@ -59,7 +112,8 @@ namespace DbSchemaDecoder.Controllers
 
             LoadCurrentTableDefinition(e.TableType, _currentVersion);
             LoadCaSchemaDefinition(e.TableType);
-            
+            //CreateEntityTable();
+            shitshat();
         }
 
         void LoadCurrentTableDefinition(string tableName, int currentVersion)
@@ -100,10 +154,130 @@ namespace DbSchemaDecoder.Controllers
         }
 
 
+        void ParseUntilFieldEnd()
+        {
+            // Create stuff
+            bool unicode = true;
+            NextValue a = new NextValue();
+            // Add to the TypeSelection listeners. 
+            if (unicode)
+            {
+                a.StringType = new OutputSuff() { Instance = Types.StringType };
+                a.OptStringType = new OutputSuff() { Instance = Types.OptStringType };
+            }
+            else
+            {
+                a.StringType = new OutputSuff() { Instance = Types.StringTypeAscii };
+                a.OptStringType = new OutputSuff() { Instance = Types.OptStringTypeAscii };
+            }
+
+            a.IntType = new OutputSuff() { Instance = Types.IntType };
+            a.BoolType = new OutputSuff() { Instance = Types.BoolType };
+            a.SingleType = new OutputSuff() { Instance = Types.SingleType };
+            a.ByteType = new OutputSuff() { Instance = Types.ByteType };
+            //
+
+
+            // Parse to current pos
+            var fields = SelectedTableTypeInformations;
+            using (var reader = new BinaryReader(new MemoryStream(_selectedFile.DbFile.Data)))
+            {
+                DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+                foreach (var selection in fields)
+                {
+                    var instance = selection.CreateInstance();
+                    instance.Decode(reader);
+                }
+
+                long showFrom = reader.BaseStream.Position;
+                var allDecoders = a.GetAll();
+                foreach (var decoder in allDecoders)
+                {
+                    decoder.Update(reader);
+                    reader.BaseStream.Position = showFrom;
+                }
+            }
+        }
+
+        public delegate FieldInfo TypeFactory();
+        class OutputSuff
+        {
+            public TypeFactory Instance;
+            public string DisplayValue;
+
+            public void Update(BinaryReader reader)
+            {
+                var instance = Instance().CreateInstance();
+                try
+                {
+                    instance.Decode(reader);
+                    DisplayValue = instance.Value;
+                }
+                catch (Exception e)
+                {
+                    DisplayValue = e.Message;
+                }
+            }
+        }
+
+        class NextValue
+        {
+            public OutputSuff StringType;
+            public OutputSuff OptStringType;
+            public OutputSuff IntType;
+            public OutputSuff BoolType;
+            public OutputSuff SingleType;
+            public OutputSuff ByteType;
+
+            public OutputSuff[] GetAll()
+            { 
+                OutputSuff[] all = { StringType, OptStringType, IntType , BoolType, SingleType, ByteType};
+                return all;
+            }
+        }
+
         void shitshat()
         {
-            var fields = SelectedTableTypeInformations;
+            return;
+            int dataLeftInStram = 0;
+            List<List<string>> tableData = new List<List<string>>();
+            int currentIndex = 0;
+            FieldInfo currentField = null;
+            try
+            {
+                var fields = SelectedTableTypeInformations;
+                var expectedEntries = SelectedFileHeaderInformation.ExpectedEntries;
 
+              
+                using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
+                {
+                    using (var reader = new BinaryReader(stream))
+                    {
+                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+                        for (currentIndex = 0; currentIndex < expectedEntries; currentIndex++)
+                        {
+                            var tableRow = new List<string>();
+                            foreach (var selection in fields)
+                            {
+                                currentField = selection;
+                                var instance = selection.CreateInstance();
+                                instance.Decode(reader);
+                                var v = instance.Value;
+                                tableRow.Add(v);
+                            }
+
+                            tableData.Add(tableRow);
+                        }
+                    }
+
+                    dataLeftInStram = stream.Capacity - (int)stream.Position;
+                }
+            }
+            catch (Exception e)
+            { 
+            
+            }
+            return;
 
             /*TypeSelection[] selections = new TypeSelection[] {
                 intType, stringType, boolType, singleType, optStringType, byteType

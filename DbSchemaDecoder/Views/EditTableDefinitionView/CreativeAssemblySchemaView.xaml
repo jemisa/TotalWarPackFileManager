@@ -12,7 +12,7 @@
                 <ListView Margin="0,0,0,37" ItemsSource="{Binding CaSchemaEntries}"> 
                     <ListView.View>
                         <GridView x:Name="grdTest">
-                            <GridViewColumn Header="index" DisplayMemberBinding="{Binding index}"  Width="auto"/>
+                            <GridViewColumn Header="No." DisplayMemberBinding="{Binding index}"  Width="auto"/>
                             <GridViewColumn Header="name" DisplayMemberBinding="{Binding name}"  Width="auto"/>
                             <GridViewColumn Header="field_type" DisplayMemberBinding="{Binding field_type}"  Width="auto"/>
                             <GridViewColumn Header="field_uuid" DisplayMemberBinding="{Binding field_uuid}"  Width="auto"/>

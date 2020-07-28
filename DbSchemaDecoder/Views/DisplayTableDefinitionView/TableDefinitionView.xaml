@@ -4,12 +4,46 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DbSchemaDecoder.DisplayTableDefinitionView"
+             
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
     <Grid>
-        <ListView ItemsSource="{Binding SelectedTableTypeInformations}">
+        <ListView ItemsSource="{Binding SelectedTableTypeInformations}" SelectedItem="{Binding Path=SelectedDbDefinition}">
+            <ListView.Resources>
+                <local:IndexConverter x:Key="IndexConverter" />
+            </ListView.Resources>
+
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem 
+                        Header="Remove"
+                        Command="{Binding DbDefinitionRemovedCommand}" />
+
+                    <MenuItem 
+                        Header="Move up" 
+                        Command="{Binding DbDefinitionMovedUpCommand}" />
+                    <MenuItem 
+                        Header="Move down" 
+                        Command="{Binding DbDefinitionMovedDownCommand}" />
+                </ContextMenu>
+            </ListView.ContextMenu>
+
+            <ListView.InputBindings>
+                <KeyBinding 
+                    Key="Enter"
+                    Command="{Binding DbDefinitionRemovedCommand}" />
+            </ListView.InputBindings>
+
             <ListView.View>
                 <GridView>
+
+                    <GridViewColumn 
+                        Header="No."
+                        DisplayMemberBinding="{Binding RelativeSource=
+                                                {RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, 
+                        Converter={StaticResource IndexConverter}}" />
+
                     <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"  Width="auto"/>
                     <GridViewColumn Header="TypeName" DisplayMemberBinding="{Binding TypeName}"  Width="auto"/>
                     <GridViewColumn Header="PrimaryKey" DisplayMemberBinding="{Binding PrimaryKey}"  Width="auto"/>

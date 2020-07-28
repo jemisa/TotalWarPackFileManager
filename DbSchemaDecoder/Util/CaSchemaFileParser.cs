@@ -179,7 +179,7 @@ namespace DbSchemaDecoder.Controllers
 
             var filteredTables = table.root.field.Where(x => !_fieldsRemovedFromTheGameByCa.Contains(x.name));
             // Create the table
-            var index = 0;
+            var index = 1;
             foreach (var item in filteredTables)
             {
                 CaSchemaEntry entry = new CaSchemaEntry();

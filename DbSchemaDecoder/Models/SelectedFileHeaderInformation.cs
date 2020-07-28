@@ -19,7 +19,7 @@ namespace DbSchemaDecoder.Models
                 Version = header.Version;
                 HeaderSize = header.Length;
                 ExpectedEntries = (int)header.EntryCount;
-                TotalSize = item.DbFile.Data.Length * 4;
+                TotalSize = item.DbFile.Data.Length;
             }
             else
             {

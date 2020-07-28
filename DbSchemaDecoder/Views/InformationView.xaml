@@ -27,7 +27,7 @@
         <Label 
             HorizontalAlignment="Left" Margin="250,50,0,0" VerticalAlignment="Top">
             <TextBlock>
-                <Run Text="Total Size: "/>
+                <Run Text="Total bytes: "/>
                 <Run Text="{Binding Path=SelectedFileHeaderInformation.TotalSize, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
