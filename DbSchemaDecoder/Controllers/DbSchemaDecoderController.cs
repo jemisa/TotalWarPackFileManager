@@ -19,8 +19,14 @@ using System.Windows.Input;
 namespace DbSchemaDecoder.Controllers
 {
 
+
+
+
     class DbSchemaDecoderController : NotifyPropertyChangedImpl
     {
+
+       // public PersonsViewModel EntityTableModel { get; set; }
+
         public SelectedFileHeaderInformation SelectedFileHeaderInformation { get; set; } = new SelectedFileHeaderInformation();
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
         public ObservableCollection<FieldInfo> SelectedTableTypeInformations { get; set; } = new ObservableCollection<FieldInfo>();
@@ -58,6 +64,9 @@ namespace DbSchemaDecoder.Controllers
 
         public DbSchemaDecoderController(FileListController fileListController)
         {
+            //EntityTableModel = new PersonsViewModel();
+
+       
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
 
@@ -114,6 +123,8 @@ namespace DbSchemaDecoder.Controllers
             LoadCaSchemaDefinition(e.TableType);
             //CreateEntityTable();
             shitshat();
+
+            
         }
 
         void LoadCurrentTableDefinition(string tableName, int currentVersion)
@@ -330,5 +341,22 @@ stringType.Selected += AddType;
                 }
             }
          */
+    }
+
+    public class ColumnConfig
+    {
+        public ObservableCollection<Column> Columns { get; set; } = new ObservableCollection<Column>();
+    }
+
+    public class Column
+    {
+        public string Header { get; set; }
+        public string DataField { get; set; }
+    }
+
+    public class Product
+    {
+        public string Name { get; set; }
+        public string Attributes { get; set; }
     }
 }

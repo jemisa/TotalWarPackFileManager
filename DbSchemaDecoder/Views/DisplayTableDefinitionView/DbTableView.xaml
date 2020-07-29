@@ -6,17 +6,16 @@
              xmlns:local="clr-namespace:DbSchemaDecoder.DisplayTableDefinitionView"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <Control.Resources>
+        <local:ConfigToDynamicGridViewConverter x:Key="ConfigToDynamicGridViewConverter" />
+    </Control.Resources>
     <Grid>
-        <ListView>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Name" Width="100"/>
-                    <GridViewColumn Header="Value" Width="100"/>
-                    <GridViewColumn Header="IsKey" Width="100"/>
-                    <GridViewColumn Header="Ref table" Width="100"/>
-                </GridView>
-            </ListView.View>
+        <ListView ItemsSource="{Binding Persons}" Grid.Row="0">
+        <ListView.View>
+            <GridView local:GridViewColumns.HeaderTextMember="HeaderText"
+                      local:GridViewColumns.DisplayMemberMember="DisplayMember"
+                      local:GridViewColumns.ColumnsSource="{Binding Columns}"/>
+        </ListView.View>
         </ListView>
-
     </Grid>
 </UserControl>

@@ -2,9 +2,12 @@
 using DbSchemaDecoder.DisplayTableDefinitionView;
 using DbSchemaDecoder.EditTableDefinitionView;
 using Filetypes.Codecs;
+using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +29,7 @@ namespace DbSchemaDecoder
     /// </summary>
     public partial class DbSchemaDecoder : UserControl
     {
+        PersonsViewModel _temp = new PersonsViewModel();
 
         DbSchemaDecoderController _mainController;
 
@@ -53,7 +57,8 @@ namespace DbSchemaDecoder
             //FindController<ConfigureTableRowsView>().DataContext = _configureTableRowsController;
             FindController<InformationView>().DataContext = _mainController;
             FindController<ConfigureTableRowsView>().DataContext = _mainController;
-            FindController<DisplayTableDefinitionView2>().DataContext = _mainController;
+            FindController<DisplayTableDefinitionView2>().DataContext = _temp;
+            //FindController<DbTableView>().DataContext = _mainController;
         }
 
      
@@ -63,7 +68,8 @@ namespace DbSchemaDecoder
         private void _fileListController_MyEvent(object sender, DataBaseFile e)
         {
             HexEdit.Stream = new MemoryStream(e.DbFile.Data);
-           // HexEdit.hex
+            // HexEdit.hex
+            _temp.Add();
         }
         //---
 
@@ -111,4 +117,112 @@ namespace DbSchemaDecoder
                 HexViewColumn.Width = new GridLength(0);
         }
     }
+
+    class ColumnDescriptor
+    {
+        public string HeaderText { get; set; }
+        public string DisplayMember { get; set; }
+    }
+
+    class PersonsViewModel
+    {
+        public PersonsViewModel()
+        {
+            List<string> headers = new List<string>() { "Id", "Age", "Content" };
+            List<string[]> items = new List<string[]>();
+            items.Add(new string[] { "0", "25", "My age is 25" });
+            items.Add(new string[] { "1", "23", "My age is 23" });
+            items.Add(new string[] { "2", "27", "My age is 27" });
+
+            this.Persons = new ObservableCollection<Object>
+            {
+                new 
+                {
+                    Name = "Doe",
+                    FirstName = "John",
+                    DateOfBirth = new DateTime(1981, 9, 12)
+                },
+                new                 {
+                    Name = "Black",
+                    FirstName = "Jack",
+                    DateOfBirth = new DateTime(1950, 1, 15)
+                },
+                new 
+                {
+                    Name = "Smith",
+                    FirstName = "Jane",
+                    DateOfBirth = new DateTime(1987, 7, 23)
+                }
+            };
+
+            dynamic data = new ExpandoObject();
+
+            IDictionary<string, object> dictionary = (IDictionary<string, object>)data;
+            dictionary.Add("Name", "Bob");
+            dictionary.Add("FirstName", "Smith");
+
+            //Persons.Add(data as Object);
+
+            this.Columns = new ObservableCollection<ColumnDescriptor>
+            {
+                new ColumnDescriptor { HeaderText = "Last name", DisplayMember = "Name" },
+                new ColumnDescriptor { HeaderText = "First name", DisplayMember = "FirstName" },
+                new ColumnDescriptor { HeaderText = "Date of birth", DisplayMember = "DateOfBirth" }
+            };
+        }
+
+
+        public void Add()
+        {
+            Persons.Add(
+                new 
+                {
+                    Name = "Smith",
+                    FirstName = "Jane",
+                    DateOfBirth = new DateTime(1987, 7, 23)
+                });
+        }
+        public ObservableCollection<Object> Persons { get; private set; }
+
+        public ObservableCollection<ColumnDescriptor> Columns { get; private set; }
+
+        private ICommand _addColumnCommand;
+        public ICommand AddColumnCommand
+        {
+            get
+            {
+                if (_addColumnCommand == null)
+                {
+                    _addColumnCommand = new RelayCommand<string>(
+                        s =>
+                        {
+                            this.Columns.Add(new ColumnDescriptor { HeaderText = s, DisplayMember = s });
+                        });
+                }
+                return _addColumnCommand;
+            }
+        }
+
+        private ICommand _removeColumnCommand;
+        public ICommand RemoveColumnCommand
+        {
+            get
+            {
+                if (_removeColumnCommand == null)
+                {
+                    _removeColumnCommand = new RelayCommand<string>(
+                        s =>
+                        {
+                            this.Columns.Remove(this.Columns.FirstOrDefault(d => d.DisplayMember == s));
+                        });
+                }
+                return _removeColumnCommand;
+            }
+        }
+    }
+
+
+    
+
+
 }
