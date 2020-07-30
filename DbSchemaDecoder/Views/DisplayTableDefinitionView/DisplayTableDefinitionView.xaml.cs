@@ -20,6 +20,15 @@ namespace DbSchemaDecoder.DisplayTableDefinitionView
     /// </summary>
     public partial class DisplayTableDefinitionView2 : UserControl
     {
+        public DataGrid DbEntriesViewDataGrid 
+        { 
+            get 
+            {
+                var tableView = (DbTableViewTabItem.Content as DbTableView);
+                return tableView.gridEmployees;
+            } 
+        }
+
         public DisplayTableDefinitionView2()
         {
             InitializeComponent();

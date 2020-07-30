@@ -86,8 +86,8 @@ namespace PackFileManager
                         "First start", MessageBoxButtons.YesNo) == DialogResult.Yes);
                     Settings.Default.FirstStart = false;
                 }
-                if (Settings.Default.UpdateOnStartup)
-                    TryUpdate (false);
+                //if (Settings.Default.UpdateOnStartup)
+                    //TryUpdate (false);
             }
             catch {}
 

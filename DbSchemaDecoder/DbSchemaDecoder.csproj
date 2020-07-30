@@ -48,6 +48,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\DbTableViewModel.cs" />
+    <Compile Include="Util\TableEntriesParser.cs" />
+    <Compile Include="Util\DataGridItemSourceUpdater.cs" />
+    <Compile Include="Util\ControllerHelper.cs" />
     <Compile Include="Models\SelectedFileHeaderInformation.cs" />
     <Compile Include="Util\CaSchemaFileParser.cs" />
     <Compile Include="Controllers\DbSchemaDecoderController.cs" />

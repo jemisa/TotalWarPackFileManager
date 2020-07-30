@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -25,7 +26,20 @@ namespace DbSchemaDecoder.Controllers
     class DbSchemaDecoderController : NotifyPropertyChangedImpl
     {
 
-       // public PersonsViewModel EntityTableModel { get; set; }
+
+        /*DataTable _myTable;
+        public DataTable MyTable
+        {
+            get { return _myTable; }
+
+            set
+            {
+                _myTable = value;
+                NotifyPropertyChanged();
+            }
+        }*/
+
+        // public PersonsViewModel EntityTableModel { get; set; }
 
         public SelectedFileHeaderInformation SelectedFileHeaderInformation { get; set; } = new SelectedFileHeaderInformation();
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
@@ -57,16 +71,30 @@ namespace DbSchemaDecoder.Controllers
         DataBaseFile _selectedFile;
         // 
         CaSchemaFileParser caSchemaFileParser = new CaSchemaFileParser();
+        TableEntriesParser _tableEntriesParser;
 
         public ICommand DbDefinitionRemovedCommand { get; private set; }
         public ICommand DbDefinitionMovedUpCommand { get; private set; }
         public ICommand DbDefinitionMovedDownCommand { get; private set; }
 
-        public DbSchemaDecoderController(FileListController fileListController)
-        {
-            //EntityTableModel = new PersonsViewModel();
 
-       
+        DataGridItemSourceUpdater _dbTableItemSourceUpdater;
+        public DbTableViewModel DbTableViewModel = new DbTableViewModel();
+        public DbSchemaDecoderController(FileListController fileListController, DataGridItemSourceUpdater dbTableItemSourceUpdater)
+        {
+            //_dbTableItemSourceUpdater = dbTableItemSourceUpdater;
+            _tableEntriesParser = new TableEntriesParser(dbTableItemSourceUpdater, DbTableViewModel);
+
+            MyTable = new DataTable();
+            MyTable.Columns.Add("Age");
+            MyTable.Columns.Add("Name");
+
+            MyTable.Rows.Add(new string[] { "123", "Nils" });
+            MyTable.Rows.Add(new string[] { "3", "Jonas" });
+
+            //_dbTableItemSourceUpdater.SetData(MyTable);
+
+
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
 
@@ -108,11 +136,30 @@ namespace DbSchemaDecoder.Controllers
             LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
         }
 
+        bool swapState = false;
         private void OnDbFileSelected(object sender, DataBaseFile e)
         {
             _selectedFile = e;
+            /*MyTable = new DataTable();
 
-            //NotifyPropertyChanged("CaSchemaEntries");
+            if (swapState)
+            {
+                MyTable.Columns.Add("Type");
+                MyTable.Columns.Add("Size");
+                MyTable.Rows.Add(new string[] { "Dog", "large" });
+                MyTable.Rows.Add(new string[] { "Cat", "small" });
+            }
+            else
+            {
+                MyTable.Columns.Add("Age");
+                MyTable.Columns.Add("Name");
+                MyTable.Rows.Add(new string[] { "11", "IOda" });
+                MyTable.Rows.Add(new string[] { "13", "Smith" });
+            }
+            swapState = !swapState;
+
+            _dbTableItemSourceUpdater.SetData(MyTable);*/
+
 
             TestValue = "MyString is cool2";
             // throw new NotImplementedException();
@@ -123,8 +170,7 @@ namespace DbSchemaDecoder.Controllers
             LoadCaSchemaDefinition(e.TableType);
             //CreateEntityTable();
             shitshat();
-
-            
+            ParseDbTableEntries(e);
         }
 
         void LoadCurrentTableDefinition(string tableName, int currentVersion)
@@ -164,6 +210,73 @@ namespace DbSchemaDecoder.Controllers
             }
         }
 
+        void ParseDbTableEntries(DataBaseFile dbFile)
+        {
+            var newTable = _tableEntriesParser.Parse(dbFile, SelectedTableTypeInformations, SelectedFileHeaderInformation.ExpectedEntries);
+
+            MyTable = newTable;
+            _tableEntriesParser.Update()
+
+            int dataLeftInStram = 0;
+            //List<List<string>> tableData = new List<List<string>>();
+            int currentIndex = 0;
+            FieldInfo currentField = null;
+            try
+            {
+                var fields = SelectedTableTypeInformations;
+                var expectedEntries = SelectedFileHeaderInformation.ExpectedEntries;
+                foreach (var field in fields)
+                    MyTable.Columns.Add(field.Name);
+
+
+                using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
+                {
+                    using (var reader = new BinaryReader(stream))
+                    {
+                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+                        if (fields.Count != 0)
+                        {
+                            for (currentIndex = 0; currentIndex < expectedEntries; currentIndex++)
+                            {
+                                var tableRow = new List<string>();
+                                foreach (var selection in fields)
+                                {
+                                    try
+                                    {
+
+                                        currentField = selection;
+                                        var instance = selection.CreateInstance();
+                                        instance.Decode(reader);
+                                        var v = instance.Value;
+                                        tableRow.Add(v);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        tableRow.Add(e.Message);
+                                    }
+                                }
+
+                                MyTable.Rows.Add(tableRow.ToArray());
+                            }
+                        }
+                        dataLeftInStram = stream.Capacity - (int)stream.Position;
+                    }
+
+                   
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            finally
+            {
+                _dbTableItemSourceUpdater.SetData(MyTable);
+            }
+            return;
+            
+
+        }
 
         void ParseUntilFieldEnd()
         {

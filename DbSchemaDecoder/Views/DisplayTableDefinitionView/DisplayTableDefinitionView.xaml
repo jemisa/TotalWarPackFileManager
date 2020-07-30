@@ -13,10 +13,8 @@
                     <local:TableDefinitionView></local:TableDefinitionView>
                 </Grid>
             </TabItem>
-            <TabItem Header="Enties">
-                <Grid Background="#FFE5E5E5">
-                    <local:DbTableView></local:DbTableView>
-                </Grid>
+            <TabItem x:Name="DbTableViewTabItem"  Header="Enties">
+                <local:DbTableView></local:DbTableView>
             </TabItem>
         </TabControl>
 
