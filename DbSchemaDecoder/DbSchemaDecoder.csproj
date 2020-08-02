@@ -58,11 +58,8 @@
     <Compile Include="Controllers\DbSchemaDecoderController.cs" />
     <Compile Include="Controllers\FileListController.cs" />
     <Compile Include="Util\NotifyPropertyChangedImpl.cs" />
-    <Compile Include="Views\DisplayTableDefinitionView\DbTableView.xaml.cs">
-      <DependentUpon>DbTableView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\DisplayTableDefinitionView\DisplayTableDefinitionView.xaml.cs">
-      <DependentUpon>DisplayTableDefinitionView.xaml</DependentUpon>
+    <Compile Include="Views\DisplayTableDefinitionView\DbParsedEntitiesTableView.xaml.cs">
+      <DependentUpon>DbParsedEntitiesTableView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EditTableDefinitionView\EditTableDefinitionView.xaml.cs">
       <DependentUpon>EditTableDefinitionView.xaml</DependentUpon>
@@ -73,11 +70,7 @@
     <Compile Include="Views\DisplayTableDefinitionView\TableDefinitionView.xaml.cs">
       <DependentUpon>TableDefinitionView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\DisplayTableDefinitionView\DbTableView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DisplayTableDefinitionView\DisplayTableDefinitionView.xaml">
+    <Page Include="Views\DisplayTableDefinitionView\DbParsedEntitiesTableView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

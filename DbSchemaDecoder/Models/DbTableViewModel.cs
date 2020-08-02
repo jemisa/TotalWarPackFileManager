@@ -1,5 +1,6 @@
 ﻿using DbSchemaDecoder.Util;
 using System.Data;
+using System.Windows.Media;
 
 namespace DbSchemaDecoder.Models
 {
@@ -7,25 +8,25 @@ namespace DbSchemaDecoder.Models
     {
         public DataTable EntityTable { get; set; } = new DataTable();
 
-        string _parseResult;
+        string _parseResult = "";
         public string ParseResult
         {
             get { return _parseResult; }
             set
             {
                 _parseResult = value;
-               // NotifyPropertyChanged();
+                NotifyPropertyChanged();
             }
         }
 
-        System.Windows.Media.Brush _resultColour;
+        System.Windows.Media.Brush _resultColour = new SolidColorBrush(Colors.LightGreen);
         public System.Windows.Media.Brush ResultColour
         {
             get { return _resultColour; }
             set
             {
                 _resultColour = value;
-                //NotifyPropertyChanged();
+                NotifyPropertyChanged();
             }
         }
 

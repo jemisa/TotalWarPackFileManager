@@ -56,7 +56,7 @@ namespace DbSchemaDecoder.Util
             finally
             {
                 if (_viewModel.ParseResult == "")
-                    _viewModel.ResultColour = new SolidColorBrush(Colors.Green);
+                    _viewModel.ResultColour = new SolidColorBrush(Colors.LightGreen);
                 else
                     _viewModel.ResultColour = new SolidColorBrush(Colors.Red);
 

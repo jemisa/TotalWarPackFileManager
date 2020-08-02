@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="DbSchemaDecoder.DisplayTableDefinitionView.DbTableView"
+﻿ <UserControl x:Class="DbSchemaDecoder.DisplayTableDefinitionView.DbParsedEntitiesTableView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,14 +7,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Label 
-            Content="{Binding Path=DbTableViewModel.ParseResult, UpdateSourceTrigger=PropertyChanged}"
-            Background="{Binding Path=DbTableViewModel.ResultColour, UpdateSourceTrigger=PropertyChanged}"
-            />
-       
         <DataGrid 
             IsReadOnly="true"
-            Name="gridEmployees"  KeyUp="onKeyup" Margin="0,20,0,0">
+            Name="gridEmployees" VerticalContentAlignment="Stretch" Margin="0,0,0,17">
         </DataGrid>
+        <Label
+            Content="{Binding Path=DbTableViewModel.ParseResult, UpdateSourceTrigger=PropertyChanged}"
+            Background="{Binding Path=DbTableViewModel.ResultColour, UpdateSourceTrigger=PropertyChanged}" Height="15" VerticalContentAlignment="Stretch" Padding="5,0" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

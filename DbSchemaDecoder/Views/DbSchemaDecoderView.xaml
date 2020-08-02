@@ -14,7 +14,7 @@
     <Grid>
         <DockPanel  >
             <Menu DockPanel.Dock="Top">
-                <MenuItem
+                <MenuItem   
                     Height="26"
                     Header="File"
                     RenderTransformOrigin="0.656,0.769">
@@ -56,12 +56,39 @@
                     ForegroundSecondColor="Blue"
                     OffSetStringVisual="Hexadecimal"
                     AllowContextMenu="false"
-                    x:Name="HexEdit" HorizontalAlignment="Left" Width="585" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.RowSpan="3" Grid.Column="1"/>
-                <local:InformationView Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" />
-                
-                <DisplayTableDefinitionView:DisplayTableDefinitionView2 Grid.Column="2" Grid.Row="1"/>
-                <local1:ConfigureTableRowsView Grid.Column="2" Grid.Row="2"/>
+                    x:Name="HexEdit" HorizontalAlignment="Left" Width="585" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                    Grid.RowSpan="3" Grid.Column="1"/>
 
+                <Grid Grid.Column="2" Grid.RowSpan="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition  Height="16" />
+                        <RowDefinition Height="auto" x:Name="InformationRow"/>
+
+                        <RowDefinition  Height="16" />
+                        <RowDefinition  x:Name="DbParsedEntitiesRow"/>
+
+                        <RowDefinition  Height="16" />
+                        <RowDefinition  x:Name="TableDefinitionRow"/>
+
+                        <RowDefinition  Height="16" />
+                        <RowDefinition  x:Name="TableAnalyticsRow"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Button Content="Information view" Grid.Row="0"  Click="OnInformationViewButtonClicked"/>
+                    <local:InformationView  Grid.Row="1" HorizontalAlignment="Left" MaxHeight="100" VerticalContentAlignment="Top" VerticalAlignment="Top" />
+
+                    <Button Content="Db view" Grid.Row="2" Click="OnDbParsedEntitiesTablesButtonClicked" />
+                    <DisplayTableDefinitionView:DbParsedEntitiesTableView  Grid.Row="3" />
+
+                    <Button Content="Table definition view" Grid.Row="4"  Click="OnTableDefinitionViewButtonClicked"/>
+                    <DisplayTableDefinitionView:TableDefinitionView Grid.Row="5" />
+
+                    <Button Content="Table analytics view" Grid.Row="6"  Click="OnTableAnalyticsViewButtonClicked"/>
+                    <local1:ConfigureTableRowsView 
+                        Grid.Row="7" 
+                        VerticalAlignment="Stretch"/>
+             
+                </Grid>
             </Grid>
 
         </DockPanel>

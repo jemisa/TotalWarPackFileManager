@@ -58,31 +58,21 @@ namespace DbSchemaDecoder
 
             var parent = GetVisualChild(0);
             ControllerHelper.FindController<FileListView>(parent).DataContext = _fileListController;
-            //FindController<ConfigureTableRowsView>().DataContext = _configureTableRowsController;
+
             ControllerHelper.FindController<InformationView>(parent).DataContext = _mainController;
+            var dbParsedEntitiesTableView = ControllerHelper.FindController<DbParsedEntitiesTableView>(parent);
+            dbParsedEntitiesTableView.DataContext = _mainController;
+            dbTableItemSourceUpdater.Grid = dbParsedEntitiesTableView.DbEntriesViewDataGrid;
+
+            ControllerHelper.FindController<TableDefinitionView>(parent).DataContext = _mainController;
             ControllerHelper.FindController<ConfigureTableRowsView>(parent).DataContext = _mainController;
-
-            var tableView = ControllerHelper.FindController<DisplayTableDefinitionView2>(parent);
-            dbTableItemSourceUpdater.Grid = tableView.DbEntriesViewDataGrid;
-
-            tableView.DataContext = _mainController;
-            //FindController<DbTableView>().DataContext = _mainController;
         }
 
-     
-
-
-        //----Hex stuff
         private void _fileListController_MyEvent(object sender, DataBaseFile e)
         {
             if(e != null)
                 HexEdit.Stream = new MemoryStream(e.DbFile.Data);
-            // HexEdit.hex
-         //   _temp.Add();
         }
-        //---
-
-
 
         private void OnShowFileListClick(object sender, RoutedEventArgs e)
         {
@@ -99,6 +89,47 @@ namespace DbSchemaDecoder
             else
                 HexViewColumn.Width = new GridLength(0);
         }
+
+        private void OnInformationViewButtonClicked(object sender, RoutedEventArgs e)
+        {
+            ToggleShowHideAuto(InformationRow);
+        }
+
+        private void OnDbParsedEntitiesTablesButtonClicked(object sender, RoutedEventArgs e)
+        {
+            ToggleShowHide(DbParsedEntitiesRow);
+        }
+
+        private void OnTableDefinitionViewButtonClicked(object sender, RoutedEventArgs e)
+        {
+            ToggleShowHide(TableDefinitionRow);
+        }
+
+        private void OnTableAnalyticsViewButtonClicked(object sender, RoutedEventArgs e)
+        {
+            ToggleShowHide(TableAnalyticsRow);
+        }
+
+
+
+
+        void ToggleShowHide(RowDefinition rowDef)
+        {
+            if (rowDef.Height.Value == 0 && rowDef.Height.GridUnitType == GridUnitType.Pixel)
+                rowDef.Height = new GridLength(1, GridUnitType.Star);
+            else
+                rowDef.Height = new GridLength(0, GridUnitType.Pixel);
+        }
+
+        void ToggleShowHideAuto(RowDefinition rowDef)
+        {
+            if (rowDef.Height.Value == 0 && rowDef.Height.GridUnitType == GridUnitType.Pixel)
+                rowDef.Height = new GridLength(1, GridUnitType.Auto);
+            else
+                rowDef.Height = new GridLength(0, GridUnitType.Pixel);
+        }
+
+
     }
 
 

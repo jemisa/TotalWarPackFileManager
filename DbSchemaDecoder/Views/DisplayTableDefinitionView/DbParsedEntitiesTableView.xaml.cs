@@ -1,6 +1,13 @@
-﻿using System;
+﻿using DbSchemaDecoder.Controllers;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Data;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,22 +23,18 @@ using System.Windows.Shapes;
 namespace DbSchemaDecoder.DisplayTableDefinitionView
 {
     /// <summary>
-    /// Interaction logic for DisplayTableDefinitionView.xaml
+    /// Interaction logic for DbTableView.xaml
     /// </summary>
-    public partial class DisplayTableDefinitionView2 : UserControl
+    public partial class DbParsedEntitiesTableView : UserControl
     {
-        public DataGrid DbEntriesViewDataGrid 
-        { 
-            get 
-            {
-                var tableView = (DbTableViewTabItem.Content as DbTableView);
-                return tableView.gridEmployees;
-            } 
-        }
-
-        public DisplayTableDefinitionView2()
+        public DbParsedEntitiesTableView()
         {
             InitializeComponent();
+        }
+
+        public DataGrid DbEntriesViewDataGrid
+        { 
+            get { return gridEmployees; }
         }
     }
 }
