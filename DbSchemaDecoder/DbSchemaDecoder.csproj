@@ -48,6 +48,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\FieldParser.cs" />
     <Compile Include="Models\DbTableViewModel.cs" />
     <Compile Include="Util\TableEntriesParser.cs" />
     <Compile Include="Util\DataGridItemSourceUpdater.cs" />

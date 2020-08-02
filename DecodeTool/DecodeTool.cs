@@ -788,5 +788,10 @@ namespace DecodeTool {
         public override void Decode(BinaryReader reader) {
             throw new NotImplementedException ();
         }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

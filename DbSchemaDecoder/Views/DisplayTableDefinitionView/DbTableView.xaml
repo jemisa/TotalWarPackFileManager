@@ -7,8 +7,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+        <Label 
+            Content="{Binding Path=DbTableViewModel.ParseResult, UpdateSourceTrigger=PropertyChanged}"
+            Background="{Binding Path=DbTableViewModel.ResultColour, UpdateSourceTrigger=PropertyChanged}"
+            />
+       
         <DataGrid 
             IsReadOnly="true"
-            Name="gridEmployees"  KeyUp="onKeyup"></DataGrid>
+            Name="gridEmployees"  KeyUp="onKeyup" Margin="0,20,0,0">
+        </DataGrid>
     </Grid>
 </UserControl>

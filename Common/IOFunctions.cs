@@ -20,11 +20,13 @@ namespace Common {
         public static string ReadCAString(BinaryReader reader) {
             return ReadCAString(reader, Encoding.Unicode);
         }
+
         /*
          * Read a string from the given reader, using the given encoding.
          * First 2 bytes contain the string length, string is not zero-terminated.
          */
-        public static string ReadCAString(BinaryReader reader, Encoding encoding) {
+        public static string ReadCAString(BinaryReader reader, Encoding encoding) 
+        {
             int num = reader.ReadInt16();
             // Unicode is 2 bytes per character; UTF8 is variable, but the number stored is the number of bytes, so use that
             int bytes = (encoding == Encoding.Unicode ? 2 : 1) * num;
@@ -34,8 +36,41 @@ namespace Common {
                 throw new InvalidDataException(string.Format("Cannot read string of length {0}: only {1} bytes left",
                     bytes, reader.BaseStream.Length - reader.BaseStream.Position));
             }
-            return new string(encoding.GetChars(reader.ReadBytes(bytes)));
+
+            var strByteData = reader.ReadBytes(bytes);
+            return encoding.GetString(strByteData);
         }
+
+        public static bool TryReadReadCAString(BinaryReader reader, Encoding encoding, out string stringResult)
+        {
+            if (reader.BaseStream.Length - reader.BaseStream.Position < 2)
+            {
+                stringResult = $"Cannot read length of string {reader.BaseStream.Length - reader.BaseStream.Position} bytes left";
+                return false;
+            }
+
+            int num = reader.ReadInt16();
+            if (0 > num)
+            {
+                stringResult = "Negative file length";
+                return false;
+            }
+
+            // Unicode is 2 bytes per character; UTF8 is variable, but the number stored is the number of bytes, so use that
+            int bytes = (encoding == Encoding.Unicode ? 2 : 1) * num;
+            // enough data left?
+            if (reader.BaseStream.Length - reader.BaseStream.Position < bytes)
+            {
+                stringResult = string.Format("Cannot read string of length {0}: only {1} bytes left",
+                    bytes, reader.BaseStream.Length - reader.BaseStream.Position);
+                return false;
+            }
+
+            var strByteData = reader.ReadBytes(bytes);
+            stringResult = encoding.GetString(strByteData);
+            return true;
+        }
+
         /*
          * Read a zero-terminated Unicode string.
          */

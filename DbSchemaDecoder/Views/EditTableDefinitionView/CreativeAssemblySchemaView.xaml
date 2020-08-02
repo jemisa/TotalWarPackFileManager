@@ -28,10 +28,13 @@
 
                     </ListView.View>
                 </ListView>
-                <Button Content="Use selected row" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="131"/>
+                <Button Content="Use all" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="131"/>
+                <Button Content="Use selected row" HorizontalAlignment="Left" Margin="136,0,0,5" VerticalAlignment="Bottom" Width="131"/>
+                <Button Content="Parse table entries" HorizontalAlignment="Left" Margin="272,0,0,5" VerticalAlignment="Bottom" Width="131"  Command="{Binding ParseTbTableUsingCaSchemaCommand}"/>
+                
                 <Label 
                     Content="{Binding Path=TestValue, UpdateSourceTrigger=PropertyChanged}"
-                    HorizontalAlignment="Left" Margin="169,0,0,2" VerticalAlignment="Bottom" Width="131"></Label>
+                    HorizontalAlignment="Left" Margin="420,0,0,10" VerticalAlignment="Bottom" Width="131"></Label>
             </Grid>
         </GroupBox>
     </Grid>

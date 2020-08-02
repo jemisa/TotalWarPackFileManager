@@ -229,6 +229,8 @@ namespace Filetypes {
                 reference.Field = value;
             }
         }
+
+        public abstract FieldInfo Copy();
         #endregion
 
         /*
@@ -269,7 +271,16 @@ namespace Filetypes {
                 Value = ""
             };
         }
-	}
+
+        public override FieldInfo Copy()
+        {
+            return new StringType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
     class StringTypeAscii : FieldInfo {
          public StringTypeAscii () {
              TypeName = "string_ascii";
@@ -279,6 +290,15 @@ namespace Filetypes {
             return new StringFieldAscii() {
                 Name = this.Name,
                 Value = ""
+            };
+        }
+
+        public override FieldInfo Copy()
+        {
+            return new StringTypeAscii()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
             };
         }
     }
@@ -294,7 +314,16 @@ namespace Filetypes {
                 Value = "0"
             };
         }
-	}
+
+        public override FieldInfo Copy()
+        {
+            return new IntType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
 
 	class ShortType : FieldInfo {
 		public ShortType () {
@@ -307,7 +336,16 @@ namespace Filetypes {
                 Value = "0"
             };
         }
-	}
+
+        public override FieldInfo Copy()
+        {
+            return new ShortType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
 
 	class SingleType : FieldInfo {
 		public SingleType () {
@@ -320,20 +358,40 @@ namespace Filetypes {
                 Value = "0"
             };
         }
-	}
 
-    class DoubleType : FieldInfo {
-     public DoubleType () {
-         TypeName = "double";
-         TypeCode = TypeCode.Single;
-     }
-        public override FieldInstance CreateInstance() {
+        public override FieldInfo Copy()
+        {
+            return new SingleType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
+
+    class DoubleType : FieldInfo 
+    {
+        public DoubleType () 
+        {
+            TypeName = "double";
+            TypeCode = TypeCode.Single;
+        }
+        public override FieldInstance CreateInstance() 
+        {
             return new DoubleField() {
                 Name = this.Name,
                 Value = "0"
             };
         }
- }
+        public override FieldInfo Copy()
+        {
+            return new DoubleType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
 
 	class BoolType : FieldInfo {
 		public BoolType () {
@@ -346,7 +404,16 @@ namespace Filetypes {
                 Value = "false"
             };
         }
-	}
+
+        public override FieldInfo Copy()
+        {
+            return new BoolType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
 
 	class OptStringType : FieldInfo {
 		public OptStringType () {
@@ -359,7 +426,16 @@ namespace Filetypes {
                 Value = ""
             };
         }
-	}
+
+        public override FieldInfo Copy()
+        {
+            return new OptStringType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
     class OptStringTypeAscii : FieldInfo {
         public OptStringTypeAscii () {
             TypeName = "optstring_ascii";
@@ -369,6 +445,15 @@ namespace Filetypes {
             return new OptStringFieldAscii() {
                 Name = this.Name,
                 Value = ""
+            };
+        }
+
+        public override FieldInfo Copy()
+        {
+            return new OptStringTypeAscii()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
             };
         }
     }
@@ -385,7 +470,16 @@ namespace Filetypes {
                 Name = this.Name
             };
         }
-	}
+
+        public override FieldInfo Copy()
+        {
+            return new OptStringTypeAscii()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
+        }
+    }
     
     public class ListType : FieldInfo {
         public ListType() {
@@ -470,6 +564,15 @@ namespace Filetypes {
         
         public override int GetHashCode() {
             return 2*Name.GetHashCode() + 3*Infos.GetHashCode();
+        }
+
+        public override FieldInfo Copy()
+        {
+            return new ListType()
+            {
+                TypeName = this.TypeName,
+                TypeCode = this.TypeCode,
+            };
         }
     }
 }

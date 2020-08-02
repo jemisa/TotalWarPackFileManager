@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Common;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Filetypes {
     /*
@@ -67,7 +68,9 @@ namespace Filetypes {
         
         public abstract void Encode(BinaryWriter writer);
         public abstract void Decode(BinaryReader reader);
-        
+
+        public abstract bool TryDecode(BinaryReader reader);
+
         #region Framework Overrides
         public override string ToString() {
             return Value;
@@ -109,6 +112,13 @@ namespace Filetypes {
         public override void Encode(BinaryWriter writer) {
             IOFunctions.WriteCAString (writer, Value.Trim(), stringEncoding);
         }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            var result =  IOFunctions.TryReadReadCAString(reader, stringEncoding, out var output);
+            Value = output;
+            return result;
+        }
     }
     
     /*
@@ -126,18 +136,22 @@ namespace Filetypes {
     public class IntField : FieldInstance {
         public IntField() : base(Types.IntType(), "0") { Length = 4; }
         public override void Decode(BinaryReader reader) {
-            Value = reader.ReadInt32 ().ToString ();
+            Value = reader.ReadInt32().ToString ();
         }     
         public override void Encode(BinaryWriter writer) {
             writer.Write (int.Parse (Value));
         }
-        public override string Value {
-            get {
-                return base.Value;
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            if (reader.BaseStream.Length - reader.BaseStream.Position < 4)
+            {
+                Value = "Not enough space in stream";
+                return false;
             }
-            set {
-                base.Value = string.IsNullOrEmpty(value) ? "0" : int.Parse(value).ToString();
-            }
+
+            Decode(reader);
+            return true;
         }
     }
     
@@ -152,13 +166,17 @@ namespace Filetypes {
         public override void Encode(BinaryWriter writer) {
             writer.Write (short.Parse (Value));
         }
-        public override string Value {
-            get {
-                return base.Value;
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            if (reader.BaseStream.Length - reader.BaseStream.Position < 2)
+            {
+                Value = "Not enough space in stream";
+                return false;
             }
-            set {
-                base.Value = short.Parse(value).ToString();
-            }
+
+            Decode(reader);
+            return true;
         }
     }
     
@@ -173,6 +191,18 @@ namespace Filetypes {
         public override void Encode(BinaryWriter writer) {
             writer.Write (float.Parse (Value));
         }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            if (reader.BaseStream.Length - reader.BaseStream.Position < 4)
+            {
+                Value = "Not enough space in stream";
+                return false;
+            }
+            Decode(reader);
+            return true;
+        }
+
         public override string Value {
             get {
                 return base.Value;
@@ -191,6 +221,18 @@ namespace Filetypes {
         public override void Encode(BinaryWriter writer) {
             writer.Write (double.Parse (Value));
         }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            if (reader.BaseStream.Length - reader.BaseStream.Position < 8)
+            {
+                Value = "Not enough space in stream";
+                return false;
+            }
+            Decode(reader);
+            return true;
+        }
+
         public override string Value {
             get {
                 return base.Value;
@@ -217,6 +259,27 @@ namespace Filetypes {
         public override void Encode(BinaryWriter writer) {
             writer.Write (bool.Parse(Value));
         }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            if (reader.BaseStream.Length - reader.BaseStream.Position < 1)
+            {
+                Value = "Not enough space in stream";
+                return false;
+            }
+
+            byte b = reader.ReadByte();
+            if (b == 0 || b == 1)
+            {
+                Value = Convert.ToBoolean(b).ToString();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public override string Value {
             get {
                 return base.Value;
@@ -235,13 +298,18 @@ namespace Filetypes {
         protected Encoding stringEncoding = Encoding.Unicode;
         public OptStringField() : base(Types.OptStringType()) {}
         public OptStringField(FieldInfo info) : base(info) {}
-        public override void Decode(BinaryReader reader) {
+
+        public override void Decode(BinaryReader reader) 
+        {
             string result = "";
             byte b = reader.ReadByte ();
-            if (b == 1) {
+            if (b == 1) 
+            {
                 result = IOFunctions.ReadCAString (reader, stringEncoding);
                 readLengthZero = result.Length == 0;
-            } else if (b != 0) {
+            } 
+            else if (b != 0) 
+            {
                 throw new InvalidDataException (string.Format("- invalid - ({0:x2})", b));
             }
             Value = result;
@@ -267,6 +335,32 @@ namespace Filetypes {
             if (Value.Length > 0) {
                 IOFunctions.WriteCAString (writer, Value.Trim(), stringEncoding);
             }
+        }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            if (reader.BaseStream.Length - reader.BaseStream.Position < 1)
+            {
+                Value = "Not enough space in stream";
+                return false;
+            }
+
+            byte b = reader.ReadByte();
+            if (b == 1)
+            {
+                var result = IOFunctions.TryReadReadCAString(reader, stringEncoding, out var stringResult);
+                Value = stringResult;
+                readLengthZero = Value.Length == 0;
+                return result;
+            }
+            else if (b != 0)
+            {
+                Value = "Error = b!=0";
+                return false;
+            }
+
+            Value = "";
+            return true;
         }
     }
     public class OptStringFieldAscii : OptStringField {
@@ -300,6 +394,13 @@ namespace Filetypes {
                 writer.Write (byte.Parse(s, System.Globalization.NumberStyles.HexNumber));
             }
         }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            Decode(reader);
+            return true;
+        }
+
         public override string Value {
             get {
                 return base.Value;
@@ -401,6 +502,12 @@ namespace Filetypes {
                 }
                 contained.Add(entry);
             }
+        }
+
+        public override bool TryDecode(BinaryReader reader)
+        {
+            Decode(reader);
+            return true;
         }
     }
 }

@@ -82,6 +82,7 @@ namespace Filetypes
         {
             var result = GetAllInfos(key);
             result.Sort(new BestVersionComparer { TargetVersion = version });
+            
 #if DEBUG
             Console.WriteLine("Returning {0} infos for {1}/{2}", result.Count, key, version);
 #endif

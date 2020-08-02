@@ -4,6 +4,7 @@ using Filetypes;
 using Filetypes.Codecs;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +13,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -19,28 +21,9 @@ using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
 {
-
-
-
-
     class DbSchemaDecoderController : NotifyPropertyChangedImpl
     {
-
-
-        /*DataTable _myTable;
-        public DataTable MyTable
-        {
-            get { return _myTable; }
-
-            set
-            {
-                _myTable = value;
-                NotifyPropertyChanged();
-            }
-        }*/
-
-        // public PersonsViewModel EntityTableModel { get; set; }
-
+        public DbTableViewModel DbTableViewModel { get; set; } = new DbTableViewModel();
         public SelectedFileHeaderInformation SelectedFileHeaderInformation { get; set; } = new SelectedFileHeaderInformation();
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
         public ObservableCollection<FieldInfo> SelectedTableTypeInformations { get; set; } = new ObservableCollection<FieldInfo>();
@@ -69,7 +52,6 @@ namespace DbSchemaDecoder.Controllers
 
         int _currentVersion = 0;
         DataBaseFile _selectedFile;
-        // 
         CaSchemaFileParser caSchemaFileParser = new CaSchemaFileParser();
         TableEntriesParser _tableEntriesParser;
 
@@ -77,31 +59,411 @@ namespace DbSchemaDecoder.Controllers
         public ICommand DbDefinitionMovedUpCommand { get; private set; }
         public ICommand DbDefinitionMovedDownCommand { get; private set; }
 
+        public ICommand ParseTbTableUsingCaSchemaCommand { get; private set; }
 
-        DataGridItemSourceUpdater _dbTableItemSourceUpdater;
-        public DbTableViewModel DbTableViewModel = new DbTableViewModel();
         public DbSchemaDecoderController(FileListController fileListController, DataGridItemSourceUpdater dbTableItemSourceUpdater)
         {
-            //_dbTableItemSourceUpdater = dbTableItemSourceUpdater;
             _tableEntriesParser = new TableEntriesParser(dbTableItemSourceUpdater, DbTableViewModel);
-
-            MyTable = new DataTable();
-            MyTable.Columns.Add("Age");
-            MyTable.Columns.Add("Name");
-
-            MyTable.Rows.Add(new string[] { "123", "Nils" });
-            MyTable.Rows.Add(new string[] { "3", "Jonas" });
-
-            //_dbTableItemSourceUpdater.SetData(MyTable);
-
-
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
 
             DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
             DbDefinitionMovedUpCommand = new RelayCommand(OnDbDefinitionMovedUp);
             DbDefinitionMovedDownCommand = new RelayCommand(OnDbDefinitionMovedDown);
+            ParseTbTableUsingCaSchemaCommand = new RelayCommand(OnTest);
         }
+
+
+
+
+      
+        class ParseHelper
+        {
+
+            public class ParseResult
+            { 
+                public FieldInfo FieldInfo { get; set; }
+                public long OffsetAfter { get; set; }
+            }
+
+            public List<ParseResult> Parse(BinaryReader reader,  long startStreamPos)
+            {
+                List<ParseResult> output = new List<ParseResult>();
+
+                //long startStreamPos = reader.BaseStream.Position;
+
+
+                // OptStringTypeAscii
+                try
+                {
+                    var instance = Types.OptStringTypeAscii().CreateInstance();
+                    instance.Decode(reader);
+                    var value = instance.Value;
+
+                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                    if (!isAscii)
+                        throw new Exception();
+
+                    output.Add(new ParseResult()
+                    {
+                        FieldInfo = Types.OptStringTypeAscii(),
+                        OffsetAfter = reader.BaseStream.Position
+                    });
+                }
+                catch (Exception e)
+                { }
+                finally
+                {
+                    reader.BaseStream.Position = startStreamPos;
+                }
+
+
+                // StringTypeAscii
+                try
+                {
+                    var instance = Types.StringTypeAscii().CreateInstance();
+                    instance.Decode(reader);
+                    var value = instance.Value;
+
+                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                    if (!isAscii)
+                        throw new Exception();
+
+                    output.Add( new ParseResult()
+                    {
+                        FieldInfo = Types.StringTypeAscii(),
+                        OffsetAfter = reader.BaseStream.Position
+                    });
+                }
+                catch (Exception e)
+                { }
+                finally
+                {
+                    reader.BaseStream.Position = startStreamPos;
+                }
+
+                // OptStringType
+                try
+                {
+                    var instance = Types.OptStringType().CreateInstance();
+                    instance.Decode(reader);
+                    var value = instance.Value;
+
+                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                    if (isAscii)
+                        throw new Exception();
+
+                    output.Add(new ParseResult()
+                    {
+                        FieldInfo = Types.OptStringType(),
+                        OffsetAfter = reader.BaseStream.Position
+                    });
+                }
+                catch (Exception e)
+                { }
+                finally
+                {
+                    reader.BaseStream.Position = startStreamPos;
+                }
+
+                // StringType
+                try
+                {
+                    var instance = Types.StringType().CreateInstance();
+                    instance.Decode(reader);
+                    var value = instance.Value;
+
+                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                    if (isAscii)
+                        throw new Exception();
+
+                    output.Add(new ParseResult()
+                    {
+                        FieldInfo = Types.StringType(),
+                        OffsetAfter = reader.BaseStream.Position
+                    });
+                }
+                catch (Exception e)
+                { }
+                finally
+                {
+                    reader.BaseStream.Position = startStreamPos;
+                }
+
+
+
+
+                // BoolType
+                try
+                {
+                    var instance = Types.BoolType().CreateInstance();
+                    instance.Decode(reader);
+
+                    output.Add(new ParseResult()
+                    {
+                        FieldInfo = Types.BoolType(),
+                        OffsetAfter = reader.BaseStream.Position
+                    });
+                }
+                catch (Exception e)
+                { }
+                finally
+                {
+                    reader.BaseStream.Position = startStreamPos;
+                }
+
+                // IntType
+                try
+                {
+                    var instance = Types.IntType().CreateInstance();
+                    instance.Decode(reader);
+
+                    output.Add(new ParseResult()
+                    {
+                        FieldInfo = Types.IntType(),
+                        OffsetAfter = reader.BaseStream.Position
+                    });
+                }
+                catch (Exception e)
+                { }
+                finally
+                {
+                    reader.BaseStream.Position = startStreamPos;
+                }
+
+                // SingleType
+                try
+                {
+                    var instance = Types.SingleType().CreateInstance();
+                    instance.Decode(reader);
+
+                    output.Add(new ParseResult()
+                    {
+                        FieldInfo = Types.SingleType(),
+                        OffsetAfter = reader.BaseStream.Position
+                    });
+                }
+                catch (Exception e)
+                { }
+                finally
+                {
+                    reader.BaseStream.Position = startStreamPos;
+                }
+
+                return output;
+            }
+        }
+
+
+        //
+        private void BruteForce()
+        {
+            using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+
+                    FieldParserEnum[] states = new FieldParserEnum[] 
+                    {
+                        FieldParserEnum.OptStringTypeAscii, 
+                        FieldParserEnum.StringTypeAscii, 
+                        FieldParserEnum.OptStringType, 
+                        FieldParserEnum.StringType,
+                        FieldParserEnum.IntType,
+                        FieldParserEnum.BoolType,
+                    };
+
+                    var currentTableInof = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
+                    var entry = currentTableInof.First();
+
+                    int maxNumberOfFields = entry.Fields.Count();
+
+                    PermutationHelper helper = new PermutationHelper();
+                    helper.printPermutations(reader, new FieldParserEnum[maxNumberOfFields], states, 0, header.Length, maxNumberOfFields);
+
+                    var possibleMutations = Math.Pow(maxNumberOfFields, 6);
+                    var actuallPossibleMutations = helper._outputTypes.Count();
+
+                    List<string> possibleSchamaList = new List<string>();
+
+                    for (int i = 0; i < helper._outputTypes.Count(); i++)
+                    {
+                        var possibleSchema = helper._outputTypes[i].Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
+
+         
+                        for (int j = 0; j < possibleSchema.Count; j++)
+                            possibleSchema[j].Name = "Column" + j;
+
+                        reader.BaseStream.Position = header.Length;
+
+                        TableEntriesParser p = new TableEntriesParser(null, new DbTableViewModel());
+                        var updateRes = p.Update(
+                            _selectedFile,
+                            possibleSchema,
+                            (int)header.EntryCount);
+
+                        if (updateRes.ParseResult == "")
+                        {
+                            var nameList = helper._outputTypes[i].Select(x => FieldParser.CreateFromEnum(x).InstanceName()).ToList();
+                            possibleSchamaList.Add(string.Join(", ", nameList));
+                        }
+                    }
+                }
+            }
+        }
+
+        class PermutationHelper
+        {
+
+            int parsings = 0;
+            int skipped = 0;
+            public List<string[]> _output = new List<string[]>();
+
+            public List<FieldParserEnum[]> _outputTypes = new List<FieldParserEnum[]>();
+            public void printPermutations(BinaryReader reader, FieldParserEnum[] n, FieldParserEnum[] states, int idx, long streamOffset, int maxNumberOfFields)
+            {
+                if (idx == n.Length)
+                {
+                    _outputTypes.Add(n.Select(x=>x).ToArray());
+                    return;
+                }
+                for (int i = 0; i < states.Length; i++)
+                {
+                    var currentState = states[i];
+                    var parser = FieldParser.CreateFromEnum(currentState);
+                    var parseResult = parser.CanParse(reader, streamOffset);
+                    parsings++;
+                    if (parseResult.Completed)
+                    {
+                        n[idx] = currentState;
+                        printPermutations(reader, n, states, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
+                    }
+                    else
+                    {
+                        skipped++;
+                    }
+                 
+                }
+            }
+        }
+
+
+
+
+
+
+
+        //
+        private void OnTest()
+        {
+
+            try
+            {
+                BruteForce();
+            }
+            catch (Exception e)
+            { }
+            return;
+
+            try 
+            {
+          
+            // Converts
+                List<FieldInfo> values = new List<FieldInfo>();
+
+
+
+                using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
+                {
+                    using (var reader = new BinaryReader(stream))
+                    {
+                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+                        foreach (var caField in CaSchemaEntries)
+                        {
+
+                            var types = Create(caField);
+                            foreach (var type in types)
+                            {
+                                bool worked = true;
+                                long showFrom = reader.BaseStream.Position;
+                                
+
+
+                                try
+                                {
+
+
+
+                                    var instance = type.CreateInstance();
+                                    instance.Decode(reader);
+                                    var value = instance.Value;
+
+                                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
+
+                                }
+                                catch (Exception e)
+                                {
+                                    reader.BaseStream.Position = showFrom;
+                                    worked = false;
+                                }
+
+                                if (worked)
+                                {
+                                    type.Name = caField.name;
+                                    values.Add(type);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Parse
+                TableEntriesParser p = new TableEntriesParser(null, new DbTableViewModel());
+                var x = p.Update(
+                    _selectedFile,
+                    values,
+                    SelectedFileHeaderInformation.ExpectedEntries);
+
+
+                if (x.ParseResult != "")
+                    throw new Exception(x.ParseResult);
+            }
+            catch(Exception e)
+            {
+
+
+            }
+        }
+
+        FieldInfo[] Create(CaSchemaEntry entry)
+        {
+            switch (entry.field_type)
+            {
+                case "yesno":
+                    return new FieldInfo[] { Types.BoolType()};
+                case "single":
+                case "decimal":
+                case "double":
+                    return new FieldInfo[] { Types.SingleType()};
+
+                case "autonumber":
+                case "integer":
+                    return new FieldInfo[] { Types.IntType() };
+                case "text":
+                    return new FieldInfo[] { Types.OptStringTypeAscii(), Types.StringTypeAscii(), Types.OptStringType(), Types.StringType() };
+            }
+
+            // case "autonumber": -> // Should be long, but long is not supported
+            throw new Exception($"Field '{entry.name}' contains unkown type '{entry.field_type}'");
+        }
+   
 
         private void OnDbDefinitionRemoved()
         {
@@ -136,53 +498,29 @@ namespace DbSchemaDecoder.Controllers
             LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
         }
 
-        bool swapState = false;
         private void OnDbFileSelected(object sender, DataBaseFile e)
         {
             _selectedFile = e;
-            /*MyTable = new DataTable();
-
-            if (swapState)
-            {
-                MyTable.Columns.Add("Type");
-                MyTable.Columns.Add("Size");
-                MyTable.Rows.Add(new string[] { "Dog", "large" });
-                MyTable.Rows.Add(new string[] { "Cat", "small" });
-            }
-            else
-            {
-                MyTable.Columns.Add("Age");
-                MyTable.Columns.Add("Name");
-                MyTable.Rows.Add(new string[] { "11", "IOda" });
-                MyTable.Rows.Add(new string[] { "13", "Smith" });
-            }
-            swapState = !swapState;
-
-            _dbTableItemSourceUpdater.SetData(MyTable);*/
-
-
-            TestValue = "MyString is cool2";
-            // throw new NotImplementedException();
+            if (_selectedFile == null)
+                return;
 
             ParseDatabaseFile(e);
-
             LoadCurrentTableDefinition(e.TableType, _currentVersion);
             LoadCaSchemaDefinition(e.TableType);
-            //CreateEntityTable();
-            shitshat();
-            ParseDbTableEntries(e);
+            _tableEntriesParser.Update(e, SelectedTableTypeInformations, SelectedFileHeaderInformation.ExpectedEntries);
         }
 
         void LoadCurrentTableDefinition(string tableName, int currentVersion)
         {
-            var x = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
+            var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
             SelectedTableTypeInformations.Clear();
 
-            if (x == null || x.FirstOrDefault() == null)
+            var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == currentVersion);
+            if (fieldCollection == null)
                 return;
-        
-            foreach(var i in x.First().Fields)
-                SelectedTableTypeInformations.Add(i); 
+
+            foreach(var f in fieldCollection.Fields)
+                SelectedTableTypeInformations.Add(f); 
         }
 
         void LoadCaSchemaDefinition(string tableName)
@@ -210,73 +548,7 @@ namespace DbSchemaDecoder.Controllers
             }
         }
 
-        void ParseDbTableEntries(DataBaseFile dbFile)
-        {
-            var newTable = _tableEntriesParser.Parse(dbFile, SelectedTableTypeInformations, SelectedFileHeaderInformation.ExpectedEntries);
-
-            MyTable = newTable;
-            _tableEntriesParser.Update()
-
-            int dataLeftInStram = 0;
-            //List<List<string>> tableData = new List<List<string>>();
-            int currentIndex = 0;
-            FieldInfo currentField = null;
-            try
-            {
-                var fields = SelectedTableTypeInformations;
-                var expectedEntries = SelectedFileHeaderInformation.ExpectedEntries;
-                foreach (var field in fields)
-                    MyTable.Columns.Add(field.Name);
-
-
-                using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                        if (fields.Count != 0)
-                        {
-                            for (currentIndex = 0; currentIndex < expectedEntries; currentIndex++)
-                            {
-                                var tableRow = new List<string>();
-                                foreach (var selection in fields)
-                                {
-                                    try
-                                    {
-
-                                        currentField = selection;
-                                        var instance = selection.CreateInstance();
-                                        instance.Decode(reader);
-                                        var v = instance.Value;
-                                        tableRow.Add(v);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        tableRow.Add(e.Message);
-                                    }
-                                }
-
-                                MyTable.Rows.Add(tableRow.ToArray());
-                            }
-                        }
-                        dataLeftInStram = stream.Capacity - (int)stream.Position;
-                    }
-
-                   
-                }
-            }
-            catch (Exception e)
-            {
-
-            }
-            finally
-            {
-                _dbTableItemSourceUpdater.SetData(MyTable);
-            }
-            return;
-            
-
-        }
+        #region Temp
 
         void ParseUntilFieldEnd()
         {
@@ -359,117 +631,6 @@ namespace DbSchemaDecoder.Controllers
                 return all;
             }
         }
-
-        void shitshat()
-        {
-            return;
-            int dataLeftInStram = 0;
-            List<List<string>> tableData = new List<List<string>>();
-            int currentIndex = 0;
-            FieldInfo currentField = null;
-            try
-            {
-                var fields = SelectedTableTypeInformations;
-                var expectedEntries = SelectedFileHeaderInformation.ExpectedEntries;
-
-              
-                using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                        for (currentIndex = 0; currentIndex < expectedEntries; currentIndex++)
-                        {
-                            var tableRow = new List<string>();
-                            foreach (var selection in fields)
-                            {
-                                currentField = selection;
-                                var instance = selection.CreateInstance();
-                                instance.Decode(reader);
-                                var v = instance.Value;
-                                tableRow.Add(v);
-                            }
-
-                            tableData.Add(tableRow);
-                        }
-                    }
-
-                    dataLeftInStram = stream.Capacity - (int)stream.Position;
-                }
-            }
-            catch (Exception e)
-            { 
-            
-            }
-            return;
-
-            /*TypeSelection[] selections = new TypeSelection[] {
-                intType, stringType, boolType, singleType, optStringType, byteType
-            };*/
-        }
-        /*
-         * 
-         * 
-         *             unicode = encodeUnicode;
-            
-            #region Type Selection Listener Initialization
-            // Add to the TypeSelection listeners. 
-            if (unicode) {
-                stringType.Factory = Types.StringType;
-                optStringType.Factory = Types.OptStringType;
-            } else {
-                stringType.Factory = Types.StringTypeAscii;
-                optStringType.Factory = Types.OptStringTypeAscii;
-            }
-stringType.Selected += AddType;
-
-            intType.Factory = Types.IntType;
-            intType.Selected += AddType;
-
-            boolType.Factory = Types.BoolType;
-            boolType.Selected += AddType;
-
-            singleType.Factory = Types.SingleType;
-            singleType.Selected += AddType;
-   
-            optStringType.Selected += AddType;
-
-            byteType.Factory = Types.ByteType;
-            byteType.Selected += AddType;
-         * 
-         * 
-         
-                     if (Bytes == null) {
-                return;
-            }
-           
-            long showFrom = CurrentCursorPosition;
-#if DEBUG
-            Console.WriteLine("parser position {0}", showFrom);
-#endif
-            using (var reader = new BinaryReader(new MemoryStream(Bytes))) {
-                foreach (TypeSelection selection in selections) {
-                    reader.BaseStream.Position = showFrom;
-                    selection.ShowPreview(reader);
-                }
-            }
-         */
-    }
-
-    public class ColumnConfig
-    {
-        public ObservableCollection<Column> Columns { get; set; } = new ObservableCollection<Column>();
-    }
-
-    public class Column
-    {
-        public string Header { get; set; }
-        public string DataField { get; set; }
-    }
-
-    public class Product
-    {
-        public string Name { get; set; }
-        public string Attributes { get; set; }
+        #endregion
     }
 }

@@ -75,7 +75,8 @@ namespace DbSchemaDecoder
         //----Hex stuff
         private void _fileListController_MyEvent(object sender, DataBaseFile e)
         {
-            HexEdit.Stream = new MemoryStream(e.DbFile.Data);
+            if(e != null)
+                HexEdit.Stream = new MemoryStream(e.DbFile.Data);
             // HexEdit.hex
          //   _temp.Add();
         }
