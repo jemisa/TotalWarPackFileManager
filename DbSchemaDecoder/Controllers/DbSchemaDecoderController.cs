@@ -53,7 +53,7 @@ namespace DbSchemaDecoder.Controllers
         int _currentVersion = 0;
         DataBaseFile _selectedFile;
         CaSchemaFileParser caSchemaFileParser = new CaSchemaFileParser();
-        TableEntriesParser _tableEntriesParser;
+        TableEntriesUpdater _tableEntriesParser;
 
         public ICommand DbDefinitionRemovedCommand { get; private set; }
         public ICommand DbDefinitionMovedUpCommand { get; private set; }
@@ -63,7 +63,7 @@ namespace DbSchemaDecoder.Controllers
 
         public DbSchemaDecoderController(FileListController fileListController, DataGridItemSourceUpdater dbTableItemSourceUpdater)
         {
-            _tableEntriesParser = new TableEntriesParser(dbTableItemSourceUpdater, DbTableViewModel);
+            _tableEntriesParser = new TableEntriesUpdater(dbTableItemSourceUpdater, DbTableViewModel);
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
 
@@ -291,6 +291,18 @@ namespace DbSchemaDecoder.Controllers
 
                     List<string> possibleSchamaList = new List<string>();
 
+
+                    /*
+                     
+                     using (var stream = new MemoryStream(baseFile.DbFile.Data))
+                {
+                    using (var reader = new BinaryReader(stream))
+                    {
+                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+                     */
+
+
+
                     for (int i = 0; i < helper._outputTypes.Count(); i++)
                     {
                         var possibleSchema = helper._outputTypes[i].Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
@@ -301,13 +313,13 @@ namespace DbSchemaDecoder.Controllers
 
                         reader.BaseStream.Position = header.Length;
 
-                        TableEntriesParser p = new TableEntriesParser(null, new DbTableViewModel());
-                        var updateRes = p.Update(
+                        TableEntriesParser p = new TableEntriesParser();
+                        var updateRes = p.CanParseTable(
                             _selectedFile,
                             possibleSchema,
                             (int)header.EntryCount);
 
-                        if (updateRes.ParseResult == "")
+                        if (!updateRes.HasError)
                         {
                             var nameList = helper._outputTypes[i].Select(x => FieldParser.CreateFromEnum(x).InstanceName()).ToList();
                             possibleSchamaList.Add(string.Join(", ", nameList));
@@ -425,7 +437,7 @@ namespace DbSchemaDecoder.Controllers
                 }
 
                 // Parse
-                TableEntriesParser p = new TableEntriesParser(null, new DbTableViewModel());
+               /* TableEntriesParser p = new TableEntriesParser(null, new DbTableViewModel());
                 var x = p.Update(
                     _selectedFile,
                     values,
@@ -433,7 +445,7 @@ namespace DbSchemaDecoder.Controllers
 
 
                 if (x.ParseResult != "")
-                    throw new Exception(x.ParseResult);
+                    throw new Exception(x.ParseResult);*/
             }
             catch(Exception e)
             {
@@ -507,7 +519,7 @@ namespace DbSchemaDecoder.Controllers
             ParseDatabaseFile(e);
             LoadCurrentTableDefinition(e.TableType, _currentVersion);
             LoadCaSchemaDefinition(e.TableType);
-            _tableEntriesParser.Update(e, SelectedTableTypeInformations, SelectedFileHeaderInformation.ExpectedEntries);
+            _tableEntriesParser.Update(e, SelectedTableTypeInformations);
         }
 
         void LoadCurrentTableDefinition(string tableName, int currentVersion)
