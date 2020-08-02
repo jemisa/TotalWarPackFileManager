@@ -68,8 +68,8 @@ namespace Filetypes {
         
         public abstract void Encode(BinaryWriter writer);
         public abstract void Decode(BinaryReader reader);
-
         public abstract bool TryDecode(BinaryReader reader);
+        public abstract bool CanDecode(BinaryReader reader, out string errorMessage);
 
         #region Framework Overrides
         public override string ToString() {
