@@ -260,109 +260,7 @@ namespace DbSchemaDecoder.Controllers
 
 
         //
-        private void BruteForce()
-        {
-            using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
-            {
-                using (var reader = new BinaryReader(stream))
-                {
-                    DBFileHeader header = PackedFileDbCodec.readHeader(reader);
 
-                    FieldParserEnum[] states = new FieldParserEnum[] 
-                    {
-                        FieldParserEnum.OptStringTypeAscii, 
-                        FieldParserEnum.StringTypeAscii, 
-                        FieldParserEnum.OptStringType, 
-                        FieldParserEnum.StringType,
-                        FieldParserEnum.IntType,
-                        FieldParserEnum.BoolType,
-                    };
-
-                    var currentTableInof = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
-                    var entry = currentTableInof.First();
-
-                    int maxNumberOfFields = entry.Fields.Count();
-
-                    PermutationHelper helper = new PermutationHelper();
-                    helper.printPermutations(reader, new FieldParserEnum[maxNumberOfFields], states, 0, header.Length, maxNumberOfFields);
-
-                    var possibleMutations = Math.Pow(maxNumberOfFields, 6);
-                    var actuallPossibleMutations = helper._outputTypes.Count();
-
-                    List<string> possibleSchamaList = new List<string>();
-
-
-                    /*
-                     
-                     using (var stream = new MemoryStream(baseFile.DbFile.Data))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                     */
-
-
-
-                    for (int i = 0; i < helper._outputTypes.Count(); i++)
-                    {
-                        var possibleSchema = helper._outputTypes[i].Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
-
-         
-                        for (int j = 0; j < possibleSchema.Count; j++)
-                            possibleSchema[j].Name = "Column" + j;
-
-                        reader.BaseStream.Position = header.Length;
-
-                        TableEntriesParser p = new TableEntriesParser();
-                        var updateRes = p.CanParseTable(
-                            _selectedFile,
-                            possibleSchema,
-                            (int)header.EntryCount);
-
-                        if (!updateRes.HasError)
-                        {
-                            var nameList = helper._outputTypes[i].Select(x => FieldParser.CreateFromEnum(x).InstanceName()).ToList();
-                            possibleSchamaList.Add(string.Join(", ", nameList));
-                        }
-                    }
-                }
-            }
-        }
-
-        class PermutationHelper
-        {
-
-            int parsings = 0;
-            int skipped = 0;
-            public List<string[]> _output = new List<string[]>();
-
-            public List<FieldParserEnum[]> _outputTypes = new List<FieldParserEnum[]>();
-            public void printPermutations(BinaryReader reader, FieldParserEnum[] n, FieldParserEnum[] states, int idx, long streamOffset, int maxNumberOfFields)
-            {
-                if (idx == n.Length)
-                {
-                    _outputTypes.Add(n.Select(x=>x).ToArray());
-                    return;
-                }
-                for (int i = 0; i < states.Length; i++)
-                {
-                    var currentState = states[i];
-                    var parser = FieldParser.CreateFromEnum(currentState);
-                    var parseResult = parser.CanParse(reader, streamOffset);
-                    parsings++;
-                    if (parseResult.Completed)
-                    {
-                        n[idx] = currentState;
-                        printPermutations(reader, n, states, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
-                    }
-                    else
-                    {
-                        skipped++;
-                    }
-                 
-                }
-            }
-        }
 
 
 
@@ -376,7 +274,16 @@ namespace DbSchemaDecoder.Controllers
 
             try
             {
-                BruteForce();
+                if (_selectedFile != null)
+                {
+
+                    var currentTableInof = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
+                    var entry = currentTableInof.First();
+                    int maxNumberOfFields = entry.Fields.Count();
+
+                    var c = new BruteForceParser();
+                    c.BruteForce(_selectedFile, maxNumberOfFields);
+                }
             }
             catch (Exception e)
             { }

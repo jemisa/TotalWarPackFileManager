@@ -133,10 +133,11 @@ namespace DbSchemaDecoder.Util
                 {
                     foreach(var field in fieldInstances)
                     {
-                        var parseResult = field.CanDecode(reader, out var errorMessage);
+                        //string errorMessage = "";
+                        var parseResult = field.TryDecode(reader);
                         if (!parseResult)
                         {
-                            output.Error = $"Error parsing column {fields[rowIndex].Name} for row {rowIndex + 1} : {errorMessage}";
+                            output.Error = $"Error parsing column {field.Name} for row {rowIndex + 1} : {field.Value}";
                             break;
                         }
                     }

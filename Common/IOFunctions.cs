@@ -43,16 +43,33 @@ namespace Common {
 
         public static bool TryReadReadCAString(BinaryReader reader, Encoding encoding, out string stringResult)
         {
+            var result = TryReadReadCAStringAsArray(reader, encoding, out var errorMessage, out var strByteData);
+            if (result)
+                stringResult = encoding.GetString(strByteData);
+            else
+                stringResult = errorMessage;
+            return result;
+        }
+
+        public static bool CanReadReadCAString(BinaryReader reader, Encoding encoding, out string errorMessage)
+        {
+            var result = TryReadReadCAStringAsArray(reader, encoding, out errorMessage, out var _);
+            return result;
+        }
+
+        private static bool TryReadReadCAStringAsArray(BinaryReader reader, Encoding encoding, out string errorMessage, out byte[] stringArray)
+        {
+            stringArray = null;
             if (reader.BaseStream.Length - reader.BaseStream.Position < 2)
             {
-                stringResult = $"Cannot read length of string {reader.BaseStream.Length - reader.BaseStream.Position} bytes left";
+                errorMessage = $"Cannot read length of string {reader.BaseStream.Length - reader.BaseStream.Position} bytes left";
                 return false;
             }
 
             int num = reader.ReadInt16();
             if (0 > num)
             {
-                stringResult = "Negative file length";
+                errorMessage = "Negative file length";
                 return false;
             }
 
@@ -61,13 +78,13 @@ namespace Common {
             // enough data left?
             if (reader.BaseStream.Length - reader.BaseStream.Position < bytes)
             {
-                stringResult = string.Format("Cannot read string of length {0}: only {1} bytes left",
+                errorMessage = string.Format("Cannot read string of length {0}: only {1} bytes left",
                     bytes, reader.BaseStream.Length - reader.BaseStream.Position);
                 return false;
             }
 
-            var strByteData = reader.ReadBytes(bytes);
-            stringResult = encoding.GetString(strByteData);
+            stringArray = reader.ReadBytes(bytes);
+            errorMessage = null;
             return true;
         }
 
