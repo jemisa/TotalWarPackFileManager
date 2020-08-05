@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Common;
+using System.Windows.Forms.VisualStyles;
 
 namespace Filetypes {
     /*
@@ -16,7 +17,6 @@ namespace Filetypes {
         String_ascii,
         Optstring,
         Optstring_ascii,
-        Int,
         Integer,
         Autonumber,
         Short,
@@ -25,7 +25,6 @@ namespace Filetypes {
         Decimal,
         Double,
         Boolean,
-        Yesno,
         List,
     }
 	public class Types 
@@ -42,7 +41,6 @@ namespace Filetypes {
                     return OptStringType();
                 case DbTypesEnum.Optstring_ascii:
                     return OptStringTypeAscii();
-                case DbTypesEnum.Int:
                 case DbTypesEnum.Integer:
                 case DbTypesEnum.Autonumber:
                     return IntType();
@@ -51,11 +49,10 @@ namespace Filetypes {
                 case DbTypesEnum.Float:
                 case DbTypesEnum.Single:
                 case DbTypesEnum.Decimal:
-                case DbTypesEnum.Double:
                     return SingleType();
-                // return DoubleType ();
+                case DbTypesEnum.Double:
+                    return DoubleType ();
                 case DbTypesEnum.Boolean:
-                case DbTypesEnum.Yesno:
                     return BoolType();
                 case DbTypesEnum.List:
                     return ListType();
@@ -160,19 +157,21 @@ namespace Filetypes {
             return string.Format("{0}.{1}", table, field);
         }
     }
-	
+
     /*
      * The info determining a column of a db table.
      */
-	[System.Diagnostics.DebuggerDisplay("{Name} - {TypeName}; {Optional}")]
+    [System.Diagnostics.DebuggerDisplay("{Name} - {TypeName}; {Optional}")]
     public abstract class FieldInfo {
         /*
          * The column name.
          */
-		public string Name {
-			get;
-			set;
-		}
+        public string Name {
+            get;
+            set;
+        }
+
+        public DbTypesEnum TypeEnum { get;  set; }
         public virtual string TypeName { get; set; }
         public TypeCode TypeCode { get; set; }
 
@@ -264,7 +263,9 @@ namespace Filetypes {
 		public StringType () {
 			TypeName = "string";
 			TypeCode = TypeCode.String;
-		}
+            TypeEnum = DbTypesEnum.String;
+
+        }
         public override FieldInstance CreateInstance() {
             return new StringField() {
                 Name = this.Name,
@@ -285,6 +286,7 @@ namespace Filetypes {
          public StringTypeAscii () {
              TypeName = "string_ascii";
              TypeCode = TypeCode.String;
+            TypeEnum = DbTypesEnum.String_ascii;
          }
         public override FieldInstance CreateInstance() {
             return new StringFieldAscii() {
@@ -307,7 +309,9 @@ namespace Filetypes {
 		public IntType () {
 			TypeName = "int";
 			TypeCode = TypeCode.Int32;
-		}
+            TypeEnum = DbTypesEnum.Integer;
+
+        }
         public override FieldInstance CreateInstance() {
             return new IntField() {
                 Name = this.Name,
@@ -329,7 +333,9 @@ namespace Filetypes {
 		public ShortType () {
 			TypeName = "short";
 			TypeCode = TypeCode.Int16;
-		}
+            TypeEnum = DbTypesEnum.Short;
+
+        }
         public override FieldInstance CreateInstance() {
             return new ShortField() {
                 Name = this.Name,
@@ -343,6 +349,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -351,7 +358,9 @@ namespace Filetypes {
 		public SingleType () {
 			TypeName = "float";
 			TypeCode = TypeCode.Single;
-		}
+            TypeEnum = DbTypesEnum.Single;
+
+        }
         public override FieldInstance CreateInstance() {
             return new SingleField() {
                 Name = this.Name,
@@ -365,6 +374,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -375,6 +385,7 @@ namespace Filetypes {
         {
             TypeName = "double";
             TypeCode = TypeCode.Single;
+            TypeEnum = DbTypesEnum.Double;
         }
         public override FieldInstance CreateInstance() 
         {
@@ -389,6 +400,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -411,6 +423,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -419,7 +432,9 @@ namespace Filetypes {
 		public OptStringType () {
 			TypeName = "optstring";
 			TypeCode = TypeCode.String;
-		}
+            TypeEnum = DbTypesEnum.Optstring;
+
+        }
         public override FieldInstance CreateInstance() {
             return new OptStringField() {
                 Name = this.Name,
@@ -433,6 +448,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -440,6 +456,7 @@ namespace Filetypes {
         public OptStringTypeAscii () {
             TypeName = "optstring_ascii";
             TypeCode = TypeCode.String;
+            TypeEnum = DbTypesEnum.Optstring_ascii;
         }
         public override FieldInstance CreateInstance() {
             return new OptStringFieldAscii() {
@@ -454,6 +471,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -464,7 +482,8 @@ namespace Filetypes {
 			TypeName = string.Format("blob{0}", byteCount);
 			TypeCode = TypeCode.Empty;
             byteCount = bytes;
-		}
+
+        }
         public override FieldInstance CreateInstance() {
             return new VarByteField(byteCount) {
                 Name = this.Name
@@ -477,6 +496,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -485,6 +505,7 @@ namespace Filetypes {
         public ListType() {
             TypeName = "list";
             TypeCode = TypeCode.Object;
+            TypeEnum = DbTypesEnum.List;
         }
         
         public override string TypeName {
@@ -572,6 +593,7 @@ namespace Filetypes {
             {
                 TypeName = this.TypeName,
                 TypeCode = this.TypeCode,
+                TypeEnum = this.TypeEnum,
             };
         }
     }

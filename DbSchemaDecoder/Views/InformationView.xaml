@@ -7,7 +7,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="98.5" Width="356.833">
     <Grid>
-        <ComboBox HorizontalAlignment="Left" Margin="52,0,0,0" VerticalAlignment="Top" Width="151"/>
+        <ComboBox HorizontalAlignment="Left" Margin="52,0,0,0" VerticalAlignment="Top" Width="151" 
+                  ItemsSource="{Binding Path=SelectedFileHeaderInformation.Versions, UpdateSourceTrigger=PropertyChanged}"
+                   DisplayMemberPath="DisplayValue"
+                  SelectedValuePath="DisplayValue"
+                  SelectedValue="{Binding Path=SelectedFileHeaderInformation.SelectedVersion ,UpdateSourceTrigger=PropertyChanged}" />
+          
         <Label Content="Version:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
 
         <Label 

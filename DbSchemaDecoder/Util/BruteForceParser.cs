@@ -1,4 +1,5 @@
-﻿using DbSchemaDecoder.Util;
+﻿using DbSchemaDecoder.Controllers;
+using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
 using System;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DbSchemaDecoder.Controllers
+namespace DbSchemaDecoder.Util
 {
     class BruteForceParser
     {

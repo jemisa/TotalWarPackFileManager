@@ -38,18 +38,28 @@ namespace DbSchemaDecoder.Util
                     {
                         DBFileHeader header = PackedFileDbCodec.readHeader(reader);
                         var parseResult = _parser.ParseTable(reader, stream.Capacity, fields.ToList(), (int)header.EntryCount);
-                        if (!parseResult.HasError)
-                        {
-                            foreach(var columnName in parseResult.ColumnNames)
-                                table.Columns.Add(columnName);
-
-                            foreach (var row in parseResult.DataRows)
-                                table.Rows.Add(row);
-                        }
-                        else
-                        {
+                        if (parseResult.HasError)
                             _viewModel.ParseResult = parseResult.Error;
+
+                        try
+                        {
+                            if (parseResult.ColumnNames != null)
+                            {
+                                foreach (var columnName in parseResult.ColumnNames)
+                                    table.Columns.Add(columnName);
+
+                                if (parseResult.DataRows != null)
+                                {
+                                    foreach (var row in parseResult.DataRows)
+                                        table.Rows.Add(row);
+                                }
+                            }
                         }
+                        catch
+                        { 
+                            
+                        }
+                       
                     }
                 }
             }

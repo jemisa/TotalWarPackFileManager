@@ -2,32 +2,36 @@
 using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
 {
+    /*class HexViewSelectionModel
+    { 
+        public int HeaderLength { get; set; }
+        public List<HighLighedByteItem> HighLightedBytes { get; set; } = new List<HighLighedByteItem>();
+
+        public class HighLighedByteItem
+        { 
+            public int StartByte { get; set; }
+            public int Length { get; set; }
+        }
+    };*/
+
     class DbSchemaDecoderController : NotifyPropertyChangedImpl
     {
         public DbTableViewModel DbTableViewModel { get; set; } = new DbTableViewModel();
         public SelectedFileHeaderInformation SelectedFileHeaderInformation { get; set; } = new SelectedFileHeaderInformation();
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
-        public ObservableCollection<FieldInfo> SelectedTableTypeInformations { get; set; } = new ObservableCollection<FieldInfo>();
-
+       
+        public DbTableDefinitionController DbTableDefinitionController { get; set; }
         string _testValue;
         public string TestValue
         {
@@ -39,25 +43,13 @@ namespace DbSchemaDecoder.Controllers
             }
         }
 
-        FieldInfo _selectedDbDefinition;
-        public FieldInfo SelectedDbDefinition
-        {
-            get { return _selectedDbDefinition; }
-            set
-            {
-                _selectedDbDefinition = value;
-                NotifyPropertyChanged();
-            }
-        }
 
         int _currentVersion = 0;
         DataBaseFile _selectedFile;
         CaSchemaFileParser caSchemaFileParser = new CaSchemaFileParser();
         TableEntriesUpdater _tableEntriesParser;
 
-        public ICommand DbDefinitionRemovedCommand { get; private set; }
-        public ICommand DbDefinitionMovedUpCommand { get; private set; }
-        public ICommand DbDefinitionMovedDownCommand { get; private set; }
+
 
         public ICommand ParseTbTableUsingCaSchemaCommand { get; private set; }
 
@@ -67,16 +59,21 @@ namespace DbSchemaDecoder.Controllers
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
 
-            DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
-            DbDefinitionMovedUpCommand = new RelayCommand(OnDbDefinitionMovedUp);
-            DbDefinitionMovedDownCommand = new RelayCommand(OnDbDefinitionMovedDown);
             ParseTbTableUsingCaSchemaCommand = new RelayCommand(OnTest);
+
+            DbTableDefinitionController = new DbTableDefinitionController();
+            DbTableDefinitionController.OnDefinitionChangedEvent += DbTableDefinitionController_OnDefinitionChangedEvent;
+
+            //InformationView.CurrentVersionChanged += TableDefinitionController.UpdateVersion(name, version)
+            // EntityTable.Update += TableDefinitionController.OnChanged
+        }
+
+        private void DbTableDefinitionController_OnDefinitionChangedEvent(object sender, List<FieldInfo> e)
+        {
+            _tableEntriesParser.Update(_selectedFile, e);
         }
 
 
-
-
-      
         class ParseHelper
         {
 
@@ -288,77 +285,6 @@ namespace DbSchemaDecoder.Controllers
             catch (Exception e)
             { }
             return;
-
-            try 
-            {
-          
-            // Converts
-                List<FieldInfo> values = new List<FieldInfo>();
-
-
-
-                using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                        foreach (var caField in CaSchemaEntries)
-                        {
-
-                            var types = Create(caField);
-                            foreach (var type in types)
-                            {
-                                bool worked = true;
-                                long showFrom = reader.BaseStream.Position;
-                                
-
-
-                                try
-                                {
-
-
-
-                                    var instance = type.CreateInstance();
-                                    instance.Decode(reader);
-                                    var value = instance.Value;
-
-                                    byte[] bytes = Encoding.ASCII.GetBytes(value);
-                                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
-
-                                }
-                                catch (Exception e)
-                                {
-                                    reader.BaseStream.Position = showFrom;
-                                    worked = false;
-                                }
-
-                                if (worked)
-                                {
-                                    type.Name = caField.name;
-                                    values.Add(type);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Parse
-               /* TableEntriesParser p = new TableEntriesParser(null, new DbTableViewModel());
-                var x = p.Update(
-                    _selectedFile,
-                    values,
-                    SelectedFileHeaderInformation.ExpectedEntries);
-
-
-                if (x.ParseResult != "")
-                    throw new Exception(x.ParseResult);*/
-            }
-            catch(Exception e)
-            {
-
-
-            }
         }
 
         FieldInfo[] Create(CaSchemaEntry entry)
@@ -384,38 +310,6 @@ namespace DbSchemaDecoder.Controllers
         }
    
 
-        private void OnDbDefinitionRemoved()
-        {
-            var x = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
-            var entry = x.First();
-            var index = entry.Fields.IndexOf(SelectedDbDefinition);
-            entry.Fields.RemoveAt(index);
-            LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
-        }
-
-        private void OnDbDefinitionMovedUp()
-        {
-            var x = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
-            var entry = x.First();
-            var index = entry.Fields.IndexOf(SelectedDbDefinition);
-            if (index == 0)
-                return;
-            entry.Fields.RemoveAt(index);
-            entry.Fields.Insert(index - 1, SelectedDbDefinition);
-            LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
-        }
-
-        private void OnDbDefinitionMovedDown()
-        {
-            var x = DBTypeMap.Instance.GetVersionedInfos(_selectedFile.TableType, _currentVersion);
-            var entry = x.First();
-            var index = entry.Fields.IndexOf(SelectedDbDefinition);
-            if (index == entry.Fields.Count)
-                return;
-            entry.Fields.RemoveAt(index);
-            entry.Fields.Insert(index + 1, SelectedDbDefinition);
-            LoadCurrentTableDefinition(_selectedFile.TableType, _currentVersion);
-        }
 
         private void OnDbFileSelected(object sender, DataBaseFile e)
         {
@@ -424,23 +318,12 @@ namespace DbSchemaDecoder.Controllers
                 return;
 
             ParseDatabaseFile(e);
-            LoadCurrentTableDefinition(e.TableType, _currentVersion);
+            DbTableDefinitionController.LoadCurrentTableDefinition(e.TableType, _currentVersion);
             LoadCaSchemaDefinition(e.TableType);
-            _tableEntriesParser.Update(e, SelectedTableTypeInformations);
+            _tableEntriesParser.Update(e, DbTableDefinitionController.TableTypeInformationRows.Select(x=>x.GetFieldInfo()).ToList());
         }
 
-        void LoadCurrentTableDefinition(string tableName, int currentVersion)
-        {
-            var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
-            SelectedTableTypeInformations.Clear();
-
-            var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == currentVersion);
-            if (fieldCollection == null)
-                return;
-
-            foreach(var f in fieldCollection.Fields)
-                SelectedTableTypeInformations.Add(f); 
-        }
+        
 
         void LoadCaSchemaDefinition(string tableName)
         {
@@ -494,13 +377,13 @@ namespace DbSchemaDecoder.Controllers
 
 
             // Parse to current pos
-            var fields = SelectedTableTypeInformations;
+            var fields = DbTableDefinitionController.TableTypeInformationRows;
             using (var reader = new BinaryReader(new MemoryStream(_selectedFile.DbFile.Data)))
             {
                 DBFileHeader header = PackedFileDbCodec.readHeader(reader);
                 foreach (var selection in fields)
                 {
-                    var instance = selection.CreateInstance();
+                    var instance = selection.GetFieldInfo().CreateInstance();
                     instance.Decode(reader);
                 }
 

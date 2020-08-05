@@ -9,51 +9,35 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <Grid>
-        <ListView ItemsSource="{Binding SelectedTableTypeInformations}" SelectedItem="{Binding Path=SelectedDbDefinition}">
-            <ListView.Resources>
+        <DataGrid ItemsSource="{Binding DbTableDefinitionController.TableTypeInformationRows}" SelectedItem="{Binding Path=DbTableDefinitionController.SelectedTypeInformationRow}">
+            <DataGrid.Resources>
                 <local:IndexConverter x:Key="IndexConverter" />
-            </ListView.Resources>
+            </DataGrid.Resources>
 
-            <ListView.ContextMenu>
+            <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem 
                         Header="Remove"
-                        Command="{Binding DbDefinitionRemovedCommand}" />
-
+                        Command="{Binding DbTableDefinitionController.DbDefinitionRemovedCommand}" />
                     <MenuItem 
                         Header="Move up" 
-                        Command="{Binding DbDefinitionMovedUpCommand}" />
+                        Command="{Binding DbTableDefinitionController.DbDefinitionMovedUpCommand}" />
                     <MenuItem 
                         Header="Move down" 
-                        Command="{Binding DbDefinitionMovedDownCommand}" />
+                        Command="{Binding DbTableDefinitionController.DbDefinitionMovedDownCommand}" />
                 </ContextMenu>
-            </ListView.ContextMenu>
+            </DataGrid.ContextMenu>
 
-            <ListView.InputBindings>
+            <DataGrid.InputBindings>
                 <KeyBinding 
-                    Key="Enter"
-                    Command="{Binding DbDefinitionRemovedCommand}" />
-            </ListView.InputBindings>
+                    Key="Delete"
+                    Command="{Binding DbTableDefinitionController.DbDefinitionRemovedCommand}" />
+            </DataGrid.InputBindings>
 
-            <ListView.View>
-                <GridView>
 
-                    <GridViewColumn 
-                        Header="No."
-                        DisplayMemberBinding="{Binding RelativeSource=
-                                                {RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, 
-                        Converter={StaticResource IndexConverter}}" />
 
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"  Width="auto"/>
-                    <GridViewColumn Header="TypeName" DisplayMemberBinding="{Binding TypeName}"  Width="auto"/>
-                    <GridViewColumn Header="PrimaryKey" DisplayMemberBinding="{Binding PrimaryKey}"  Width="auto"/>
-                    <GridViewColumn Header="Optional" DisplayMemberBinding="{Binding Optional}"  Width="auto"/>
-                    <GridViewColumn Header="ForeignReference" DisplayMemberBinding="{Binding ForeignReference}"  Width="auto"/>
-                    <GridViewColumn Header="ReferencedTable" DisplayMemberBinding="{Binding ReferencedTable}"  Width="auto"/>
-                    <GridViewColumn Header="ReferencedField" DisplayMemberBinding="{Binding ReferencedField}"  Width="auto"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        
+        </DataGrid>
 
     </Grid>
 </UserControl>

@@ -70,8 +70,25 @@ namespace DbSchemaDecoder
 
         private void _fileListController_MyEvent(object sender, DataBaseFile e)
         {
-            if(e != null)
+            if (e != null)
+            {
                 HexEdit.Stream = new MemoryStream(e.DbFile.Data);
+                HexEdit.CustomBackgroundBlockItems.Add(
+                    new WpfHexaEditor.Core.CustomBackgroundBlock() 
+                    {
+                        Color = new SolidColorBrush(Color.FromRgb(244,0,0)),
+                        StartOffset = 10, 
+                        Length = 50
+                    });
+
+                HexEdit.CustomBackgroundBlockItems.Add(
+                    new WpfHexaEditor.Core.CustomBackgroundBlock()
+                    {
+                        Color = new SolidColorBrush(Color.FromRgb(0, 244, 0)),
+                        StartOffset = 80,
+                        Length = 200
+                    });
+            }
         }
 
         private void OnShowFileListClick(object sender, RoutedEventArgs e)
