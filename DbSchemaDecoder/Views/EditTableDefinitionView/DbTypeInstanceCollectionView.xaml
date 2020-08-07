@@ -6,25 +6,19 @@
              xmlns:local="clr-namespace:DbSchemaDecoder.EditTableDefinitionView"
              mc:Ignorable="d" 
              d:DesignHeight="247.385" d:DesignWidth="623.529">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-        </Grid.RowDefinitions>
-        <local:DbTypeInstanceView Grid.Row="0" VerticalAlignment="Center"></local:DbTypeInstanceView>
-        <local:DbTypeInstanceView Grid.Row="1" VerticalAlignment="Center"></local:DbTypeInstanceView>
-        <local:DbTypeInstanceView Grid.Row="2" VerticalAlignment="Center"></local:DbTypeInstanceView>
-        <local:DbTypeInstanceView Grid.Row="3" VerticalAlignment="Center"></local:DbTypeInstanceView>
-        <local:DbTypeInstanceView Grid.Row="4" VerticalAlignment="Center"></local:DbTypeInstanceView>
-        <local:DbTypeInstanceView Grid.Row="5" VerticalAlignment="Center"></local:DbTypeInstanceView>
-        <Button Content="&lt;&lt;" Grid.Row="6" HorizontalAlignment="Left"></Button>
-        <Button Content="&lt;" Grid.Row="6" HorizontalAlignment="Left" Margin="34,0,0,-1"></Button>
-        <Button Content="&gt;" Grid.Row="6" HorizontalAlignment="Right"></Button>
-        <Label Grid.Row="6" Content="0/10" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
-    </Grid>
+    <DockPanel>
+
+        <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[0], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[1], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[2], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[3], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[4], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[5], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
+        <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[6], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
+
+        <Button Content="&lt;&lt;"  HorizontalAlignment="Left" Click="Button_Click"></Button>
+        <Button Content="&lt;"  HorizontalAlignment="Left" Margin="34,0,0,-1"></Button>
+        <Button Content="&gt;"  HorizontalAlignment="Right"></Button>
+        <Label  Content="{Binding Path=NextItemController.CustomDisplayText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+    </DockPanel>
 </UserControl>

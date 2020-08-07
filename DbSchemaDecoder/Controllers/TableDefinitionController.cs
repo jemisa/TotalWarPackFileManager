@@ -112,7 +112,15 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnCreateNewDbDefinitionCommand()
         {
+            var type = Types.StringType();
+            type.Name = "Column_" + TableTypeInformationRows.Count() + 1;
+            var item = new FieldInfoViewModel(type, TableTypeInformationRows.Count() + 1);
+            item.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;
+            TableTypeInformationRows.Add(item);
+            OnDefinitionChanged();
         }
+
+
 
         private void OnDbDefinitionRemoved()
         {

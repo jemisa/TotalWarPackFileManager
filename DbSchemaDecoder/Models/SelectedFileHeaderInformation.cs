@@ -60,7 +60,7 @@ namespace DbSchemaDecoder.Models
                         var newitem = new VersionViewItem()
                         {
                             DisplayValue = "Version " + groupedVersions[i].Key.ToString() + " - Instance " + (j + 1).ToString(),
-                            TypeInfo = groupedVersions[i].ElementAt(i)
+                            TypeInfo = groupedVersions[i].ElementAt(j)
                         };
 
                         Versions.Add(newitem);
@@ -68,11 +68,12 @@ namespace DbSchemaDecoder.Models
                         if (groupedVersions[i].Key == Version && j == 0)
                             selectedIndex = Versions.Count() - 1;
                     }
-
-
                 }
             }
-                
+
+            NumVersions = Versions.Count();
+
+
             NotifyPropertyChanged("TableName");
             NotifyPropertyChanged("Version");
             NotifyPropertyChanged("HeaderSize");

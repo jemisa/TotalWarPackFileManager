@@ -7,9 +7,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="23" d:DesignWidth="332.177">
     <Grid>
-        <Label x:Name="DescriptionTextBox" Content="Label" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="100"/>
-        <TextBox x:Name="ValueTextBox" HorizontalAlignment="Right" Height="23" Margin="0,0,65,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="97" Grid.Column="1"/>
-        <Button x:Name="UseButton" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="23" Grid.Column="1"/>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"></ColumnDefinition>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="60"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label x:Name="DescriptionTextBox" VerticalAlignment="Top"  Grid.Column="0"
+               Content="{Binding Path=CustomDisplayText, UpdateSourceTrigger=PropertyChanged}" Height="23" />
+        <TextBox x:Name="ValueTextBox" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1"
+                 Text="{Binding Path=ValueText, UpdateSourceTrigger=PropertyChanged}"
+                 Background="AliceBlue"/>
+        <Button x:Name="UseButton" Content="{Binding Path=ButtonText, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Height="23" Grid.Column="2"
+                Command="{Binding CustomButtonPressedCommand}"
+                CommandParameter="{Binding}"
+                />
+        
     </Grid>
 </UserControl>

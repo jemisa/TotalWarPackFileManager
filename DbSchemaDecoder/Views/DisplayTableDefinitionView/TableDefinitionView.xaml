@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DbSchemaDecoder.DisplayTableDefinitionView"
-             
+             xmlns:local="clr-namespace:DbSchemaDecoder.DisplayTableDefinitionView" xmlns:util="clr-namespace:DbSchemaDecoder.Util"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <Grid>
-        <DataGrid ItemsSource="{Binding DbTableDefinitionController.TableTypeInformationRows}" SelectedItem="{Binding Path=DbTableDefinitionController.SelectedTypeInformationRow}">
+        <util:DataGridEx ItemsSource="{Binding DbTableDefinitionController.TableTypeInformationRows}" SelectedItem="{Binding Path=DbTableDefinitionController.SelectedTypeInformationRow}">
             <DataGrid.Resources>
                 <local:IndexConverter x:Key="IndexConverter" />
             </DataGrid.Resources>
@@ -25,6 +24,9 @@
                     <MenuItem 
                         Header="Move down" 
                         Command="{Binding DbTableDefinitionController.DbDefinitionMovedDownCommand}" />
+                    <MenuItem 
+                        Header="Add Field" 
+                        Command="{Binding DbTableDefinitionController.CreateNewDbDefinitionCommand}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
 
@@ -36,8 +38,7 @@
 
 
 
-        
-        </DataGrid>
+        </util:DataGridEx>
 
     </Grid>
 </UserControl>

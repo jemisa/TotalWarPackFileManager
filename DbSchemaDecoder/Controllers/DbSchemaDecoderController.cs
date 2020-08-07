@@ -30,7 +30,8 @@ namespace DbSchemaDecoder.Controllers
         public DbTableViewModel DbTableViewModel { get; set; } = new DbTableViewModel();
         public SelectedFileHeaderInformation SelectedFileHeaderInformation { get; set; } = new SelectedFileHeaderInformation();
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
-       
+
+        public NextItemController NextItemController { get; set; }
         public DbTableDefinitionController DbTableDefinitionController { get; set; }
         string _testValue;
         public string TestValue
@@ -61,6 +62,8 @@ namespace DbSchemaDecoder.Controllers
 
             ParseTbTableUsingCaSchemaCommand = new RelayCommand(OnTest);
 
+            NextItemController = new NextItemController();
+
             DbTableDefinitionController = new DbTableDefinitionController();
             DbTableDefinitionController.OnDefinitionChangedEvent += DbTableDefinitionController_OnDefinitionChangedEvent;
 
@@ -71,6 +74,9 @@ namespace DbSchemaDecoder.Controllers
         private void DbTableDefinitionController_OnDefinitionChangedEvent(object sender, List<FieldInfo> e)
         {
             _tableEntriesParser.Update(_selectedFile, e);
+
+            NextItemController.Update(_selectedFile, e);
+            //NextItemController.CustomDisplayText = _selectedFile.DbFile.Name;
         }
 
 
@@ -321,6 +327,7 @@ namespace DbSchemaDecoder.Controllers
             DbTableDefinitionController.LoadCurrentTableDefinition(e.TableType, _currentVersion);
             LoadCaSchemaDefinition(e.TableType);
             _tableEntriesParser.Update(e, DbTableDefinitionController.TableTypeInformationRows.Select(x=>x.GetFieldInfo()).ToList());
+            NextItemController.Update(_selectedFile, DbTableDefinitionController.TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList());
         }
 
         

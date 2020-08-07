@@ -48,7 +48,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\NextItemController.cs" />
     <Compile Include="Util\BruteForceParser.cs" />
+    <Compile Include="Util\DataGridEx.cs" />
     <Compile Include="Util\FieldParser.cs" />
     <Compile Include="Controllers\TableDefinitionController.cs" />
     <Compile Include="Models\DbTableViewModel.cs" />

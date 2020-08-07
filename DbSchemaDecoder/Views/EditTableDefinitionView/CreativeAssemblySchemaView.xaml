@@ -10,6 +10,7 @@
         <GroupBox Header="Creative Assembly Schema Explorer">
             <Grid>
                 <ListView Margin="0,0,0,37" ItemsSource="{Binding CaSchemaEntries}"> 
+                    
                     <ListView.View>
                         <GridView x:Name="grdTest">
                             <GridViewColumn Header="No." DisplayMemberBinding="{Binding index}"  Width="auto"/>

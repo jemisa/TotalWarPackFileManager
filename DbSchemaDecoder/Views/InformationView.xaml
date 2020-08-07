@@ -4,15 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DbSchemaDecoder"
-             mc:Ignorable="d" 
-             d:DesignHeight="98.5" Width="356.833">
+             mc:Ignorable="d" Width="800" Height="75">
     <Grid>
         <ComboBox HorizontalAlignment="Left" Margin="52,0,0,0" VerticalAlignment="Top" Width="151" 
                   ItemsSource="{Binding Path=SelectedFileHeaderInformation.Versions, UpdateSourceTrigger=PropertyChanged}"
                    DisplayMemberPath="DisplayValue"
                   SelectedValuePath="DisplayValue"
                   SelectedValue="{Binding Path=SelectedFileHeaderInformation.SelectedVersion ,UpdateSourceTrigger=PropertyChanged}" />
-          
+
         <Label Content="Version:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
 
         <Label 
@@ -30,24 +29,31 @@
             </TextBlock>
         </Label>
         <Label 
-            HorizontalAlignment="Left" Margin="250,50,0,0" VerticalAlignment="Top">
+            HorizontalAlignment="Left" Margin="150,50,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Total bytes: "/>
                 <Run Text="{Binding Path=SelectedFileHeaderInformation.TotalSize, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
         <Label 
-            HorizontalAlignment="Left" Margin="250,75,0,0" VerticalAlignment="Top">
+            HorizontalAlignment="Left" Margin="200,0,0,0" VerticalAlignment="Top">
             <TextBlock>
-                <Run Text="Version: "/>
+                <Run Text="Header Version: "/>
                 <Run Text="{Binding Path=SelectedFileHeaderInformation.Version, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
         <Label 
-            HorizontalAlignment="Left" Margin="0,75,0,0" VerticalAlignment="Top">
+            HorizontalAlignment="Left" Margin="300,50,0,0" VerticalAlignment="Top" >
             <TextBlock>
                 <Run Text="Expected Entries: "/>
                 <Run Text="{Binding Path=SelectedFileHeaderInformation.ExpectedEntries, UpdateSourceTrigger=PropertyChanged}"/>
+            </TextBlock>
+        </Label>
+        <Label 
+            HorizontalAlignment="Left" Margin="300,0,0,0" VerticalAlignment="Top">
+            <TextBlock>
+                <Run Text="Num Versions: "/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformation.NumVersions, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
 
