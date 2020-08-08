@@ -33,6 +33,8 @@ namespace DbSchemaDecoder.Controllers
 
         public NextItemController NextItemController { get; set; }
         public DbTableDefinitionController DbTableDefinitionController { get; set; }
+
+        public BruteForceController BruteForceController { get; set; }
         string _testValue;
         public string TestValue
         {
@@ -63,20 +65,23 @@ namespace DbSchemaDecoder.Controllers
             ParseTbTableUsingCaSchemaCommand = new RelayCommand(OnTest);
 
             NextItemController = new NextItemController();
+            BruteForceController = new BruteForceController();
 
             DbTableDefinitionController = new DbTableDefinitionController();
             DbTableDefinitionController.OnDefinitionChangedEvent += DbTableDefinitionController_OnDefinitionChangedEvent;
+            DbTableDefinitionController.OnSelectedRowChangedEvent += DbTableDefinitionController_OnSelectedRowChangedEvent;
+            NextItemController.OnNewDefinitionCreated += DbTableDefinitionController.AppendRowOfTypeEventHandler;
+        }
 
-            //InformationView.CurrentVersionChanged += TableDefinitionController.UpdateVersion(name, version)
-            // EntityTable.Update += TableDefinitionController.OnChanged
+        private void DbTableDefinitionController_OnSelectedRowChangedEvent(object sender, FieldInfoViewModel e)
+        {
+            NextItemController.Update(_selectedFile, DbTableDefinitionController.TableTypeInformationTypes, DbTableDefinitionController.SelectedTypeInformationRow);
         }
 
         private void DbTableDefinitionController_OnDefinitionChangedEvent(object sender, List<FieldInfo> e)
         {
-            _tableEntriesParser.Update(_selectedFile, e);
-
-            NextItemController.Update(_selectedFile, e);
-            //NextItemController.CustomDisplayText = _selectedFile.DbFile.Name;
+            _tableEntriesParser.Update(_selectedFile, DbTableDefinitionController.TableTypeInformationTypes);
+            NextItemController.Update(_selectedFile, DbTableDefinitionController.TableTypeInformationTypes, DbTableDefinitionController.SelectedTypeInformationRow);
         }
 
 
@@ -327,7 +332,7 @@ namespace DbSchemaDecoder.Controllers
             DbTableDefinitionController.LoadCurrentTableDefinition(e.TableType, _currentVersion);
             LoadCaSchemaDefinition(e.TableType);
             _tableEntriesParser.Update(e, DbTableDefinitionController.TableTypeInformationRows.Select(x=>x.GetFieldInfo()).ToList());
-            NextItemController.Update(_selectedFile, DbTableDefinitionController.TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList());
+            NextItemController.Update(_selectedFile, DbTableDefinitionController.TableTypeInformationTypes, DbTableDefinitionController.SelectedTypeInformationRow);
         }
 
         

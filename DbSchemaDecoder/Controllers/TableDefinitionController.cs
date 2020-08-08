@@ -56,7 +56,10 @@ namespace DbSchemaDecoder.Controllers
     class DbTableDefinitionController : NotifyPropertyChangedImpl
     {
         public event EventHandler<List<FieldInfo>> OnDefinitionChangedEvent;
+        public event EventHandler<FieldInfoViewModel> OnSelectedRowChangedEvent;
 
+
+        public List<FieldInfo> TableTypeInformationTypes { get { return TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList(); } }
         public ObservableCollection<FieldInfoViewModel> TableTypeInformationRows { get; set; } = new ObservableCollection<FieldInfoViewModel>();
 
         FieldInfoViewModel _selectedTypeInformationRow;
@@ -66,6 +69,7 @@ namespace DbSchemaDecoder.Controllers
             set
             {
                 _selectedTypeInformationRow = value;
+                OnSelectedRowChangedEvent?.Invoke(this, _selectedTypeInformationRow);
                 NotifyPropertyChanged();
             }
         }
@@ -74,6 +78,7 @@ namespace DbSchemaDecoder.Controllers
         public ICommand DbDefinitionMovedUpCommand { get; private set; }
         public ICommand DbDefinitionMovedDownCommand { get; private set; }
         public ICommand CreateNewDbDefinitionCommand { get; private set; }
+        public ICommand DeselectCommand { get; private set; }
 
         public DbTableDefinitionController()
         {
@@ -81,6 +86,7 @@ namespace DbSchemaDecoder.Controllers
             DbDefinitionMovedUpCommand = new RelayCommand(OnDbDefinitionMovedUp);
             DbDefinitionMovedDownCommand = new RelayCommand(OnDbDefinitionMovedDown);
             CreateNewDbDefinitionCommand = new RelayCommand(OnCreateNewDbDefinitionCommand);
+            DeselectCommand = new RelayCommand(OnDeselectCommand);
         }
 
         public void LoadCurrentTableDefinition(string tableName, int currentVersion)
@@ -124,6 +130,8 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnDbDefinitionRemoved()
         {
+            if (SelectedTypeInformationRow == null)
+                return;
             var index = TableTypeInformationRows.IndexOf(SelectedTypeInformationRow);
             TableTypeInformationRows.RemoveAt(index);
             RecomputeIndexes();
@@ -132,32 +140,56 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnDbDefinitionMovedUp()
         {
+            if (SelectedTypeInformationRow == null)
+                return;
             var index = TableTypeInformationRows.IndexOf(SelectedTypeInformationRow);
             if (index == 0)
                 return;
             var selectedRef = SelectedTypeInformationRow;
             TableTypeInformationRows.RemoveAt(index);
             TableTypeInformationRows.Insert(index - 1, selectedRef);
+            SelectedTypeInformationRow = TableTypeInformationRows[index - 1];
             RecomputeIndexes();
             OnDefinitionChanged();
         }
 
         private void OnDbDefinitionMovedDown()
         {
+            if (SelectedTypeInformationRow == null)
+                return;
             var index = TableTypeInformationRows.IndexOf(SelectedTypeInformationRow);
-            if (index == TableTypeInformationRows.Count)
+            if (index == TableTypeInformationRows.Count - 1)
                 return;
             var selectedRef = SelectedTypeInformationRow;
             TableTypeInformationRows.RemoveAt(index);
             TableTypeInformationRows.Insert(index + 1, selectedRef);
+            SelectedTypeInformationRow = TableTypeInformationRows[index + 1];
             RecomputeIndexes();
             OnDefinitionChanged();
+        }
+
+        void OnDeselectCommand()
+        {
+            SelectedTypeInformationRow = null;
         }
 
         void RecomputeIndexes()
         {
             for (int i = 0; i < TableTypeInformationRows.Count; i++)
                 TableTypeInformationRows[i].SetIndex(i + 1);
+        }
+
+        public void AppendRowOfTypeEventHandler(object e, DbTypesEnum type)
+        {
+            var newType = Types.FromEnum(type);
+            var newFieldInfoViewModel = new FieldInfoViewModel(newType, 99);
+            newFieldInfoViewModel.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;
+            TableTypeInformationRows.Add(newFieldInfoViewModel);
+
+            
+            RecomputeIndexes();
+
+            OnDefinitionChanged();
         }
     }
 }

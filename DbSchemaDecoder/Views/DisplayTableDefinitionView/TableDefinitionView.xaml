@@ -8,7 +8,16 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <Grid>
-        <util:DataGridEx ItemsSource="{Binding DbTableDefinitionController.TableTypeInformationRows}" SelectedItem="{Binding Path=DbTableDefinitionController.SelectedTypeInformationRow}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.Column="0" LastChildFill="false">
+            <Button DockPanel.Dock="Top" Content="▲" Height="20" Command="{Binding DbTableDefinitionController.DbDefinitionMovedUpCommand}"></Button>
+            <Button DockPanel.Dock="Bottom" Content="▼" Height="20" Command="{Binding DbTableDefinitionController.DbDefinitionMovedDownCommand}"></Button>
+        </DockPanel>
+        <util:DataGridEx Grid.Column="1"
+            ItemsSource="{Binding DbTableDefinitionController.TableTypeInformationRows}" SelectedItem="{Binding Path=DbTableDefinitionController.SelectedTypeInformationRow}">
             <DataGrid.Resources>
                 <local:IndexConverter x:Key="IndexConverter" />
             </DataGrid.Resources>
@@ -27,6 +36,10 @@
                     <MenuItem 
                         Header="Add Field" 
                         Command="{Binding DbTableDefinitionController.CreateNewDbDefinitionCommand}" />
+
+                    <MenuItem 
+                        Header="Deselect" 
+                        Command="{Binding DbTableDefinitionController.DeselectCommand}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
 

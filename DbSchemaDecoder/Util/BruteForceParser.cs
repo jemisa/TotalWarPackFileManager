@@ -27,6 +27,8 @@ namespace DbSchemaDecoder.Util
             };
         }
 
+        
+
         public List<string> BruteForce(DataBaseFile dataBaseFile, int maxNumberOfFields)
         {
             var possibleSchamaList = new List<string>();

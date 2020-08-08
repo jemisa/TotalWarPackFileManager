@@ -48,6 +48,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\BruteForceController.cs" />
     <Compile Include="Controllers\NextItemController.cs" />
     <Compile Include="Util\BruteForceParser.cs" />
     <Compile Include="Util\DataGridEx.cs" />
@@ -65,6 +66,9 @@
     <Compile Include="Views\DisplayTableDefinitionView\DbParsedEntitiesTableView.xaml.cs">
       <DependentUpon>DbParsedEntitiesTableView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EditTableDefinitionView\BruteForceView.xaml.cs">
+      <DependentUpon>BruteForceView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditTableDefinitionView\EditTableDefinitionView.xaml.cs">
       <DependentUpon>EditTableDefinitionView.xaml</DependentUpon>
     </Compile>
@@ -75,6 +79,10 @@
       <DependentUpon>TableDefinitionView.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\DisplayTableDefinitionView\DbParsedEntitiesTableView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditTableDefinitionView\BruteForceView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

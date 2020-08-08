@@ -15,10 +15,6 @@
         <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[4], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
         <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[5], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
         <local:DbTypeInstanceView DataContext="{Binding Path=NextItemController.Items[6], UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"  VerticalAlignment="Center"></local:DbTypeInstanceView>
-
-        <Button Content="&lt;&lt;"  HorizontalAlignment="Left" Click="Button_Click"></Button>
-        <Button Content="&lt;"  HorizontalAlignment="Left" Margin="34,0,0,-1"></Button>
-        <Button Content="&gt;"  HorizontalAlignment="Right"></Button>
-        <Label  Content="{Binding Path=NextItemController.CustomDisplayText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+        <Label Content="{Binding Path=NextItemController.HelperText, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top"></Label>
     </DockPanel>
 </UserControl>
