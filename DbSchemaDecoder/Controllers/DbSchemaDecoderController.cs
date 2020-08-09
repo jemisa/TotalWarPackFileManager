@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
@@ -24,7 +26,7 @@ namespace DbSchemaDecoder.Controllers
             public int Length { get; set; }
         }
     };*/
-
+  
     class DbSchemaDecoderController : NotifyPropertyChangedImpl
     {
         public DbTableViewModel DbTableViewModel { get; set; } = new DbTableViewModel();
@@ -58,6 +60,10 @@ namespace DbSchemaDecoder.Controllers
 
         public DbSchemaDecoderController(FileListController fileListController, DataGridItemSourceUpdater dbTableItemSourceUpdater)
         {
+
+
+
+
             _tableEntriesParser = new TableEntriesUpdater(dbTableItemSourceUpdater, DbTableViewModel);
             fileListController.OnFileSelectedEvent += OnDbFileSelected;
             TestValue = "MyString is cool";
@@ -71,6 +77,8 @@ namespace DbSchemaDecoder.Controllers
             DbTableDefinitionController.OnDefinitionChangedEvent += DbTableDefinitionController_OnDefinitionChangedEvent;
             DbTableDefinitionController.OnSelectedRowChangedEvent += DbTableDefinitionController_OnSelectedRowChangedEvent;
             NextItemController.OnNewDefinitionCreated += DbTableDefinitionController.AppendRowOfTypeEventHandler;
+
+            BruteForceController.OnNewDefinitionApplied += (s, a) => { DbTableDefinitionController.Set(a); };
         }
 
         private void DbTableDefinitionController_OnSelectedRowChangedEvent(object sender, FieldInfoViewModel e)
@@ -289,8 +297,8 @@ namespace DbSchemaDecoder.Controllers
                     var entry = currentTableInof.First();
                     int maxNumberOfFields = entry.Fields.Count();
 
-                    var c = new BruteForceParser();
-                    c.BruteForce(_selectedFile, maxNumberOfFields);
+                    //var c = new BruteForceParser();
+                    //c.BruteForce(_selectedFile, maxNumberOfFields);
                 }
             }
             catch (Exception e)
@@ -331,8 +339,16 @@ namespace DbSchemaDecoder.Controllers
             ParseDatabaseFile(e);
             DbTableDefinitionController.LoadCurrentTableDefinition(e.TableType, _currentVersion);
             LoadCaSchemaDefinition(e.TableType);
-            _tableEntriesParser.Update(e, DbTableDefinitionController.TableTypeInformationRows.Select(x=>x.GetFieldInfo()).ToList());
+            //_tableEntriesParser.Update(e, DbTableDefinitionController.TableTypeInformationRows.Select(x=>x.GetFieldInfo()).ToList());
             NextItemController.Update(_selectedFile, DbTableDefinitionController.TableTypeInformationTypes, DbTableDefinitionController.SelectedTypeInformationRow);
+
+
+
+            BruteForceController.SelectedFile = e;
+            BruteForceController.TabelCount = DbTableDefinitionController.TableTypeInformationTypes.Count();
+
+
+
         }
 
         

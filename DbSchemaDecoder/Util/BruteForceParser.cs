@@ -14,6 +14,16 @@ namespace DbSchemaDecoder.Util
 {
     class BruteForceParser
     {
+        public class StatusUpdate
+        {
+            public int computedPermutations { get; set; }
+            public int skippedEarlyPermutations { get; set; }
+        }
+
+        public event EventHandler<StatusUpdate> OnParsingCompleteEvent;
+        public event EventHandler<FieldParserEnum[]> OnCombintionFoundEvent;
+        public event EventHandler<StatusUpdate> OnStatusUpdateEvent;
+
         FieldParserEnum[] GetPossibleFields()
         {
             return new FieldParserEnum[]
@@ -27,68 +37,119 @@ namespace DbSchemaDecoder.Util
             };
         }
 
-        
+        DataBaseFile _file;
+        int _maxNumberOfFields;
 
-        public List<string> BruteForce(DataBaseFile dataBaseFile, int maxNumberOfFields)
+        MemoryStream _permutationStream;
+        BinaryReader _permutationReader;
+        int _headerLength;
+        int _HeaderEntryCount;
+
+
+        public int PossibleCombinations { get { return (int)Math.Pow(_maxNumberOfFields, GetPossibleFields().Count()); } }
+        public List<FieldParserEnum[]> PossiblePermutations { get; set; } = new List<FieldParserEnum[]>();
+
+        public BruteForceParser(DataBaseFile dataBaseFile, int maxNumberOfFields)
         {
-            var possibleSchamaList = new List<string>();
-            var permutationTimer = new Stopwatch();
-            var tableValidationTimer = new Stopwatch();
-            var possibleMutations = Math.Pow(maxNumberOfFields, 6);
-            int actuallPossibleMutations = 0;
+            _file = dataBaseFile;
+            _maxNumberOfFields = maxNumberOfFields;
 
-            using (var stream = new MemoryStream(dataBaseFile.DbFile.Data))
-            {
-                using (var reader = new BinaryReader(stream))
-                {
-                    DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+            _permutationStream = new MemoryStream(_file.DbFile.Data);
+            _permutationReader = new BinaryReader(_permutationStream);
 
-                    permutationTimer.Start();
-
-                    var states = GetPossibleFields();
-                    PermutationHelper helper = new PermutationHelper();
-                    helper.ComputePermutations(reader, new FieldParserEnum[maxNumberOfFields], states, 0, header.Length, maxNumberOfFields);
-                    actuallPossibleMutations = helper.Result.Count();
-                    
-                    permutationTimer.Stop();
-
-                  
-
-                    tableValidationTimer.Start();
-                    for (int i = 0; i < helper.Result.Count(); i++)
-                    {
-                        var possibleSchema = helper.Result[i].Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
-                        reader.BaseStream.Position = header.Length;
-
-                        TableEntriesParser p = new TableEntriesParser();
-                        var updateRes = p.CanParseTable(
-                            reader,
-                            stream.Capacity,
-                            possibleSchema,
-                            (int)header.EntryCount);
-
-                        if (!updateRes.HasError)
-                        {
-                            var nameList = helper.Result[i].Select(x => FieldParser.CreateFromEnum(x).InstanceName()).ToList();
-                            possibleSchamaList.Add(string.Join(", ", nameList));
-                        }
-                    }
-                    tableValidationTimer.Stop();
-
-                }
-            }
-
-            return possibleSchamaList;
+            DBFileHeader header = PackedFileDbCodec.readHeader(_permutationReader);
+            _headerLength = header.Length;
+            _HeaderEntryCount = (int)header.EntryCount;
         }
+
+
+
+        public void Compute()
+        {
+            PermutationHelper permutationHelper = new PermutationHelper(OnEvaluatePermutation, OnUpdateStatus);
+            permutationHelper.ComputePermutations(
+                _permutationReader, 
+                new FieldParserEnum[_maxNumberOfFields], 
+                GetPossibleFields(), 
+                0,
+                _headerLength,
+                _maxNumberOfFields);
+
+            _permutationReader.Dispose();
+            _permutationStream.Dispose();
+
+            
+            StatusUpdate update = new StatusUpdate()
+            { 
+                computedPermutations = permutationHelper.computedPermutations,
+                skippedEarlyPermutations = permutationHelper.skippedEarlyPermutations 
+            };
+            OnParsingCompleteEvent?.Invoke(this, update);
+        }
+
+        void OnEvaluatePermutation(FieldParserEnum[] combination)
+        {
+            var possibleSchema = combination.Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
+            _permutationReader.BaseStream.Position = _headerLength;
+
+            TableEntriesParser p = new TableEntriesParser();
+            var updateRes = p.CanParseTable(
+                _permutationReader,
+                _permutationStream.Capacity,
+                possibleSchema,
+                _HeaderEntryCount);
+
+            if (!updateRes.HasError)
+            {
+                UpdatePossiblePermutation(combination);
+            }
+        }
+
+        void OnUpdateStatus(int computedPermutations, int skippedEarlyPermutations)
+        {
+            StatusUpdate update = new StatusUpdate() 
+            { computedPermutations = computedPermutations, skippedEarlyPermutations = skippedEarlyPermutations };
+            OnStatusUpdateEvent?.Invoke(this, update);
+        }
+
+        void UpdatePossiblePermutation(FieldParserEnum[] combination)
+        {
+            PossiblePermutations.Add(combination);
+            OnCombintionFoundEvent?.Invoke(this, combination);
+        }
+
 
         class PermutationHelper
         {
-            public List<FieldParserEnum[]> Result { get; set; } = new List<FieldParserEnum[]>();
+            public List<FieldParserEnum[]> Results { get; set; } = new List<FieldParserEnum[]>();
+
+            public delegate void OnCombintionFoundDelegate(FieldParserEnum[] combination);
+            public delegate void OnUpdateStatusDelegate(int computedPermutations, int skippedEarlyPermutations);
+
+            OnCombintionFoundDelegate _evaluateCallback;
+            OnUpdateStatusDelegate _statusCallback;
+            public PermutationHelper(OnCombintionFoundDelegate callback, OnUpdateStatusDelegate statusCallback)
+            {
+                _evaluateCallback = callback;
+                _statusCallback = statusCallback;
+            }
+
+            public int computedPermutations { get; set; } = 0;
+            public  int skippedEarlyPermutations { get; set; } = 0;           
+            void UpdateStatus(int updateVariable)
+            {
+                if (updateVariable % 10000 == 0)
+                    _statusCallback(computedPermutations, skippedEarlyPermutations);
+            }
             public void ComputePermutations(BinaryReader reader, FieldParserEnum[] n, FieldParserEnum[] states, int idx, long streamOffset, int maxNumberOfFields)
             {
                 if (idx == n.Length)
                 {
-                    Result.Add(n.Select(x => x).ToArray());
+                    var newItem = n.Select(x => x).ToArray();
+                    Results.Add(newItem);
+                    _evaluateCallback(newItem);
+                    computedPermutations++;
+                    UpdateStatus(computedPermutations);
                     return;
                 }
                 for (int i = 0; i < states.Length; i++)
@@ -100,6 +161,11 @@ namespace DbSchemaDecoder.Util
                     {
                         n[idx] = currentState;
                         ComputePermutations(reader, n, states, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
+                    }
+                    else
+                    {
+                        skippedEarlyPermutations++;
+                        UpdateStatus(skippedEarlyPermutations);
                     }
 
                 }

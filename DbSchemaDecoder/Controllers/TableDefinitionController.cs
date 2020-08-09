@@ -92,18 +92,26 @@ namespace DbSchemaDecoder.Controllers
         public void LoadCurrentTableDefinition(string tableName, int currentVersion)
         {
             var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
-            TableTypeInformationRows.Clear();
+
 
             var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == currentVersion);
             if (fieldCollection == null)
                 return;
 
-            for (int i = 0; i < fieldCollection.Fields.Count(); i++)
+            Set(fieldCollection.Fields);
+            
+        }
+
+        public void Set(List<FieldInfo> fields)
+        {
+            TableTypeInformationRows.Clear();
+            for (int i = 0; i < fields.Count(); i++)
             {
-                var newFieldInfoViewModel = new FieldInfoViewModel(fieldCollection.Fields[i], i + 1);
+                var newFieldInfoViewModel = new FieldInfoViewModel(fields[i], i + 1);
                 newFieldInfoViewModel.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;
                 TableTypeInformationRows.Add(newFieldInfoViewModel);
             }
+            OnDefinitionChanged();
         }
 
         private void NewFieldInfoViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -176,7 +184,11 @@ namespace DbSchemaDecoder.Controllers
         void RecomputeIndexes()
         {
             for (int i = 0; i < TableTypeInformationRows.Count; i++)
+            {
                 TableTypeInformationRows[i].SetIndex(i + 1);
+                if (TableTypeInformationRows[i].Name == "unknown")
+                    TableTypeInformationRows[i].Name = "unknown_" + i;
+            }
         }
 
         public void AppendRowOfTypeEventHandler(object e, DbTypesEnum type)

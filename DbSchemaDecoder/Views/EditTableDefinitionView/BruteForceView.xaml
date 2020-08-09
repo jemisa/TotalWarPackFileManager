@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DbSchemaDecoder.Views.EditTableDefinitionView"
+             xmlns:local="clr-namespace:DbSchemaDecoder.Views.EditTableDefinitionView" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -20,26 +20,66 @@
             <RadioButton GroupName="BruteType">Real brute force (slow for large tables)</RadioButton>
             <StackPanel Orientation="Horizontal">
                 <Label Content="No. Table Columns:"/>
-                <TextBox Height="15" Width="30" Text="30" HorizontalAlignment="Left"></TextBox>
+                <TextBox Height="15" Width="30" HorizontalAlignment="Left" Text="{Binding Path=BruteForceController.ColumnCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </StackPanel>
-            <Button Content="Calculate" Width="100" ></Button>
+            <Button Content="Calculate" Width="100" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
         </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
-                <Label Content="Total possible combinations:"></Label>
-                <Label Content="Evaluated combinations:"></Label>
+                <Label >
+                    <TextBlock>
+                        <Run Text="Total possible combinations: "/>
+                        <Run Text="{Binding Path=BruteForceController.TotalPossibleCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label Content="Possible combinations found:"></Label>
-                <Label Content="Early skipped:"></Label>
-                <Label Content="Run time:"></Label>
+                <Label >
+                    <TextBlock>
+                        <Run Text="Total possible combinations: "/>
+                        <Run Text="{Binding Path=BruteForceController.TotalPossibleCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
+                <Label>
+                    <TextBlock>
+                        <Run Text="Possible combinations found:"/>
+                        <Run Text="{Binding Path=BruteForceController.PossibleCombinationsFound, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+
+
+                </Label>
+                <Label>
+                    <TextBlock>
+                        <Run Text="Run time:"/>
+                        <Run Text="{Binding Path=BruteForceController.RunTime, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
+                <Label >
+                    <TextBlock>
+                        <Run Text="Status:"/>
+                        <Run Text="{Binding Path=BruteForceController.RunningStatus, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,10,0">
                 <Button Content="Cancel" Width="100" Margin="-10,0,0,0"></Button>
                 <Button Content="Help" Width="100" Margin="10,0,0,0"></Button>
+                <Button Content="Save" Width="100" Margin="10,0,0,0" Command="{Binding BruteForceController.SaveResultCommand}"></Button>
             </StackPanel>
         </StackPanel>
-        <ListView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+        <ListView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" x:Name="listView1"
+                  ItemsSource="{Binding BruteForceController.Values}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding BruteForceController.OnClickCommand}" CommandParameter="{Binding ElementName=listView1,Path=SelectedItem}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <ListView.View>
+                <GridView x:Name="grdTest">
+                    <GridViewColumn Header="Idx" DisplayMemberBinding="{Binding Idx}"  Width="auto"/>
+                    <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}"  Width="auto"/>
+                </GridView>
+            </ListView.View>
         </ListView>
         
        

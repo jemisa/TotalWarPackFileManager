@@ -409,7 +409,9 @@ namespace Filetypes {
 		public BoolType () {
 			TypeName = "boolean";
 			TypeCode = TypeCode.Boolean;
-		}
+            TypeEnum = DbTypesEnum.Boolean;
+
+        }
         public override FieldInstance CreateInstance() {
             return new BoolField() {
                 Name = this.Name,
