@@ -22,31 +22,55 @@
                 <Label Content="No. Table Columns:"/>
                 <TextBox Height="15" Width="30" HorizontalAlignment="Left" Text="{Binding Path=BruteForceController.ColumnCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </StackPanel>
-            <Button Content="Calculate" Width="100" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
+            <Button Content= "{Binding Path=BruteForceController.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"   Width="100" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
         </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Label >
                     <TextBlock>
-                        <Run Text="Total possible combinations: "/>
+                        <Run Text="Possible combinations: "/>
                         <Run Text="{Binding Path=BruteForceController.TotalPossibleCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
+                <Label >
+                        <TextBlock>
+                        <Run Text="Evaluated: "/>
+                        <Run Text="{Binding Path=BruteForceController.EvaluatedCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
+
+                <Label >
+                    <TextBlock>
+                        <Run Text="Skipped: "/>
+                        <Run Text="{Binding Path=BruteForceController.SkippedEarlyCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
+                <Label >
+                    <TextBlock>
+                        <Run Text="Possible first rows: "/>
+                        <Run Text="{Binding Path=BruteForceController.PossibleFirstRpws, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
+                <Label>
+                    <TextBlock>
+                        <Run Text="Found:"/>
+                        <Run Text="{Binding Path=BruteForceController.PossibleCombinationsFound, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBlock>
+                </Label>
                 <Label >
                     <TextBlock>
-                        <Run Text="Total possible combinations: "/>
-                        <Run Text="{Binding Path=BruteForceController.TotalPossibleCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="Per Sec: "/>
+                        <Run Text="{Binding Path=BruteForceController.ComputedPerSec, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
+
                 </Label>
                 <Label>
                     <TextBlock>
-                        <Run Text="Possible combinations found:"/>
-                        <Run Text="{Binding Path=BruteForceController.PossibleCombinationsFound, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="Estimated runtime: "/>
+                        <Run Text="{Binding Path=BruteForceController.EstimatedRunTime, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
-
-
                 </Label>
                 <Label>
                     <TextBlock>

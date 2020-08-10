@@ -5,8 +5,10 @@ using GalaSoft.MvvmLight.Threading;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +19,6 @@ namespace DbSchemaDecoder.Controllers
 {
     class BruteForceController : NotifyPropertyChangedImpl
     {
-
         public class ItemView
         {
             public List<FieldParserEnum> Enums { get; set; }
@@ -48,6 +49,7 @@ namespace DbSchemaDecoder.Controllers
             _timer.Elapsed += _timer_Elapsed;
             _timer.AutoReset = true;
             RunningStatus = "Not run";
+            CalculateButtonText = "Calculate";
         }
 
         void OnClickFunc(ItemView clickedItem)
@@ -59,8 +61,8 @@ namespace DbSchemaDecoder.Controllers
         }
         private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            var t = e.SignalTime - _startTime;
-            RunTime = (int)t.TotalSeconds + "s"; 
+            var runTimeSec = (e.SignalTime - _startTime).TotalSeconds;
+            Update(runTimeSec);
         }
 
         public DataBaseFile SelectedFile { get; set; }
@@ -78,17 +80,22 @@ namespace DbSchemaDecoder.Controllers
         }
         void BruteForce(DataBaseFile file, int count)
         {
-            Values.Clear();
-            _startTime = DateTime.Now;
-            _timer.Start();
-            RunTime = "";
-            RunningStatus = "Running";
-            TotalPossibleCombinations = "0";
-
             if (_threadHandle == null)
             {
+                Values.Clear();
+                _startTime = DateTime.Now;
+                _timer.Start();
+                RunTime = "";
+                RunningStatus = "Running";
+                TotalPossibleCombinations = "";
+                EvaluatedCombinations = "";
+                SkippedEarlyCombinations = "";
+                ComputedPerSec = "";
+                PossibleFirstRpws = "";
+                CalculateButtonText = "Cancel";
+
                 _bruteForceparser = new BruteForceParser(file, count);
-                TotalPossibleCombinations = _bruteForceparser.PossibleCombinations.ToString();
+                TotalPossibleCombinations = _bruteForceparser.PossibleCombinations.ToString("N0");
 
 
                 _bruteForceparser.OnParsingCompleteEvent += ComputationDoneEventHandler;
@@ -99,9 +106,8 @@ namespace DbSchemaDecoder.Controllers
             }
             else
             {
-                _threadHandle.Abort();
-                _threadHandle = null;
-                BruteForce(file, count);
+                Cancel();
+            
             }
         }
         void CombinationFoundEventHandler(object sender, FieldParserEnum[] val)
@@ -125,10 +131,49 @@ namespace DbSchemaDecoder.Controllers
         void ComputationDoneEventHandler(object sender, BruteForceParser.StatusUpdate update)
         {
             RunningStatus = "Done";
+            CalculateButtonText = "Calculate";
+            var runTimeSec = (DateTime.Now - _startTime).TotalSeconds;
             _timer.Stop();
-            RunTime = (DateTime.Now - _startTime).TotalSeconds + "s";
+
+            Update(runTimeSec);
         }
 
+        void Update(double runTimeSec)
+        {
+            RunTime = (int)runTimeSec + "s";
+
+            EvaluatedCombinations =  _bruteForceparser.EvaluatedCombinations.ToString("N0");
+            SkippedEarlyCombinations =  _bruteForceparser.SkippedEarlyCombinations.ToString("N0");
+
+            var bigIntTime = new BigInteger(runTimeSec);
+            if (bigIntTime == 0)
+                bigIntTime = 1;
+            ComputedPerSec = (_bruteForceparser.EvaluatedCombinations / bigIntTime).ToString("N0");
+            PossibleFirstRpws =  _bruteForceparser.PossibleFirstRows.ToString("N0");
+
+   
+            BigFloat bigFloatEvaluatedCombinations = new BigFloat(_bruteForceparser.EvaluatedCombinations);
+            BigFloat bigFloatTotal = new BigFloat(_bruteForceparser.PossibleCombinations);
+
+   
+
+
+            var ar = ((bigFloatEvaluatedCombinations / bigFloatTotal) * 100).ToString().Take(5).ToArray();
+            string firstFivChar = new string(ar);
+            EstimatedRunTime = firstFivChar + "%";
+        }
+
+        public void Cancel()
+        {
+            if (_threadHandle != null)
+            {
+                _threadHandle.Abort();
+                _threadHandle = null;
+                CalculateButtonText = "Calculate";
+                RunningStatus = "Stopped";
+                _timer.Stop();
+            }
+        }
 
 
 
@@ -188,6 +233,71 @@ namespace DbSchemaDecoder.Controllers
         }
 
 
+        string _evaluatedCombinations;
+        public string EvaluatedCombinations
+        {
+            get { return _evaluatedCombinations; }
+            set
+            {
+                _evaluatedCombinations = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _skippedEarlyCombinations;
+        public string SkippedEarlyCombinations
+        {
+            get { return _skippedEarlyCombinations; }
+            set
+            {
+                _skippedEarlyCombinations = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _computedPerSec;
+        public string ComputedPerSec
+        {
+            get { return _computedPerSec; }
+            set
+            {
+                _computedPerSec = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _possibleFirstRpws;
+        public string PossibleFirstRpws
+        {
+            get { return _possibleFirstRpws; }
+            set
+            {
+                _possibleFirstRpws = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _estimatedRunTime;
+        public string EstimatedRunTime
+        {
+            get { return _estimatedRunTime; }
+            set
+            {
+                _estimatedRunTime = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _calculateButtonText;
+        public string CalculateButtonText
+        {
+            get { return _calculateButtonText; }
+            set
+            {
+                _calculateButtonText = value;
+                NotifyPropertyChanged();
+            }
+        }
 
     }
 

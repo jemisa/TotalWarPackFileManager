@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 
 namespace DbSchemaDecoder.Util
 {
@@ -24,6 +25,10 @@ namespace DbSchemaDecoder.Util
         public event EventHandler<FieldParserEnum[]> OnCombintionFoundEvent;
         public event EventHandler<StatusUpdate> OnStatusUpdateEvent;
 
+        public BigInteger EvaluatedCombinations { get { return _permutationHelper.computedPermutations; } }
+        public BigInteger SkippedEarlyCombinations { get { return _permutationHelper.skippedEarlyPermutations; } }
+        public BigInteger PossibleFirstRows { get { return _permutationHelper.PossibleFirstRows; } }
+        
         FieldParserEnum[] GetPossibleFields()
         {
             return new FieldParserEnum[]
@@ -46,9 +51,9 @@ namespace DbSchemaDecoder.Util
         int _HeaderEntryCount;
 
 
-        public int PossibleCombinations { get { return (int)Math.Pow(_maxNumberOfFields, GetPossibleFields().Count()); } }
+        public BigInteger PossibleCombinations { get { return BigInteger.Pow(GetPossibleFields().Count(), _maxNumberOfFields); } }
         public List<FieldParserEnum[]> PossiblePermutations { get; set; } = new List<FieldParserEnum[]>();
-
+        PermutationHelper _permutationHelper;
         public BruteForceParser(DataBaseFile dataBaseFile, int maxNumberOfFields)
         {
             _file = dataBaseFile;
@@ -66,8 +71,8 @@ namespace DbSchemaDecoder.Util
 
         public void Compute()
         {
-            PermutationHelper permutationHelper = new PermutationHelper(OnEvaluatePermutation, OnUpdateStatus);
-            permutationHelper.ComputePermutations(
+            _permutationHelper = new PermutationHelper(OnEvaluatePermutation);
+            _permutationHelper.ComputePermutations(
                 _permutationReader, 
                 new FieldParserEnum[_maxNumberOfFields], 
                 GetPossibleFields(), 
@@ -79,12 +84,7 @@ namespace DbSchemaDecoder.Util
             _permutationStream.Dispose();
 
             
-            StatusUpdate update = new StatusUpdate()
-            { 
-                computedPermutations = permutationHelper.computedPermutations,
-                skippedEarlyPermutations = permutationHelper.skippedEarlyPermutations 
-            };
-            OnParsingCompleteEvent?.Invoke(this, update);
+            OnParsingCompleteEvent?.Invoke(this, null);
         }
 
         void OnEvaluatePermutation(FieldParserEnum[] combination)
@@ -104,14 +104,6 @@ namespace DbSchemaDecoder.Util
                 UpdatePossiblePermutation(combination);
             }
         }
-
-        void OnUpdateStatus(int computedPermutations, int skippedEarlyPermutations)
-        {
-            StatusUpdate update = new StatusUpdate() 
-            { computedPermutations = computedPermutations, skippedEarlyPermutations = skippedEarlyPermutations };
-            OnStatusUpdateEvent?.Invoke(this, update);
-        }
-
         void UpdatePossiblePermutation(FieldParserEnum[] combination)
         {
             PossiblePermutations.Add(combination);
@@ -121,35 +113,25 @@ namespace DbSchemaDecoder.Util
 
         class PermutationHelper
         {
-            public List<FieldParserEnum[]> Results { get; set; } = new List<FieldParserEnum[]>();
-
             public delegate void OnCombintionFoundDelegate(FieldParserEnum[] combination);
-            public delegate void OnUpdateStatusDelegate(int computedPermutations, int skippedEarlyPermutations);
-
             OnCombintionFoundDelegate _evaluateCallback;
-            OnUpdateStatusDelegate _statusCallback;
-            public PermutationHelper(OnCombintionFoundDelegate callback, OnUpdateStatusDelegate statusCallback)
+ 
+            public PermutationHelper(OnCombintionFoundDelegate callback)
             {
                 _evaluateCallback = callback;
-                _statusCallback = statusCallback;
             }
 
-            public int computedPermutations { get; set; } = 0;
-            public  int skippedEarlyPermutations { get; set; } = 0;           
-            void UpdateStatus(int updateVariable)
-            {
-                if (updateVariable % 10000 == 0)
-                    _statusCallback(computedPermutations, skippedEarlyPermutations);
-            }
+            public BigInteger computedPermutations { get; set; } = 0;
+            public BigInteger skippedEarlyPermutations { get; set; } = 0;
+            public BigInteger PossibleFirstRows { get; set; } = 0;
             public void ComputePermutations(BinaryReader reader, FieldParserEnum[] n, FieldParserEnum[] states, int idx, long streamOffset, int maxNumberOfFields)
             {
                 if (idx == n.Length)
                 {
                     var newItem = n.Select(x => x).ToArray();
-                    Results.Add(newItem);
                     _evaluateCallback(newItem);
                     computedPermutations++;
-                    UpdateStatus(computedPermutations);
+                    PossibleFirstRows++;
                     return;
                 }
                 for (int i = 0; i < states.Length; i++)
@@ -164,8 +146,13 @@ namespace DbSchemaDecoder.Util
                     }
                     else
                     {
-                        skippedEarlyPermutations++;
-                        UpdateStatus(skippedEarlyPermutations);
+                        var totalCount = n.Count();
+
+                        var realCount = totalCount - idx - 1;
+                        var skippedCount = BigInteger.Pow(states.Length, realCount);
+           
+                        skippedEarlyPermutations += skippedCount;
+                        computedPermutations += skippedCount;
                     }
 
                 }
