@@ -20,35 +20,35 @@
             <RadioButton GroupName="BruteType">Real brute force (slow for large tables)</RadioButton>
             <StackPanel Orientation="Horizontal">
                 <Label Content="No. Table Columns:"/>
-                <TextBox Height="15" Width="30" HorizontalAlignment="Left" Text="{Binding Path=BruteForceController.ColumnCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <TextBox Height="15" Width="30" HorizontalAlignment="Left" Text="{Binding Path=BruteForceController.ViewModel.ColumnCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </StackPanel>
-            <Button Content= "{Binding Path=BruteForceController.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"   Width="100" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
+            <Button Content= "{Binding Path=BruteForceController.ViewModel.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"   Width="100" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
         </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Label >
                     <TextBlock>
                         <Run Text="Possible combinations: "/>
-                        <Run Text="{Binding Path=BruteForceController.TotalPossibleCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.TotalPossibleCombinations, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
                 <Label >
                         <TextBlock>
                         <Run Text="Evaluated: "/>
-                        <Run Text="{Binding Path=BruteForceController.EvaluatedCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.EvaluatedCombinations, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
 
                 <Label >
                     <TextBlock>
                         <Run Text="Skipped: "/>
-                        <Run Text="{Binding Path=BruteForceController.SkippedEarlyCombinations, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.SkippedEarlyCombinations, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
                 <Label >
                     <TextBlock>
                         <Run Text="Possible first rows: "/>
-                        <Run Text="{Binding Path=BruteForceController.PossibleFirstRpws, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.PossibleFirstRpws, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
             </StackPanel>
@@ -56,32 +56,32 @@
                 <Label>
                     <TextBlock>
                         <Run Text="Found:"/>
-                        <Run Text="{Binding Path=BruteForceController.PossibleCombinationsFound, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.PossibleCombinationsFound, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
                 <Label >
                     <TextBlock>
                         <Run Text="Per Sec: "/>
-                        <Run Text="{Binding Path=BruteForceController.ComputedPerSec, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.ComputedPerSec, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
 
                 </Label>
                 <Label>
                     <TextBlock>
                         <Run Text="Estimated runtime: "/>
-                        <Run Text="{Binding Path=BruteForceController.EstimatedRunTime, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.EstimatedRunTime, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
                 <Label>
                     <TextBlock>
                         <Run Text="Run time:"/>
-                        <Run Text="{Binding Path=BruteForceController.RunTime, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.RunTime, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
                 <Label >
                     <TextBlock>
                         <Run Text="Status:"/>
-                        <Run Text="{Binding Path=BruteForceController.RunningStatus, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.RunningStatus, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
             </StackPanel>
@@ -92,7 +92,7 @@
             </StackPanel>
         </StackPanel>
         <ListView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" x:Name="listView1"
-                  ItemsSource="{Binding BruteForceController.Values}">
+                  ItemsSource="{Binding BruteForceController.ViewModel.Values}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
                     <i:InvokeCommandAction Command="{Binding BruteForceController.OnClickCommand}" CommandParameter="{Binding ElementName=listView1,Path=SelectedItem}" />

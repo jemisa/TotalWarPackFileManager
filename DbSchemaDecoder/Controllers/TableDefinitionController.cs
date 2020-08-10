@@ -1,4 +1,5 @@
-﻿using DbSchemaDecoder.Util;
+﻿using DbSchemaDecoder.Models;
+using DbSchemaDecoder.Util;
 using Filetypes;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
@@ -12,47 +13,6 @@ using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
 {
-
-
-    class FieldInfoViewModel : NotifyPropertyChangedImpl
-    {
-
-        public int Index { get { return _index; } }
-        bool _use = true;
-        int _index;
-        public bool Use { get { return _use;  } set { _use = value;  NotifyPropertyChanged(); } }
-        public string Name { get { return _fieldInfo.Name; } set { _fieldInfo.Name = value; NotifyPropertyChanged(); } }
-        public DbTypesEnum Type 
-        { 
-            get { return _fieldInfo.TypeEnum; } 
-            set
-            {
-                var newInstance = Types.FromEnum(value);
-                newInstance.Name = _fieldInfo.Name;
-                newInstance.FieldReference = _fieldInfo.FieldReference;
-                newInstance.Optional = _fieldInfo.Optional;
-                newInstance.PrimaryKey = _fieldInfo.PrimaryKey;
-                _fieldInfo = newInstance;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public bool PrimaryKey { get { return _fieldInfo.PrimaryKey; } set { _fieldInfo.PrimaryKey = value; } }
-        public bool Optional { get { return _fieldInfo.Optional; } set { _fieldInfo.Optional = value; } }
-        public string ReferencedTable { get { return _fieldInfo.ReferencedTable; } }
-        public string ReferencedField { get { return _fieldInfo.ReferencedField; } set { _fieldInfo.ReferencedField = value; } }
-
-        public FieldInfoViewModel(FieldInfo info, int idx)
-        {
-            _index = idx;
-            _fieldInfo = info;
-        }
-
-        FieldInfo _fieldInfo;
-        public FieldInfo GetFieldInfo() { return _fieldInfo; }
-        public void SetIndex(int idx) { _index = idx; }
-    } 
-
     class DbTableDefinitionController : NotifyPropertyChangedImpl
     {
         public event EventHandler<List<FieldInfo>> OnDefinitionChangedEvent;
@@ -75,31 +35,39 @@ namespace DbSchemaDecoder.Controllers
         }
 
         public ICommand DbDefinitionRemovedCommand { get; private set; }
+        public ICommand DbDefinitionRemovedAllCommand { get; private set; }
         public ICommand DbDefinitionMovedUpCommand { get; private set; }
         public ICommand DbDefinitionMovedDownCommand { get; private set; }
         public ICommand CreateNewDbDefinitionCommand { get; private set; }
         public ICommand DeselectCommand { get; private set; }
+        public ICommand DbDefinitionReloadAllCommand { get; private set; }
+
+        string _currentTableName;
+        int _currentVersion;
 
         public DbTableDefinitionController()
         {
             DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
+            DbDefinitionRemovedAllCommand = new RelayCommand(OnDbDefinitionRemovedAll);
             DbDefinitionMovedUpCommand = new RelayCommand(OnDbDefinitionMovedUp);
             DbDefinitionMovedDownCommand = new RelayCommand(OnDbDefinitionMovedDown);
             CreateNewDbDefinitionCommand = new RelayCommand(OnCreateNewDbDefinitionCommand);
+            DbDefinitionReloadAllCommand = new RelayCommand(OnDefinitionReloadAll);
             DeselectCommand = new RelayCommand(OnDeselectCommand);
         }
 
         public void LoadCurrentTableDefinition(string tableName, int currentVersion)
         {
-            var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
+            _currentTableName = tableName;
+            _currentVersion = currentVersion;
 
+            var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
 
             var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == currentVersion);
             if (fieldCollection == null)
                 return;
 
             Set(fieldCollection.Fields);
-            
         }
 
         public void Set(List<FieldInfo> fields)
@@ -146,6 +114,13 @@ namespace DbSchemaDecoder.Controllers
             OnDefinitionChanged();
         }
 
+        private void OnDbDefinitionRemovedAll()
+        {
+            TableTypeInformationRows.Clear();
+            RecomputeIndexes();
+            OnDefinitionChanged();
+        }
+
         private void OnDbDefinitionMovedUp()
         {
             if (SelectedTypeInformationRow == null)
@@ -179,6 +154,11 @@ namespace DbSchemaDecoder.Controllers
         void OnDeselectCommand()
         {
             SelectedTypeInformationRow = null;
+        }
+        void OnDefinitionReloadAll()
+        {
+            if (!string.IsNullOrWhiteSpace(_currentTableName))
+                LoadCurrentTableDefinition(_currentTableName, _currentVersion);
         }
 
         void RecomputeIndexes()

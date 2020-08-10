@@ -51,6 +51,9 @@
   <ItemGroup>
     <Compile Include="Controllers\BruteForceController.cs" />
     <Compile Include="Controllers\NextItemController.cs" />
+    <Compile Include="Models\BruteForceViewModel.cs" />
+    <Compile Include="Models\FieldInfoViewModel.cs" />
+    <Compile Include="Util\BatchEvaluator.cs" />
     <Compile Include="Util\BruteForceParser.cs" />
     <Compile Include="Util\DataGridEx.cs" />
     <Compile Include="Util\FieldParser.cs" />

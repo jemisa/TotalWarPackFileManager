@@ -28,15 +28,17 @@
                         Header="Remove"
                         Command="{Binding DbTableDefinitionController.DbDefinitionRemovedCommand}" />
                     <MenuItem 
-                        Header="Move up" 
-                        Command="{Binding DbTableDefinitionController.DbDefinitionMovedUpCommand}" />
+                        Header="Remove All"
+                        Command="{Binding DbTableDefinitionController.DbDefinitionRemovedAllCommand}" />
+                    <Separator />
                     <MenuItem 
-                        Header="Move down" 
-                        Command="{Binding DbTableDefinitionController.DbDefinitionMovedDownCommand}" />
+                        Header="Reload" 
+                        Command="{Binding DbTableDefinitionController.DbDefinitionReloadAllCommand}" />
+                    <Separator />
                     <MenuItem 
                         Header="Add Field" 
                         Command="{Binding DbTableDefinitionController.CreateNewDbDefinitionCommand}" />
-
+                    <Separator />
                     <MenuItem 
                         Header="Deselect" 
                         Command="{Binding DbTableDefinitionController.DeselectCommand}" />

@@ -15,18 +15,10 @@ namespace DbSchemaDecoder.Util
 {
     class BruteForceParser
     {
-        public class StatusUpdate
-        {
-            public int computedPermutations { get; set; }
-            public int skippedEarlyPermutations { get; set; }
-        }
-
-        public event EventHandler<StatusUpdate> OnParsingCompleteEvent;
+        public event EventHandler OnParsingCompleteEvent;
         public event EventHandler<FieldParserEnum[]> OnCombintionFoundEvent;
-        public event EventHandler<StatusUpdate> OnStatusUpdateEvent;
-
-        public BigInteger EvaluatedCombinations { get { return _permutationHelper.computedPermutations; } }
-        public BigInteger SkippedEarlyCombinations { get { return _permutationHelper.skippedEarlyPermutations; } }
+        public BigInteger EvaluatedCombinations { get { return _permutationHelper.ComputedPermutations; } }
+        public BigInteger SkippedEarlyCombinations { get { return _permutationHelper.SkippedEarlyPermutations; } }
         public BigInteger PossibleFirstRows { get { return _permutationHelper.PossibleFirstRows; } }
         
         FieldParserEnum[] GetPossibleFields()
@@ -115,22 +107,23 @@ namespace DbSchemaDecoder.Util
         {
             public delegate void OnCombintionFoundDelegate(FieldParserEnum[] combination);
             OnCombintionFoundDelegate _evaluateCallback;
- 
+
+            public BigInteger ComputedPermutations { get; set; } = 0;
+            public BigInteger SkippedEarlyPermutations { get; set; } = 0;
+            public BigInteger PossibleFirstRows { get; set; } = 0;
             public PermutationHelper(OnCombintionFoundDelegate callback)
             {
                 _evaluateCallback = callback;
             }
 
-            public BigInteger computedPermutations { get; set; } = 0;
-            public BigInteger skippedEarlyPermutations { get; set; } = 0;
-            public BigInteger PossibleFirstRows { get; set; } = 0;
+
             public void ComputePermutations(BinaryReader reader, FieldParserEnum[] n, FieldParserEnum[] states, int idx, long streamOffset, int maxNumberOfFields)
             {
                 if (idx == n.Length)
                 {
                     var newItem = n.Select(x => x).ToArray();
                     _evaluateCallback(newItem);
-                    computedPermutations++;
+                    ComputedPermutations++;
                     PossibleFirstRows++;
                     return;
                 }
@@ -146,13 +139,11 @@ namespace DbSchemaDecoder.Util
                     }
                     else
                     {
-                        var totalCount = n.Count();
-
-                        var realCount = totalCount - idx - 1;
+                        var realCount = n.Count() - idx - 1;
                         var skippedCount = BigInteger.Pow(states.Length, realCount);
            
-                        skippedEarlyPermutations += skippedCount;
-                        computedPermutations += skippedCount;
+                        SkippedEarlyPermutations += skippedCount;
+                        ComputedPermutations += skippedCount;
                     }
 
                 }
