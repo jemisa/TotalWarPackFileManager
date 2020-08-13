@@ -60,21 +60,20 @@ namespace DbSchemaDecoder
             _mainController = new DbSchemaDecoderController(eventHub, dbTableItemSourceUpdater);
 
             // Hex stuff
-            eventHub.OnFileSelected += _fileListController_MyEvent;
+            eventHub.OnFileSelected += OnFileSelected;
 
             var parent = GetVisualChild(0);
             ControllerHelper.FindController<FileListView>(parent).DataContext = _fileListController;
-
             ControllerHelper.FindController<InformationView>(parent).DataContext = _mainController;
+            ControllerHelper.FindController<TableDefinitionView>(parent).DataContext = _mainController;
+            ControllerHelper.FindController<ConfigureTableRowsView>(parent).DataContext = _mainController;
+
             var dbParsedEntitiesTableView = ControllerHelper.FindController<DbParsedEntitiesTableView>(parent);
             dbParsedEntitiesTableView.DataContext = _mainController;
             dbTableItemSourceUpdater.Grid = dbParsedEntitiesTableView.DbEntriesViewDataGrid;
-
-            ControllerHelper.FindController<TableDefinitionView>(parent).DataContext = _mainController;
-            ControllerHelper.FindController<ConfigureTableRowsView>(parent).DataContext = _mainController;
         }
 
-        private void _fileListController_MyEvent(object sender, DataBaseFile e)
+        private void OnFileSelected(object sender, DataBaseFile e)
         {
             if (e != null)
             {
@@ -132,9 +131,6 @@ namespace DbSchemaDecoder
         {
             ToggleShowHide(TableAnalyticsRow);
         }
-
-
-
 
         void ToggleShowHide(RowDefinition rowDef)
         {

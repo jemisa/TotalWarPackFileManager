@@ -17,7 +17,6 @@ namespace DbSchemaDecoder.Controllers
 {
     class DbSchemaDecoderController : NotifyPropertyChangedImpl
     {
-
         public NextItemController NextItemController { get; set; }
         public DbTableDefinitionController DbTableDefinitionController { get; set; }
         public BruteForceController BruteForceController { get; set; }
