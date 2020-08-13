@@ -15,11 +15,6 @@ namespace DbSchemaDecoder.Controllers
 {
     class DbTableDefinitionController : NotifyPropertyChangedImpl
     {
-        public event EventHandler<List<FieldInfo>> OnDefinitionChangedEvent;
-        public event EventHandler<FieldInfoViewModel> OnSelectedRowChangedEvent;
-
-
-        public List<FieldInfo> TableTypeInformationTypes { get { return TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList(); } }
         public ObservableCollection<FieldInfoViewModel> TableTypeInformationRows { get; set; } = new ObservableCollection<FieldInfoViewModel>();
 
         FieldInfoViewModel _selectedTypeInformationRow;
@@ -29,7 +24,7 @@ namespace DbSchemaDecoder.Controllers
             set
             {
                 _selectedTypeInformationRow = value;
-                OnSelectedRowChangedEvent?.Invoke(this, _selectedTypeInformationRow);
+                _eventHub.TriggerOnSelectedDbSchemaRowChanged(this, _selectedTypeInformationRow);
                 NotifyPropertyChanged();
             }
         }
@@ -42,11 +37,20 @@ namespace DbSchemaDecoder.Controllers
         public ICommand DeselectCommand { get; private set; }
         public ICommand DbDefinitionReloadAllCommand { get; private set; }
 
-        string _currentTableName;
-        int _currentVersion;
+        string _currentTableName = null;
+        int _currentVersion = -1;
 
-        public DbTableDefinitionController()
+
+        EventHub _eventHub;
+        public DbTableDefinitionController(EventHub eventHub)
         {
+            _eventHub = eventHub;
+            _eventHub.OnSetDbSchema +=(sender, newSchema) => { Set(newSchema); };
+            _eventHub.OnFileSelected += _eventHub_OnFileSelected;
+            _eventHub.OnHeaderVersionChanged += _eventHub_OnHeaderVersionChanged;
+            _eventHub.OnNewDbSchemaRowCreated += AppendRowOfTypeEventHandler;
+
+
             DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
             DbDefinitionRemovedAllCommand = new RelayCommand(OnDbDefinitionRemovedAll);
             DbDefinitionMovedUpCommand = new RelayCommand(OnDbDefinitionMovedUp);
@@ -56,14 +60,32 @@ namespace DbSchemaDecoder.Controllers
             DeselectCommand = new RelayCommand(OnDeselectCommand);
         }
 
-        public void LoadCurrentTableDefinition(string tableName, int currentVersion)
+        private void _eventHub_OnHeaderVersionChanged(object sender, int e)
         {
-            _currentTableName = tableName;
-            _currentVersion = currentVersion;
+            if (_currentVersion != e)
+            {
+                _currentVersion = e;
+                LoadCurrentTableDefinition();
+            }
+        }
 
-            var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(tableName, currentVersion);
+        private void _eventHub_OnFileSelected(object sender, DataBaseFile e)
+        {
+            if (e.TableType != _currentTableName)
+            {
+                _currentTableName = e.TableType;
+                LoadCurrentTableDefinition();
+            }
+        }
 
-            var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == currentVersion);
+        void LoadCurrentTableDefinition()
+        {
+            if (_currentTableName == null || _currentVersion == -1)
+                return;
+
+            var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(_currentTableName, _currentVersion);
+
+            var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == _currentVersion);
             if (fieldCollection == null)
             {
                 Set(new List<FieldInfo>());
@@ -92,7 +114,7 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnDefinitionChanged()
         {
-            OnDefinitionChangedEvent?.Invoke(this, TableTypeInformationRows.Select(x=>x.GetFieldInfo()).ToList());
+            _eventHub.TriggerOnDbSchemaChanged(this, TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList());
         }
 
         private void OnCreateNewDbDefinitionCommand()
@@ -104,8 +126,6 @@ namespace DbSchemaDecoder.Controllers
             TableTypeInformationRows.Add(item);
             OnDefinitionChanged();
         }
-
-
 
         private void OnDbDefinitionRemoved()
         {
@@ -158,10 +178,11 @@ namespace DbSchemaDecoder.Controllers
         {
             SelectedTypeInformationRow = null;
         }
+
         void OnDefinitionReloadAll()
         {
             if (!string.IsNullOrWhiteSpace(_currentTableName))
-                LoadCurrentTableDefinition(_currentTableName, _currentVersion);
+                LoadCurrentTableDefinition();
         }
 
         void RecomputeIndexes()
@@ -174,16 +195,14 @@ namespace DbSchemaDecoder.Controllers
             }
         }
 
-        public void AppendRowOfTypeEventHandler(object e, DbTypesEnum type)
+        void AppendRowOfTypeEventHandler(object e, DbTypesEnum type)
         {
             var newType = Types.FromEnum(type);
             var newFieldInfoViewModel = new FieldInfoViewModel(newType, 99);
             newFieldInfoViewModel.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;
             TableTypeInformationRows.Add(newFieldInfoViewModel);
-
             
             RecomputeIndexes();
-
             OnDefinitionChanged();
         }
     }

@@ -9,7 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="300">
     <Grid>
         <ListView x:Name="FileListView1"  
-                  ItemsSource="{Binding FileList}" SelectedItem="{Binding SelectedItem}" 
+                  ItemsSource="{Binding ViewModel.FileList}" SelectedItem="{Binding SelectedItem}" 
                   Margin="0,0,0,50">
 
             <ListView.ItemContainerStyle>
@@ -38,7 +38,7 @@
         </ListView>
 
         <TextBox 
-            Text="{Binding Path=SearchFilter, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding Path=ViewModel.SearchFilter, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap" 
             HorizontalContentAlignment="Stretch" 
             Height="25" 
@@ -64,19 +64,19 @@
         
         <ToggleButton 
             Content="Only errors" 
-            IsChecked="{Binding OnlyShowTablesWithErrors, Mode=TwoWay}"
+            IsChecked="{Binding ViewModel.OnlyShowTablesWithErrors, Mode=TwoWay}"
             HorizontalAlignment="Right" 
             Margin="226,428,0,0" 
             VerticalAlignment="Bottom" 
             Width="74"
-            Command="{Binding OnlyShowTablesWithError}"/>
+            Command="{Binding OnlyShowTablesWithErrorCommand}"/>
 
         <Label  HorizontalAlignment="Left" Margin="0,425,0,0" VerticalAlignment="Bottom">
             <TextBlock>
                 <Run Text="Total Tables: "></Run>
-                <Run Text="{Binding TotalDbFiles}"/>
+                <Run Text="{Binding ViewModel.TotalDbFiles}"/>
                 <Run Text="   With error:"></Run>
-                <Run Text="{Binding DbFilesWithError}"/>
+                <Run Text="{Binding ViewModel.DbFilesWithError}"/>
             </TextBlock>
         </Label>
     </Grid>

@@ -7,10 +7,10 @@
              mc:Ignorable="d" Width="800" Height="75">
     <Grid>
         <ComboBox HorizontalAlignment="Left" Margin="52,0,0,0" VerticalAlignment="Top" Width="151" 
-                  ItemsSource="{Binding Path=SelectedFileHeaderInformation.Versions, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding Path=SelectedFileHeaderInformationController.ViewModel.Versions, UpdateSourceTrigger=PropertyChanged}"
                    DisplayMemberPath="DisplayValue"
                   SelectedValuePath="DisplayValue"
-                  SelectedValue="{Binding Path=SelectedFileHeaderInformation.SelectedVersion ,UpdateSourceTrigger=PropertyChanged}" />
+                  SelectedValue="{Binding Path=SelectedFileHeaderInformationController.ViewModel.SelectedVersion ,UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Content="Version:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
 
@@ -18,42 +18,42 @@
             HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Table Name: "/>
-                <Run Text="{Binding Path=SelectedFileHeaderInformation.TableName, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.TableName, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
         <Label 
             HorizontalAlignment="Left" Margin="0,50,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Header Size: "/>
-                <Run Text="{Binding Path=SelectedFileHeaderInformation.HeaderSize, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.HeaderSize, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
         <Label 
             HorizontalAlignment="Left" Margin="150,50,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Total bytes: "/>
-                <Run Text="{Binding Path=SelectedFileHeaderInformation.TotalSize, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.TotalSize, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
         <Label 
             HorizontalAlignment="Left" Margin="200,0,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Header Version: "/>
-                <Run Text="{Binding Path=SelectedFileHeaderInformation.Version, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.Version, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
         <Label 
             HorizontalAlignment="Left" Margin="300,50,0,0" VerticalAlignment="Top" >
             <TextBlock>
                 <Run Text="Expected Entries: "/>
-                <Run Text="{Binding Path=SelectedFileHeaderInformation.ExpectedEntries, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.ExpectedEntries, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
         <Label 
             HorizontalAlignment="Left" Margin="300,0,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Num Versions: "/>
-                <Run Text="{Binding Path=SelectedFileHeaderInformation.NumVersions, UpdateSourceTrigger=PropertyChanged}"/>
+                <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.NumVersions, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
         </Label>
 

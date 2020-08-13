@@ -145,7 +145,7 @@ namespace Filetypes {
         {
             if (reader.BaseStream.Length - reader.BaseStream.Position < 4)
             {
-                Value = "Not enough space in stream";
+                //Value = "Not enough space in stream";
                 return false;
             }
 
@@ -170,7 +170,7 @@ namespace Filetypes {
         {
             if (reader.BaseStream.Length - reader.BaseStream.Position < 2)
             {
-                Value = "Not enough space in stream";
+                //Value = "Not enough space in stream";
                 return false;
             }
 
@@ -195,7 +195,7 @@ namespace Filetypes {
         {
             if (reader.BaseStream.Length - reader.BaseStream.Position < 4)
             {
-                Value = "Not enough space in stream";
+                //Value = "Not enough space in stream";
                 return false;
             }
             Decode(reader);
@@ -225,7 +225,7 @@ namespace Filetypes {
         {
             if (reader.BaseStream.Length - reader.BaseStream.Position < 8)
             {
-                Value = "Not enough space in stream";
+                //Value = "Not enough space in stream";
                 return false;
             }
             Decode(reader);
@@ -263,7 +263,7 @@ namespace Filetypes {
         {
             if (reader.BaseStream.Length - reader.BaseStream.Position < 1)
             {
-                Value = "Not enough space in stream";
+                //Value = "Not enough space in stream";
                 return false;
             }
 

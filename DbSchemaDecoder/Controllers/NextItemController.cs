@@ -59,8 +59,6 @@ namespace DbSchemaDecoder.Controllers
     class NextItemController : NotifyPropertyChangedImpl
     {
         FieldInfoViewModel _selectedRowFieldItem;
-
-        public event EventHandler<DbTypesEnum> OnNewDefinitionCreated;
         
         string _helperText;
         public string HelperText
@@ -73,8 +71,12 @@ namespace DbSchemaDecoder.Controllers
             }
         }
 
+
+        EventHub _eventHub;
+        DataBaseFile _selectedFile;
+        List<FieldInfo> _dbSchemaDefinition;
         public List<NextItemControllerItem> Items { get; set; } = new List<NextItemControllerItem>();
-        public NextItemController()
+        public NextItemController(EventHub eventHub)
         {
             Create(DbTypesEnum.String_ascii);
             Create(DbTypesEnum.Optstring_ascii);
@@ -83,7 +85,13 @@ namespace DbSchemaDecoder.Controllers
             Create(DbTypesEnum.Integer);
             Create(DbTypesEnum.Float);
             Create(DbTypesEnum.Boolean);
+
+            _eventHub = eventHub;
+            _eventHub.OnFileSelected += (sender, file) => { _selectedFile = file; Update(); };
+            _eventHub.OnDbSchemaChanged += (sender, schama) => { _dbSchemaDefinition = schama; Update(); };
+            _eventHub.OnSelectedDbSchemaRowChanged += (sender, item) => { _selectedRowFieldItem = item; Update(); };
         }
+
 
         void Create(DbTypesEnum enumValue)
         {
@@ -112,17 +120,18 @@ namespace DbSchemaDecoder.Controllers
             if (_selectedRowFieldItem != null)
                 _selectedRowFieldItem.Type = val.EnumValue;
             else
-                OnNewDefinitionCreated?.Invoke(null, val.EnumValue);
+                _eventHub.TriggerNewDbSchemaRowCreated(this, val.EnumValue);
         }
 
-        public void Update( DataBaseFile baseFile, List<FieldInfo> fields, FieldInfoViewModel selectedRow)
+        void Update()
         {
-            _selectedRowFieldItem = selectedRow;
+            if (_dbSchemaDefinition == null || _selectedFile == null)
+                return;
+
             if (_selectedRowFieldItem != null)
             {
                 HelperText = $"Update type for field '{_selectedRowFieldItem.Name}' at Index '{_selectedRowFieldItem.Index}'";
                 Items.ForEach(x => x.ButtonText = "Update");
-
             }
             else
             {
@@ -130,18 +139,18 @@ namespace DbSchemaDecoder.Controllers
                 Items.ForEach(x => x.ButtonText = "Add");
             }
 
-            using (var stream = new MemoryStream(baseFile.DbFile.Data))
+            using (var stream = new MemoryStream(_selectedFile.DbFile.Data))
             {
                 using (var reader = new BinaryReader(stream))
                 {
                     DBFileHeader header = PackedFileDbCodec.readHeader(reader);
 
-                    var endIndex = fields.Count();
+                    var endIndex = _dbSchemaDefinition.Count();
                     if (_selectedRowFieldItem != null)
-                        endIndex = selectedRow.Index - 1;
+                        endIndex = _selectedRowFieldItem.Index - 1;
                     for (int i = 0; i < endIndex; i++)
                     {
-                        fields[i].CreateInstance().TryDecode(reader);
+                        _dbSchemaDefinition[i].CreateInstance().TryDecode(reader);
                     }
 
                     var refPos = reader.BaseStream.Position;

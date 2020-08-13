@@ -24,23 +24,27 @@ namespace DbSchemaDecoder.Controllers
             BruteForce,
             BruteForceUsingExistingTables
         };
+
         public BruteForceViewModel ViewModel { get; set; } = new BruteForceViewModel();
 
-        public event EventHandler<List<FieldInfo>> OnNewDefinitionApplied;
-        public DataBaseFile SelectedFile { get; set; }
-        public int TabelCount { set { ViewModel.ColumnCount = value; } }
-        public IEnumerable<CaSchemaEntry> CaSchemaEntryList { get; set; }
-
+        DataBaseFile _selectedFile;
+        List<CaSchemaEntry> _caSchemaEntryList;
         Thread _threadHandle;
         BruteForceParser _bruteForceparser;
         DateTime _startTime;
+        EventHub _eventHub;
+
         private readonly System.Timers.Timer _timer;
         public ICommand ComputeBruteForceCommand { get; private set; }
         public ICommand SaveResultCommand { get; private set; }
         public ICommand OnClickCommand { get; private set; }
-        public BruteForceController()
+
+        public BruteForceController(EventHub eventHub)
         {
-            
+            _eventHub = eventHub;
+            _eventHub.OnCaSchemaLoaded += _eventHub_OnCaSchemaLoaded;
+            _eventHub.OnFileSelected += (sender, file) => { _selectedFile = file; };
+
             ComputeBruteForceCommand = new RelayCommand(OnCompute);
             SaveResultCommand = new RelayCommand(OnSave);
             OnClickCommand = new RelayCommand<ItemView>(OnItemDoubleClicked);
@@ -52,26 +56,37 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.CalculateButtonText = "Calculate";
         }
 
+        private void _eventHub_OnCaSchemaLoaded(object sender, List<CaSchemaEntry> e)
+        {
+            _caSchemaEntryList = e;
+            ViewModel.ColumnCount = e.Count();
+        }
+
         void OnItemDoubleClicked(ItemView clickedItem)
         {
             var items = clickedItem.Enums.Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
             for (int i = 0; i < items.Count(); i++)
                 items[i].Name = "Unknown" + i;
-            OnNewDefinitionApplied(this, items);
+
+            _eventHub.TriggerSetDbSchema(this, items);
         }
+
         private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             var runTimeSec = (e.SignalTime - _startTime).TotalSeconds;
             Update(runTimeSec);
         }
+
         void OnCompute()
         {
-            BruteForce(SelectedFile, ViewModel.ColumnCount);
+            BruteForce(_selectedFile, ViewModel.ColumnCount);
         }
+
         void OnSave()
         {
             File.WriteAllLines(@"C:\temp\output.text", ViewModel.Values.Select(x => x.Value));
         }
+
         void BruteForce(DataBaseFile file, int count)
         {
             if (_threadHandle == null)
@@ -94,7 +109,7 @@ namespace DbSchemaDecoder.Controllers
                 if (bruteForceMethod == BruteForceCalculatorType.BruteForce)
                     combinationProvider = new AllCombinations();
                 else
-                    combinationProvider = new CaTableCombinations(CaSchemaEntryList);
+                    combinationProvider = new CaTableCombinations(_caSchemaEntryList);
 
                 _bruteForceparser = new BruteForceParser(file, combinationProvider, count);
                 ViewModel.TotalPossibleCombinations = _bruteForceparser.PossibleCombinations.ToString("N0");
@@ -109,10 +124,8 @@ namespace DbSchemaDecoder.Controllers
             else
             {
                 Cancel();
-            
             }
         }
-
 
         void CombinationFoundEventHandler(object sender, FieldParserEnum[] val)
         {
@@ -176,9 +189,5 @@ namespace DbSchemaDecoder.Controllers
                 _timer.Stop();
             }
         }
-
-
-
-
     }
 }

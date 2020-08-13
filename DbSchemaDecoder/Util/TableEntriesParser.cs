@@ -1,86 +1,13 @@
-﻿using DbSchemaDecoder.Controllers;
-using DbSchemaDecoder.Models;
-using Filetypes;
-using Filetypes.Codecs;
+﻿using Filetypes;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace DbSchemaDecoder.Util
 {
-    class TableEntriesUpdater
-    {
-        readonly DataGridItemSourceUpdater _dataGridUpdater;
-        readonly DbTableViewModel _viewModel;
-        readonly TableEntriesParser _parser = new TableEntriesParser();
-
-        public TableEntriesUpdater(DataGridItemSourceUpdater dataGridUpdater, DbTableViewModel viewModel)
-        {
-            _dataGridUpdater = dataGridUpdater;
-            _viewModel = viewModel;
-        }
-
-        public void Update(DataBaseFile baseFile, IEnumerable<FieldInfo> fields)
-        {
-            DataTable table = new DataTable();
-            _viewModel.ParseResult = "";
-            try
-            {
-                using (var stream = new MemoryStream(baseFile.DbFile.Data))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                        var parseResult = _parser.ParseTable(reader, stream.Capacity, fields.ToList(), (int)header.EntryCount);
-                        if (parseResult.HasError)
-                            _viewModel.ParseResult = parseResult.Error;
-
-                        try
-                        {
-                            if (parseResult.ColumnNames != null)
-                            {
-                                foreach (var columnName in parseResult.ColumnNames)
-                                    table.Columns.Add(columnName);
-
-                                if (parseResult.DataRows != null)
-                                {
-                                    foreach (var row in parseResult.DataRows)
-                                        table.Rows.Add(row);
-                                }
-                            }
-                        }
-                        catch
-                        { 
-                            
-                        }
-                       
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                _viewModel.ParseResult = $"Error:{e.Message}"; 
-            }
-            finally
-            {
-                if (_viewModel.ParseResult == "")
-                    _viewModel.ResultColour = new SolidColorBrush(Colors.LightGreen);
-                else
-                    _viewModel.ResultColour = new SolidColorBrush(Colors.Red);
-
-                _viewModel.EntityTable = table;
-                if(_dataGridUpdater != null)
-                    _dataGridUpdater.SetData(table);
-            }
-        }
-    }
-
     class TableEntriesParser
     {
         /// This function expects that the header of the file is already read!
@@ -119,7 +46,7 @@ namespace DbSchemaDecoder.Util
                 Content = new string[fieldsCount],
             };
 
-            for(int i = 0; i < fieldsCount; i++)
+            for (int i = 0; i < fieldsCount; i++)
             {
                 var parseResult = fields[i].TryDecode(reader);
                 result.Content[i] = fields[i].Value;
@@ -141,7 +68,7 @@ namespace DbSchemaDecoder.Util
                 var fieldInstances = fields.Select(x => x.CreateInstance()).ToArray();
                 for (int rowIndex = 0; rowIndex < expectedEntries; rowIndex++)
                 {
-                    foreach(var field in fieldInstances)
+                    foreach (var field in fieldInstances)
                     {
                         //string errorMessage = "";
                         var parseResult = field.TryDecode(reader);

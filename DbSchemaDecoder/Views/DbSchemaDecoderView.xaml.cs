@@ -51,13 +51,16 @@ namespace DbSchemaDecoder
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
+
+            EventHub eventHub = new EventHub();
+
             DataGridItemSourceUpdater dbTableItemSourceUpdater = new DataGridItemSourceUpdater();
 
-            _fileListController = new FileListController();
-            _mainController = new DbSchemaDecoderController(_fileListController, dbTableItemSourceUpdater);
+            _fileListController = new FileListController(eventHub);
+            _mainController = new DbSchemaDecoderController(eventHub, dbTableItemSourceUpdater);
 
             // Hex stuff
-            _fileListController.OnFileSelectedEvent += _fileListController_MyEvent;
+            eventHub.OnFileSelected += _fileListController_MyEvent;
 
             var parent = GetVisualChild(0);
             ControllerHelper.FindController<FileListView>(parent).DataContext = _fileListController;

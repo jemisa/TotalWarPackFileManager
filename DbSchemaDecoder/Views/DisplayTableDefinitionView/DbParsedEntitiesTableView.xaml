@@ -12,7 +12,7 @@
             Name="gridEmployees" VerticalContentAlignment="Stretch" Margin="0,0,0,17">
         </DataGrid>
         <Label
-            Content="{Binding Path=DbTableViewModel.ParseResult, UpdateSourceTrigger=PropertyChanged}"
-            Background="{Binding Path=DbTableViewModel.ResultColour, UpdateSourceTrigger=PropertyChanged}" Height="15" VerticalContentAlignment="Stretch" Padding="5,0" VerticalAlignment="Bottom"/>
+            Content="{Binding Path=TableEntriesController.ViewModel.ParseResult, UpdateSourceTrigger=PropertyChanged}"
+            Background="{Binding Path=TableEntriesController.ViewModel.ResultColour, UpdateSourceTrigger=PropertyChanged}" Height="15" VerticalContentAlignment="Stretch" Padding="5,0" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Models
 {
-    class SelectedFileHeaderInformation : NotifyPropertyChangedImpl
+    class SelectedFileHeaderInformationViewModel : NotifyPropertyChangedImpl
     {
         public void Update(DBFileHeader header, DataBaseFile item)
         {

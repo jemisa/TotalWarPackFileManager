@@ -50,24 +50,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\BruteForceController.cs" />
+    <Compile Include="Controllers\CaSchemaController.cs" />
     <Compile Include="Controllers\NextItemController.cs" />
+    <Compile Include="Controllers\SelectedFileHeaderInformationController.cs" />
     <Compile Include="Models\BruteForceViewModel.cs" />
+    <Compile Include="Models\DatabaseFileViewModel.cs" />
     <Compile Include="Models\FieldInfoViewModel.cs" />
     <Compile Include="Util\BatchEvaluator.cs" />
     <Compile Include="Util\BruteForceParser.cs" />
+    <Compile Include="Util\EventHub.cs" />
     <Compile Include="Util\RadioBoolToIntConverter.cs" />
     <Compile Include="Util\DataGridEx.cs" />
     <Compile Include="Util\FieldParser.cs" />
     <Compile Include="Controllers\TableDefinitionController.cs" />
     <Compile Include="Models\DbTableViewModel.cs" />
-    <Compile Include="Util\TableEntriesParser.cs" />
+    <Compile Include="Controllers\TableEntriesController.cs" />
     <Compile Include="Util\DataGridItemSourceUpdater.cs" />
     <Compile Include="Util\ControllerHelper.cs" />
-    <Compile Include="Models\SelectedFileHeaderInformation.cs" />
+    <Compile Include="Models\SelectedFileHeaderInformationViewModel.cs" />
     <Compile Include="Util\CaSchemaFileParser.cs" />
     <Compile Include="Controllers\DbSchemaDecoderController.cs" />
     <Compile Include="Controllers\FileListController.cs" />
     <Compile Include="Util\NotifyPropertyChangedImpl.cs" />
+    <Compile Include="Util\TableEntriesParser.cs" />
     <Compile Include="Views\DisplayTableDefinitionView\DbParsedEntitiesTableView.xaml.cs">
       <DependentUpon>DbParsedEntitiesTableView.xaml</DependentUpon>
     </Compile>
@@ -141,7 +146,7 @@
     <Compile Include="Views\InformationView.xaml.cs">
       <DependentUpon>InformationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\FileListModel.cs" />
+    <Compile Include="Models\FileListViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
