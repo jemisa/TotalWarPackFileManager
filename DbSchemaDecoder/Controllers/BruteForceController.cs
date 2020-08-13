@@ -15,22 +15,21 @@ using static DbSchemaDecoder.Models.BruteForceViewModel;
 
 namespace DbSchemaDecoder.Controllers
 {
-    
-
 
     class BruteForceController : NotifyPropertyChangedImpl
     {
-
-
+        public enum BruteForceCalculatorType
+        { 
+            BruteForceUsingCaSchama = 0,
+            BruteForce,
+            BruteForceUsingExistingTables
+        };
         public BruteForceViewModel ViewModel { get; set; } = new BruteForceViewModel();
-
-
-
 
         public event EventHandler<List<FieldInfo>> OnNewDefinitionApplied;
         public DataBaseFile SelectedFile { get; set; }
         public int TabelCount { set { ViewModel.ColumnCount = value; } }
-
+        public IEnumerable<CaSchemaEntry> CaSchemaEntryList { get; set; }
 
         Thread _threadHandle;
         BruteForceParser _bruteForceparser;
@@ -41,7 +40,7 @@ namespace DbSchemaDecoder.Controllers
         public ICommand OnClickCommand { get; private set; }
         public BruteForceController()
         {
-            DispatcherHelper.Initialize();
+            
             ComputeBruteForceCommand = new RelayCommand(OnCompute);
             SaveResultCommand = new RelayCommand(OnSave);
             OnClickCommand = new RelayCommand<ItemView>(OnItemDoubleClicked);
@@ -89,7 +88,15 @@ namespace DbSchemaDecoder.Controllers
                 ViewModel.PossibleFirstRpws = "";
                 ViewModel.CalculateButtonText = "Cancel";
 
-                _bruteForceparser = new BruteForceParser(file, count);
+                var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
+
+                IBruteForceCombinationProvider combinationProvider;
+                if (bruteForceMethod == BruteForceCalculatorType.BruteForce)
+                    combinationProvider = new AllCombinations();
+                else
+                    combinationProvider = new CaTableCombinations(CaSchemaEntryList);
+
+                _bruteForceparser = new BruteForceParser(file, combinationProvider, count);
                 ViewModel.TotalPossibleCombinations = _bruteForceparser.PossibleCombinations.ToString("N0");
 
 
@@ -105,6 +112,8 @@ namespace DbSchemaDecoder.Controllers
             
             }
         }
+
+
         void CombinationFoundEventHandler(object sender, FieldParserEnum[] val)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() =>

@@ -65,7 +65,10 @@ namespace DbSchemaDecoder.Controllers
 
             var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == currentVersion);
             if (fieldCollection == null)
+            {
+                Set(new List<FieldInfo>());
                 return;
+            }
 
             Set(fieldCollection.Fields);
         }

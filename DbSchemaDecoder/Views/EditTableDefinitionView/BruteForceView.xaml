@@ -3,9 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DbSchemaDecoder.Views.EditTableDefinitionView" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:local="clr-namespace:DbSchemaDecoder.Views.EditTableDefinitionView" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:util="clr-namespace:DbSchemaDecoder.Util"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <Control.Resources>
+        <util:RadioBoolToIntConverter x:Key="radioBoolToIntConverter" />
+    </Control.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230"></ColumnDefinition>
@@ -16,14 +20,15 @@
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="0" Grid.Row="0">
-            <RadioButton GroupName="BruteType">Brute force using CA Schema</RadioButton>
-            <RadioButton GroupName="BruteType">Real brute force (slow for large tables)</RadioButton>
+            <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=0}" GroupName="BruteType">Brute force using CA Schema</RadioButton>
+            <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" GroupName="BruteType">Real brute force (slow for large tables)</RadioButton>
+            <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" GroupName="BruteType">Append current model</RadioButton>
             <StackPanel Orientation="Horizontal">
                 <Label Content="No. Table Columns:"/>
                 <TextBox Height="15" Width="30" HorizontalAlignment="Left" Text="{Binding Path=BruteForceController.ViewModel.ColumnCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Button Content= "{Binding Path=BruteForceController.ViewModel.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"  Margin="10,0,0,0" Width="70" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
             </StackPanel>
-            <Button Content= "{Binding Path=BruteForceController.ViewModel.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"   Width="100" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
-        </StackPanel>
+           </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Label >

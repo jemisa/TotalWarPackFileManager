@@ -13,6 +13,8 @@ using System.Numerics;
 
 namespace DbSchemaDecoder.Util
 {
+
+
     class BruteForceParser
     {
         public event EventHandler OnParsingCompleteEvent;
@@ -20,7 +22,7 @@ namespace DbSchemaDecoder.Util
         public BigInteger EvaluatedCombinations { get { return _permutationHelper.ComputedPermutations; } }
         public BigInteger SkippedEarlyCombinations { get { return _permutationHelper.SkippedEarlyPermutations; } }
         public BigInteger PossibleFirstRows { get { return _permutationHelper.PossibleFirstRows; } }
-        
+
         FieldParserEnum[] GetPossibleFields()
         {
             return new FieldParserEnum[]
@@ -46,10 +48,12 @@ namespace DbSchemaDecoder.Util
         public BigInteger PossibleCombinations { get { return BigInteger.Pow(GetPossibleFields().Count(), _maxNumberOfFields); } }
         public List<FieldParserEnum[]> PossiblePermutations { get; set; } = new List<FieldParserEnum[]>();
         PermutationHelper _permutationHelper;
-        public BruteForceParser(DataBaseFile dataBaseFile, int maxNumberOfFields)
+        IBruteForceCombinationProvider _combinationProvider;
+        public BruteForceParser(DataBaseFile dataBaseFile, IBruteForceCombinationProvider combinationProvider, int maxNumberOfFields)
         {
             _file = dataBaseFile;
             _maxNumberOfFields = maxNumberOfFields;
+            _combinationProvider = combinationProvider;
 
             _permutationStream = new MemoryStream(_file.DbFile.Data);
             _permutationReader = new BinaryReader(_permutationStream);
@@ -58,16 +62,13 @@ namespace DbSchemaDecoder.Util
             _headerLength = header.Length;
             _HeaderEntryCount = (int)header.EntryCount;
         }
-
-
-
         public void Compute()
         {
             _permutationHelper = new PermutationHelper(OnEvaluatePermutation);
             _permutationHelper.ComputePermutations(
-                _permutationReader, 
-                new FieldParserEnum[_maxNumberOfFields], 
-                GetPossibleFields(), 
+                _permutationReader,
+                new FieldParserEnum[_maxNumberOfFields],
+                _combinationProvider,
                 0,
                 _headerLength,
                 _maxNumberOfFields);
@@ -75,7 +76,7 @@ namespace DbSchemaDecoder.Util
             _permutationReader.Dispose();
             _permutationStream.Dispose();
 
-            
+
             OnParsingCompleteEvent?.Invoke(this, null);
         }
 
@@ -102,52 +103,121 @@ namespace DbSchemaDecoder.Util
             OnCombintionFoundEvent?.Invoke(this, combination);
         }
 
+    }
 
-        class PermutationHelper
+    class PermutationHelper
+    {
+        public delegate void OnCombintionFoundDelegate(FieldParserEnum[] combination);
+        OnCombintionFoundDelegate _evaluateCallback;
+        public BigInteger ComputedPermutations { get; set; } = 0;
+        public BigInteger SkippedEarlyPermutations { get; set; } = 0;
+        public BigInteger PossibleFirstRows { get; set; } = 0;
+        public PermutationHelper(OnCombintionFoundDelegate callback)
         {
-            public delegate void OnCombintionFoundDelegate(FieldParserEnum[] combination);
-            OnCombintionFoundDelegate _evaluateCallback;
+            _evaluateCallback = callback;
+        }
 
-            public BigInteger ComputedPermutations { get; set; } = 0;
-            public BigInteger SkippedEarlyPermutations { get; set; } = 0;
-            public BigInteger PossibleFirstRows { get; set; } = 0;
-            public PermutationHelper(OnCombintionFoundDelegate callback)
+        public void ComputePermutations(BinaryReader reader, FieldParserEnum[] n, IBruteForceCombinationProvider combinationProvider, int idx, long streamOffset, int maxNumberOfFields)
+        {
+            if (idx == n.Length)
             {
-                _evaluateCallback = callback;
+                var newItem = n.Select(x => x).ToArray();
+                _evaluateCallback(newItem);
+                ComputedPermutations++;
+                PossibleFirstRows++;
+                return;
             }
-
-
-            public void ComputePermutations(BinaryReader reader, FieldParserEnum[] n, FieldParserEnum[] states, int idx, long streamOffset, int maxNumberOfFields)
+            var states = combinationProvider.GetPossibleCombinations(idx);
+            for (int i = 0; i < states.Length; i++)
             {
-                if (idx == n.Length)
+                var currentState = states[i];
+                var parser = FieldParser.CreateFromEnum(currentState);
+                var parseResult = parser.CanParse(reader, streamOffset);
+                if (parseResult.Completed)
                 {
-                    var newItem = n.Select(x => x).ToArray();
-                    _evaluateCallback(newItem);
-                    ComputedPermutations++;
-                    PossibleFirstRows++;
-                    return;
+                    n[idx] = currentState;
+                    ComputePermutations(reader, n, combinationProvider, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
                 }
-                for (int i = 0; i < states.Length; i++)
+                else
                 {
-                    var currentState = states[i];
-                    var parser = FieldParser.CreateFromEnum(currentState);
-                    var parseResult = parser.CanParse(reader, streamOffset);
-                    if (parseResult.Completed)
-                    {
-                        n[idx] = currentState;
-                        ComputePermutations(reader, n, states, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
-                    }
-                    else
-                    {
-                        var realCount = n.Count() - idx - 1;
-                        var skippedCount = BigInteger.Pow(states.Length, realCount);
-           
-                        SkippedEarlyPermutations += skippedCount;
-                        ComputedPermutations += skippedCount;
-                    }
+                    var realCount = n.Count() - idx - 1;
+                    var skippedCount = BigInteger.Pow(states.Length, realCount);
 
+                    SkippedEarlyPermutations += skippedCount;
+                    ComputedPermutations += skippedCount;
                 }
             }
+        }
+    }
+
+    interface IBruteForceCombinationProvider
+    {
+        FieldParserEnum[] GetPossibleCombinations(int index);
+    }
+    class AllCombinations : IBruteForceCombinationProvider
+    {
+        FieldParserEnum[] _possibleCombinations;
+        public AllCombinations()
+        {
+            _possibleCombinations = new FieldParserEnum[]
+            {
+                FieldParserEnum.OptStringTypeAscii,
+                FieldParserEnum.StringTypeAscii,
+                FieldParserEnum.OptStringType,
+                FieldParserEnum.StringType,
+                FieldParserEnum.IntType,
+                FieldParserEnum.BoolType,
+            };
+        }
+        public FieldParserEnum[] GetPossibleCombinations(int index)
+        {
+            return _possibleCombinations;
+        }
+    }
+
+    class CaTableCombinations : IBruteForceCombinationProvider
+    {
+        FieldParserEnum[][] _possibleCombinations;
+        public CaTableCombinations(IEnumerable<CaSchemaEntry> caSchemaEntries)
+        {
+            var schemasAsList = caSchemaEntries.ToList();
+            _possibleCombinations = new FieldParserEnum[schemasAsList.Count][];
+            
+            for(int i = 0; i < schemasAsList.Count; i++)
+            {
+                var possibleCombinations = GetCombinationsForType(schemasAsList[i]);
+                _possibleCombinations[i] = possibleCombinations;
+            }
+        }
+
+        FieldParserEnum[] GetCombinationsForType(CaSchemaEntry entry)
+        {
+            switch (entry.field_type)
+            {
+                case "yesno":
+                    return new FieldParserEnum[] { FieldParserEnum.BoolType };
+                case "single":
+                case "decimal":
+                case "double":
+                    return new FieldParserEnum[] { FieldParserEnum.SingleType };
+                case "autonumber":
+                case "integer":
+                    return new FieldParserEnum[] { FieldParserEnum.IntType};
+                case "text":
+                    return new FieldParserEnum[] 
+                    { 
+                        FieldParserEnum.OptStringTypeAscii, FieldParserEnum.StringTypeAscii, 
+                        FieldParserEnum.OptStringType, FieldParserEnum.StringType 
+                    };
+            }
+
+            // case "autonumber": -> // Should be long, but long is not supported?
+            throw new Exception($"Field '{entry.name}' contains unkown type '{entry.field_type}'");
+        }
+
+        public FieldParserEnum[] GetPossibleCombinations(int index)
+        {
+            return _possibleCombinations[index];
         }
     }
 }

@@ -3,12 +3,15 @@ using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
 using Filetypes.Codecs;
 using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Threading;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -21,6 +24,44 @@ namespace DbSchemaDecoder.Controllers
         public PackedFile DbFile { get; set; }
         public bool HasDefinitionError { get; set; }
         public string ErrorMessage { get; set; }
+    }
+
+    class DatabaseFileViewModel : NotifyPropertyChangedImpl
+    { 
+        public DataBaseFile DataBaseFile { get; set; }
+
+        string _errorMessage;
+        public string ErrorMessage
+        {
+            get
+            {
+                return _errorMessage;
+            }
+            set
+            {
+                _errorMessage = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool HasError
+        {
+            get { return !string.IsNullOrWhiteSpace(ErrorMessage); }
+        }
+
+        Color _backgroundColour;
+        public Color BackgroundColour
+        {
+            get
+            {
+                return _backgroundColour;
+            }
+            set
+            {
+                _backgroundColour = value;
+                NotifyPropertyChanged();
+            }
+        }
     }
 
     class FileListController : NotifyPropertyChangedImpl
@@ -86,33 +127,44 @@ namespace DbSchemaDecoder.Controllers
         public ICommand FilterButtonCommand { get; private set; }
         public ICommand OnlyShowTablesWithError { get; private set; }
 
-        public ObservableCollection<DataBaseFile> FileList { get; set; } = new ObservableCollection<DataBaseFile>();
+        public ObservableCollection<DatabaseFileViewModel> FileList { get; set; } = new ObservableCollection<DatabaseFileViewModel>();
         public event EventHandler<DataBaseFile> OnFileSelectedEvent;
+        List<BatchEvaluator.Result> _errorParsingResult = null;
 
         // Internal
         List<DataBaseFile> _internalFileList = new List<DataBaseFile>();
- 
 
 
+        Thread _evaluateThradHandle;
         public FileListController()
         {
             DbFilesWithError = 123;
             TotalDbFiles = 1024;
             Load(@"C:\Program Files (x86)\Steam\steamapps\common\Total War WARHAMMER II");
+            BatchEvaluator batchEvaluator = new BatchEvaluator(_internalFileList);
+            batchEvaluator.OnCompleted += BatchEvaluator_OnCompleted;
 
-
-            FileSelectedCommand = new RelayCommand<DataBaseFile>(OnFileSelected);
+            FileSelectedCommand = new RelayCommand<DatabaseFileViewModel>(OnFileSelected);
             FilterButtonCommand = new RelayCommand(OnFilter);
             OnlyShowTablesWithError = new RelayCommand(OnShowOnlyTablesWithErrors);
+
+            // Evaluate in a new thread
+            _evaluateThradHandle = new Thread(new ThreadStart(batchEvaluator.Evaluate));
+            _evaluateThradHandle.Start();
         }
 
-
-
-
-
-        private void OnFileSelected(DataBaseFile state)
+        private void BatchEvaluator_OnCompleted(object sender, List<BatchEvaluator.Result> e)
         {
-            OnFileSelectedEvent?.Invoke(this, state);
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                _errorParsingResult = e;
+                BuildFileList();
+            });
+        }
+
+        private void OnFileSelected(DatabaseFileViewModel state)
+        {
+            OnFileSelectedEvent?.Invoke(this, state.DataBaseFile);
         }
 
         private void OnShowOnlyTablesWithErrors()
@@ -139,7 +191,20 @@ namespace DbSchemaDecoder.Controllers
 
             FileList.Clear();
             foreach (var item in items)
-                FileList.Add(item);
+            {
+                var parseRessult = _errorParsingResult?.FirstOrDefault(x => x.TableType == item.TableType);
+                DatabaseFileViewModel model = new DatabaseFileViewModel();
+                if (parseRessult != null)
+                {
+                    //System.Windows.Media.SolidColorBrush a = new System.Windows.Media.SolidColorBrush();
+                  //  a.Color = System.Windows.Media.Color.Red;
+
+                    model.ErrorMessage = string.Join("\n", parseRessult.Errors);
+                   // model.BackgroundColour =  = 
+                }
+                model.DataBaseFile = item;
+                FileList.Add(model);
+            }
         }
 
         public void Load(string gameDir)
@@ -166,8 +231,8 @@ namespace DbSchemaDecoder.Controllers
                         {
                             TableType = dbEntry.Value.Item1,
                             DbFile = dbEntry.Value.Item2,
-                            HasDefinitionError = !canDecode,
-                            ErrorMessage = errorMessage
+                            //HasDefinitionError = !canDecode,
+                            //ErrorMessage = errorMessage
                         });
                     }
                 }

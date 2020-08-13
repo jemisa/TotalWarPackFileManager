@@ -55,6 +55,7 @@
     <Compile Include="Models\FieldInfoViewModel.cs" />
     <Compile Include="Util\BatchEvaluator.cs" />
     <Compile Include="Util\BruteForceParser.cs" />
+    <Compile Include="Util\RadioBoolToIntConverter.cs" />
     <Compile Include="Util\DataGridEx.cs" />
     <Compile Include="Util\FieldParser.cs" />
     <Compile Include="Controllers\TableDefinitionController.cs" />

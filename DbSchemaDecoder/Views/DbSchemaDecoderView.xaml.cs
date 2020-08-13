@@ -4,6 +4,7 @@ using DbSchemaDecoder.EditTableDefinitionView;
 using DbSchemaDecoder.Util;
 using Filetypes.Codecs;
 using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Threading;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,6 +39,8 @@ namespace DbSchemaDecoder
 
         public DbSchemaDecoder()
         {
+            DispatcherHelper.Initialize();
+
             InitializeComponent();
             Loaded += SettingsControl_Loaded;
         }

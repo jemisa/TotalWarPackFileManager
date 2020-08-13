@@ -140,5 +140,17 @@ namespace DbSchemaDecoder.Models
             }
         }
 
+        int _computeType = 1;
+        public int ComputeType
+        {
+            get { return _computeType; }
+            set
+            {
+                _computeType = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
     }
 }
