@@ -58,6 +58,7 @@
     <Compile Include="DB\DBTypeMap.cs" />
     <Compile Include="DB\FieldInfo.cs" />
     <Compile Include="DB\FieldInstance.cs" />
+    <Compile Include="DB\FieldInstance2.cs" />
     <Compile Include="DB\MappedTable.cs" />
     <Compile Include="DB\TypeInfo.cs" />
     <Compile Include="Codecs\LocCodec.cs" />

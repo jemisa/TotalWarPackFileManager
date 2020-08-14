@@ -31,10 +31,9 @@ namespace DbSchemaDecoder.Models
             }
         }
 
-        public bool PrimaryKey { get { return _fieldInfo.PrimaryKey; } set { _fieldInfo.PrimaryKey = value; } }
-        public bool Optional { get { return _fieldInfo.Optional; } set { _fieldInfo.Optional = value; } }
-        public string ReferencedTable { get { return _fieldInfo.ReferencedTable; } }
-        public string ReferencedField { get { return _fieldInfo.ReferencedField; } set { _fieldInfo.ReferencedField = value; } }
+        public bool PrimaryKey { get { return _fieldInfo.PrimaryKey; } set { _fieldInfo.PrimaryKey = value; NotifyPropertyChanged(); } }
+        public bool Optional { get { return _fieldInfo.Optional; } set { _fieldInfo.Optional = value; NotifyPropertyChanged(); } }
+        public string ReferencedTable { get { return _fieldInfo.ForeignReference; } set { _fieldInfo.ForeignReference = value; NotifyPropertyChanged(); } }
 
         public FieldInfoViewModel(FieldInfo info, int idx)
         {

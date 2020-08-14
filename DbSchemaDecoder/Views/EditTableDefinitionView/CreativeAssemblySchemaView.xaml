@@ -9,22 +9,18 @@
     <Grid>
         <GroupBox Header="Creative Assembly Schema Explorer">
             <Grid>
-                <ListView Margin="0,0,0,37" ItemsSource="{Binding CaSchemaController.CaSchemaEntries}"> 
+                <ListView Margin="0,0,0,37" ItemsSource="{Binding CaSchemaController.CaSchemaEntries}">  
                     
                     <ListView.View>
                         <GridView x:Name="grdTest">
                             <GridViewColumn Header="No." DisplayMemberBinding="{Binding index}"  Width="auto"/>
                             <GridViewColumn Header="name" DisplayMemberBinding="{Binding name}"  Width="auto"/>
                             <GridViewColumn Header="field_type" DisplayMemberBinding="{Binding field_type}"  Width="auto"/>
-                            <GridViewColumn Header="field_uuid" DisplayMemberBinding="{Binding field_uuid}"  Width="auto"/>
                             <GridViewColumn Header="primary_key" DisplayMemberBinding="{Binding primary_key}"  Width="auto"/>
                             <GridViewColumn Header="required" DisplayMemberBinding="{Binding required}"  Width="auto"/>
                             <GridViewColumn Header="max_length" DisplayMemberBinding="{Binding max_length}"  Width="auto"/>
                             <GridViewColumn Header="column_source_column" DisplayMemberBinding="{Binding column_source_column}"  Width="auto"/>
                             <GridViewColumn Header="column_source_table" DisplayMemberBinding="{Binding column_source_table}"  Width="auto"/>
-                            <GridViewColumn Header="encyclopaedia_export" DisplayMemberBinding="{Binding encyclopaedia_export}"  Width="auto"/>
-                            <GridViewColumn Header="requires_startpos_reprocess" DisplayMemberBinding="{Binding requires_startpos_reprocess}"  Width="auto"/>
-                            <GridViewColumn Header="requires_campaign_map_reprocess" DisplayMemberBinding="{Binding requires_campaign_map_reprocess}"  Width="auto"/>
                         </GridView>
 
                     </ListView.View>

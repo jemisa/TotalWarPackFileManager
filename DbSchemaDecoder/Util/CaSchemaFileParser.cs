@@ -39,7 +39,7 @@ namespace DbSchemaDecoder.Controllers
         }
     }
 
-    class CaSchemaEntry
+    class CaSchemaEntry : ICloneable
     {
         public int index { get; set; }
         public string field_uuid { get; set; }
@@ -53,6 +53,11 @@ namespace DbSchemaDecoder.Controllers
         public string encyclopaedia_export { get; set; }
         public string requires_startpos_reprocess { get; set; }
         public string requires_campaign_map_reprocess { get; set; }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 
     class CaSchema
@@ -191,7 +196,7 @@ namespace DbSchemaDecoder.Controllers
                 entry.field_type = item.field_type;
                 entry.required = item.required;
                 entry.max_length = item.max_length;
-                //entry.column_source_column = item.column_source_column;
+                entry.column_source_column = item.column_source_column.FirstOrDefault();
                 entry.column_source_table = item.column_source_table;
                 entry.encyclopaedia_export = item.encyclopaedia_export;
                 entry.requires_startpos_reprocess = item.requires_startpos_reprocess;

@@ -25,19 +25,31 @@
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem 
-                        Header="Remove"
-                        Command="{Binding DbTableDefinitionController.DbDefinitionRemovedCommand}" />
+                        Header="Remove" 
+                        Command="{Binding DbTableDefinitionController.DbDefinitionRemovedCommand}">
+                    </MenuItem>
                     <MenuItem 
                         Header="Remove All"
                         Command="{Binding DbTableDefinitionController.DbDefinitionRemovedAllCommand}" />
                     <Separator />
                     <MenuItem 
-                        Header="Reload" 
+                        Header="Reload"  
                         Command="{Binding DbTableDefinitionController.DbDefinitionReloadAllCommand}" />
                     <Separator />
                     <MenuItem 
                         Header="Add Field" 
                         Command="{Binding DbTableDefinitionController.CreateNewDbDefinitionCommand}" />
+                    <MenuItem 
+                        Header="Remove Meta data" 
+                        Command="{Binding DbTableDefinitionController.OnRemoveMetaDataCommand}" />
+                    <MenuItem 
+                        Header="Apply Meta data" ItemsSource="{Binding Path=DbTableDefinitionController.CaMetaData}" DisplayMemberPath="name">
+                        <MenuItem.ItemContainerStyle>
+                            <Style>
+                                <EventSetter Event="MenuItem.Click" Handler="Menu_Click"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
                     <Separator />
                     <MenuItem 
                         Header="Deselect" 

@@ -15,6 +15,7 @@ namespace DbSchemaDecoder.Controllers
 {
     class DbTableDefinitionController : NotifyPropertyChangedImpl
     {
+        public ObservableCollection<CaSchemaEntry> CaMetaData { get; set; } = new ObservableCollection<CaSchemaEntry>();
         public ObservableCollection<FieldInfoViewModel> TableTypeInformationRows { get; set; } = new ObservableCollection<FieldInfoViewModel>();
 
         FieldInfoViewModel _selectedTypeInformationRow;
@@ -36,10 +37,12 @@ namespace DbSchemaDecoder.Controllers
         public ICommand CreateNewDbDefinitionCommand { get; private set; }
         public ICommand DeselectCommand { get; private set; }
         public ICommand DbDefinitionReloadAllCommand { get; private set; }
+        public ICommand DbMetaDataAppliedCommand { get; private set; }
+        public ICommand OnRemoveMetaDataCommand { get; private set; }
 
         string _currentTableName = null;
         int _currentVersion = -1;
-
+        List<CaSchemaEntry> _caSchemas;
 
         EventHub _eventHub;
         public DbTableDefinitionController(EventHub eventHub)
@@ -49,7 +52,7 @@ namespace DbSchemaDecoder.Controllers
             _eventHub.OnFileSelected += _eventHub_OnFileSelected;
             _eventHub.OnHeaderVersionChanged += _eventHub_OnHeaderVersionChanged;
             _eventHub.OnNewDbSchemaRowCreated += AppendRowOfTypeEventHandler;
-
+            _eventHub.OnCaSchemaLoaded += OnCaSchemaLoadedHandler;
 
             DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
             DbDefinitionRemovedAllCommand = new RelayCommand(OnDbDefinitionRemovedAll);
@@ -58,6 +61,62 @@ namespace DbSchemaDecoder.Controllers
             CreateNewDbDefinitionCommand = new RelayCommand(OnCreateNewDbDefinitionCommand);
             DbDefinitionReloadAllCommand = new RelayCommand(OnDefinitionReloadAll);
             DeselectCommand = new RelayCommand(OnDeselectCommand);
+            OnRemoveMetaDataCommand = new RelayCommand(OnRemoveMetaData);
+            DbMetaDataAppliedCommand = new RelayCommand<CaSchemaEntry>(OnMetaDataApplied);
+        }
+
+        
+        private void OnCaSchemaLoadedHandler(object sender, List<CaSchemaEntry> e)
+        {
+            _caSchemas = e;
+            UpdateMetaDataList();
+        }
+
+        void UpdateMetaDataList()
+        {
+            if (_caSchemas == null || TableTypeInformationRows == null)
+                return;
+
+            CaMetaData.Clear();
+            var unused = BuildUnusedMetaData(_caSchemas, TableTypeInformationRows);
+            foreach (var item in unused)
+                CaMetaData.Add(item);
+        }
+
+        List<CaSchemaEntry> BuildUnusedMetaData(List<CaSchemaEntry> caSchemaEntries, Collection<FieldInfoViewModel> fields)
+        {
+            List<CaSchemaEntry> notUsed = new List<CaSchemaEntry>();
+            List<CaSchemaEntry> used = new List<CaSchemaEntry>();
+            foreach (var caSchema in caSchemaEntries)
+            {
+                var isUsed = false;
+                foreach (var field in fields)
+                {
+                    if (field.Name == caSchema.name)
+                    {
+                        isUsed = true;
+                        break;
+                    }
+                }
+
+                var clone = (CaSchemaEntry)caSchema.Clone();
+                if (isUsed)
+                {
+                    clone.name += " {Used}";
+                    used.Add(clone);
+                }
+                else
+                {
+                    notUsed.Add(clone);
+                }
+            }
+
+            notUsed = notUsed.OrderBy(x=>x.name).ToList();
+            used = used.OrderBy(x => x.name).ToList();
+
+            foreach (var item in used)
+                notUsed.Add(item);
+            return notUsed;
         }
 
         private void _eventHub_OnHeaderVersionChanged(object sender, int e)
@@ -104,6 +163,8 @@ namespace DbSchemaDecoder.Controllers
                 newFieldInfoViewModel.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;
                 TableTypeInformationRows.Add(newFieldInfoViewModel);
             }
+
+            UpdateMetaDataList();
             OnDefinitionChanged();
         }
 
@@ -133,6 +194,7 @@ namespace DbSchemaDecoder.Controllers
                 return;
             var index = TableTypeInformationRows.IndexOf(SelectedTypeInformationRow);
             TableTypeInformationRows.RemoveAt(index);
+            UpdateMetaDataList();
             RecomputeIndexes();
             OnDefinitionChanged();
         }
@@ -140,6 +202,7 @@ namespace DbSchemaDecoder.Controllers
         private void OnDbDefinitionRemovedAll()
         {
             TableTypeInformationRows.Clear();
+            UpdateMetaDataList();
             RecomputeIndexes();
             OnDefinitionChanged();
         }
@@ -177,6 +240,34 @@ namespace DbSchemaDecoder.Controllers
         void OnDeselectCommand()
         {
             SelectedTypeInformationRow = null;
+        }
+
+        void OnRemoveMetaData()
+        {
+            if (SelectedTypeInformationRow != null)
+            {
+                SelectedTypeInformationRow.Name = "Unknown" + SelectedTypeInformationRow.Index;
+                SelectedTypeInformationRow.Optional = false;
+                SelectedTypeInformationRow.PrimaryKey = false;
+                SelectedTypeInformationRow.ReferencedTable = "";
+                UpdateMetaDataList();
+            }
+        }
+
+        void OnMetaDataApplied(CaSchemaEntry metaData)
+        {
+            if (SelectedTypeInformationRow != null)
+            {
+                SelectedTypeInformationRow.Name = metaData.name;
+                SelectedTypeInformationRow.Optional = metaData.required == "1";
+                SelectedTypeInformationRow.PrimaryKey = metaData.primary_key == "1";
+
+                if (!string.IsNullOrWhiteSpace(metaData.column_source_table) && !string.IsNullOrWhiteSpace(metaData.column_source_column))
+                    SelectedTypeInformationRow.ReferencedTable = metaData.column_source_table + "." + metaData.column_source_column;
+                else
+                    SelectedTypeInformationRow.ReferencedTable = "";
+                UpdateMetaDataList();
+            }
         }
 
         void OnDefinitionReloadAll()

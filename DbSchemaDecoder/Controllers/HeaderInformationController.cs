@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Controllers
 {
-    class SelectedFileHeaderInformationController
+    class HeaderInformationController
     {
-        public SelectedFileHeaderInformationViewModel ViewModel { get; set; } = new SelectedFileHeaderInformationViewModel();
+        public HeaderInformationViewModel ViewModel { get; set; } = new HeaderInformationViewModel();
         EventHub _eventHub;
 
-        public SelectedFileHeaderInformationController(EventHub eventHub)
+        public HeaderInformationController(EventHub eventHub)
         {
             _eventHub = eventHub;
             _eventHub.OnFileSelected += (sender, file) => { ParseDatabaseFile(file); };

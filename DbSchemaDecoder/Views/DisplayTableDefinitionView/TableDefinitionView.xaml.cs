@@ -1,4 +1,5 @@
-﻿using DbSchemaDecoder.Util;
+﻿using DbSchemaDecoder.Controllers;
+using DbSchemaDecoder.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,6 +27,13 @@ namespace DbSchemaDecoder.DisplayTableDefinitionView
         public TableDefinitionView()
         {
             InitializeComponent();
+        }
+
+        public void Menu_Click(object sender, RoutedEventArgs args)
+        {
+            DbSchemaDecoderController controller = (this.DataContext as DbSchemaDecoderController);
+            var menuItem = args.Source as MenuItem;
+            controller.DbTableDefinitionController.DbMetaDataAppliedCommand.Execute(menuItem.DataContext as CaSchemaEntry);
         }
     }
 

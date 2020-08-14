@@ -22,7 +22,7 @@ namespace DbSchemaDecoder.Controllers
         public BruteForceController BruteForceController { get; set; }
         public CaSchemaController CaSchemaController { get; set; }
         public TableEntriesController TableEntriesController { get; set; }
-        public SelectedFileHeaderInformationController SelectedFileHeaderInformationController { get; set; }
+        public HeaderInformationController SelectedFileHeaderInformationController { get; set; }
 
         EventHub _eventHub;
 
@@ -35,7 +35,7 @@ namespace DbSchemaDecoder.Controllers
             BruteForceController = new BruteForceController(_eventHub);
             CaSchemaController = new CaSchemaController(_eventHub);
             DbTableDefinitionController = new DbTableDefinitionController(_eventHub);
-            SelectedFileHeaderInformationController = new SelectedFileHeaderInformationController(_eventHub);
+            SelectedFileHeaderInformationController = new HeaderInformationController(_eventHub);
         }
 
 
