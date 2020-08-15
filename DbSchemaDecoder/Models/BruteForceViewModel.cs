@@ -75,6 +75,31 @@ namespace DbSchemaDecoder.Models
             }
         }
 
+        bool _columnCountEditable;
+        public bool ColumnCountEditable
+        {
+            get { return _columnCountEditable; }
+            set
+            {
+                _columnCountEditable = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
+
+
+        string _bruteForceColumnCountText;
+        public string BruteForceColumnCountText
+        {
+            get { return _bruteForceColumnCountText; }
+            set
+            {
+                _bruteForceColumnCountText = value;
+                NotifyPropertyChanged();
+            }
+        }
+
 
         string _evaluatedCombinations;
         public string EvaluatedCombinations

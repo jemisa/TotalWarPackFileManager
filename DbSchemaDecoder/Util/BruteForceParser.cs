@@ -220,4 +220,58 @@ namespace DbSchemaDecoder.Util
             return _possibleCombinations[index];
         }
     }
+
+    class AppendTableCombinations : IBruteForceCombinationProvider
+    {
+        FieldParserEnum[][] _existingFields;
+        AllCombinations _allCombinations = new AllCombinations();
+
+        public AppendTableCombinations(DbTypesEnum[] existingFields)
+        {
+            _existingFields = new FieldParserEnum[existingFields.Count()][];
+            for(int i = 0; i < existingFields.Count(); i++)
+                _existingFields[i] = GetCombinationsForType(existingFields[i]);
+        }
+
+        FieldParserEnum[] GetCombinationsForType(DbTypesEnum entry)
+        {
+            switch (entry)
+            {
+                case DbTypesEnum.String:
+                    return new FieldParserEnum[] { FieldParserEnum.StringType };
+
+                case DbTypesEnum.String_ascii:
+                    return new FieldParserEnum[] { FieldParserEnum.StringTypeAscii };
+
+                case DbTypesEnum.Optstring:
+                    return new FieldParserEnum[] { FieldParserEnum.OptStringType };
+
+                case DbTypesEnum.Optstring_ascii:
+                    return new FieldParserEnum[] { FieldParserEnum.OptStringTypeAscii };
+
+                case DbTypesEnum.Integer:
+                case DbTypesEnum.Autonumber:
+                    return new FieldParserEnum[] { FieldParserEnum.IntType };
+
+                case DbTypesEnum.Float:
+                case DbTypesEnum.Single:
+                case DbTypesEnum.Decimal:
+                case DbTypesEnum.Double:
+                    return new FieldParserEnum[] { FieldParserEnum.SingleType };
+
+                case DbTypesEnum.Boolean:
+                    return new FieldParserEnum[] { FieldParserEnum.BoolType };
+            }
+
+            throw new Exception($"Field '{entry}' contains unkown type");
+        }
+
+        public FieldParserEnum[] GetPossibleCombinations(int index)
+        {
+            if (_existingFields.Length >= index)
+                return _existingFields[index];
+            else
+                return _allCombinations.GetPossibleCombinations(index);
+        }
+    }
 }

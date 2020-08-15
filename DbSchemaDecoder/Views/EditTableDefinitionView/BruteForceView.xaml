@@ -16,7 +16,7 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="85"></RowDefinition>
+            <RowDefinition Height="95"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="0" Grid.Row="0">
@@ -24,12 +24,15 @@
             <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" GroupName="BruteType">Real brute force (slow for large tables)</RadioButton>
             <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" GroupName="BruteType">Append current model</RadioButton>
             <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=3}" GroupName="BruteType">Brute force unknown table size</RadioButton>
+            <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=4}" GroupName="BruteType">Append current model, unknown size</RadioButton>
 
             <StackPanel Orientation="Horizontal">
-                <Label Content="No. Table Columns:"/>
-                <TextBox Height="15" Width="30" HorizontalAlignment="Left" Text="{Binding Path=BruteForceController.ViewModel.ColumnCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-             </StackPanel>
-           </StackPanel>
+                <Label Content="{Binding Path=BruteForceController.ViewModel.BruteForceColumnCountText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Height="15" Width="30" HorizontalAlignment="Left" 
+                         Text="{Binding Path=BruteForceController.ViewModel.ColumnCount, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding Path=BruteForceController.ViewModel.ColumnCountEditable, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Label >
@@ -45,7 +48,7 @@
                     </TextBlock>
                 </Label>
 
-                <Label >
+                <Label>
                     <TextBlock>
                         <Run Text="Skipped: "/>
                         <Run Text="{Binding Path=BruteForceController.ViewModel.SkippedEarlyCombinations, UpdateSourceTrigger=PropertyChanged}"/>

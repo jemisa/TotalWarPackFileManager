@@ -1,5 +1,6 @@
 ﻿using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
+using Filetypes;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
 using System;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 using static DbSchemaDecoder.Models.BruteForceViewModel;
 
@@ -20,13 +22,15 @@ namespace DbSchemaDecoder.Controllers
             BruteForceUsingCaSchama = 0,
             BruteForce,
             BruteForceUsingExistingTables,
-            BruteForceUnknownTableCount
+            BruteForceUnknownTableCount,
+            BruteForceUsingExistingTableUnknownTableCount
         };
 
         public BruteForceViewModel ViewModel { get; set; } = new BruteForceViewModel();
 
         DataBaseFile _selectedFile;
         List<CaSchemaEntry> _caSchemaEntryList;
+        List<FieldInfo> _dbSchemaList;
         Thread _threadHandle;
         BruteForceParser _bruteForceparser;
         DateTime _startTime;
@@ -41,6 +45,7 @@ namespace DbSchemaDecoder.Controllers
         {
             _eventHub = eventHub;
             _eventHub.OnCaSchemaLoaded += _eventHub_OnCaSchemaLoaded;
+            _eventHub.OnDbSchemaChanged += (sender, schema) => { _dbSchemaList = schema; };
             _eventHub.OnFileSelected += (sender, file) => { _selectedFile = file; Cancel(); };
 
             ComputeBruteForceCommand = new RelayCommand(OnCompute);
@@ -52,6 +57,64 @@ namespace DbSchemaDecoder.Controllers
             _timer.AutoReset = true;
             ViewModel.RunningStatus = "Not run";
             ViewModel.CalculateButtonText = "Calculate";
+            UpdateBruteForceDisplay();
+
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ViewModel.ComputeType))
+                UpdateBruteForceDisplay();
+        }
+
+
+        void UpdateBruteForceDisplay()
+        {
+            if(_caSchemaEntryList != null)
+                ViewModel.ColumnCount = _caSchemaEntryList.Count();
+
+            var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
+            if (bruteForceMethod == BruteForceCalculatorType.BruteForce)
+            {
+                ViewModel.BruteForceColumnCountText = "No. Table Columns:";
+                ViewModel.ColumnCountEditable = true;
+                if (_dbSchemaList != null)
+                    ViewModel.ColumnCount = _dbSchemaList.Count();
+                return;
+            }
+            else if (bruteForceMethod == BruteForceCalculatorType.BruteForceUnknownTableCount)
+            {
+                ViewModel.BruteForceColumnCountText = "Max Columns:";
+                ViewModel.ColumnCountEditable = true;
+                if (_dbSchemaList != null)
+                    ViewModel.ColumnCount = _dbSchemaList.Count();
+                return;
+            }
+            else if(bruteForceMethod == BruteForceCalculatorType.BruteForceUsingCaSchama)
+            {
+                ViewModel.BruteForceColumnCountText = "No. Ca Columns:";
+                ViewModel.ColumnCountEditable = false;
+                return;
+            }
+            else if(bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTables)
+            {
+                ViewModel.BruteForceColumnCountText = "No.Total Table Columns:";
+                if(_dbSchemaList != null)
+                    ViewModel.ColumnCount = _dbSchemaList.Count();
+                ViewModel.ColumnCountEditable = true;
+                return;
+            }
+            else if (bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount)
+            {
+                ViewModel.BruteForceColumnCountText = "No.Total Max Table Columns:";
+                if (_dbSchemaList != null)
+                    ViewModel.ColumnCount = _dbSchemaList.Count();
+                ViewModel.ColumnCountEditable = true;
+                return;
+            }
+
+            throw new NotImplementedException("Unknown compute type");
         }
 
         private void _eventHub_OnCaSchemaLoaded(object sender, List<CaSchemaEntry> e)
@@ -85,10 +148,15 @@ namespace DbSchemaDecoder.Controllers
             File.WriteAllLines(@"C:\temp\output.text", ViewModel.Values.Select(x => x.Value));
         }
 
-        void BruteForce(DataBaseFile file, int count)
+        void BruteForce(DataBaseFile file, int maxNumberOfFields)
         {
             if (_threadHandle == null)
             {
+                var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
+                IBruteForceCombinationProvider combinationProvider = GetCombinationProvider(bruteForceMethod);
+                if (combinationProvider == null)
+                    return;
+
                 ViewModel.Values.Clear();
                 _startTime = DateTime.Now;
                 _timer.Start();
@@ -101,15 +169,7 @@ namespace DbSchemaDecoder.Controllers
                 ViewModel.PossibleFirstRpws = "";
                 ViewModel.CalculateButtonText = "Cancel";
 
-                var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
-
-                IBruteForceCombinationProvider combinationProvider;
-                if (bruteForceMethod == BruteForceCalculatorType.BruteForce)
-                    combinationProvider = new AllCombinations();
-                else
-                    combinationProvider = new CaTableCombinations(_caSchemaEntryList);
-
-                _bruteForceparser = new BruteForceParser(file, combinationProvider, count);
+                _bruteForceparser = new BruteForceParser(file, combinationProvider, maxNumberOfFields);
                 ViewModel.TotalPossibleCombinations = _bruteForceparser.PossibleCombinations.ToString("N0");
 
                 _bruteForceparser.OnParsingCompleteEvent += ComputationDoneEventHandler;
@@ -122,6 +182,36 @@ namespace DbSchemaDecoder.Controllers
             {
                 Cancel();
             }
+        }
+
+
+
+
+        IBruteForceCombinationProvider GetCombinationProvider(BruteForceCalculatorType type)
+        {
+            try
+            {
+                switch (type)
+                {
+                    case BruteForceCalculatorType.BruteForce:
+                    case BruteForceCalculatorType.BruteForceUnknownTableCount:
+                        return new AllCombinations();
+
+                    case BruteForceCalculatorType.BruteForceUsingCaSchama:
+                        return new CaTableCombinations(_caSchemaEntryList);
+
+                    case BruteForceCalculatorType.BruteForceUsingExistingTables:
+                    case BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount:
+                        return new AppendTableCombinations(_dbSchemaList.Select(x => x.TypeEnum).ToArray());
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return null;
+            }
+
+            throw new NotImplementedException("Unknown compute type");
         }
 
         void CombinationFoundEventHandler(object sender, FieldParserEnum[] val)
@@ -166,7 +256,6 @@ namespace DbSchemaDecoder.Controllers
                 bigIntTime = 1;
             ViewModel.ComputedPerSec = (_bruteForceparser.EvaluatedCombinations / bigIntTime).ToString("N0");
             ViewModel.PossibleFirstRpws =  _bruteForceparser.PossibleFirstRows.ToString("N0");
-
    
             BigFloat bigFloatEvaluatedCombinations = new BigFloat(_bruteForceparser.EvaluatedCombinations);
             BigFloat bigFloatTotal = new BigFloat(_bruteForceparser.PossibleCombinations);
