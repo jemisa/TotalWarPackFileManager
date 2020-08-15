@@ -31,12 +31,11 @@ namespace DbSchemaDecoder.Controllers
         DataBaseFile _selectedFile;
         List<CaSchemaEntry> _caSchemaEntryList;
         List<FieldInfo> _dbSchemaList;
-        Thread _threadHandle;
-        BruteForceParser _bruteForceparser;
-        DateTime _startTime;
-        EventHub _eventHub;
 
-        private readonly System.Timers.Timer _timer;
+        BruteForceParser _bruteForceparser;
+        EventHub _eventHub;
+        TimedThreadProcess<BruteForceParser>[] _timedProcess;
+
         public ICommand ComputeBruteForceCommand { get; private set; }
         public ICommand SaveResultCommand { get; private set; }
         public ICommand OnClickCommand { get; private set; }
@@ -52,9 +51,6 @@ namespace DbSchemaDecoder.Controllers
             SaveResultCommand = new RelayCommand(OnSave);
             OnClickCommand = new RelayCommand<ItemView>(OnItemDoubleClicked);
 
-            _timer = new System.Timers.Timer(500);
-            _timer.Elapsed += _timer_Elapsed;
-            _timer.AutoReset = true;
             ViewModel.RunningStatus = "Not run";
             ViewModel.CalculateButtonText = "Calculate";
             UpdateBruteForceDisplay();
@@ -67,7 +63,6 @@ namespace DbSchemaDecoder.Controllers
             if (e.PropertyName == nameof(ViewModel.ComputeType))
                 UpdateBruteForceDisplay();
         }
-
 
         void UpdateBruteForceDisplay()
         {
@@ -132,15 +127,44 @@ namespace DbSchemaDecoder.Controllers
             _eventHub.TriggerSetDbSchema(this, items);
         }
 
-        private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            var runTimeSec = (e.SignalTime - _startTime).TotalSeconds;
-            Update(runTimeSec);
-        }
-
         void OnCompute()
         {
-            BruteForce(_selectedFile, ViewModel.ColumnCount);
+            var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
+            IBruteForceCombinationProvider combinationProvider = GetCombinationProvider(bruteForceMethod);
+            if (combinationProvider == null)
+                return;
+
+            ViewModel.Values.Clear();
+            ViewModel.PossibleCombinationsFound = "0";
+            ViewModel.RunTime = "";
+            ViewModel.RunningStatus = "Running";
+            ViewModel.TotalPossibleCombinations = "";
+            ViewModel.EvaluatedCombinations = "";
+            ViewModel.SkippedEarlyCombinations = "";
+            ViewModel.ComputedPerSec = "";
+            ViewModel.PossibleFirstRpws = "";
+            ViewModel.CalculateButtonText = "Cancel";
+
+            if (bruteForceMethod == BruteForceCalculatorType.BruteForceUnknownTableCount ||
+                bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount)
+            {
+                BigInteger possibleCombinations = 0;
+                for (int i = 0; i < ViewModel.ColumnCount; i++)
+                    possibleCombinations += BruteForceParser.PossibleCombinations(i);
+                ViewModel.TotalPossibleCombinations = possibleCombinations.ToString("N0");
+                ViewModel.ColumnVariationsCompleted = "0/" + ViewModel.ColumnCount;
+
+                _timedProcess = new TimedThreadProcess<BruteForceParser>[ViewModel.ColumnCount];
+                for (int i = 0; i < ViewModel.ColumnCount; i++)
+                    BruteForce(_selectedFile, i, combinationProvider, 1);
+            }
+            else
+            {
+                ViewModel.ColumnVariationsCompleted = "0/1";
+                ViewModel.TotalPossibleCombinations = BruteForceParser.PossibleCombinations(ViewModel.ColumnCount).ToString("N0");
+                _timedProcess = new TimedThreadProcess<BruteForceParser>[1];
+                BruteForce(_selectedFile, ViewModel.ColumnCount, combinationProvider, 0);
+            }
         }
 
         void OnSave()
@@ -148,44 +172,15 @@ namespace DbSchemaDecoder.Controllers
             File.WriteAllLines(@"C:\temp\output.text", ViewModel.Values.Select(x => x.Value));
         }
 
-        void BruteForce(DataBaseFile file, int maxNumberOfFields)
+        void BruteForce(DataBaseFile file, int maxNumberOfFields, IBruteForceCombinationProvider combinationProvider, int threadIndex)
         {
-            if (_threadHandle == null)
-            {
-                var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
-                IBruteForceCombinationProvider combinationProvider = GetCombinationProvider(bruteForceMethod);
-                if (combinationProvider == null)
-                    return;
+            _bruteForceparser = new BruteForceParser(file, combinationProvider, maxNumberOfFields);
+            _bruteForceparser.OnParsingCompleteEvent += ComputationDoneEventHandler;
+            _bruteForceparser.OnCombintionFoundEvent += CombinationFoundEventHandler;
 
-                ViewModel.Values.Clear();
-                _startTime = DateTime.Now;
-                _timer.Start();
-                ViewModel.RunTime = "";
-                ViewModel.RunningStatus = "Running";
-                ViewModel.TotalPossibleCombinations = "";
-                ViewModel.EvaluatedCombinations = "";
-                ViewModel.SkippedEarlyCombinations = "";
-                ViewModel.ComputedPerSec = "";
-                ViewModel.PossibleFirstRpws = "";
-                ViewModel.CalculateButtonText = "Cancel";
-
-                _bruteForceparser = new BruteForceParser(file, combinationProvider, maxNumberOfFields);
-                ViewModel.TotalPossibleCombinations = _bruteForceparser.PossibleCombinations.ToString("N0");
-
-                _bruteForceparser.OnParsingCompleteEvent += ComputationDoneEventHandler;
-                _bruteForceparser.OnCombintionFoundEvent += CombinationFoundEventHandler;
-
-                _threadHandle = new Thread(new ThreadStart(_bruteForceparser.Compute));
-                _threadHandle.Start();
-            }
-            else
-            {
-                Cancel();
-            }
+            _timedProcess[threadIndex] = new TimedThreadProcess<BruteForceParser>(_bruteForceparser);
+            _timedProcess[threadIndex].Start(_bruteForceparser.Compute);
         }
-
-
-
 
         IBruteForceCombinationProvider GetCombinationProvider(BruteForceCalculatorType type)
         {
@@ -237,14 +232,28 @@ namespace DbSchemaDecoder.Controllers
         {
             ViewModel.RunningStatus = "Done";
             ViewModel.CalculateButtonText = "Calculate";
-            var runTimeSec = (DateTime.Now - _startTime).TotalSeconds;
-            _timer.Stop();
-            _threadHandle = null;
 
-            Update(runTimeSec);
+            if (_timedProcess == null)
+                return;
+
+            int index = -1;
+            for (int i = 0; i < _timedProcess.Length; i++)
+            {
+                if (_timedProcess[i] == sender)
+                    index = i;
+            }
+
+            if (index == -1)
+                return;
+
+            var runTimeSec = _timedProcess[index].RunTimeInSec();
+            _timedProcess[index].Stop();
+            _timedProcess[index] = null;
+
+            Update(runTimeSec, index);
         }
 
-        void Update(double runTimeSec)
+        void Update(double runTimeSec, int threadIndex)
         {
             ViewModel.RunTime = (int)runTimeSec + "s";
 
@@ -258,7 +267,7 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.PossibleFirstRpws =  _bruteForceparser.PossibleFirstRows.ToString("N0");
    
             BigFloat bigFloatEvaluatedCombinations = new BigFloat(_bruteForceparser.EvaluatedCombinations);
-            BigFloat bigFloatTotal = new BigFloat(_bruteForceparser.PossibleCombinations);
+            BigFloat bigFloatTotal = new BigFloat(BruteForceParser.PossibleCombinations(ViewModel.ColumnCount));
 
             var ar = ((bigFloatEvaluatedCombinations / bigFloatTotal) * 100).ToString().Take(5).ToArray();
             string firstFivChar = new string(ar);
@@ -267,14 +276,17 @@ namespace DbSchemaDecoder.Controllers
 
         public void Cancel()
         {
-            if (_threadHandle != null)
+            if (_timedProcess == null)
+                return;
+
+            for(int i = 0; i < _timedProcess.Length; i++)
             {
-                _threadHandle.Abort();
-                _threadHandle = null;
-                ViewModel.CalculateButtonText = "Calculate";
-                ViewModel.RunningStatus = "Stopped";
-                _timer.Stop();
+                if(_timedProcess[i] != null)
+                    _timedProcess[i].Stop();
+                _timedProcess[i] = null;
             }
+            ViewModel.CalculateButtonText = "Calculate";
+            ViewModel.RunningStatus = "Stopped";
         }
     }
 }

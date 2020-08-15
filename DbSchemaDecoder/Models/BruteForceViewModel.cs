@@ -86,9 +86,6 @@ namespace DbSchemaDecoder.Models
             }
         }
 
-
-
-
         string _bruteForceColumnCountText;
         public string BruteForceColumnCountText
         {
@@ -152,6 +149,17 @@ namespace DbSchemaDecoder.Models
             set
             {
                 _estimatedRunTime = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _columnVariationsCompleted;
+        public string ColumnVariationsCompleted
+        {
+            get { return _columnVariationsCompleted; }
+            set
+            {
+                _columnVariationsCompleted = value;
                 NotifyPropertyChanged();
             }
         }

@@ -311,7 +311,8 @@ namespace DbSchemaDecoder.Util
                 return new ParseResult()
                 {
                     FieldInfo = Types.SingleType(),
-                    OffsetAfter = reader.BaseStream.Position
+                    OffsetAfter = reader.BaseStream.Position,
+                    Completed = true,
                 };
             }
 

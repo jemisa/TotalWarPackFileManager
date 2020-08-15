@@ -73,6 +73,7 @@
     <Compile Include="Controllers\FileListController.cs" />
     <Compile Include="Util\NotifyPropertyChangedImpl.cs" />
     <Compile Include="Util\TableEntriesParser.cs" />
+    <Compile Include="Util\TimedThreadProcess.cs" />
     <Compile Include="Views\DisplayTableDefinitionView\DbParsedEntitiesTableView.xaml.cs">
       <DependentUpon>DbParsedEntitiesTableView.xaml</DependentUpon>
     </Compile>

@@ -16,7 +16,7 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="95"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="0" Grid.Row="0">
@@ -93,8 +93,15 @@
                         <Run Text="{Binding Path=BruteForceController.ViewModel.RunningStatus, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
+
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,10,0">
+            <Label>
+                <TextBlock>
+                        <Run Text="Column variations completed:"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.ColumnVariationsCompleted, UpdateSourceTrigger=PropertyChanged}"/>
+                </TextBlock>
+            </Label>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content= "{Binding Path=BruteForceController.ViewModel.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"  Margin="10,0,0,0" Width="70" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
                 <Button Content="Save" Width="100" Margin="10,0,0,0" Command="{Binding BruteForceController.SaveResultCommand}"></Button>
             </StackPanel>

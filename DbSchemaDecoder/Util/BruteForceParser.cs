@@ -15,15 +15,16 @@ namespace DbSchemaDecoder.Util
 {
 
 
-    class BruteForceParser
+    class BruteForceParser : IThreadableTask
     {
-        public event EventHandler OnParsingCompleteEvent;
         public event EventHandler<FieldParserEnum[]> OnCombintionFoundEvent;
+        public event EventHandler OnThreadCompleted;
+
         public BigInteger EvaluatedCombinations { get { return _permutationHelper.ComputedPermutations; } }
         public BigInteger SkippedEarlyCombinations { get { return _permutationHelper.SkippedEarlyPermutations; } }
         public BigInteger PossibleFirstRows { get { return _permutationHelper.PossibleFirstRows; } }
 
-        FieldParserEnum[] GetPossibleFields()
+        static FieldParserEnum[] GetPossibleFields()
         {
             return new FieldParserEnum[]
             {
@@ -44,8 +45,11 @@ namespace DbSchemaDecoder.Util
         int _headerLength;
         int _HeaderEntryCount;
 
+        public static BigInteger PossibleCombinations(int numFields)
+        {
+            return BigInteger.Pow(GetPossibleFields().Count(), numFields);
+        }
 
-        public BigInteger PossibleCombinations { get { return BigInteger.Pow(GetPossibleFields().Count(), _maxNumberOfFields); } }
         public List<FieldParserEnum[]> PossiblePermutations { get; set; } = new List<FieldParserEnum[]>();
         PermutationHelper _permutationHelper;
         IBruteForceCombinationProvider _combinationProvider;
@@ -76,8 +80,7 @@ namespace DbSchemaDecoder.Util
             _permutationReader.Dispose();
             _permutationStream.Dispose();
 
-
-            OnParsingCompleteEvent?.Invoke(this, null);
+            OnThreadCompleted?.Invoke(this, null);
         }
 
         void OnEvaluatePermutation(FieldParserEnum[] combination)
@@ -268,7 +271,7 @@ namespace DbSchemaDecoder.Util
 
         public FieldParserEnum[] GetPossibleCombinations(int index)
         {
-            if (_existingFields.Length >= index)
+            if (_existingFields.Length > index)
                 return _existingFields[index];
             else
                 return _allCombinations.GetPossibleCombinations(index);
