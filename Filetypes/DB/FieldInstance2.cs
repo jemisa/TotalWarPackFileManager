@@ -11,7 +11,7 @@ using System.Windows.Forms.VisualStyles;
 
 namespace Filetypes.DB
 {
-
+    /*
     class ParseResult
     {
         public int BytesRead;
@@ -102,7 +102,7 @@ namespace Filetypes.DB
     class FieldInstance2
     {
         string _enumvalue;
-        IFieldParser _parser;
+        IFieldParser _parser;   // static?
         FieldMetaData _metaData;
         
     }
@@ -111,6 +111,7 @@ namespace Filetypes.DB
     {
         FieldInstance2 _stuff;
         string _currentValue;
+        bool _valid;
 
-    }
+    }*/
 }

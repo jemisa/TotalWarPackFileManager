@@ -16,18 +16,19 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"></RowDefinition>
+            <RowDefinition Height="85"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="0" Grid.Row="0">
             <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=0}" GroupName="BruteType">Brute force using CA Schema</RadioButton>
             <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" GroupName="BruteType">Real brute force (slow for large tables)</RadioButton>
             <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" GroupName="BruteType">Append current model</RadioButton>
+            <RadioButton IsChecked="{Binding Path=BruteForceController.ViewModel.ComputeType, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=3}" GroupName="BruteType">Brute force unknown table size</RadioButton>
+
             <StackPanel Orientation="Horizontal">
                 <Label Content="No. Table Columns:"/>
                 <TextBox Height="15" Width="30" HorizontalAlignment="Left" Text="{Binding Path=BruteForceController.ViewModel.ColumnCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Button Content= "{Binding Path=BruteForceController.ViewModel.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"  Margin="10,0,0,0" Width="70" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
-            </StackPanel>
+             </StackPanel>
            </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
@@ -73,7 +74,7 @@
                 </Label>
                 <Label>
                     <TextBlock>
-                        <Run Text="Estimated runtime: "/>
+                        <Run Text="Percentage done: "/>
                         <Run Text="{Binding Path=BruteForceController.ViewModel.EstimatedRunTime, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
@@ -91,8 +92,7 @@
                 </Label>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,10,0">
-                <Button Content="Cancel" Width="100" Margin="-10,0,0,0"></Button>
-                <Button Content="Help" Width="100" Margin="10,0,0,0"></Button>
+                <Button Content= "{Binding Path=BruteForceController.ViewModel.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"  Margin="10,0,0,0" Width="70" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
                 <Button Content="Save" Width="100" Margin="10,0,0,0" Command="{Binding BruteForceController.SaveResultCommand}"></Button>
             </StackPanel>
         </StackPanel>
@@ -106,6 +106,7 @@
             <ListView.View>
                 <GridView x:Name="grdTest">
                     <GridViewColumn Header="Idx" DisplayMemberBinding="{Binding Idx}"  Width="auto"/>
+                    <GridViewColumn Header="Columns" DisplayMemberBinding="{Binding Columns}"  Width="auto"/>
                     <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}"  Width="auto"/>
                 </GridView>
             </ListView.View>

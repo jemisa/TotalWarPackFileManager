@@ -36,7 +36,7 @@
             </TextBlock>
         </Label>
         <Label 
-            HorizontalAlignment="Left" Margin="200,0,0,0" VerticalAlignment="Top">
+            HorizontalAlignment="Left" Margin="250,0,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Header Version: "/>
                 <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.Version, UpdateSourceTrigger=PropertyChanged}"/>
@@ -50,12 +50,13 @@
             </TextBlock>
         </Label>
         <Label 
-            HorizontalAlignment="Left" Margin="300,0,0,0" VerticalAlignment="Top">
+            HorizontalAlignment="Left" Margin="350,0,0,0" VerticalAlignment="Top">
             <TextBlock>
                 <Run Text="Num Versions: "/>
                 <Run Text="{Binding Path=SelectedFileHeaderInformationController.ViewModel.NumVersions, UpdateSourceTrigger=PropertyChanged}"/>
             </TextBlock>
+            
         </Label>
-
+        <Button Content="Reload" HorizontalAlignment="Left" Margin="210,2,0,0" VerticalAlignment="Top" Command="{Binding SelectedFileHeaderInformationController.ReloadCommand}"></Button>
     </Grid>
 </UserControl>

@@ -36,40 +36,27 @@ namespace DbSchemaDecoder.Controllers
         public ICommand DbDefinitionMovedDownCommand { get; private set; }
         public ICommand CreateNewDbDefinitionCommand { get; private set; }
         public ICommand DeselectCommand { get; private set; }
-        public ICommand DbDefinitionReloadAllCommand { get; private set; }
         public ICommand DbMetaDataAppliedCommand { get; private set; }
         public ICommand OnRemoveMetaDataCommand { get; private set; }
 
-        string _currentTableName = null;
-        int _currentVersion = -1;
         List<CaSchemaEntry> _caSchemas;
-
         EventHub _eventHub;
+
         public DbTableDefinitionController(EventHub eventHub)
         {
             _eventHub = eventHub;
             _eventHub.OnSetDbSchema +=(sender, newSchema) => { Set(newSchema); };
-            _eventHub.OnFileSelected += _eventHub_OnFileSelected;
-            _eventHub.OnHeaderVersionChanged += _eventHub_OnHeaderVersionChanged;
             _eventHub.OnNewDbSchemaRowCreated += AppendRowOfTypeEventHandler;
-            _eventHub.OnCaSchemaLoaded += OnCaSchemaLoadedHandler;
+            _eventHub.OnCaSchemaLoaded += (sender, caSchemas) => { _caSchemas = caSchemas; UpdateMetaDataList(); };
 
             DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
             DbDefinitionRemovedAllCommand = new RelayCommand(OnDbDefinitionRemovedAll);
             DbDefinitionMovedUpCommand = new RelayCommand(OnDbDefinitionMovedUp);
             DbDefinitionMovedDownCommand = new RelayCommand(OnDbDefinitionMovedDown);
             CreateNewDbDefinitionCommand = new RelayCommand(OnCreateNewDbDefinitionCommand);
-            DbDefinitionReloadAllCommand = new RelayCommand(OnDefinitionReloadAll);
             DeselectCommand = new RelayCommand(OnDeselectCommand);
             OnRemoveMetaDataCommand = new RelayCommand(OnRemoveMetaData);
             DbMetaDataAppliedCommand = new RelayCommand<CaSchemaEntry>(OnMetaDataApplied);
-        }
-
-        
-        private void OnCaSchemaLoadedHandler(object sender, List<CaSchemaEntry> e)
-        {
-            _caSchemas = e;
-            UpdateMetaDataList();
         }
 
         void UpdateMetaDataList()
@@ -117,41 +104,6 @@ namespace DbSchemaDecoder.Controllers
             foreach (var item in used)
                 notUsed.Add(item);
             return notUsed;
-        }
-
-        private void _eventHub_OnHeaderVersionChanged(object sender, int e)
-        {
-            if (_currentVersion != e)
-            {
-                _currentVersion = e;
-                LoadCurrentTableDefinition();
-            }
-        }
-
-        private void _eventHub_OnFileSelected(object sender, DataBaseFile e)
-        {
-            if (e.TableType != _currentTableName)
-            {
-                _currentTableName = e.TableType;
-                LoadCurrentTableDefinition();
-            }
-        }
-
-        void LoadCurrentTableDefinition()
-        {
-            if (_currentTableName == null || _currentVersion == -1)
-                return;
-
-            var allTableDefinitions = DBTypeMap.Instance.GetVersionedInfos(_currentTableName, _currentVersion);
-
-            var fieldCollection = allTableDefinitions.FirstOrDefault(x => x.Version == _currentVersion);
-            if (fieldCollection == null)
-            {
-                Set(new List<FieldInfo>());
-                return;
-            }
-
-            Set(fieldCollection.Fields);
         }
 
         public void Set(List<FieldInfo> fields)
@@ -268,12 +220,6 @@ namespace DbSchemaDecoder.Controllers
                     SelectedTypeInformationRow.ReferencedTable = "";
                 UpdateMetaDataList();
             }
-        }
-
-        void OnDefinitionReloadAll()
-        {
-            if (!string.IsNullOrWhiteSpace(_currentTableName))
-                LoadCurrentTableDefinition();
         }
 
         void RecomputeIndexes()

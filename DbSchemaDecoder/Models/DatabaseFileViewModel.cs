@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace DbSchemaDecoder.Models
@@ -32,8 +33,8 @@ namespace DbSchemaDecoder.Models
             get { return !string.IsNullOrWhiteSpace(ErrorMessage); }
         }
 
-        Color _backgroundColour;
-        public Color BackgroundColour
+        Color _backgroundColour = Colors.Black;
+        public Color Color
         {
             get
             {

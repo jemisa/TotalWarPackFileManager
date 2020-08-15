@@ -35,7 +35,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition  Height="100" />
                     <RowDefinition Height="150*"/>
-                    <RowDefinition Height="145*"/>
+                    <RowDefinition Height="100"/>
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <local:FileListView Grid.Column="0" Grid.RowSpan="3"/>
@@ -57,7 +57,14 @@
                     OffSetStringVisual="Hexadecimal"
                     AllowContextMenu="false"
                     x:Name="HexEdit" HorizontalAlignment="Left" Width="585" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                    Grid.RowSpan="3" Grid.Column="1"/>
+                    Grid.RowSpan="2" Grid.Column="1"/>
+                <Grid Grid.Row="2" Grid.Column="1">
+                    <DockPanel>
+                        <Label DockPanel.Dock="Top" Content="Errors:"></Label>
+                        <TreeView DockPanel.Dock="Top" x:Name="ErrorTreeView" >
+                        </TreeView>
+                    </DockPanel>
+                </Grid>
 
                 <Grid Grid.Column="2" Grid.RowSpan="3">
                     <Grid.RowDefinitions>

@@ -66,5 +66,13 @@ namespace DbSchemaDecoder.Util
             OnHeaderVersionChanged?.Invoke(sender, headerVersion);
         }
         public event EventHandler<int> OnHeaderVersionChanged;
+
+
+        public void TriggerErrorParsingCompleted(object sender, List<BatchEvaluator.Result> errorResult)
+        {
+            OnErrorParsingCompleted?.Invoke(sender, errorResult);
+        }
+
+        public event EventHandler<List<BatchEvaluator.Result>> OnErrorParsingCompleted;
     }
 }

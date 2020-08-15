@@ -38,14 +38,6 @@ namespace DbSchemaDecoder.Util
                 results.Add(result);
             }
 
-            /*var tablesWithError = results.Where(x => x.HasError).ToList();
-            var r = results
-                .Where(x => x.HasError == false)
-                .GroupBy(x => x.TabelColumnCount)
-                .Select(x => (x.Key, x.ToList().Count()))
-                .OrderBy(x=>x.Key)
-                .ToList();*/
-
             OnCompleted?.Invoke(this, results);
         }
 
@@ -74,11 +66,11 @@ namespace DbSchemaDecoder.Util
                 var fieldCollections = allTableDefinitions.Where(x => x.Version == header.Version);
                 if (fieldCollections.Count() == 0)
                 {
-                    result.Errors.Add($"No field definition for current version");
+                    result.Errors.Add($"No definition for current version");
                 }
                 else if (fieldCollections.Count() != 1)
                 {
-                    result.Errors.Add($"More then one field definition for current version");
+                    result.Errors.Add($"More then one definition for current version");
                 }
                 else
                 {

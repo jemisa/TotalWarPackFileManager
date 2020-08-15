@@ -1,17 +1,4 @@
-﻿using DbSchemaDecoder.Models;
-using DbSchemaDecoder.Util;
-using Filetypes;
-using Filetypes.Codecs;
-using GalaSoft.MvvmLight.CommandWpf;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using DbSchemaDecoder.Util;
 
 namespace DbSchemaDecoder.Controllers
 {
@@ -37,8 +24,5 @@ namespace DbSchemaDecoder.Controllers
             DbTableDefinitionController = new DbTableDefinitionController(_eventHub);
             SelectedFileHeaderInformationController = new HeaderInformationController(_eventHub);
         }
-
-
-       
     }
 }

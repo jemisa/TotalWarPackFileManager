@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace DbSchemaDecoder.Models
             public List<FieldParserEnum> Enums { get; set; }
             public int Idx { get; set; }
             public string Value { get; set; }
+            public int Columns { get; set; }
         }
         public ObservableCollection<ItemView> Values { get; set; } = new ObservableCollection<ItemView>();
 

@@ -33,10 +33,6 @@
                         Command="{Binding DbTableDefinitionController.DbDefinitionRemovedAllCommand}" />
                     <Separator />
                     <MenuItem 
-                        Header="Reload"  
-                        Command="{Binding DbTableDefinitionController.DbDefinitionReloadAllCommand}" />
-                    <Separator />
-                    <MenuItem 
                         Header="Add Field" 
                         Command="{Binding DbTableDefinitionController.CreateNewDbDefinitionCommand}" />
                     <MenuItem 

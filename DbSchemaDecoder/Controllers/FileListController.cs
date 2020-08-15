@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DbSchemaDecoder.Controllers
 {
@@ -59,6 +60,7 @@ namespace DbSchemaDecoder.Controllers
             {
                 _errorParsingResult = e;
                 ViewModel.DbFilesWithError = _errorParsingResult.Count(x => x.HasError == true);
+                _eventHub.TriggerErrorParsingCompleted(this, _errorParsingResult);
                 BuildFileList();
             });
         }
@@ -96,15 +98,11 @@ namespace DbSchemaDecoder.Controllers
             {
                 var parseRessult = _errorParsingResult?.FirstOrDefault(x => x.TableType == item.TableType);
                 DatabaseFileViewModel model = new DatabaseFileViewModel();
-                if (parseRessult != null)
+                if (parseRessult != null && parseRessult.HasError)
                 {
-                    //System.Windows.Media.SolidColorBrush a = new System.Windows.Media.SolidColorBrush();
-                  //  a.Color = System.Windows.Media.Color.Red;
-
-                    model.ErrorMessage = string.Join("\n", parseRessult.Errors);
-                   // model.BackgroundColour =  = 
+                    model.Color = Colors.Red;
                 }
-                model.DataBaseFile = item;
+                model.DataBaseFile = item;  
                 ViewModel.FileList.Add(model);
             }
         }

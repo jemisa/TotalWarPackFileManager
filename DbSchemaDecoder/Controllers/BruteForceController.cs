@@ -1,11 +1,9 @@
 ﻿using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
-using Filetypes;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -15,14 +13,14 @@ using static DbSchemaDecoder.Models.BruteForceViewModel;
 
 namespace DbSchemaDecoder.Controllers
 {
-
     class BruteForceController : NotifyPropertyChangedImpl
     {
         public enum BruteForceCalculatorType
         { 
             BruteForceUsingCaSchama = 0,
             BruteForce,
-            BruteForceUsingExistingTables
+            BruteForceUsingExistingTables,
+            BruteForceUnknownTableCount
         };
 
         public BruteForceViewModel ViewModel { get; set; } = new BruteForceViewModel();
@@ -43,7 +41,7 @@ namespace DbSchemaDecoder.Controllers
         {
             _eventHub = eventHub;
             _eventHub.OnCaSchemaLoaded += _eventHub_OnCaSchemaLoaded;
-            _eventHub.OnFileSelected += (sender, file) => { _selectedFile = file; };
+            _eventHub.OnFileSelected += (sender, file) => { _selectedFile = file; Cancel(); };
 
             ComputeBruteForceCommand = new RelayCommand(OnCompute);
             SaveResultCommand = new RelayCommand(OnSave);
@@ -59,7 +57,7 @@ namespace DbSchemaDecoder.Controllers
         private void _eventHub_OnCaSchemaLoaded(object sender, List<CaSchemaEntry> e)
         {
             _caSchemaEntryList = e;
-            ViewModel.ColumnCount = e.Count();
+            ViewModel.ColumnCount = _caSchemaEntryList.Count();
         }
 
         void OnItemDoubleClicked(ItemView clickedItem)
@@ -114,7 +112,6 @@ namespace DbSchemaDecoder.Controllers
                 _bruteForceparser = new BruteForceParser(file, combinationProvider, count);
                 ViewModel.TotalPossibleCombinations = _bruteForceparser.PossibleCombinations.ToString("N0");
 
-
                 _bruteForceparser.OnParsingCompleteEvent += ComputationDoneEventHandler;
                 _bruteForceparser.OnCombintionFoundEvent += CombinationFoundEventHandler;
 
@@ -138,7 +135,8 @@ namespace DbSchemaDecoder.Controllers
                 { 
                     Idx= ViewModel.Values.Count() + 1,
                     Value = v,
-                    Enums = val.ToList()
+                    Enums = val.ToList(),
+                    Columns = val.Count(),
                 });
 
                 ViewModel.PossibleCombinationsFound = ViewModel.Values.Count().ToString();

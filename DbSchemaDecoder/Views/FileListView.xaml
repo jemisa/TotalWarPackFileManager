@@ -12,11 +12,7 @@
                   ItemsSource="{Binding ViewModel.FileList}" SelectedItem="{Binding SelectedItem}" 
                   Margin="0,0,0,50">
 
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="Background" Value="{Binding DataBaseFile.Brush}" />
-                </Style>
-            </ListView.ItemContainerStyle>
+
 
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged" >
@@ -26,14 +22,17 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
 
-            <ListView.View>
-                
-                
-                <GridView x:Name="grdTest">
-                    <GridViewColumn Header="File" DisplayMemberBinding="{Binding DataBaseFile.TableType}"  Width="auto"/>
-                    <GridViewColumn Header="Error" DisplayMemberBinding="{Binding ErrorMessage}"  Width="auto"/>
-                </GridView>
-            </ListView.View>
+
+            
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock  Text="{Binding DataBaseFile.TableType , UpdateSourceTrigger=PropertyChanged}">
+                        <TextBlock.Foreground>
+                            <SolidColorBrush Color="{Binding Color , UpdateSourceTrigger=PropertyChanged}"/>
+                        </TextBlock.Foreground>
+                    </TextBlock>
+                </DataTemplate>
+            </ListView.ItemTemplate>
 
         </ListView>
 
@@ -44,11 +43,10 @@
             Height="25" 
             Margin="0,400,74,25" 
             VerticalAlignment="Bottom" FontSize="18">
-            
+
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding FilterButtonCommand}"/>
             </TextBox.InputBindings>
-
         </TextBox>
             
 
