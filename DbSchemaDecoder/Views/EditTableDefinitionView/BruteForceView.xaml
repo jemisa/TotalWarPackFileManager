@@ -57,7 +57,7 @@
                 <Label >
                     <TextBlock>
                         <Run Text="Possible first rows: "/>
-                        <Run Text="{Binding Path=BruteForceController.ViewModel.PossibleFirstRpws, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Run Text="{Binding Path=BruteForceController.ViewModel.PossibleFirstRows, UpdateSourceTrigger=PropertyChanged}"/>
                     </TextBlock>
                 </Label>
             </StackPanel>

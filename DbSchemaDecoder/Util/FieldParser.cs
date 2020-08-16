@@ -200,7 +200,7 @@ namespace DbSchemaDecoder.Util
 
                 byte[] bytes = Encoding.ASCII.GetBytes(value);
                 var isAscii = bytes.All(b => b >= 32 && b <= 127);
-                if (!isAscii)
+                if (isAscii)
                 { 
                     return new ParseResult()
                     {

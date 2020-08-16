@@ -132,7 +132,7 @@ namespace DbSchemaDecoder.Models
         }
 
         string _possibleFirstRpws;
-        public string PossibleFirstRpws
+        public string PossibleFirstRows
         {
             get { return _possibleFirstRpws; }
             set
