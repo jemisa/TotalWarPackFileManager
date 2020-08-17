@@ -25,7 +25,7 @@ namespace DbSchemaDecoder.Controllers
             set
             {
                 _selectedTypeInformationRow = value;
-                _eventHub.SelectedDbSchemaRow = _selectedTypeInformationRow;
+                _windowState.SelectedDbSchemaRow = _selectedTypeInformationRow;
                 NotifyPropertyChanged();
             }
         }
@@ -39,14 +39,14 @@ namespace DbSchemaDecoder.Controllers
         public ICommand DbMetaDataAppliedCommand { get; private set; }
         public ICommand OnRemoveMetaDataCommand { get; private set; }
 
-        WindowState _eventHub;
+        WindowState _windowState;
 
-        public DbTableDefinitionController(WindowState eventHub)
+        public DbTableDefinitionController(WindowState windowState)
         {
-            _eventHub = eventHub;
-            _eventHub.OnSetDbSchema +=(sender, newSchema) => { Set(newSchema); };
-            _eventHub.OnNewDbSchemaRowCreated += AppendRowOfTypeEventHandler;
-            _eventHub.OnCaSchemaLoaded += (sender, caSchemas) => { UpdateMetaDataList(); };
+            _windowState = windowState;
+            _windowState.OnSetDbSchema +=(sender, newSchema) => { Set(newSchema); };
+            _windowState.OnNewDbSchemaRowCreated += AppendRowOfTypeEventHandler;
+            _windowState.OnCaSchemaLoaded += (sender, caSchemas) => { UpdateMetaDataList(); };
 
             DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
             DbDefinitionRemovedAllCommand = new RelayCommand(OnDbDefinitionRemovedAll);
@@ -60,11 +60,11 @@ namespace DbSchemaDecoder.Controllers
 
         void UpdateMetaDataList()
         {
-            if (_eventHub.CaSchema == null || TableTypeInformationRows == null)
+            if (_windowState.CaSchema == null || TableTypeInformationRows == null)
                 return;
 
             CaMetaData.Clear();
-            var unused = BuildUnusedMetaData(_eventHub.CaSchema, TableTypeInformationRows);
+            var unused = BuildUnusedMetaData(_windowState.CaSchema, TableTypeInformationRows);
             foreach (var item in unused)
                 CaMetaData.Add(item);
         }
@@ -148,7 +148,7 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnDefinitionChanged()
         {
-            _eventHub.DbSchemaFields = TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList();
+            _windowState.DbSchemaFields = TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList();
         }
 
         private void OnCreateNewDbDefinitionCommand()

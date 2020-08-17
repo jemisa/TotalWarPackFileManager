@@ -8,12 +8,12 @@ namespace DbSchemaDecoder.Controllers
     {
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
 
-        WindowState _eventHub;
+        WindowState _windowState;
         
-        public CaSchemaController(WindowState eventHub)
+        public CaSchemaController(WindowState windowState)
         {
-            _eventHub = eventHub;
-            _eventHub.OnFileSelected += (sender, file) => { LoadCaSchemaDefinition(file.TableType); };
+            _windowState = windowState;
+            _windowState.OnFileSelected += (sender, file) => { LoadCaSchemaDefinition(file.TableType); };
         }
 
         void LoadCaSchemaDefinition(string tableName)
@@ -24,7 +24,7 @@ namespace DbSchemaDecoder.Controllers
             foreach (var x in res.Entries)
                 CaSchemaEntries.Add(x);
 
-            _eventHub.CaSchema = CaSchemaEntries.ToList();
+            _windowState.CaSchema = CaSchemaEntries.ToList();
         }
     }
 }

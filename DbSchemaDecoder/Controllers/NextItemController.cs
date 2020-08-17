@@ -70,9 +70,9 @@ namespace DbSchemaDecoder.Controllers
         }
 
 
-        WindowState _eventHub;
+        WindowState _windowState;
         public List<NextItemControllerItem> Items { get; set; } = new List<NextItemControllerItem>();
-        public NextItemController(WindowState eventHub)
+        public NextItemController(WindowState windowState)
         {
             Create(DbTypesEnum.String_ascii);
             Create(DbTypesEnum.Optstring_ascii);
@@ -82,10 +82,10 @@ namespace DbSchemaDecoder.Controllers
             Create(DbTypesEnum.Float);
             Create(DbTypesEnum.Boolean);
 
-            _eventHub = eventHub;
-            _eventHub.OnFileSelected += (sender, file) => { Update(); };
-            _eventHub.OnSetDbSchema += (sender, schama) => {  Update(); };
-            _eventHub.OnSelectedDbSchemaRowChanged += (sender, item) => { Update(); };
+            _windowState = windowState;
+            _windowState.OnFileSelected += (sender, file) => { Update(); };
+            _windowState.OnSetDbSchema += (sender, schama) => {  Update(); };
+            _windowState.OnSelectedDbSchemaRowChanged += (sender, item) => { Update(); };
         }
 
 
@@ -113,20 +113,20 @@ namespace DbSchemaDecoder.Controllers
 
         public void OnButtonPressed(NextItemControllerItem val)
         {
-            if (_eventHub.SelectedDbSchemaRow != null)
-                _eventHub.SelectedDbSchemaRow.Type = val.EnumValue;
+            if (_windowState.SelectedDbSchemaRow != null)
+                _windowState.SelectedDbSchemaRow.Type = val.EnumValue;
             else
-                _eventHub.TriggerNewDbSchemaRowCreated(this, val.EnumValue);
+                _windowState.TriggerNewDbSchemaRowCreated(this, val.EnumValue);
         }
 
         void Update()
         {
-            if (_eventHub.DbSchemaFields == null || _eventHub.SelectedFile == null)
+            if (_windowState.DbSchemaFields == null || _windowState.SelectedFile == null)
                 return;
 
-            if (_eventHub.SelectedDbSchemaRow != null)
+            if (_windowState.SelectedDbSchemaRow != null)
             {
-                HelperText = $"Update type for field '{_eventHub.SelectedDbSchemaRow.Name}' at Index '{_eventHub.SelectedDbSchemaRow.Index}'";
+                HelperText = $"Update type for field '{_windowState.SelectedDbSchemaRow.Name}' at Index '{_windowState.SelectedDbSchemaRow.Index}'";
                 Items.ForEach(x => x.ButtonText = "Update");
             }
             else
@@ -135,18 +135,18 @@ namespace DbSchemaDecoder.Controllers
                 Items.ForEach(x => x.ButtonText = "Add");
             }
 
-            using (var stream = new MemoryStream(_eventHub.SelectedFile.DbFile.Data))
+            using (var stream = new MemoryStream(_windowState.SelectedFile.DbFile.Data))
             {
                 using (var reader = new BinaryReader(stream))
                 {
                     DBFileHeader header = PackedFileDbCodec.readHeader(reader);
 
-                    var endIndex = _eventHub.DbSchemaFields.Count();
-                    if (_eventHub.SelectedDbSchemaRow != null)
-                        endIndex = _eventHub.SelectedDbSchemaRow.Index - 1;
+                    var endIndex = _windowState.DbSchemaFields.Count();
+                    if (_windowState.SelectedDbSchemaRow != null)
+                        endIndex = _windowState.SelectedDbSchemaRow.Index - 1;
                     for (int i = 0; i < endIndex; i++)
                     {
-                        _eventHub.DbSchemaFields[i].CreateInstance().TryDecode(reader);
+                        _windowState.DbSchemaFields[i].CreateInstance().TryDecode(reader);
                     }
 
                     var refPos = reader.BaseStream.Position;

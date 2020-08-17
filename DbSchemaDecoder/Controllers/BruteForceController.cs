@@ -27,19 +27,19 @@ namespace DbSchemaDecoder.Controllers
         };
 
         public BruteForceViewModel ViewModel { get; set; } = new BruteForceViewModel();
-        Util.WindowState _eventHub;
+        Util.WindowState _windowState;
         TimedThreadProcess<BruteForceParser>[] _timedProcess;
 
         public ICommand ComputeBruteForceCommand { get; private set; }
         public ICommand SaveResultCommand { get; private set; }
         public ICommand OnClickCommand { get; private set; }
 
-        public BruteForceController(Util.WindowState eventHub)
+        public BruteForceController(Util.WindowState windowState)
         {
-            _eventHub = eventHub;
-            _eventHub.OnCaSchemaLoaded += (sender, caSchema) => { ViewModel.ColumnCount = caSchema.Count(); };
+            _windowState = windowState;
+            _windowState.OnCaSchemaLoaded += (sender, caSchema) => { ViewModel.ColumnCount = caSchema.Count(); };
 
-            _eventHub.OnFileSelected += (sender, file) => 
+            _windowState.OnFileSelected += (sender, file) => 
             { 
                 Cancel(); 
                 ViewModel.Values.Clear(); 
@@ -64,24 +64,24 @@ namespace DbSchemaDecoder.Controllers
 
         void UpdateBruteForceDisplay()
         {
-            if(_eventHub.CaSchema != null)
-                ViewModel.ColumnCount = _eventHub.CaSchema.Count();
+            if(_windowState.CaSchema != null)
+                ViewModel.ColumnCount = _windowState.CaSchema.Count();
 
             var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
             if (bruteForceMethod == BruteForceCalculatorType.BruteForce)
             {
                 ViewModel.BruteForceColumnCountText = "No. Table Columns:";
                 ViewModel.ColumnCountEditable = true;
-                if (_eventHub.DbSchemaFields != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
+                if (_windowState.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _windowState.DbSchemaFields.Count();
                 return;
             }
             else if (bruteForceMethod == BruteForceCalculatorType.BruteForceUnknownTableCount)
             {
                 ViewModel.BruteForceColumnCountText = "Max Columns:";
                 ViewModel.ColumnCountEditable = true;
-                if (_eventHub.DbSchemaFields != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
+                if (_windowState.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _windowState.DbSchemaFields.Count();
                 return;
             }
             else if(bruteForceMethod == BruteForceCalculatorType.BruteForceUsingCaSchama)
@@ -93,16 +93,16 @@ namespace DbSchemaDecoder.Controllers
             else if(bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTables)
             {
                 ViewModel.BruteForceColumnCountText = "No.Total Table Columns:";
-                if(_eventHub.DbSchemaFields != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
+                if(_windowState.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _windowState.DbSchemaFields.Count();
                 ViewModel.ColumnCountEditable = true;
                 return;
             }
             else if (bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount)
             {
                 ViewModel.BruteForceColumnCountText = "No.Total Max Table Columns:";
-                if (_eventHub.DbSchemaFields != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
+                if (_windowState.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _windowState.DbSchemaFields.Count();
                 ViewModel.ColumnCountEditable = true;
                 return;
             }
@@ -116,7 +116,7 @@ namespace DbSchemaDecoder.Controllers
             for (int i = 0; i < items.Count(); i++)
                 items[i].Name = "Unknown" + i;
 
-            _eventHub.DbSchemaFields = items;
+            _windowState.DbSchemaFields = items;
         }
 
         void OnCompute()
@@ -152,7 +152,7 @@ namespace DbSchemaDecoder.Controllers
                     _possibleCombinations += BruteForceParser.PossibleCombinations(i);
 
                 for (int i = 1; i < ViewModel.ColumnCount + 1; i++)
-                    BruteForce(_eventHub.SelectedFile, i, combinationProvider, i - 1);
+                    BruteForce(_windowState.SelectedFile, i, combinationProvider, i - 1);
 
                 ViewModel.ColumnVariationsCompleted = "0/" + ViewModel.ColumnCount;
                 ViewModel.TotalPossibleCombinations = _possibleCombinations.ToString("N0");
@@ -161,7 +161,7 @@ namespace DbSchemaDecoder.Controllers
             {
                 _possibleCombinations = BruteForceParser.PossibleCombinations(ViewModel.ColumnCount);
                 _timedProcess = new TimedThreadProcess<BruteForceParser>[1];
-                BruteForce(_eventHub.SelectedFile, ViewModel.ColumnCount, combinationProvider, 0);
+                BruteForce(_windowState.SelectedFile, ViewModel.ColumnCount, combinationProvider, 0);
 
                 ViewModel.ColumnVariationsCompleted = "0/1";
                 ViewModel.TotalPossibleCombinations = _possibleCombinations.ToString("N0"); ;
@@ -214,11 +214,11 @@ namespace DbSchemaDecoder.Controllers
                         return new AllCombinations();
 
                     case BruteForceCalculatorType.BruteForceUsingCaSchama:
-                        return new CaTableCombinations(_eventHub.CaSchema);
+                        return new CaTableCombinations(_windowState.CaSchema);
 
                     case BruteForceCalculatorType.BruteForceUsingExistingTables:
                     case BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount:
-                        return new AppendTableCombinations(_eventHub.DbSchemaFields.Select(x => x.TypeEnum).ToArray());
+                        return new AppendTableCombinations(_windowState.DbSchemaFields.Select(x => x.TypeEnum).ToArray());
                 }
             }
             catch (Exception e)

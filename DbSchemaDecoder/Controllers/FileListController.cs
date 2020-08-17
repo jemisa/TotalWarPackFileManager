@@ -30,12 +30,12 @@ namespace DbSchemaDecoder.Controllers
 
         // Internal variables
         List<DataBaseFile> _internalFileList = new List<DataBaseFile>();
-        WindowState _eventHub;
+        WindowState _windowState;
         Thread _evaluateThradHandle;
 
-        public FileListController(WindowState eventHub)
+        public FileListController(WindowState windowState)
         {
-            _eventHub = eventHub;
+            _windowState = windowState;
             Load(@"C:\Program Files (x86)\Steam\steamapps\common\Total War WARHAMMER II");
             BatchEvaluator batchEvaluator = new BatchEvaluator(_internalFileList);
             batchEvaluator.OnCompleted += BatchEvaluator_OnCompleted;
@@ -54,7 +54,7 @@ namespace DbSchemaDecoder.Controllers
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
                 ViewModel.DbFilesWithError = errorParsingResult.Count(x => x.HasError == true);
-                _eventHub.FileParsingErrors = errorParsingResult;
+                _windowState.FileParsingErrors = errorParsingResult;
                 BuildFileList();
             });
         }
@@ -62,7 +62,7 @@ namespace DbSchemaDecoder.Controllers
         private void OnFileSelected(DatabaseFileViewModel state)
         {
             if(state != null)
-                _eventHub.SelectedFile = state.DataBaseFile;
+                _windowState.SelectedFile = state.DataBaseFile;
         }
 
         private void OnShowOnlyTablesWithErrors()
@@ -79,8 +79,8 @@ namespace DbSchemaDecoder.Controllers
         {
             IEnumerable<DataBaseFile> items;
 
-            if (ViewModel.OnlyShowTablesWithErrors && _eventHub.FileParsingErrors != null)
-                items = _internalFileList.Where(x => _eventHub.FileParsingErrors.First(e => e.TableType == x.TableType).HasError);
+            if (ViewModel.OnlyShowTablesWithErrors && _windowState.FileParsingErrors != null)
+                items = _internalFileList.Where(x => _windowState.FileParsingErrors.First(e => e.TableType == x.TableType).HasError);
             else
                 items = _internalFileList.AsEnumerable();
 
@@ -90,7 +90,7 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.FileList.Clear();
             foreach (var item in items)
             {
-                var parseRessult = _eventHub.FileParsingErrors?.FirstOrDefault(x => x.TableType == item.TableType);
+                var parseRessult = _windowState.FileParsingErrors?.FirstOrDefault(x => x.TableType == item.TableType);
                 DatabaseFileViewModel model = new DatabaseFileViewModel();
                 if (parseRessult != null && parseRessult.HasError)
                 {

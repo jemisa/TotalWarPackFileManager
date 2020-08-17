@@ -18,24 +18,24 @@ namespace DbSchemaDecoder.Controllers
         readonly DataGridItemSourceUpdater _dataGridUpdater;
         readonly TableEntriesParser _parser = new TableEntriesParser();
 
-        WindowState _eventHub;
-        public TableEntriesController(WindowState eventHub, DataGridItemSourceUpdater dataGridUpdater)
+        WindowState _windowState;
+        public TableEntriesController(WindowState windowState, DataGridItemSourceUpdater dataGridUpdater)
         {
-            _eventHub = eventHub;
+            _windowState = windowState;
             _dataGridUpdater = dataGridUpdater;
-            _eventHub.OnSetDbSchema += (sender, schema) => { Update(schema); };
+            _windowState.OnSetDbSchema += (sender, schema) => { Update(schema); };
         }
 
         void Update(IEnumerable<FieldInfo> schema)
         {
-            if (_eventHub.SelectedFile == null)
+            if (_windowState.SelectedFile == null)
                 return;
 
             DataTable table = new DataTable();
             ViewModel.ParseResult = "";
             try
             {
-                using (var stream = new MemoryStream(_eventHub.SelectedFile.DbFile.Data))
+                using (var stream = new MemoryStream(_windowState.SelectedFile.DbFile.Data))
                 {
                     using (var reader = new BinaryReader(stream))
                     {
