@@ -87,11 +87,11 @@ namespace DbSchemaDecoder
             try
             {
                 HexEdit.CustomBackgroundBlockItems.Clear();
-                HexEdit.AllowByteCount = true;
                 using (BinaryReader reader = new BinaryReader(new MemoryStream(_windowState.SelectedFile.DbFile.Data)))
                 {
                     DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                    HexEdit.CustomBackgroundBlockItems.Add(new WpfHexaEditor.Core.CustomBackgroundBlock(0, header.Length, new SolidColorBrush(Color.FromRgb(254, 0, 0))));
+                    HexEdit.CustomBackgroundBlockItems.Add(
+                        new WpfHexaEditor.Core.CustomBackgroundBlock(0, header.Length, new SolidColorBrush(Color.FromRgb(254, 0, 0)), "Header"));
      
                     if (_windowState.SelectedDbSchemaRow != null && _windowState.DbSchemaFields != null)
                     {
@@ -118,7 +118,7 @@ namespace DbSchemaDecoder
                 }
                 HexEdit.RefreshView();
             }
-            catch ()
+            catch
             { }
         }
 
