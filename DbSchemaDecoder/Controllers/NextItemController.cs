@@ -121,7 +121,7 @@ namespace DbSchemaDecoder.Controllers
 
         void Update()
         {
-            if (_eventHub.DbSchema == null || _eventHub.SelectedFile == null)
+            if (_eventHub.DbSchemaFields == null || _eventHub.SelectedFile == null)
                 return;
 
             if (_eventHub.SelectedDbSchemaRow != null)
@@ -141,12 +141,12 @@ namespace DbSchemaDecoder.Controllers
                 {
                     DBFileHeader header = PackedFileDbCodec.readHeader(reader);
 
-                    var endIndex = _eventHub.DbSchema.Count();
+                    var endIndex = _eventHub.DbSchemaFields.Count();
                     if (_eventHub.SelectedDbSchemaRow != null)
                         endIndex = _eventHub.SelectedDbSchemaRow.Index - 1;
                     for (int i = 0; i < endIndex; i++)
                     {
-                        _eventHub.DbSchema[i].CreateInstance().TryDecode(reader);
+                        _eventHub.DbSchemaFields[i].CreateInstance().TryDecode(reader);
                     }
 
                     var refPos = reader.BaseStream.Position;

@@ -56,6 +56,7 @@
                     ForegroundSecondColor="Blue"
                     OffSetStringVisual="Hexadecimal"
                     AllowContextMenu="false"
+                    AllowAutoHighLightSelectionByte="False"
                     x:Name="HexEdit" HorizontalAlignment="Left" Width="585" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
                     Grid.RowSpan="2" Grid.Column="1"/>
                 <Grid Grid.Row="2" Grid.Column="1">

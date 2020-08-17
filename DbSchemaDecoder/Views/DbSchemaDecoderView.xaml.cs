@@ -2,6 +2,7 @@
 using DbSchemaDecoder.DisplayTableDefinitionView;
 using DbSchemaDecoder.EditTableDefinitionView;
 using DbSchemaDecoder.Util;
+using Filetypes;
 using Filetypes.Codecs;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
@@ -33,7 +34,7 @@ namespace DbSchemaDecoder
     {
         DbSchemaDecoderController _mainController;
         FileListController _fileListController;
-        Util.WindowState _eventHub = new Util.WindowState();
+        Util.WindowState _windowState = new Util.WindowState();
 
         public DbSchemaDecoder()
         {
@@ -51,12 +52,13 @@ namespace DbSchemaDecoder
 
             DataGridItemSourceUpdater dbTableItemSourceUpdater = new DataGridItemSourceUpdater();
 
-            _fileListController = new FileListController(_eventHub);
-            _mainController = new DbSchemaDecoderController(_eventHub, dbTableItemSourceUpdater);
+            _fileListController = new FileListController(_windowState);
+            _mainController = new DbSchemaDecoderController(_windowState, dbTableItemSourceUpdater);
 
             // Hex stuff
-            _eventHub.OnFileSelected += OnFileSelected;
-            _eventHub.OnErrorParsingCompleted += (_0, _1) => { Update(); } ;
+            _windowState.OnFileSelected += OnFileSelected;
+            _windowState.OnErrorParsingCompleted += (_0, _1) => { UpdateParsingErrors(); } ;
+            _windowState.OnSelectedDbSchemaRowChanged +=(_0, _1) => { UpdateSelection(); };
 
             var parent = GetVisualChild(0);
             ControllerHelper.FindController<FileListView>(parent).DataContext = _fileListController;
@@ -70,36 +72,63 @@ namespace DbSchemaDecoder
         }
 
 
-        private void OnFileSelected(object sender, DataBaseFile e)
+        private void OnFileSelected(object sender, DataBaseFile selectedFile)
         {
-            Update();
-            if (e != null)
+            if (selectedFile != null)
             {
-                HexEdit.Stream = new MemoryStream(e.DbFile.Data);
-                HexEdit.CustomBackgroundBlockItems.Add(
-                    new WpfHexaEditor.Core.CustomBackgroundBlock() 
-                    {
-                        Color = new SolidColorBrush(Color.FromRgb(244,0,0)),
-                        StartOffset = 10, 
-                        Length = 50
-                    });
-
-                HexEdit.CustomBackgroundBlockItems.Add(
-                    new WpfHexaEditor.Core.CustomBackgroundBlock()
-                    {
-                        Color = new SolidColorBrush(Color.FromRgb(0, 244, 0)),
-                        StartOffset = 80,
-                        Length = 200
-                    });
+                HexEdit.Stream = new MemoryStream(selectedFile.DbFile.Data);
+                UpdateSelection();
+                UpdateParsingErrors();
             }
         }
 
-        void Update()
+        void UpdateSelection()
+        {
+            try
+            {
+                HexEdit.CustomBackgroundBlockItems.Clear();
+                HexEdit.AllowByteCount = true;
+                using (BinaryReader reader = new BinaryReader(new MemoryStream(_windowState.SelectedFile.DbFile.Data)))
+                {
+                    DBFileHeader header = PackedFileDbCodec.readHeader(reader);
+                    HexEdit.CustomBackgroundBlockItems.Add(new WpfHexaEditor.Core.CustomBackgroundBlock(0, header.Length, new SolidColorBrush(Color.FromRgb(254, 0, 0))));
+     
+                    if (_windowState.SelectedDbSchemaRow != null && _windowState.DbSchemaFields != null)
+                    {
+                        for (int i = 0; i < header.EntryCount; i++)
+                        {
+                            foreach (var field in _windowState.DbSchemaFields)
+                            {
+                                var start = reader.BaseStream.Position;
+                                var value = field.CreateInstance().TryDecode(reader);
+                                var end = reader.BaseStream.Position;
+                                if (field.Name == _windowState.SelectedDbSchemaRow.Name)
+                                {
+                                    HexEdit.CustomBackgroundBlockItems.Add(
+                                    new WpfHexaEditor.Core.CustomBackgroundBlock()
+                                    {
+                                        Color = new SolidColorBrush(Color.FromRgb(0, 255, 0)),
+                                        StartOffset = start ,
+                                        Length = end - start
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+                HexEdit.RefreshView();
+            }
+            catch ()
+            { }
+        }
+
+
+        void UpdateParsingErrors()
         {
             ErrorTreeView.Items.Clear();
-            if (_eventHub.SelectedFile == null || _eventHub.FileParsingErrors == null)
+            if (_windowState.SelectedFile == null || _windowState.FileParsingErrors == null)
                 return;
-            var errorItem = _eventHub.FileParsingErrors.FirstOrDefault(x => x.TableType == _eventHub.SelectedFile.TableType);
+            var errorItem = _windowState.FileParsingErrors.FirstOrDefault(x => x.TableType == _windowState.SelectedFile.TableType);
             if (errorItem == null)
                 return;
             foreach (var item in errorItem.Errors)

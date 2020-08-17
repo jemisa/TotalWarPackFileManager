@@ -72,16 +72,16 @@ namespace DbSchemaDecoder.Controllers
             {
                 ViewModel.BruteForceColumnCountText = "No. Table Columns:";
                 ViewModel.ColumnCountEditable = true;
-                if (_eventHub.DbSchema != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchema.Count();
+                if (_eventHub.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
                 return;
             }
             else if (bruteForceMethod == BruteForceCalculatorType.BruteForceUnknownTableCount)
             {
                 ViewModel.BruteForceColumnCountText = "Max Columns:";
                 ViewModel.ColumnCountEditable = true;
-                if (_eventHub.DbSchema != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchema.Count();
+                if (_eventHub.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
                 return;
             }
             else if(bruteForceMethod == BruteForceCalculatorType.BruteForceUsingCaSchama)
@@ -93,16 +93,16 @@ namespace DbSchemaDecoder.Controllers
             else if(bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTables)
             {
                 ViewModel.BruteForceColumnCountText = "No.Total Table Columns:";
-                if(_eventHub.DbSchema != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchema.Count();
+                if(_eventHub.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
                 ViewModel.ColumnCountEditable = true;
                 return;
             }
             else if (bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount)
             {
                 ViewModel.BruteForceColumnCountText = "No.Total Max Table Columns:";
-                if (_eventHub.DbSchema != null)
-                    ViewModel.ColumnCount = _eventHub.DbSchema.Count();
+                if (_eventHub.DbSchemaFields != null)
+                    ViewModel.ColumnCount = _eventHub.DbSchemaFields.Count();
                 ViewModel.ColumnCountEditable = true;
                 return;
             }
@@ -116,7 +116,7 @@ namespace DbSchemaDecoder.Controllers
             for (int i = 0; i < items.Count(); i++)
                 items[i].Name = "Unknown" + i;
 
-            _eventHub.DbSchema = items;
+            _eventHub.DbSchemaFields = items;
         }
 
         void OnCompute()
@@ -218,7 +218,7 @@ namespace DbSchemaDecoder.Controllers
 
                     case BruteForceCalculatorType.BruteForceUsingExistingTables:
                     case BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount:
-                        return new AppendTableCombinations(_eventHub.DbSchema.Select(x => x.TypeEnum).ToArray());
+                        return new AppendTableCombinations(_eventHub.DbSchemaFields.Select(x => x.TypeEnum).ToArray());
                 }
             }
             catch (Exception e)

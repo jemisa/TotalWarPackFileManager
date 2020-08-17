@@ -148,7 +148,7 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnDefinitionChanged()
         {
-            _eventHub.DbSchema = TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList();
+            _eventHub.DbSchemaFields = TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList();
         }
 
         private void OnCreateNewDbDefinitionCommand()

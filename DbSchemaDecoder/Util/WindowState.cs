@@ -25,7 +25,7 @@ namespace DbSchemaDecoder.Util
 
         // DataBase schema
         List<FieldInfo> _DbSchema;
-        public List<FieldInfo> DbSchema { get { return _DbSchema; } set { _DbSchema = value; OnSetDbSchema?.Invoke(null, _DbSchema); } }
+        public List<FieldInfo> DbSchemaFields { get { return _DbSchema; } set { _DbSchema = value; OnSetDbSchema?.Invoke(null, _DbSchema); } }
         public event EventHandler<List<FieldInfo>> OnSetDbSchema;
 
 

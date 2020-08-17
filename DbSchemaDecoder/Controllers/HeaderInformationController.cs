@@ -35,7 +35,7 @@ namespace DbSchemaDecoder.Controllers
                 var newVersion = ViewModel.Versions.FirstOrDefault(x => x.DisplayValue == ViewModel.SelectedVersion);
                 if (newVersion != null)
                 {
-                    _eventHub.DbSchema = newVersion.TypeInfo.Fields;
+                    _eventHub.DbSchemaFields = newVersion.TypeInfo.Fields;
                 }
             }
         }
@@ -44,9 +44,9 @@ namespace DbSchemaDecoder.Controllers
         {
             var newVersion = ViewModel.Versions.FirstOrDefault(x => x.DisplayValue == ViewModel.SelectedVersion);
             if (newVersion != null)
-                _eventHub.DbSchema =  newVersion.TypeInfo.Fields;
+                _eventHub.DbSchemaFields =  newVersion.TypeInfo.Fields;
             else
-                _eventHub.DbSchema = new List<FieldInfo>();
+                _eventHub.DbSchemaFields = new List<FieldInfo>();
         }
 
         void ParseDatabaseFile(DataBaseFile item)
@@ -61,11 +61,6 @@ namespace DbSchemaDecoder.Controllers
             using (BinaryReader reader = new BinaryReader(new MemoryStream(bytes)))
             {
                 DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                /*if (header != null)
-                {
-                    _eventHub.TriggerOnHeaderVersionChanged(this, header.Version);
-                }*/
-                
                 ViewModel.Update(header, item);
                 OnReloadTable();
             }
