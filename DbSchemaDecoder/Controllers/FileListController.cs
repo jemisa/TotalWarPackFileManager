@@ -5,8 +5,6 @@ using Filetypes.Codecs;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -15,14 +13,12 @@ using System.Windows.Media;
 
 namespace DbSchemaDecoder.Controllers
 {
-
     public class DataBaseFile
     {
         public string TableType { get; set; }
         public PackedFile DbFile { get; set; }
     }
 
-    
 
     class FileListController : NotifyPropertyChangedImpl
     {
@@ -33,12 +29,11 @@ namespace DbSchemaDecoder.Controllers
         public ICommand OnlyShowTablesWithErrorCommand { get; private set; }
 
         // Internal variables
-        List<BatchEvaluator.Result> _errorParsingResult = null;
         List<DataBaseFile> _internalFileList = new List<DataBaseFile>();
-        EventHub _eventHub;
+        WindowState _eventHub;
         Thread _evaluateThradHandle;
 
-        public FileListController(EventHub eventHub)
+        public FileListController(WindowState eventHub)
         {
             _eventHub = eventHub;
             Load(@"C:\Program Files (x86)\Steam\steamapps\common\Total War WARHAMMER II");
@@ -54,13 +49,12 @@ namespace DbSchemaDecoder.Controllers
             _evaluateThradHandle.Start();
         }
 
-        private void BatchEvaluator_OnCompleted(object sender, List<BatchEvaluator.Result> e)
+        private void BatchEvaluator_OnCompleted(object sender, List<BatchEvaluator.Result> errorParsingResult)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
-                _errorParsingResult = e;
-                ViewModel.DbFilesWithError = _errorParsingResult.Count(x => x.HasError == true);
-                _eventHub.TriggerErrorParsingCompleted(this, _errorParsingResult);
+                ViewModel.DbFilesWithError = errorParsingResult.Count(x => x.HasError == true);
+                _eventHub.FileParsingErrors = errorParsingResult;
                 BuildFileList();
             });
         }
@@ -68,7 +62,7 @@ namespace DbSchemaDecoder.Controllers
         private void OnFileSelected(DatabaseFileViewModel state)
         {
             if(state != null)
-                _eventHub.TriggerOnFileSelected(null, state.DataBaseFile);
+                _eventHub.SelectedFile = state.DataBaseFile;
         }
 
         private void OnShowOnlyTablesWithErrors()
@@ -85,8 +79,8 @@ namespace DbSchemaDecoder.Controllers
         {
             IEnumerable<DataBaseFile> items;
 
-            if (ViewModel.OnlyShowTablesWithErrors && _errorParsingResult != null)
-                items = _internalFileList.Where(x => _errorParsingResult.First(e => e.TableType == x.TableType).HasError);
+            if (ViewModel.OnlyShowTablesWithErrors && _eventHub.FileParsingErrors != null)
+                items = _internalFileList.Where(x => _eventHub.FileParsingErrors.First(e => e.TableType == x.TableType).HasError);
             else
                 items = _internalFileList.AsEnumerable();
 
@@ -96,7 +90,7 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.FileList.Clear();
             foreach (var item in items)
             {
-                var parseRessult = _errorParsingResult?.FirstOrDefault(x => x.TableType == item.TableType);
+                var parseRessult = _eventHub.FileParsingErrors?.FirstOrDefault(x => x.TableType == item.TableType);
                 DatabaseFileViewModel model = new DatabaseFileViewModel();
                 if (parseRessult != null && parseRessult.HasError)
                 {

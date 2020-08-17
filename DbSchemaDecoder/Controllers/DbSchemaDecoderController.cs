@@ -11,18 +11,18 @@ namespace DbSchemaDecoder.Controllers
         public TableEntriesController TableEntriesController { get; set; }
         public HeaderInformationController SelectedFileHeaderInformationController { get; set; }
 
-        EventHub _eventHub;
+        WindowState _windowState;
 
-        public DbSchemaDecoderController(EventHub eventHub, DataGridItemSourceUpdater dbTableItemSourceUpdater)
+        public DbSchemaDecoderController(WindowState eventHub, DataGridItemSourceUpdater dbTableItemSourceUpdater)
         {
-            _eventHub = eventHub;
+            _windowState = eventHub;
 
-            TableEntriesController = new TableEntriesController(_eventHub, dbTableItemSourceUpdater);
-            NextItemController = new NextItemController(_eventHub);
-            BruteForceController = new BruteForceController(_eventHub);
-            CaSchemaController = new CaSchemaController(_eventHub);
-            DbTableDefinitionController = new DbTableDefinitionController(_eventHub);
-            SelectedFileHeaderInformationController = new HeaderInformationController(_eventHub);
+            TableEntriesController = new TableEntriesController(_windowState, dbTableItemSourceUpdater);
+            NextItemController = new NextItemController(_windowState);
+            BruteForceController = new BruteForceController(_windowState);
+            CaSchemaController = new CaSchemaController(_windowState);
+            DbTableDefinitionController = new DbTableDefinitionController(_windowState);
+            SelectedFileHeaderInformationController = new HeaderInformationController(_windowState);
         }
     }
 }

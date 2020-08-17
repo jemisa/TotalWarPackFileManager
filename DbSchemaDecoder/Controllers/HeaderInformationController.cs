@@ -16,10 +16,10 @@ namespace DbSchemaDecoder.Controllers
     class HeaderInformationController
     {
         public HeaderInformationViewModel ViewModel { get; set; } = new HeaderInformationViewModel();
-        EventHub _eventHub;
+        WindowState _eventHub;
 
         public ICommand ReloadCommand { get; private set; }
-        public HeaderInformationController(EventHub eventHub)
+        public HeaderInformationController(WindowState eventHub)
         {
             _eventHub = eventHub;
             _eventHub.OnFileSelected += (sender, file) => { ParseDatabaseFile(file); };
@@ -35,7 +35,7 @@ namespace DbSchemaDecoder.Controllers
                 var newVersion = ViewModel.Versions.FirstOrDefault(x => x.DisplayValue == ViewModel.SelectedVersion);
                 if (newVersion != null)
                 {
-                    _eventHub.TriggerSetDbSchema(this, newVersion.TypeInfo.Fields);
+                    _eventHub.DbSchema = newVersion.TypeInfo.Fields;
                 }
             }
         }
@@ -44,9 +44,9 @@ namespace DbSchemaDecoder.Controllers
         {
             var newVersion = ViewModel.Versions.FirstOrDefault(x => x.DisplayValue == ViewModel.SelectedVersion);
             if (newVersion != null)
-                _eventHub.TriggerSetDbSchema(this, newVersion.TypeInfo.Fields);
+                _eventHub.DbSchema =  newVersion.TypeInfo.Fields;
             else
-                _eventHub.TriggerSetDbSchema(this, new List<FieldInfo>());
+                _eventHub.DbSchema = new List<FieldInfo>();
         }
 
         void ParseDatabaseFile(DataBaseFile item)

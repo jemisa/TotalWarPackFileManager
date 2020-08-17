@@ -31,13 +31,9 @@ namespace DbSchemaDecoder
     /// </summary>
     public partial class DbSchemaDecoder : UserControl
     {
-        
-
         DbSchemaDecoderController _mainController;
-
         FileListController _fileListController;
-        DataBaseFile _selectedFile;
-        List<BatchEvaluator.Result> _errorResult;
+        Util.WindowState _eventHub = new Util.WindowState();
 
         public DbSchemaDecoder()
         {
@@ -53,20 +49,14 @@ namespace DbSchemaDecoder
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-            ErrorTreeView.Items.Add("Error 1");
-            ErrorTreeView.Items.Add("Error 2");
-            ErrorTreeView.Items.Add("Error 3");
-
-            EventHub eventHub = new EventHub();
-
             DataGridItemSourceUpdater dbTableItemSourceUpdater = new DataGridItemSourceUpdater();
 
-            _fileListController = new FileListController(eventHub);
-            _mainController = new DbSchemaDecoderController(eventHub, dbTableItemSourceUpdater);
+            _fileListController = new FileListController(_eventHub);
+            _mainController = new DbSchemaDecoderController(_eventHub, dbTableItemSourceUpdater);
 
             // Hex stuff
-            eventHub.OnFileSelected += OnFileSelected;
-            eventHub.OnErrorParsingCompleted += EventHub_OnErrorParsingCompleted;
+            _eventHub.OnFileSelected += OnFileSelected;
+            _eventHub.OnErrorParsingCompleted += (_0, _1) => { Update(); } ;
 
             var parent = GetVisualChild(0);
             ControllerHelper.FindController<FileListView>(parent).DataContext = _fileListController;
@@ -79,15 +69,9 @@ namespace DbSchemaDecoder
             dbTableItemSourceUpdater.Grid = dbParsedEntitiesTableView.DbEntriesViewDataGrid;
         }
 
-        private void EventHub_OnErrorParsingCompleted(object sender, List<BatchEvaluator.Result> e)
-        {
-            _errorResult = e;
-            Update();
-        }
 
         private void OnFileSelected(object sender, DataBaseFile e)
         {
-            _selectedFile = e;
             Update();
             if (e != null)
             {
@@ -113,9 +97,9 @@ namespace DbSchemaDecoder
         void Update()
         {
             ErrorTreeView.Items.Clear();
-            if (_selectedFile == null || _errorResult == null)
+            if (_eventHub.SelectedFile == null || _eventHub.FileParsingErrors == null)
                 return;
-            var errorItem = _errorResult.FirstOrDefault(x => x.TableType == _selectedFile.TableType);
+            var errorItem = _eventHub.FileParsingErrors.FirstOrDefault(x => x.TableType == _eventHub.SelectedFile.TableType);
             if (errorItem == null)
                 return;
             foreach (var item in errorItem.Errors)

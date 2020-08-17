@@ -30,7 +30,7 @@ namespace DbSchemaDecoder.Util
         { 
             _timer = new System.Timers.Timer(updateInterval);
             _timer.Elapsed += _timer_Elapsed;
-            _timer.AutoReset = true;
+            _timer.AutoReset = true; 
             _instance = instance;
             _instance.OnThreadCompleted += OnThreadCompleted;
         }

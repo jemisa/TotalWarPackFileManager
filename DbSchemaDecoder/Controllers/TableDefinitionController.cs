@@ -25,7 +25,7 @@ namespace DbSchemaDecoder.Controllers
             set
             {
                 _selectedTypeInformationRow = value;
-                _eventHub.TriggerOnSelectedDbSchemaRowChanged(this, _selectedTypeInformationRow);
+                _eventHub.SelectedDbSchemaRow = _selectedTypeInformationRow;
                 NotifyPropertyChanged();
             }
         }
@@ -39,15 +39,14 @@ namespace DbSchemaDecoder.Controllers
         public ICommand DbMetaDataAppliedCommand { get; private set; }
         public ICommand OnRemoveMetaDataCommand { get; private set; }
 
-        List<CaSchemaEntry> _caSchemas;
-        EventHub _eventHub;
+        WindowState _eventHub;
 
-        public DbTableDefinitionController(EventHub eventHub)
+        public DbTableDefinitionController(WindowState eventHub)
         {
             _eventHub = eventHub;
             _eventHub.OnSetDbSchema +=(sender, newSchema) => { Set(newSchema); };
             _eventHub.OnNewDbSchemaRowCreated += AppendRowOfTypeEventHandler;
-            _eventHub.OnCaSchemaLoaded += (sender, caSchemas) => { _caSchemas = caSchemas; UpdateMetaDataList(); };
+            _eventHub.OnCaSchemaLoaded += (sender, caSchemas) => { UpdateMetaDataList(); };
 
             DbDefinitionRemovedCommand = new RelayCommand(OnDbDefinitionRemoved);
             DbDefinitionRemovedAllCommand = new RelayCommand(OnDbDefinitionRemovedAll);
@@ -61,11 +60,11 @@ namespace DbSchemaDecoder.Controllers
 
         void UpdateMetaDataList()
         {
-            if (_caSchemas == null || TableTypeInformationRows == null)
+            if (_eventHub.CaSchema == null || TableTypeInformationRows == null)
                 return;
 
             CaMetaData.Clear();
-            var unused = BuildUnusedMetaData(_caSchemas, TableTypeInformationRows);
+            var unused = BuildUnusedMetaData(_eventHub.CaSchema, TableTypeInformationRows);
             foreach (var item in unused)
                 CaMetaData.Add(item);
         }
@@ -106,8 +105,29 @@ namespace DbSchemaDecoder.Controllers
             return notUsed;
         }
 
+
+        bool AreEqual(List<FieldInfo> newItems, ObservableCollection<FieldInfoViewModel> oldItems)
+        {
+            if (newItems.Count != oldItems.Count)
+                return false;
+
+            for (int i = 0; i < newItems.Count; i++)
+            {
+                var newItem = newItems[i];
+                var oldItem = oldItems[i];
+                if (newItem != oldItem.GetFieldInfo())
+                    return false;
+            }
+
+            return true;
+        }
+
         public void Set(List<FieldInfo> fields)
         {
+            // Avoid circular triggering
+            if (AreEqual(fields, TableTypeInformationRows))
+                return;
+
             TableTypeInformationRows.Clear();
             for (int i = 0; i < fields.Count(); i++)
             {
@@ -116,6 +136,7 @@ namespace DbSchemaDecoder.Controllers
                 TableTypeInformationRows.Add(newFieldInfoViewModel);
             }
 
+            RecomputeIndexes();
             UpdateMetaDataList();
             OnDefinitionChanged();
         }
@@ -127,7 +148,7 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnDefinitionChanged()
         {
-            _eventHub.TriggerOnDbSchemaChanged(this, TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList());
+            _eventHub.DbSchema = TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList();
         }
 
         private void OnCreateNewDbDefinitionCommand()

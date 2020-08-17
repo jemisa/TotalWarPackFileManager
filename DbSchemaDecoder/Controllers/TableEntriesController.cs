@@ -18,33 +18,29 @@ namespace DbSchemaDecoder.Controllers
         readonly DataGridItemSourceUpdater _dataGridUpdater;
         readonly TableEntriesParser _parser = new TableEntriesParser();
 
-
-        DataBaseFile _seletedFile;
-        EventHub _eventHub;
-        public TableEntriesController(EventHub eventHub, DataGridItemSourceUpdater dataGridUpdater)
+        WindowState _eventHub;
+        public TableEntriesController(WindowState eventHub, DataGridItemSourceUpdater dataGridUpdater)
         {
             _eventHub = eventHub;
             _dataGridUpdater = dataGridUpdater;
-
-            _eventHub.OnFileSelected += (sender, file) => { _seletedFile = file; };
-            _eventHub.OnDbSchemaChanged += (sender, schama) => { Update(schama); };
+            _eventHub.OnSetDbSchema += (sender, schema) => { Update(schema); };
         }
 
-        void Update(IEnumerable<FieldInfo> schama)
+        void Update(IEnumerable<FieldInfo> schema)
         {
-            if (_seletedFile == null)
+            if (_eventHub.SelectedFile == null)
                 return;
 
             DataTable table = new DataTable();
             ViewModel.ParseResult = "";
             try
             {
-                using (var stream = new MemoryStream(_seletedFile.DbFile.Data))
+                using (var stream = new MemoryStream(_eventHub.SelectedFile.DbFile.Data))
                 {
                     using (var reader = new BinaryReader(stream))
                     {
                         DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                        var parseResult = _parser.ParseTable(reader, stream.Capacity, schama.ToList(), (int)header.EntryCount);
+                        var parseResult = _parser.ParseTable(reader, stream.Capacity, schema.ToList(), (int)header.EntryCount);
                         if (parseResult.HasError)
                             ViewModel.ParseResult = parseResult.Error;
 
@@ -66,7 +62,6 @@ namespace DbSchemaDecoder.Controllers
                         { 
                             
                         }
-                       
                     }
                 }
             }
