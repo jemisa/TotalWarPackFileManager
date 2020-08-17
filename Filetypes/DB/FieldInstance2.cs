@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -101,10 +102,8 @@ namespace Filetypes.DB
 
     class FieldInstance2
     {
-        string _enumvalue;
         IFieldParser _parser;   // static?
         FieldMetaData _metaData;
-        
     }
 
     class FieldInstanceValue
@@ -114,4 +113,141 @@ namespace Filetypes.DB
         bool _valid;
 
     }*/
+
+
+    abstract class FieldParser
+    {
+        public abstract bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error);
+        public abstract bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error);
+        //public abstract bool Encode();
+    }
+
+    abstract class NumberParser : FieldParser
+    {
+        protected abstract int FieldSize { get; }
+
+        protected abstract string Decode(byte[] buffer, int index);
+
+        public override bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
+        {
+            if (buffer.Length - index < FieldSize)
+            {
+                bytesRead = 0;
+                _error = "Not enough space in stream";
+                return false;
+            }
+            bytesRead = FieldSize;
+            _error = null;
+            return true;
+        }
+
+        public override bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
+        {
+            value = null;
+            bool canDecode = CanDecode(buffer, index, out bytesRead, out _error);
+            if (canDecode)
+                value = Decode(buffer, index);
+            return canDecode;
+        }
+    }
+
+    class IntFieldParser : NumberParser
+    {
+        protected override int FieldSize => 4;
+
+        protected override string Decode(byte[] buffer, int index)
+        {
+            return BitConverter.ToInt32(buffer, index).ToString();
+        }
+    }
+
+    class SingleFieldParser : NumberParser
+    {
+        protected override int FieldSize => 4;
+
+        protected override string Decode(byte[] buffer, int index)
+        {
+            return BitConverter.ToSingle(buffer, index).ToString();
+        }
+    }
+
+    class ShortFieldParser : NumberParser
+    {
+        protected override int FieldSize => 2;
+
+        protected override string Decode(byte[] buffer, int index)
+        {
+            return BitConverter.ToInt16(buffer, index).ToString();
+        }
+    }
+
+    class BoolFieldParser : FieldParser
+    {
+        protected int FieldSize => 1;
+
+        public override bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
+        {
+            if (buffer.Length - index < FieldSize)
+            {
+                bytesRead = 0;
+                _error = "Not enough space in stream";
+                return false;
+            }
+            var value = buffer[index];
+            if (!(value == 1 || value == 0))
+            {
+                bytesRead = 0;
+                _error = value + " is not a valid bool";
+                return false;
+            }
+
+            bytesRead = FieldSize;
+            _error = null;
+            return true;
+        }
+
+        public override bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
+        {
+            value = null;
+            bool canDecode = CanDecode(buffer, index, out bytesRead, out _error);
+            if (canDecode)
+                value = (buffer[index] == 1).ToString();
+            return canDecode;
+        }
+    }
+
+
+    class OptStringFieldParser : FieldParser
+    {
+        public override bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
+        {
+            _error = null;
+            bytesRead = 0;
+            byte flag = buffer[index];
+            if (flag == 1)
+            {
+                var result = IOFunctions.ReadCAString(reader, stringEncoding);
+            }
+            else if (flag != 0)
+            {
+
+                _error = "can never be";
+
+            }
+
+            if (buffer.Length < index)
+                _error = "out of range";
+            bytesRead = 4;
+            return true;
+        }
+
+        public override bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string _error)
+        {
+            var intVal = BitConverter.ToInt32(buffer, index);
+            value = "sdf";
+            bytesRead = 4;
+            _error = "";
+            return true;
+        }
+    }
 }
