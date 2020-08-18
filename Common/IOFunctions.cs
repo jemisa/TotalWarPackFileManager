@@ -84,72 +84,7 @@ namespace Common {
         }
 
 
-        public static bool TryReadReadCAStringAsArray(byte[] buffer, int index, Encoding encoding, bool isOptString,
-            out string errorMessage, out int stringStart, out int stringLength, out int bytesInString)
-        {
-            stringStart = 0;
-            stringLength = 0;
-            bytesInString = 0;
-            var bytesLeft = buffer.Length - index;
 
-            int offset = 0;
-            bool readTheString = true;
-            if (isOptString)
-            {
-                if (bytesLeft < 4)
-                {
-                    errorMessage = $"Cannot read optString flag {bytesLeft} bytes left";
-                    return false;
-                }
-
-                var flag = BitConverter.ToInt32(buffer, index);
-                if (flag == 0)
-                {
-                    readTheString = false;
-                }
-                else if (flag != 1)
-                {
-                    errorMessage = $"Invalid flag {flag} at beginnning of optStr";
-                    return false;
-                }
-                offset += 4;
-                bytesLeft -= 4;
-            }
-
-            if (readTheString)
-            {
-                if (bytesLeft < 2)
-                {
-                    errorMessage = $"Cannot read length of string {bytesLeft} bytes left";
-                    return false;
-                }
-
-                int num = BitConverter.ToInt16(buffer, index + offset);
-                bytesLeft -= 2;
-                if (0 > num)
-                {
-                    errorMessage = "Negative file length";
-                    return false;
-                }
-
-                // Unicode is 2 bytes per character; UTF8 is variable, but the number stored is the number of bytes, so use that
-                int bytes = (encoding == Encoding.Unicode ? 2 : 1) * num;
-                // enough data left?
-                if (bytesLeft < bytes)
-                {
-                    errorMessage = string.Format("Cannot read string of length {0}: only {1} bytes left", bytes, bytesLeft);
-                    return false;
-                }
-
-                stringStart = (index + 2 + offset);
-                stringLength = num;
-                bytesInString = bytes + 2;
-            }
-
-            bytesInString += offset;
-            errorMessage = null;
-            return true;
-        }
 
 
 
