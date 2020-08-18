@@ -39,7 +39,7 @@ namespace DbSchemaDecoder.Controllers
         }
     }
 
-    class CaSchemaEntry : ICloneable
+    public class CaSchemaEntry : ICloneable
     {
         public int index { get; set; }
         public string field_uuid { get; set; }

@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "dgSpecHash": "VAjV38vpwBaADmXA4ju2jugqveY4N85imVW3huFZcYSVMiFB6odVMeNo6j3d6GZwBmLvFG3ewVlF+yqj24AHnw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\PackFileManagerUnitTests\\PackFileManagerUnitTests.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ole_k\\.nuget\\packages\\bigfloat\\1.1.0\\bigfloat.1.1.0.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\commonservicelocator\\2.0.2\\commonservicelocator.2.0.2.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\freeimage.standard\\4.3.8\\freeimage.standard.4.3.8.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.19\\microsoft.xaml.behaviors.wpf.1.1.19.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\mstest.testadapter\\2.1.1\\mstest.testadapter.2.1.1.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\mstest.testframework\\2.1.1\\mstest.testframework.2.1.1.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\mvvmlightlibs\\5.4.1.1\\mvvmlightlibs.5.4.1.1.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\sevenzip\\19.0.0\\sevenzip.19.0.0.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\system.drawing.common\\4.5.1\\system.drawing.common.4.5.1.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\system.drawing.primitives\\4.3.0\\system.drawing.primitives.4.3.0.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\wpfhexaeditor\\2.0.2\\wpfhexaeditor.2.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}

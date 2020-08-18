@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DbSchemaDecoder.Util
 {
 
-    enum FieldParserEnum
+    public enum FieldParserEnum
     {
         OptStringTypeAscii,
         StringTypeAscii,

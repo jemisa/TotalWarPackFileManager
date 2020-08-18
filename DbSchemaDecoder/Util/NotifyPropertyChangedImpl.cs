@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Util
 {
-    class NotifyPropertyChangedImpl : INotifyPropertyChanged
+    public class NotifyPropertyChangedImpl : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

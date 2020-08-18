@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Models
 {
-    class FileListViewModel : NotifyPropertyChangedImpl
+    public class FileListViewModel : NotifyPropertyChangedImpl
     {
         string _searchFilter;
         public string SearchFilter

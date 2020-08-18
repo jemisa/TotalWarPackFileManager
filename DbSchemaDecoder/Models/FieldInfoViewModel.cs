@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Models
 {
-    class FieldInfoViewModel : NotifyPropertyChangedImpl
+    public class FieldInfoViewModel : NotifyPropertyChangedImpl
     {
 
         public int Index { get { return _index; } }

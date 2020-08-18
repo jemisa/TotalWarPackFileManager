@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
 {
-    class HeaderInformationController
+    public class HeaderInformationController
     {
         public HeaderInformationViewModel ViewModel { get; set; } = new HeaderInformationViewModel();
         WindowState _windowState;

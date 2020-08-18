@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DbSchemaDecoder.Controllers
 {
-    class CaSchemaController
+    public class CaSchemaController
     {
         public ObservableCollection<CaSchemaEntry> CaSchemaEntries { get; set; } = new ObservableCollection<CaSchemaEntry>();
 

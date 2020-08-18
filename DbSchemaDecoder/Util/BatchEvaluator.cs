@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Util
 {
-    class BatchEvaluator
+    public class BatchEvaluator
     {
         public event EventHandler<List<Result>> OnCompleted;
         public class Result

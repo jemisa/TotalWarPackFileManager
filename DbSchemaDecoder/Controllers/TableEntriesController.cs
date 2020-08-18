@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace DbSchemaDecoder.Controllers
 {
-    class TableEntriesController
+    public class TableEntriesController
     {
         public DbTableViewModel ViewModel { get; set; } = new DbTableViewModel();
 

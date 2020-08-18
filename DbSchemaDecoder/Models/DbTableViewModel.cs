@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace DbSchemaDecoder.Models
 {
-    class DbTableViewModel : NotifyPropertyChangedImpl
+    public class DbTableViewModel : NotifyPropertyChangedImpl
     {
         public DataTable EntityTable { get; set; } = new DataTable();
 

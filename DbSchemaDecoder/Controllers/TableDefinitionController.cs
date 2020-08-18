@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
 {
-    class DbTableDefinitionController : NotifyPropertyChangedImpl
+    public class DbTableDefinitionController : NotifyPropertyChangedImpl
     {
         public ObservableCollection<CaSchemaEntry> CaMetaData { get; set; } = new ObservableCollection<CaSchemaEntry>();
         public ObservableCollection<FieldInfoViewModel> TableTypeInformationRows { get; set; } = new ObservableCollection<FieldInfoViewModel>();

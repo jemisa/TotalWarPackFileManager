@@ -15,7 +15,7 @@ using static DbSchemaDecoder.Models.BruteForceViewModel;
 
 namespace DbSchemaDecoder.Controllers
 {
-    class BruteForceController : NotifyPropertyChangedImpl
+    public class BruteForceController : NotifyPropertyChangedImpl
     {
         public enum BruteForceCalculatorType
         { 

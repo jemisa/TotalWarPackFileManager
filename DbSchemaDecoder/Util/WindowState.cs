@@ -10,7 +10,7 @@ using static DbSchemaDecoder.Util.BatchEvaluator;
 
 namespace DbSchemaDecoder.Util
 {
-    class WindowState
+    public class WindowState
     {
         // File handling
         DataBaseFile _selectedFile;

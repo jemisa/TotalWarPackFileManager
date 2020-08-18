@@ -16,7 +16,7 @@ using System.Windows.Input;
 namespace DbSchemaDecoder.Controllers
 {
 
-    class NextItemControllerItem : NotifyPropertyChangedImpl
+    public class NextItemControllerItem : NotifyPropertyChangedImpl
     {
         string _CustomDisplayText;
         public string CustomDisplayText
@@ -56,7 +56,7 @@ namespace DbSchemaDecoder.Controllers
 
     }
 
-    class NextItemController : NotifyPropertyChangedImpl
+    public class NextItemController : NotifyPropertyChangedImpl
     {
         string _helperText;
         public string HelperText

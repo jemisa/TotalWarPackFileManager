@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Models
 {
-    class BruteForceViewModel : NotifyPropertyChangedImpl
+    public class BruteForceViewModel : NotifyPropertyChangedImpl
     {
         public class ItemView
         {

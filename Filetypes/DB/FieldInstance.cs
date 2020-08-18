@@ -100,6 +100,7 @@ namespace Filetypes {
                 return stringEncoding.GetBytes(Value).Length;
             }
         }
+
         public override int ReadLength {
             get {
                 return Length + 2;

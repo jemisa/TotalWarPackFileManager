@@ -259,7 +259,7 @@ namespace Filetypes {
         #endregion
 	}
 
-	class StringType : FieldInfo {
+	public class StringType : FieldInfo {
 		public StringType () {
 			TypeName = "string";
 			TypeCode = TypeCode.String;
@@ -282,7 +282,7 @@ namespace Filetypes {
             };
         }
     }
-    class StringTypeAscii : FieldInfo {
+    public class StringTypeAscii : FieldInfo {
          public StringTypeAscii () {
              TypeName = "string_ascii";
              TypeCode = TypeCode.String;
@@ -305,7 +305,7 @@ namespace Filetypes {
         }
     }
 
-	class IntType : FieldInfo {
+    public class IntType : FieldInfo {
 		public IntType () {
 			TypeName = "int";
 			TypeCode = TypeCode.Int32;
@@ -329,7 +329,7 @@ namespace Filetypes {
         }
     }
 
-	class ShortType : FieldInfo {
+    public class ShortType : FieldInfo {
 		public ShortType () {
 			TypeName = "short";
 			TypeCode = TypeCode.Int16;
@@ -354,7 +354,7 @@ namespace Filetypes {
         }
     }
 
-	class SingleType : FieldInfo {
+    public class SingleType : FieldInfo {
 		public SingleType () {
 			TypeName = "float";
 			TypeCode = TypeCode.Single;
@@ -379,7 +379,7 @@ namespace Filetypes {
         }
     }
 
-    class DoubleType : FieldInfo 
+    public class DoubleType : FieldInfo 
     {
         public DoubleType () 
         {
@@ -405,7 +405,7 @@ namespace Filetypes {
         }
     }
 
-	class BoolType : FieldInfo {
+    public class BoolType : FieldInfo {
 		public BoolType () {
 			TypeName = "boolean";
 			TypeCode = TypeCode.Boolean;

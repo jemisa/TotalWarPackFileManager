@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace DbSchemaDecoder.Models
 {
-    class DatabaseFileViewModel : NotifyPropertyChangedImpl
+    public class DatabaseFileViewModel : NotifyPropertyChangedImpl
     {
         public DataBaseFile DataBaseFile { get; set; }
 

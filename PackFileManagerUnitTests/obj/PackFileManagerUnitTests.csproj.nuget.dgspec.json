@@ -1,0 +1,251 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\PackFileManagerUnitTests\\PackFileManagerUnitTests.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj": {
+      "restore": {
+        "projectUniqueName": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj",
+        "projectName": "Common",
+        "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj"
+      },
+      "frameworks": {
+        "net472": {}
+      }
+    },
+    "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\DbSchemaDecoder\\DbSchemaDecoder.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\DbSchemaDecoder\\DbSchemaDecoder.csproj",
+        "projectName": "DbSchemaDecoder",
+        "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\DbSchemaDecoder\\DbSchemaDecoder.csproj",
+        "packagesPath": "C:\\Users\\ole_k\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\DbSchemaDecoder\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\ole_k\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {
+              "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj": {
+                "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj"
+              },
+              "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\ExternalProjects\\WPFHexaEditor\\WpfHexEditorCore.csproj": {
+                "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\ExternalProjects\\WPFHexaEditor\\WpfHexEditorCore.csproj"
+              },
+              "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj": {
+                "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj"
+              }
+            }
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "BigFloat": {
+              "target": "Package",
+              "version": "[1.1.0, )"
+            },
+            "Microsoft.Xaml.Behaviors.Wpf": {
+              "target": "Package",
+              "version": "[1.1.19, )"
+            },
+            "MvvmLightLibs": {
+              "target": "Package",
+              "version": "[5.4.1.1, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    },
+    "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\ExternalProjects\\WPFHexaEditor\\WpfHexEditorCore.csproj": {
+      "version": "2.0.2",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\ExternalProjects\\WPFHexaEditor\\WpfHexEditorCore.csproj",
+        "projectName": "WPFHexaEditor",
+        "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\ExternalProjects\\WPFHexaEditor\\WpfHexEditorCore.csproj",
+        "packagesPath": "C:\\Users\\ole_k\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\ExternalProjects\\WPFHexaEditor\\obj\\",
+        "projectStyle": "PackageReference",
+        "crossTargeting": true,
+        "configFilePaths": [
+          "C:\\Users\\ole_k\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net47"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net47": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net47": {
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj",
+        "projectName": "Filetypes",
+        "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj",
+        "packagesPath": "C:\\Users\\ole_k\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\ole_k\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {
+              "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj": {
+                "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj"
+              }
+            }
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "FreeImage.Standard": {
+              "target": "Package",
+              "version": "[4.3.8, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
+            "SevenZip": {
+              "target": "Package",
+              "version": "[19.0.0, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    },
+    "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\PackFileManagerUnitTests\\PackFileManagerUnitTests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\PackFileManagerUnitTests\\PackFileManagerUnitTests.csproj",
+        "projectName": "PackFileManagerUnitTests",
+        "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\PackFileManagerUnitTests\\PackFileManagerUnitTests.csproj",
+        "packagesPath": "C:\\Users\\ole_k\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\PackFileManagerUnitTests\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\ole_k\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {
+              "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj": {
+                "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj"
+              },
+              "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\DbSchemaDecoder\\DbSchemaDecoder.csproj": {
+                "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\DbSchemaDecoder\\DbSchemaDecoder.csproj"
+              },
+              "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj": {
+                "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj"
+              }
+            }
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[2.1.1, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[2.1.1, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

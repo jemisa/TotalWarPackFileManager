@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace DbSchemaDecoder.Util
 {
-    class DataGridItemSourceUpdater
+    public class DataGridItemSourceUpdater
     {
         public DataGrid Grid { get; set; }
 

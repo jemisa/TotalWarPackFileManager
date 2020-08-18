@@ -20,7 +20,7 @@ namespace DbSchemaDecoder.Controllers
     }
 
 
-    class FileListController : NotifyPropertyChangedImpl
+    public class FileListController : NotifyPropertyChangedImpl
     {
         // Ui related variables
         public FileListViewModel ViewModel { get; set; } = new FileListViewModel();
