@@ -1,79 +1,46 @@
 ﻿using Common;
 using DbSchemaDecoder.Controllers;
 using DbSchemaDecoder.Util;
-using Filetypes;
-using Filetypes.Codecs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PackFileManagerUnitTests.Utility;
 
 namespace PackFileManagerUnitTests.SbSchemaDecoder
 {
     [TestClass]
     public class TableEntriesControllerTests
     {
-        void LoadTestSchameas()
-        { 
-        
-        }
-
-        void CreateRow(DBFile file, string[] values)
-        {
-            var row = new DBRow(file.CurrentType);
-            for (int i = 0; i < file.CurrentType.Fields.Count; i++)
-            {
-                row[i].Value = values[i];
-            }
-            file.Entries.Add(row);
-        }
-
         [TestMethod]
-        public void IntParser()
+        public void ConvertTabele_validDefinition()
         {
-
-            var fields = new List<FieldInfo>()
-            {
-                new StringTypeAscii() { Name = "FirstName"},
-                new StringTypeAscii() { Name = "LastName"},
-                new IntType() { Name = "Age"},
-                new SingleType() { Name = "Height"},
-            };
-            TypeInfo myType = new TypeInfo(fields)
-            {
-                Name = "TestPeople",
-                Version = 4,
-            };
-
-            DBFileHeader header = new DBFileHeader(Guid.NewGuid().ToString(), myType.Version, 0, false);
-            DBFile dbFile = new DBFile(header, myType);
-
-            CreateRow(dbFile, new string[]{ "Ole", "Kristian", "21", "178.4" });
-            CreateRow(dbFile, new string[]{ "Line", "Homelien", "21", "158.4" });
-            CreateRow(dbFile, new string[]{ "Jenny", "boop", "0", "88.4" });
-
-
-
-            PackedFileDbCodec a = new PackedFileDbCodec(myType.Name);
-            var bytes = a.Encode(dbFile);
-
-
+            var table = DbHelper.CreateTestPeopleTable();
+            DbHelper.AddRow(table, new string[]{ "Ole", "Kjærsti", "21", "178.4" });
+            DbHelper.AddRow(table, new string[]{ "Line", "Burito", "21", "158.4" });
+            DbHelper.AddRow(table, new string[]{ "Jonny", "boop", "0", "88.4" });
+            var bytes = DbHelper.GetBytes(table);
 
             WindowState state = new WindowState();
             TableEntriesController controller = new TableEntriesController(state, null);
 
             state.SelectedFile = new DataBaseFile()
             {
-                TableType = myType.Name,
+                TableType = table.CurrentType.Name,
                 DbFile = new PackedFile()
                 {
                     Data = bytes
                 }
             };
-            state.DbSchemaFields = fields;
+            state.DbSchemaFields = table.CurrentType.Fields;
+
+            Assert.AreEqual(4, controller.ViewModel.EntityTable.Columns.Count);
+            Assert.AreEqual(3, controller.ViewModel.EntityTable.Rows.Count);
+
+            var row = controller.ViewModel.EntityTable.Rows[1];
+            Assert.AreEqual("Line", row.ItemArray[0]);
+            Assert.AreEqual("Burito", row.ItemArray[1]);
+            Assert.AreEqual("21", row.ItemArray[2]);
+            Assert.AreEqual("158.4", row.ItemArray[3]);
         }
-        //
+
+      
     }
 }

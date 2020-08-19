@@ -3,12 +3,9 @@ using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
 using GalaSoft.MvvmLight.Command;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers

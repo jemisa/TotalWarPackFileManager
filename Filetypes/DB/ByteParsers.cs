@@ -1,5 +1,8 @@
 ﻿using Common;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Filetypes.DB
@@ -314,10 +317,18 @@ namespace Filetypes.DB
         }
     }
 
+    public class DbColumnDefinition 
+    {
+        public DbFieldMetaData MetaData { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DbTypesEnum Type { get; set; }
+    }
+
     public class DbField : ICloneable
     {
         ByteParser _parser;
-        public DbFieldMetaData MetaData { get; set; }
+       
         public ByteParser Parser { get { return _parser; } }
         public string Value { get; set; }
         public string Error { get; set; }
@@ -333,5 +344,12 @@ namespace Filetypes.DB
         {
             return MemberwiseClone();
         }
+    }
+
+    public class DbTableDefinition
+    { 
+        public string TableName { get; set; }
+        public int Version { get; set; }
+        public List<DbColumnDefinition> ColumnDefinitions { get; set; } = new List<DbColumnDefinition>();
     }
 }

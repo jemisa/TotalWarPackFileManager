@@ -58,6 +58,7 @@
     <Compile Include="Models\FieldInfoViewModel.cs" />
     <Compile Include="Util\BatchEvaluator.cs" />
     <Compile Include="Util\BruteForceParser.cs" />
+    <Compile Include="Util\DbSchemaVersionUpdater.cs" />
     <Compile Include="Util\WindowState.cs" />
     <Compile Include="Util\RadioBoolToIntConverter.cs" />
     <Compile Include="Util\DataGridEx.cs" />

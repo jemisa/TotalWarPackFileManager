@@ -23,6 +23,10 @@ namespace DbSchemaDecoder.Controllers
             CaSchemaController = new CaSchemaController(_windowState);
             DbTableDefinitionController = new DbTableDefinitionController(_windowState);
             SelectedFileHeaderInformationController = new HeaderInformationController(_windowState);
+
+
+            DbSchemaVersionUpdater updater = new DbSchemaVersionUpdater();
+            updater.Convert();
         }
     }
 }
