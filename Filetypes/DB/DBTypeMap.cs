@@ -12,8 +12,7 @@ namespace Filetypes
 {
     public class DBTypeMap
     {
-
-        Dictionary<string, List<TypeInfo>> _typeInfos = new Dictionary<string, List<TypeInfo>>();
+        private Dictionary<string, List<TypeInfo>> _typeInfos = new Dictionary<string, List<TypeInfo>>();
         public Dictionary<string, List<TypeInfo>> AllInfos { get { return _typeInfos; } }
 
         public static DBTypeMap Instance { get; private set; } = new DBTypeMap();

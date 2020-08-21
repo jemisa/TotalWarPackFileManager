@@ -1,6 +1,7 @@
 ﻿using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
 using Filetypes;
+using Filetypes.ByteParsing;
 using Filetypes.DB;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;

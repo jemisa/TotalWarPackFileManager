@@ -15,10 +15,10 @@ namespace Filetypes
         Float,
         Single,
         Decimal,
-        Double,
         Boolean,
         List,
     }
+
 	public class Types 
     {
         public static FieldInfo FromEnum(DbTypesEnum typeEnum)
@@ -42,8 +42,6 @@ namespace Filetypes
                 case DbTypesEnum.Single:
                 case DbTypesEnum.Decimal:
                     return SingleType();
-                case DbTypesEnum.Double:
-                    return DoubleType ();
                 case DbTypesEnum.Boolean:
                     return BoolType();
                 case DbTypesEnum.List:
@@ -60,7 +58,6 @@ namespace Filetypes
         public static FieldInfo OptStringType() { return new OptStringType() { Name = "unknown" }; }
         public static FieldInfo OptStringTypeAscii() { return new OptStringTypeAscii() { Name = "unknown" }; }
         public static FieldInfo SingleType() { return new SingleType() { Name = "unknown" }; }
-        public static FieldInfo DoubleType() { return new DoubleType() { Name = "unknown" }; }
         public static FieldInfo ListType() { return new ListType() { Name = "unknown" }; }
     }
  
@@ -220,23 +217,6 @@ namespace Filetypes
         }
     }
 
-    public class DoubleType : FieldInfo 
-    {
-        public DoubleType () 
-        {
-            TypeName = "double";
-            TypeCode = TypeCode.Single;
-            TypeEnum = DbTypesEnum.Double;
-        }
-        public override FieldInstance CreateInstance() 
-        {
-            return new DoubleField() {
-                Name = this.Name,
-                Value = "0"
-            };
-        }
-    }
-
     public class BoolType : FieldInfo {
 		public BoolType () {
 			TypeName = "boolean";
@@ -266,6 +246,7 @@ namespace Filetypes
             };
         }
     }
+
     class OptStringTypeAscii : FieldInfo {
         public OptStringTypeAscii () {
             TypeName = "optstring_ascii";
@@ -280,8 +261,6 @@ namespace Filetypes
         }
     }
 
-
-    
     public class ListType : FieldInfo {
         public ListType() {
             TypeName = "list";

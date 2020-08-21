@@ -36,7 +36,7 @@ namespace DbSchemaDecoder.Util
 
         abstract public string InstanceName();
 
-        public static FieldParser CreateFromEnum(FieldParserEnum parserEnum) 
+       /* public static FieldParser CreateFromEnum(FieldParserEnum parserEnum) 
         {
             switch (parserEnum)
             {
@@ -57,9 +57,9 @@ namespace DbSchemaDecoder.Util
             }
 
             throw new NotImplementedException();
-        }
-
-        class OptStringTypeAscii : FieldParser
+        }*/
+/*
+    class OptStringTypeAscii : FieldParser
     {
         public override string InstanceName()
         {
@@ -327,5 +327,6 @@ namespace DbSchemaDecoder.Util
             return Types.SingleType();
         }
     }
+        */
     }
 }

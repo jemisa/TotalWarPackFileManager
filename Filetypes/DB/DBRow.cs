@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace Filetypes {
+namespace Filetypes 
+{
+
+
     public class DBRow : List<FieldInstance> {
         private TypeInfo info;
         

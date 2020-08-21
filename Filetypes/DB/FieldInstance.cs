@@ -4,13 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Common;
-using System.Runtime.InteropServices.WindowsRuntime;
 
-namespace Filetypes {
-    /*
-     * A single item of data in a db table.
-     * These can be encoded/decoded to and from a string.
-     */
+namespace Filetypes
+{
+
     [DebuggerDisplay("{Value}:{Info}; ")]
     public abstract class FieldInstance {
         public FieldInstance(FieldInfo fieldInfo, string value = "") {
@@ -87,9 +84,6 @@ namespace Filetypes {
         #endregion
     }
 
-    /*
-     * String Field.
-     */
     public class StringField : FieldInstance {
         protected Encoding stringEncoding = Encoding.Unicode;
 
@@ -121,18 +115,12 @@ namespace Filetypes {
         }
     }
     
-    /*
-     * It's actually StringFieldUTF8, but I'm not going to rename it now.
-     */
     public class StringFieldAscii : StringField {
         public StringFieldAscii() : base(Types.StringTypeAscii()) { 
             stringEncoding = Encoding.UTF8;
         }
     }
 
-    /*
-     * 4 byte Int Field.
-     */
     public class IntField : FieldInstance {
         public IntField() : base(Types.IntType(), "0") { Length = 4; }
         public override void Decode(BinaryReader reader) {
@@ -155,9 +143,6 @@ namespace Filetypes {
         }
     }
     
-    /*
-     * 2-byte Short Field.
-     */
     public class ShortField : FieldInstance {
         public ShortField() : base(Types.ShortType(), "0") { Length = 2;  }
         public override void Decode(BinaryReader reader) {
@@ -180,9 +165,6 @@ namespace Filetypes {
         }
     }
     
-    /*
-     * Single Field.
-     */
     public class SingleField : FieldInstance {
         public SingleField() : base(Types.SingleType(), "0") { Length = 4; }
         public override void Decode(BinaryReader reader) {
@@ -213,39 +195,7 @@ namespace Filetypes {
         }
     }
     
-    public class DoubleField : FieldInstance {
-        public DoubleField() : base(Types.DoubleType(), "0") { Length = 8; }
-        public override void Decode(BinaryReader reader) {
-            Value = reader.ReadDouble ().ToString ();
-        }
-        public override void Encode(BinaryWriter writer) {
-            writer.Write (double.Parse (Value));
-        }
 
-        public override bool TryDecode(BinaryReader reader)
-        {
-            if (reader.BaseStream.Length - reader.BaseStream.Position < 8)
-            {
-                //Value = "Not enough space in stream";
-                return false;
-            }
-            Decode(reader);
-            return true;
-        }
-
-        public override string Value {
-            get {
-                return base.Value;
-            }
-            set {
-                base.Value = double.Parse(value).ToString();
-            }
-        }
-    }
-    
-    /*
-     * Bool Field.
-     */
     public class BoolField : FieldInstance {
         public BoolField() : base(Types.BoolType(), false.ToString()) { Length = 1; }
         public override void Decode(BinaryReader reader) {
@@ -289,12 +239,9 @@ namespace Filetypes {
             }
         }
     }
-    
-    /*
-     * Opt String Field.
-     */
-    public class OptStringField : FieldInstance {
-        private bool readLengthZero = false;
+
+    public class OptStringField : FieldInstance 
+    {
         protected Encoding stringEncoding = Encoding.Unicode;
         public OptStringField() : base(Types.OptStringType()) {}
         public OptStringField(FieldInfo info) : base(info) {}
@@ -306,7 +253,6 @@ namespace Filetypes {
             if (b == 1) 
             {
                 result = IOFunctions.ReadCAString (reader, stringEncoding);
-                readLengthZero = result.Length == 0;
             } 
             else if (b != 0) 
             {
@@ -320,16 +266,7 @@ namespace Filetypes {
                 return stringEncoding.GetBytes(Value).Length;
             }
         }
-        public override int ReadLength {
-            get {
-                if (readLengthZero) {
-                    return 3;
-                } else {
-                    // 1 byte for true/false, two for string length if not empty
-                    return base.ReadLength + (Value.Length == 0 ? 1 : 3);
-                }
-            }
-        }
+
         public override void Encode(BinaryWriter writer) {
             writer.Write (Value.Length > 0);
             if (Value.Length > 0) {
@@ -350,7 +287,6 @@ namespace Filetypes {
             {
                 var result = IOFunctions.TryReadReadCAString(reader, stringEncoding, out var stringResult);
                 Value = stringResult;
-                readLengthZero = Value.Length == 0;
                 return result;
             }
             else if (b != 0)
@@ -363,21 +299,14 @@ namespace Filetypes {
             return true;
         }
     }
-    public class OptStringFieldAscii : OptStringField {
+
+    public class OptStringFieldAscii : OptStringField 
+    {
         public OptStringFieldAscii() : base(Types.OptStringTypeAscii()) { 
             stringEncoding = Encoding.UTF8;
         }
     }
 
-    /*
-     * VarByte Field.
-     */
-
- 
-    
-    /*
-     * List Field.
-     */
     public class ListField : FieldInstance {
         public ListField(ListType type) : base(type) {}
         

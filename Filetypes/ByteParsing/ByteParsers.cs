@@ -1,11 +1,9 @@
-﻿using Common;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
-namespace Filetypes.DB
+namespace Filetypes.ByteParsing
 {
     public interface ByteParser
     {
@@ -249,7 +247,6 @@ namespace Filetypes.DB
         protected override bool IsOptStr => true;
     }
 
-
     public static class ByteParsers
     {
         public static IntParser Int32 { get; set; } = new IntParser();
@@ -295,7 +292,6 @@ namespace Filetypes.DB
                     return ByteParsers.Bool;
 
                 case DbTypesEnum.Decimal:
-                case DbTypesEnum.Double:
                 case DbTypesEnum.List:
                     throw new NotImplementedException();
             }
