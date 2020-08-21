@@ -43,7 +43,6 @@ namespace Filetypes
         {
             if (Initialized)
                 return;
-
             foreach (string file in SCHEMA_FILENAMES)
             {
                 string xmlFile = Path.Combine(basePath, file);

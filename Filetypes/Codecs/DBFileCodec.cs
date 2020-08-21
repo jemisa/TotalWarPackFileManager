@@ -107,14 +107,7 @@ namespace Filetypes.Codecs {
         }
         #endregion
 
-        /*
-         * Query if given packed file can be deccoded.
-         * Is not entirely reliable because it only reads the header and checks if a 
-         * type definition is available for the given GUID and/or type name and version.
-         * The actual decode tries out all available type infos for that type name
-         * but that is less efficient because it has to read the whole file at least once
-         * if successful.
-         */
+
         public static bool CanDecode(PackedFile packedFile, out string display) 
         {
             bool result = true;
