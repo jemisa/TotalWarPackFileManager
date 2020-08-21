@@ -17,6 +17,7 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using Aga.Controls.Tree;
 using PackFileManager.Dialogs.Settings;
+using Filetypes.DB;
 
 namespace PackFileManager
 {

@@ -58,6 +58,7 @@
     <Compile Include="DB\FieldInfo.cs" />
     <Compile Include="DB\FieldInstance.cs" />
     <Compile Include="DB\ByteParsers.cs" />
+    <Compile Include="DB\SchemaManager.cs" />
     <Compile Include="DB\TypeInfo.cs" />
     <Compile Include="Codecs\LocCodec.cs" />
     <Compile Include="Esf\AbcaCodec.cs" />

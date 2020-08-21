@@ -2,6 +2,7 @@
 using DbSchemaDecoder.Controllers;
 using Filetypes;
 using Filetypes.Codecs;
+using Filetypes.DB;
 using System;
 using System.Collections.Generic;
 using System.IO;

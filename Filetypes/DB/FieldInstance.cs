@@ -372,57 +372,7 @@ namespace Filetypes {
     /*
      * VarByte Field.
      */
-    public class VarByteField : FieldInstance {
-        public VarByteField() : this(1) {}
-        public VarByteField(int len) : base(Types.ByteType()) { Length = len; }
-        public override void Decode(BinaryReader reader) {
-            if (Length == 0) {
-                Value = "";
-                return;
-            }
-            byte[] bytes = reader.ReadBytes (Length);
-            StringBuilder result = new StringBuilder (3 * bytes.Length);
-            result.Append (string.Format ("{0:x2}", bytes [0]));
-            for (int i = 1; i < bytes.Length; i++) {
-                result.Append (string.Format (" {0:x2}", bytes [i]));
-            }
-            base.Value = result.ToString ();
-        }
-        public override void Encode(BinaryWriter writer) {
-            string[] split = Value.Split (' ');
-            foreach (string s in split) {
-                writer.Write (byte.Parse(s, System.Globalization.NumberStyles.HexNumber));
-            }
-        }
 
-        public override bool TryDecode(BinaryReader reader)
-        {
-            Decode(reader);
-            return true;
-        }
-
-        public override string Value {
-            get {
-                return base.Value;
-            }
-            set {
-                if (string.IsNullOrEmpty(value)) {
-                    base.Value = "";
-                } else {
-#if DEBUG
-                    Console.WriteLine("parsing '{0}' as byte", value);
-#endif
-                    StringBuilder result = new StringBuilder(value.Length);
-                    string[] split = value.Split(' ');
-                    result.Append(string.Format("{0}", byte.Parse(split[0]).ToString()));
-                    for(int i = 1; i < split.Length; i++) {
-                        result.Append(string.Format(" {0}", byte.Parse(split[1]).ToString("x2")));
-                    }
-                    base.Value = result.ToString();
-                }
-            }
-        }
-    }
  
     
     /*

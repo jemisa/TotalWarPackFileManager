@@ -60,41 +60,6 @@ namespace Filetypes {
             throw new InvalidOperationException(String.Format("Cannot create field info from {0}", typeEnum.ToString()));
         }
 
-        public static FieldInfo FromTypeName(string typeName) {
-			switch (typeName) {
-			case "string":
-				return StringType ();
-            case "string_ascii":
-                return StringTypeAscii();
-			case "optstring":
-				return OptStringType ();
-            case "optstring_ascii":
-                return OptStringTypeAscii();
-			case "int":
-            case "integer":
-            case "autonumber":
-				return IntType ();
-			case "short":
-				return ShortType ();
-			case "float":
-            case "single":
-            case "decimal":
-            case "double":
-                return SingleType ();
-                // return DoubleType ();
-			case "boolean":
-            case "yesno":
-				return BoolType ();
-            case "list":
-                return ListType();
-			}
-			if (typeName.StartsWith ("blob")) {
-				string lengthPart = typeName.Substring (4);
-				int length = int.Parse (lengthPart);
-				return new VarBytesType (length);
-			}
-            throw new InvalidOperationException(String.Format("Cannot create field info from {0}", typeName));
-		}
         public static FieldInfo StringType() { return new StringType() { Name = "unknown" }; }
         public static FieldInfo StringTypeAscii() { return new StringTypeAscii() { Name = "unknown" }; }
         public static FieldInfo IntType() { return new IntType() { Name = "unknown" }; }
@@ -104,7 +69,6 @@ namespace Filetypes {
         public static FieldInfo OptStringTypeAscii() { return new OptStringTypeAscii() { Name = "unknown" }; }
         public static FieldInfo SingleType() { return new SingleType() { Name = "unknown" }; }
         public static FieldInfo DoubleType() { return new DoubleType() { Name = "unknown" }; }
-        public static FieldInfo ByteType() { return new VarBytesType(1) { Name = "unknown" }; }
         public static FieldInfo ListType() { return new ListType() { Name = "unknown" }; }
     }
  
@@ -472,30 +436,7 @@ namespace Filetypes {
         }
     }
 
-	public class VarBytesType : FieldInfo {
-        int byteCount;
-		public VarBytesType (int bytes) {
-			TypeName = string.Format("blob{0}", byteCount);
-			TypeCode = TypeCode.Empty;
-            byteCount = bytes;
 
-        }
-        public override FieldInstance CreateInstance() {
-            return new VarByteField(byteCount) {
-                Name = this.Name
-            };
-        }
-
-        public override FieldInfo Copy()
-        {
-            return new OptStringTypeAscii()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
-            };
-        }
-    }
     
     public class ListType : FieldInfo {
         public ListType() {
