@@ -14,12 +14,6 @@ namespace Filetypes.Codecs {
         
         public static readonly ICodec<DBFile> Instance = new TextDbCodec();
         
-        public static byte[] Encode(DBFile file) {
-            using (MemoryStream stream = new MemoryStream()) {
-                TextDbCodec.Instance.Encode(stream, file);
-                return stream.ToArray();
-            }
-        }
 
         public DBFile Decode(Stream stream) {
             return Decode (new StreamReader (stream));

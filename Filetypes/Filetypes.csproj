@@ -46,7 +46,6 @@
     <Compile Include="Codecs\ICodec.cs" />
     <Compile Include="Codecs\AtlasCodec.cs" />
     <Compile Include="Codecs\BitmapCodec.cs" />
-    <Compile Include="Codecs\CaXmlDbFileCodec.cs" />
     <Compile Include="Codecs\DelegatingDbFileCodec.cs" />
     <Compile Include="Codecs\DelegatingEsfCodec.cs" />
     <Compile Include="Codecs\TextCodec.cs" />
@@ -85,14 +84,9 @@
     <Compile Include="UnitVariant\UnitVariantFile.cs" />
     <Compile Include="UnitVariant\UnitVariantObject.cs" />
     <Compile Include="Groupformations\Groupformation.cs" />
-    <Compile Include="Models\ModelCodecs.cs" />
-    <Compile Include="Models\Models.cs" />
-    <Compile Include="Models\Buildings.cs" />
-    <Compile Include="Models\Naval.cs" />
     <Compile Include="DB\DBFileUpdate.cs" />
     <Compile Include="DB\SchemaOptimizer.cs" />
     <Compile Include="Codecs\TextDbCodec.cs" />
-    <Compile Include="Codecs\ModToolDBCodec.cs" />
     <Compile Include="DB\FieldMappingManager.cs" />
     <Compile Include="DB\DBRow.cs" />
   </ItemGroup>

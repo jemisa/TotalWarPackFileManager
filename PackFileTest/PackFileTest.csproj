@@ -65,7 +65,6 @@
     <Compile Include="ReferenceChecker.cs" />
     <Compile Include="UnitVariantTest.cs" />
     <Compile Include="GroupformationTest.cs" />
-    <Compile Include="ModelsTest.cs" />
     <Compile Include="PackedFileTest.cs" />
   </ItemGroup>
   <ItemGroup>
