@@ -93,7 +93,7 @@ namespace DbSchemaDecoder.Controllers
 
         void Create(DbTypesEnum enumValue)
         {
-            var type = ParserFactory.Create(enumValue);
+            var type = ByteParserFactory.Create(enumValue);
             NextItemControllerItem viewModel = new NextItemControllerItem();
             viewModel.EnumValue = enumValue;
             viewModel.CustomDisplayText = type.TypeName;
@@ -104,7 +104,7 @@ namespace DbSchemaDecoder.Controllers
 
         void UpdateViewModel(NextItemControllerItem viewModelRef, byte[] data, int index)
         {
-            var parser = ParserFactory.Create(viewModelRef.EnumValue);
+            var parser = ByteParserFactory.Create(viewModelRef.EnumValue);
             var result = parser.TryDecode(data, index, out string value, out var _, out string error);
             if (result == false)
                 viewModelRef.ValueText = "Error:" + error;
@@ -148,7 +148,7 @@ namespace DbSchemaDecoder.Controllers
                     for (int i = 0; i < endIndex; i++)
                     {
                         var byteParserType = _windowState.DbSchemaFields[i].Type;
-                        var parser = ParserFactory.Create(byteParserType);
+                        var parser = ByteParserFactory.Create(byteParserType);
                         parser.TryDecode(_windowState.SelectedFile.DbFile.Data, index, out _, out var bytesRead, out _);
                         index += bytesRead;
                     }

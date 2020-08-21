@@ -32,7 +32,7 @@ namespace DbSchemaDecoder.Util
                     output.ColumnNames[i] = columnDefinitions[i].MetaData.Name;
 
                 // Find the actuall parsers
-                var fieldInstances = columnDefinitions.Select(x => ParserFactory.Create(x.Type)).ToArray();
+                var fieldInstances = columnDefinitions.Select(x => ByteParserFactory.Create(x.Type)).ToArray();
 
                 // Parse the table
                 output.DataRows = new string[expectedEntries][];
@@ -81,7 +81,7 @@ namespace DbSchemaDecoder.Util
             if (columnDefinitions.Count() != 0)
             {
                 // Find the actuall parsers
-                var fieldInstances = columnDefinitions.Select(x => ParserFactory.Create(x.Type)).ToArray();
+                var fieldInstances = columnDefinitions.Select(x => ByteParserFactory.Create(x.Type)).ToArray();
 
                 for (int rowIndex = 0; rowIndex < expectedEntries; rowIndex++)
                 {

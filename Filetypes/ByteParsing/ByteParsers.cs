@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Filetypes.DB;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Filetypes.ByteParsing
@@ -273,7 +275,7 @@ namespace Filetypes.ByteParsing
         public static StringAsciiParser StringAscii { get; set; } = new StringAsciiParser();
     }
 
-    public static class ParserFactory
+    public static class ByteParserFactory
     {
         public static ByteParser Create(DbTypesEnum typeEnum)
         {
@@ -335,6 +337,14 @@ namespace Filetypes.ByteParsing
             return value;
         }
 
+        public void Read(ByteParser parser, out string value, out string error)
+        {
+            if (!parser.TryDecode(_buffer, _currentIndex, out  value, out int bytesRead, out error))
+                throw new Exception("Unable to parse :" + error);
+
+            _currentIndex += bytesRead;
+        }
+
         public int ReadInt32() => Read(ByteParsers.Int32);
         public float ReadSingle() => Read(ByteParsers.Single);
         public short ReadShort() => Read(ByteParsers.Short);
@@ -368,14 +378,23 @@ namespace Filetypes.ByteParsing
     public class DbField : ICloneable
     {
         ByteParser _parser;
-       
+        string _error = "";
+        string _value = "";
+
+        public DbField(DbTypesEnum type)
+        {
+            Type = type;
+        }
+
         public ByteParser Parser { get { return _parser; } }
-        public string Value { get; set; }
-        public string Error { get; set; }
-        public bool HasError { get; set; }
-        public DbTypesEnum Type { get { return _parser.Type; } set { _parser = ParserFactory.Create(value); } }
-        public void Decode()
-        { }
+        public string Value { get { return _value; } set { _value = value; } }
+        public string Error { get { return _error; } }
+        public bool HasError { get { return !string.IsNullOrWhiteSpace(_error); } }
+        public DbTypesEnum Type { get { return _parser.Type; } set { _parser = ByteParserFactory.Create(value); } }
+        public void Decode(ByteChunk chunk)
+        {
+            chunk.Read(_parser, out _value, out _error);
+        }
 
         public void Encode()
         { }
@@ -383,6 +402,61 @@ namespace Filetypes.ByteParsing
         public object Clone()
         {
             return MemberwiseClone();
+        }
+    }
+
+    public class DBRow : List<DbField>
+    {
+        private DbTableDefinition info;
+
+        public DBRow(DbTableDefinition i, List<DbField> val) : base(val)
+        {
+            info = i;
+        }
+        public DBRow(DbTableDefinition i) : this(i, CreateRow(i)) { }
+
+
+        public DbField this[string fieldName]
+        {
+            get
+            {
+                return this[IndexOfField(fieldName)];
+            }
+            set
+            {
+                this[IndexOfField(fieldName)] = value;
+            }
+        }
+
+        public bool SameData(DBRow row)
+        {
+            if (Count != row.Count)
+                return false;
+            for (int i = 0; i < Count; ++i)
+                if (!this[i].Value.Equals(row[i].Value))
+                    return false;
+            return true;
+        }
+
+        private int IndexOfField(string fieldName)
+        {
+            for (int i = 0; i < info.ColumnDefinitions.Count; i++)
+            {
+                if (info.ColumnDefinitions[i].MetaData.Name == fieldName)
+                    return i;
+            }
+            throw new IndexOutOfRangeException(string.Format("Field name {0} not valid for type {1}", fieldName, info.TableName));
+        }
+
+        static List<DbField> CreateRow(DbTableDefinition info)
+        {
+            List<DbField> result = new List<DbField>(info.ColumnDefinitions.Count);
+            foreach (var item in info.ColumnDefinitions)
+            {
+                var dbfield = new DbField(item.Type);
+                result.Add(dbfield);
+            }
+            return result;
         }
     }
 
