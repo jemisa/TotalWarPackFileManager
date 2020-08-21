@@ -10,11 +10,8 @@ namespace Filetypes
         Optstring,
         Optstring_ascii,
         Integer,
-        Autonumber,
         Short,
-        Float,
         Single,
-        Decimal,
         Boolean,
         List,
     }
@@ -34,13 +31,10 @@ namespace Filetypes
                 case DbTypesEnum.Optstring_ascii:
                     return OptStringTypeAscii();
                 case DbTypesEnum.Integer:
-                case DbTypesEnum.Autonumber:
                     return IntType();
                 case DbTypesEnum.Short:
                     return ShortType();
-                case DbTypesEnum.Float:
                 case DbTypesEnum.Single:
-                case DbTypesEnum.Decimal:
                     return SingleType();
                 case DbTypesEnum.Boolean:
                     return BoolType();

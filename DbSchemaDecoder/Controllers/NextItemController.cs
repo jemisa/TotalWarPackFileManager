@@ -81,7 +81,7 @@ namespace DbSchemaDecoder.Controllers
             Create(DbTypesEnum.String);
             Create(DbTypesEnum.Optstring);
             Create(DbTypesEnum.Integer);
-            Create(DbTypesEnum.Float);
+            Create(DbTypesEnum.Single);
             Create(DbTypesEnum.Boolean);
 
             _windowState = windowState;

@@ -278,20 +278,17 @@ namespace Filetypes.ByteParsing
                     return ByteParsers.OptStringAscii;
 
                 case DbTypesEnum.Integer:
-                case DbTypesEnum.Autonumber:
                     return ByteParsers.Int32;
 
                 case DbTypesEnum.Short:
                     return ByteParsers.Short;
 
-                case DbTypesEnum.Float:
                 case DbTypesEnum.Single:
                     return ByteParsers.Single;
 
                 case DbTypesEnum.Boolean:
                     return ByteParsers.Bool;
 
-                case DbTypesEnum.Decimal:
                 case DbTypesEnum.List:
                     throw new NotImplementedException();
             }
