@@ -8,22 +8,14 @@ namespace Filetypes.Codecs {
     /*
      * A class parsing dbfiles from and to data streams in packed file format.
      */
-    public class PackedFileDbCodec : ICodec<DBFile> {
-        string typeName;
-
-        /*
-         * Notification events.
-         */
+    public class PackedFileDbCodec : ICodec<DBFile> 
+    {
+        
+        string _typeName;
         public delegate void EntryLoaded(FieldInfo info, string value);
         public delegate void HeaderLoaded(DBFileHeader header);
         public delegate void LoadingPackedFile(PackedFile packed);
 
-        /*
-         * If set to true (default), codec will add the GUID of a
-         * successfully decoded db file to the list of GUIDs
-         * which can be decoded.
-         */
-        public bool AutoadjustGuid { get; set; }
 
         #region Internal
         // header markers
@@ -31,31 +23,19 @@ namespace Filetypes.Codecs {
         static UInt32 VERSION_MARKER = BitConverter.ToUInt32(new byte[] { 0xFC, 0xFD, 0xFE, 0xFF }, 0);
         #endregion
 
-        /*
-         * Retrieve codec for the given PackedFile.
-         */
-        public static PackedFileDbCodec GetCodec(PackedFile file) {
-            return new PackedFileDbCodec(DBFile.Typename(file.FullPath));
-        }
-        /*
-         * Create DBFile from the given PackedFile.
-         */
-        public static DBFile Decode(PackedFile file) {
+        public static DBFile Decode(PackedFile file)
+        {
             PackedFileDbCodec codec = FromFilename(file.FullPath);
             return codec.Decode(file.Data);
         }
-        /*
-         * Create codec for the given file name.
-         */
-        public static PackedFileDbCodec FromFilename(string filename) {
+        public static PackedFileDbCodec FromFilename(string filename)
+        {
             return new PackedFileDbCodec(DBFile.Typename(filename));
         }
-        /*
-         * Create codec for table of the given type.
-         */
-        public PackedFileDbCodec(string type) {
-            typeName = type;
-            AutoadjustGuid = true;
+
+        public PackedFileDbCodec(string type) 
+        {
+            _typeName = type;
         }
 
         #region Read
@@ -69,29 +49,25 @@ namespace Filetypes.Codecs {
             {
                 reader.BaseStream.Position = 0;
                 DBFileHeader header = readHeader(reader);
-                List<TypeInfo> infos = DBTypeMap.Instance.GetVersionedInfos(typeName, header.Version);
+                List<TypeInfo> infos = DBTypeMap.Instance.GetVersionedInfos(_typeName, header.Version);
                 if (infos.Count == 0)
-                    infos.AddRange(DBTypeMap.Instance.GetAllInfos(typeName));
+                    infos.AddRange(DBTypeMap.Instance.GetAllInfos(_typeName));
 
                 foreach (TypeInfo realInfo in infos)
                 {
                     try
                     {
-#if DEBUG
-                        Console.WriteLine("Parsing version {1} with info {0}", string.Join(",", realInfo.Fields), header.Version);
-#endif
                         DBFile result = ReadFile(reader, header, realInfo);
                         return result;
                     }
-                    catch (Exception e)
+                    catch 
                     { }
                 }
                 return null;
             }
-            // throw new DBFileNotSupportedException(string.Format("No applicable type definition found"));
         }
 
-        public DBFile ReadFile(BinaryReader reader, DBFileHeader header, TypeInfo info) 
+        DBFile ReadFile(BinaryReader reader, DBFileHeader header, TypeInfo info) 
         {
             reader.BaseStream.Position = header.Length;
             DBFile file = new DBFile(header, info);
@@ -115,11 +91,11 @@ namespace Filetypes.Codecs {
              else if (reader.BaseStream.Position != reader.BaseStream.Length) 
                 throw new DBFileNotSupportedException(string.Format("Expected {0} bytes, read {1}", header.Length, reader.BaseStream.Position));
             
+           
             return file;
         }
-        /*
-         * Decode from the given data array (usually retrieved from a packed file Data).
-         */
+
+
         public DBFile Decode(byte[] data) 
         {
             using (MemoryStream stream = new MemoryStream(data, 0, data.Length))
@@ -139,7 +115,8 @@ namespace Filetypes.Codecs {
          * but that is less efficient because it has to read the whole file at least once
          * if successful.
          */
-        public static bool CanDecode(PackedFile packedFile, out string display) {
+        public static bool CanDecode(PackedFile packedFile, out string display) 
+        {
             bool result = true;
             string key = DBFile.Typename(packedFile.FullPath);
             if (DBTypeMap.Instance.IsSupported(key)) {
@@ -163,15 +140,16 @@ namespace Filetypes.Codecs {
         }
 
         #region Read Header
-        public static DBFileHeader readHeader(PackedFile file) {
-            using (MemoryStream stream = new MemoryStream(file.Data, (int)0, (int)file.Size)) {
-                return readHeader(stream);
+        public static DBFileHeader readHeader(PackedFile file) 
+        {
+            using (MemoryStream stream = new MemoryStream(file.Data, (int)0, (int)file.Size)) 
+            {
+                return readHeader(new BinaryReader(stream));
             }
         }
-        public static DBFileHeader readHeader(Stream stream) {
-            return readHeader(new BinaryReader(stream));
-        }
-        public static DBFileHeader readHeader(BinaryReader reader) {
+
+        public static DBFileHeader readHeader(BinaryReader reader) 
+        {
             byte index = reader.ReadByte();
             int version = 0;
             string guid = "";
@@ -179,7 +157,8 @@ namespace Filetypes.Codecs {
             uint entryCount = 0;
 
             try {
-                if (index != 1) {
+                if (index != 1) 
+                {
                     // I don't think those can actually occur more than once per file
                     while (index == 0xFC || index == 0xFD) {
                         var bytes = new List<byte>(4);
@@ -194,13 +173,17 @@ namespace Filetypes.Codecs {
                             version = reader.ReadInt32();
                             index = reader.ReadByte();
                             // break;
-                        } else {
+                        } 
+                        else 
+                        {
                             throw new DBFileNotSupportedException(string.Format("could not interpret {0}", marker));
                         }
                     }
                 }
                 entryCount = reader.ReadUInt32();
-            } catch {
+            } 
+            catch 
+            {
             }
             DBFileHeader header = new DBFileHeader(guid, version, entryCount, hasMarker);
             return header;
@@ -209,7 +192,7 @@ namespace Filetypes.Codecs {
 
         // creates a list of field values from the given type.
         // stream needs to be positioned at the beginning of the entry.
-        private DBRow ReadFields(BinaryReader reader, TypeInfo type, bool skipHeader = true) 
+        DBRow ReadFields(BinaryReader reader, TypeInfo type, bool skipHeader = true) 
         {
             if (!skipHeader) 
                 readHeader(reader);
@@ -240,7 +223,8 @@ namespace Filetypes.Codecs {
         /*
          * Encodes db file to the given stream.
          */
-        public void Encode(Stream stream, DBFile file) {
+        public void Encode(Stream stream, DBFile file) 
+        {
             BinaryWriter writer = new BinaryWriter(stream);
             file.Header.EntryCount = (uint)file.Entries.Count;
             WriteHeader(writer, file.Header);
@@ -250,31 +234,39 @@ namespace Filetypes.Codecs {
         /*
          * Encode db file to memory and return it as a byte array.
          */
-        public byte[] Encode(DBFile file) {
-            using (MemoryStream stream = new MemoryStream()) {
+        public byte[] Encode(DBFile file) 
+        {
+            using (MemoryStream stream = new MemoryStream()) 
+            {
                 Encode(stream, file);
                 return stream.ToArray();
             }
         }
+
         /*
          * Writes the given header to the given writer.
          */
-        public static void WriteHeader(BinaryWriter writer, DBFileHeader header) {
-            if (header.GUID != "") {
+        void WriteHeader(BinaryWriter writer, DBFileHeader header)
+        {
+            if (header.GUID != "") 
+            {
                 writer.Write(GUID_MARKER);
                 IOFunctions.WriteCAString(writer, header.GUID, Encoding.Unicode);
             }
-            if (header.Version != 0) {
+            if (header.Version != 0) 
+            {
                 writer.Write(VERSION_MARKER);
                 writer.Write(header.Version);
             }
+
             writer.Write((byte)1);
             writer.Write(header.EntryCount);
         }
+
         /*
          * Write the given entry to the given writer.
          */
-        private void WriteEntry(BinaryWriter writer, List<FieldInstance> fields) {
+        void WriteEntry(BinaryWriter writer, List<FieldInstance> fields) {
 #if DEBUG
             for (int i = 0; i < fields.Count; i++) {
                 try {

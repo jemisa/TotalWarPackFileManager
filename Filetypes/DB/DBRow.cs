@@ -10,11 +10,6 @@ namespace Filetypes {
         }
         public DBRow (TypeInfo i) : this(i, CreateRow(i)) { }
         
-        public TypeInfo Info {
-            get {
-                return info;
-            }
-        }
 
         public FieldInstance this[string fieldName] {
             get {

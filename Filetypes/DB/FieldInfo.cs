@@ -117,10 +117,6 @@ namespace Filetypes {
         /*
          * Create reference to given table and field.
          */
-        public FieldReference(string table, string field) {
-            Table = table;
-            Field = field;
-        }
         /*
          * Parse encoded reference (see #FormatReference).
          */
@@ -136,8 +132,6 @@ namespace Filetypes {
         /*
          * Create an empty reference.
          */
-        public FieldReference() {
-        }
 
         public string Table { get; set; }
         public string Field { get; set; }

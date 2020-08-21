@@ -14,12 +14,6 @@ namespace Filetypes {
         public delegate string GuidDeterminator(List<string> options);
         
         public GuidDeterminator DetermineGuid { get; set; }
-        public string GetGuid(List<string> options) {
-            if (DetermineGuid != null) {
-                return DetermineGuid(options);
-            }
-            throw null;
-        }
         
         // this could do with an update; since the transition to schema.xml,
         // we also know obsolete fields and can remove them,

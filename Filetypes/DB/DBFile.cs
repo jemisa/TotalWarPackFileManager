@@ -35,11 +35,6 @@ namespace Filetypes {
             HasVersionMarker = marker;
         }
         
-        /*
-         * Create copy of given header.
-         */
-        public DBFileHeader(DBFileHeader toCopy) : this(toCopy.GUID, toCopy.Version, 0, toCopy.HasVersionMarker) {}
-
 		#region Framework Overrides
         public override bool Equals(object other) {
             bool result = false;
@@ -92,14 +87,6 @@ namespace Filetypes {
 			Header = h;
 			CurrentType = info;
 		}
-        /*
-         * Create copy of the given db file.
-         */
-        public DBFile (DBFile toCopy) : this(toCopy.Header, toCopy.CurrentType) {
-			Header = new DBFileHeader (toCopy.Header.GUID, toCopy.Header.Version, toCopy.Header.EntryCount, toCopy.Header.HasVersionMarker);
-            // we need to create a new instance for every field so we don't write through to the old data
-			toCopy.entries.ForEach (entry => entries.Add (new DBRow (toCopy.CurrentType, entry)));
-		}
         #endregion
 
         /**
@@ -116,36 +103,7 @@ namespace Filetypes {
             return false;
         }
 
-        /*
-         * Create new entry for the data base.
-         * Note that the entry will not be added to the entries by this.
-         */
-        public DBRow GetNewEntry() {
-			return new DBRow(CurrentType);
-		}
-  
-        /*
-         * Add data contained in the given db file to this one.
-         */
-        public void Import(DBFile file) {
-			if (CurrentType.Name != file.CurrentType.Name) {
-				throw new DBFileNotSupportedException 
-					("File type of imported DB doesn't match that of the currently opened one", this);
-			}
-			// check field type compatibility
-			for (int i = 0; i < file.CurrentType.Fields.Count; i++) {
-				if (file.CurrentType.Fields [i].TypeCode != CurrentType.Fields [i].TypeCode) {
-					throw new DBFileNotSupportedException 
-						("Data structure of imported DB doesn't match that of currently opened one at field " + i, this);
-				}
-			}
-			DBFileHeader h = file.Header;
-			Header = new DBFileHeader (h.GUID, h.Version, h.EntryCount, h.HasVersionMarker);
-			CurrentType = file.CurrentType;
-			// this.entries = new List<List<FieldInstance>> ();
-			entries.AddRange (file.entries);
-            Header.EntryCount = (uint) entries.Count;
-		}
+
         /*
          * Helper to retrieve type name from a file path.
          */

@@ -58,7 +58,6 @@
     <Compile Include="DB\FieldInfo.cs" />
     <Compile Include="DB\FieldInstance.cs" />
     <Compile Include="DB\ByteParsers.cs" />
-    <Compile Include="DB\MappedTable.cs" />
     <Compile Include="DB\TypeInfo.cs" />
     <Compile Include="Codecs\LocCodec.cs" />
     <Compile Include="Esf\AbcaCodec.cs" />
@@ -87,7 +86,6 @@
     <Compile Include="DB\DBFileUpdate.cs" />
     <Compile Include="DB\SchemaOptimizer.cs" />
     <Compile Include="Codecs\TextDbCodec.cs" />
-    <Compile Include="DB\FieldMappingManager.cs" />
     <Compile Include="DB\DBRow.cs" />
   </ItemGroup>
   <ItemGroup>

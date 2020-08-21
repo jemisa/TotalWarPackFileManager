@@ -95,10 +95,18 @@ namespace CommonUtilities {
                 foreach(DBFile file in referenceFiles)
                     if(TypesCompatible(modDBFile, file))
                         modDBFile.Entries.RemoveAll(file.ContainsRow);
-                if(modDBFile.Entries.Count != 0)
-                    result.Data = PackedFileDbCodec.GetCodec(unoptimizedFile).Encode(modDBFile);
+                
+                if (modDBFile.Entries.Count != 0)
+                {
+                    var type = DBFile.Typename(unoptimizedFile.FullPath);
+                    var codec = new PackedFileDbCodec(type);
+                    result.Data = codec.Encode(modDBFile);
+                }
                 else
+                {
                     result = null;
+                }
+                    
             }
 
             return result;
@@ -137,21 +145,6 @@ namespace CommonUtilities {
             return result;
         }
 
-        /**
-         * <summary>Finds the <see cref="PackedFile"/> with the given <see cref="PackedFile.FullPath">Path</see> in the given <see cref="PackFile"/>.</summary>
-         * 
-         * <param name="pack">The <see cref="PackFile"/> to be searched.</param>
-         * <param name="name">The <see cref="PackedFile.FullPath"/> of the <see cref="PackedFile"/> to search for.</param>
-         * <returns>The <see cref="PackedFile"/> that was being searched for or null if it was not found.</returns>
-         */
-        PackedFile FindInPack(PackFile pack, string name)
-        {
-            foreach(PackedFile file in pack)
-                if(file.FullPath.Equals(name))
-                    return file;
-            return null;
-        }
-
         /*
          * Create db file from the given packed file.
          * Will not throw an exception on error, but return null.
@@ -159,10 +152,9 @@ namespace CommonUtilities {
         DBFile FromPacked(PackedFile packed) {
             DBFile result = null;
             try {
-                PackedFileDbCodec codec = PackedFileDbCodec.GetCodec(packed);
-                if (codec != null) {
-                    result = codec.Decode(packed.Data);
-                }
+                var type = DBFile.Typename(packed.FullPath);
+                var codec = new PackedFileDbCodec(type);
+                result = codec.Decode(packed.Data);
             } catch {}
             return result;
         }

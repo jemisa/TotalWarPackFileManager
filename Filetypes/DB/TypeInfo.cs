@@ -26,33 +26,12 @@ namespace Filetypes
                 return null;
             }
         }
-  
-        #region Constructors
-		public TypeInfo () {
-		}
 
 		public TypeInfo (List<FieldInfo> addFields) {
 			Fields.AddRange(addFields);
 		}
-
-		public TypeInfo (TypeInfo toCopy) {
-			Name = toCopy.Name;
-            Version = toCopy.Version;
-			Fields.AddRange (toCopy.Fields);
-		}
-        #endregion
   
-        public bool SameTypes(TypeInfo other) {
-            bool typesMatch = Fields.Count == other.Fields.Count;
-            if (typesMatch) {
-                for (int i = 0; i < Fields.Count && typesMatch; i++) {
-                    if (!Fields[i].TypeName.Equals(other.Fields[i].TypeName)) {
-                        typesMatch = false;
-                    }
-                }
-            }
-            return typesMatch;
-        }
+       
 
         public int CompareTo(TypeInfo other) {
             int result = Name.CompareTo(other.Name);

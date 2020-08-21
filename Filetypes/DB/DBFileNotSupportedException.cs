@@ -12,10 +12,6 @@ namespace Filetypes {
 
         public DbException (string message, Exception x) : base(message, x) {
         }
-
-        public DbException(string message, DBFile file) : base(message) {
-            DbFile = file;
-        }
     }
     
     /*
@@ -25,7 +21,6 @@ namespace Filetypes {
         public DBFileNotSupportedException(string message) : base(message) {
         }
 
-        public DBFileNotSupportedException(DBFile file) : this("DB File not supported", file) {}
 
 		public DBFileNotSupportedException (string message, Exception x) : base(message, x) {
 		}

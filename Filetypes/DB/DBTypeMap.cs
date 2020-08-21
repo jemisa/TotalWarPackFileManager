@@ -10,6 +10,14 @@ using System.Reflection;
 
 namespace Filetypes
 {
+
+    public class DbTableDefinition
+    {
+        public string TableName { get; set; }
+        public int Version { get; set; }
+        public List<DbColumnDefinition> ColumnDefinitions { get; set; } = new List<DbColumnDefinition>();
+    }
+
     class SchemaFile
     {
         [JsonConverter(typeof(StringEnumConverter))]
