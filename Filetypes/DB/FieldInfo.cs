@@ -1,16 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using Common;
-using System.Windows.Forms.VisualStyles;
 
-namespace Filetypes {
-    /*
-     * A collection of types that can be decoded from the db.
-     */
-
+namespace Filetypes
+{
     public enum DbTypesEnum
     { 
         String,
@@ -75,15 +67,10 @@ namespace Filetypes {
     /*
      * A reference to a field in a specific table.
      */
-    public class FieldReference {
+    public class FieldReference
+    {
         static char[] SEPARATOR = { '.' };
   
-        /*
-         * Create reference to given table and field.
-         */
-        /*
-         * Parse encoded reference (see #FormatReference).
-         */
         public FieldReference(string encoded) 
         {
             string[] parts = encoded.Split(SEPARATOR);
@@ -93,25 +80,21 @@ namespace Filetypes {
                 Field = parts[1];
             }
         }
-        /*
-         * Create an empty reference.
-         */
 
         public string Table { get; set; }
         public string Field { get; set; }
 
-        public override string ToString() {
+        public override string ToString() 
+        {
             string result = "";
-            if (!string.IsNullOrEmpty(Table) && !string.IsNullOrEmpty(Field)) {
+            if (!string.IsNullOrEmpty(Table) && !string.IsNullOrEmpty(Field)) 
                 result = FormatReference(Table, Field);
-            }
+  
             return result;
         }
 
-        /*
-         * Encode given table and field to format "table.field".
-         */
-        public static string FormatReference(string table, string field) {
+        string FormatReference(string table, string field) 
+        {
             return string.Format("{0}.{1}", table, field);
         }
     }
@@ -120,15 +103,9 @@ namespace Filetypes {
      * The info determining a column of a db table.
      */
     [System.Diagnostics.DebuggerDisplay("{Name} - {TypeName}; {Optional}")]
-    public abstract class FieldInfo {
-        /*
-         * The column name.
-         */
-        public string Name {
-            get;
-            set;
-        }
-
+    public abstract class FieldInfo 
+    {
+        public string Name { get;set;}
         public DbTypesEnum TypeEnum { get;  set; }
         public virtual string TypeName { get; set; }
         public TypeCode TypeCode { get; set; }
@@ -139,63 +116,16 @@ namespace Filetypes {
          * of their values has to be unique.
          */
         public bool PrimaryKey { get; set; }
-        /*
-         * There are string fields which do not need to contain data, in which
-         * case they will only contain a "0" in the packed file.
-         * This attribute is true for those fields.
-         */
-        public bool Optional { get; set; }
-  
-        #region Reference
-        /*
-         * The referenced table/field containing the valid values for this column.
-         */
+
         FieldReference reference;
-        public FieldReference FieldReference {
-            get {
-                return reference;
-            }
-            set {
-                reference = value;
-            }
-        }
-        /*
-         * The referenced table/field as a string.
-         */
-        public string ForeignReference {
-            get {
-                return reference != null ? reference.ToString() : "";
-            }
-            set {
-                reference = new FieldReference(value);
-            }
+        public string ForeignReference 
+        {
+            get { return reference != null ? reference.ToString() : "";}
+            set {reference = new FieldReference(value);}
         }
 
-        // The referenced table; empty string if no reference
-        public string ReferencedTable {
-            get {
-                return reference != null ? reference.Table : "";
-            }
-        }
-        // The referenced field in the referenced table; empty string if no reference
-        public string ReferencedField {
-            get {
-                return reference != null ? reference.Field : "";
-            }
-            set {
-                reference.Field = value;
-            }
-        }
-
-        public abstract FieldInfo Copy();
-        #endregion
-
-        /*
-         * Create an instance valid for this field.
-         */
         public abstract FieldInstance CreateInstance();
 
-        #region Framework Overrides
         public override bool Equals(object other) {
             bool result = false;
             if (other is FieldInfo) {
@@ -214,7 +144,6 @@ namespace Filetypes {
         public override string ToString() {
             return string.Format("{0}:{1}", Name, TypeName);
         }
-        #endregion
 	}
 
 	public class StringType : FieldInfo {
@@ -230,16 +159,8 @@ namespace Filetypes {
                 Value = ""
             };
         }
-
-        public override FieldInfo Copy()
-        {
-            return new StringType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-            };
-        }
     }
+
     public class StringTypeAscii : FieldInfo {
          public StringTypeAscii () {
              TypeName = "string_ascii";
@@ -250,15 +171,6 @@ namespace Filetypes {
             return new StringFieldAscii() {
                 Name = this.Name,
                 Value = ""
-            };
-        }
-
-        public override FieldInfo Copy()
-        {
-            return new StringTypeAscii()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
             };
         }
     }
@@ -276,15 +188,6 @@ namespace Filetypes {
                 Value = "0"
             };
         }
-
-        public override FieldInfo Copy()
-        {
-            return new IntType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-            };
-        }
     }
 
     public class ShortType : FieldInfo {
@@ -292,7 +195,6 @@ namespace Filetypes {
 			TypeName = "short";
 			TypeCode = TypeCode.Int16;
             TypeEnum = DbTypesEnum.Short;
-
         }
         public override FieldInstance CreateInstance() {
             return new ShortField() {
@@ -301,15 +203,6 @@ namespace Filetypes {
             };
         }
 
-        public override FieldInfo Copy()
-        {
-            return new ShortType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
-            };
-        }
     }
 
     public class SingleType : FieldInfo {
@@ -323,16 +216,6 @@ namespace Filetypes {
             return new SingleField() {
                 Name = this.Name,
                 Value = "0"
-            };
-        }
-
-        public override FieldInfo Copy()
-        {
-            return new SingleType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -352,15 +235,6 @@ namespace Filetypes {
                 Value = "0"
             };
         }
-        public override FieldInfo Copy()
-        {
-            return new DoubleType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
-            };
-        }
     }
 
     public class BoolType : FieldInfo {
@@ -374,16 +248,6 @@ namespace Filetypes {
             return new BoolField() {
                 Name = this.Name,
                 Value = "false"
-            };
-        }
-
-        public override FieldInfo Copy()
-        {
-            return new BoolType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -401,16 +265,6 @@ namespace Filetypes {
                 Value = ""
             };
         }
-
-        public override FieldInfo Copy()
-        {
-            return new OptStringType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
-            };
-        }
     }
     class OptStringTypeAscii : FieldInfo {
         public OptStringTypeAscii () {
@@ -422,16 +276,6 @@ namespace Filetypes {
             return new OptStringFieldAscii() {
                 Name = this.Name,
                 Value = ""
-            };
-        }
-
-        public override FieldInfo Copy()
-        {
-            return new OptStringTypeAscii()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
             };
         }
     }
@@ -522,16 +366,6 @@ namespace Filetypes {
         
         public override int GetHashCode() {
             return 2*Name.GetHashCode() + 3*Infos.GetHashCode();
-        }
-
-        public override FieldInfo Copy()
-        {
-            return new ListType()
-            {
-                TypeName = this.TypeName,
-                TypeCode = this.TypeCode,
-                TypeEnum = this.TypeEnum,
-            };
         }
     }
 }

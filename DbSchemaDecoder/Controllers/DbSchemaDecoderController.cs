@@ -28,8 +28,8 @@ namespace DbSchemaDecoder.Controllers
             SelectedFileHeaderInformationController = new HeaderInformationController(_windowState);
 
 
-            DbSchemaVersionUpdater updater = new DbSchemaVersionUpdater();
-            updater.Convert();
+            
+            
         }
     }
 }
