@@ -1,6 +1,8 @@
-﻿using DbSchemaDecoder.Controllers;
+﻿using Common;
+using DbSchemaDecoder.Controllers;
 using DbSchemaDecoder.Util;
 using Filetypes;
+using Filetypes.DB;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ namespace DbSchemaDecoder.Models
 {
     public class HeaderInformationViewModel : NotifyPropertyChangedImpl
     {
-        public void Update(DBFileHeader header, DataBaseFile item)
+        public void Update(DBFileHeader header, DataBaseFile item, SchemaManager schemaManager, GameTypeEnum currentGame)
         {
             if (header != null)
             {
@@ -33,7 +35,9 @@ namespace DbSchemaDecoder.Models
                 NumVersions = 0;
             }
 
-            var allTableDefinitions = DBTypeMap.Instance.GetAllInfos(item.TableType);
+
+            var allTableDefinitions = schemaManager.GetTableDefinitionsForTable(currentGame, item.TableType);
+
             NumVersions = allTableDefinitions.Count();
             var groupedVersions = allTableDefinitions.GroupBy(x => x.Version).ToList();
             Versions = new List<VersionViewItem>();
@@ -103,7 +107,7 @@ namespace DbSchemaDecoder.Models
 
         public class VersionViewItem
         { 
-            public TypeInfo TypeInfo { get; set; }
+            public DbTableDefinition TypeInfo { get; set; }
             public string DisplayValue { get; set; } 
         }
     }

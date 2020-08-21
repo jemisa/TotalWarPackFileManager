@@ -1,4 +1,5 @@
 ﻿using Filetypes;
+using Filetypes.DB;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,22 +11,33 @@ namespace DbSchemaDecoder.Util
 {
     class TableEntriesParser
     {
+        byte[] _tableData;
+        int _dataIndex;
+        public TableEntriesParser(byte[] tableData, int indexOfTableData)
+        {
+            _tableData = tableData;
+            _dataIndex = indexOfTableData;
+        }
+
         /// This function expects that the header of the file is already read!
-        public TableResult ParseTable(BinaryReader reader, int streamCapacity, List<FieldInfo> fields, int expectedEntries)
+        public TableResult ParseTable(List<DbColumnDefinition> columnDefinitions, int expectedEntries)
         {
             TableResult output = new TableResult();
-            if (fields.Count() != 0)
+            if (columnDefinitions.Count() != 0)
             {
-                output.ColumnNames = new string[fields.Count];
-                for (int i = 0; i < fields.Count; i++)
-                    output.ColumnNames[i] = fields[i].Name;
+                // Create the headers
+                output.ColumnNames = new string[columnDefinitions.Count];
+                for (int i = 0; i < columnDefinitions.Count; i++)
+                    output.ColumnNames[i] = columnDefinitions[i].MetaData.Name;
 
-                var fieldInstances = fields.Select(x => x.CreateInstance()).ToArray();
+                // Find the actuall parsers
+                var fieldInstances = columnDefinitions.Select(x => ParserFactory.Create(x.Type)).ToArray();
 
+                // Parse the table
                 output.DataRows = new string[expectedEntries][];
                 for (int i = 0; i < expectedEntries; i++)
                 {
-                    var rowResult = ParseRow(reader, fieldInstances, i);
+                    var rowResult = ParseRow(fieldInstances, columnDefinitions, i);
                     output.DataRows[i] = rowResult.Content;
                     if (rowResult.HasError)
                     {
@@ -34,11 +46,11 @@ namespace DbSchemaDecoder.Util
                 }
             }
 
-            CheckForEndOfTableError(reader, streamCapacity, output);
+            CheckForEndOfTableError(output);
             return output;
         }
 
-        RowResult ParseRow(BinaryReader reader, FieldInstance[] fields, int rowIndex)
+        RowResult ParseRow( ByteParser[] fields, List<DbColumnDefinition> columnDefinitions, int rowIndex)
         {
             int fieldsCount = fields.Count();
             RowResult result = new RowResult()
@@ -48,50 +60,56 @@ namespace DbSchemaDecoder.Util
 
             for (int i = 0; i < fieldsCount; i++)
             {
-                var parseResult = fields[i].TryDecode(reader);
-                result.Content[i] = fields[i].Value;
+                var parseResult = fields[i].TryDecode(_tableData, _dataIndex, out string value, out int bytesReas, out string error);
+                
+                result.Content[i] = value;
                 if (!parseResult)
                 {
-                    result.Error = $"Error parsing column {fields[i].Name} for row {rowIndex + 1} : {fields[i].Value}";
+                    result.Error = $"Error parsing column {columnDefinitions[i].MetaData.Name} for row {rowIndex + 1} : {error}";
                     break;
                 }
+                _dataIndex += bytesReas;
             }
             return result;
         }
 
         // A much faster version that just checks if the table can be parsed using the current field configuration
-        public TableResult CanParseTable(BinaryReader reader, int streamCapacity, List<FieldInfo> fields, int expectedEntries)
+        public TableResult CanParseTable(List<DbColumnDefinition> columnDefinitions, int expectedEntries)
         {
             TableResult output = new TableResult();
-            if (fields.Count() != 0)
+            if (columnDefinitions.Count() != 0)
             {
-                var fieldInstances = fields.Select(x => x.CreateInstance()).ToArray();
+                // Find the actuall parsers
+                var fieldInstances = columnDefinitions.Select(x => ParserFactory.Create(x.Type)).ToArray();
+
                 for (int rowIndex = 0; rowIndex < expectedEntries; rowIndex++)
                 {
-                    foreach (var field in fieldInstances)
+                    for (int i = 0; i < fieldInstances.Length; i++)
                     {
                         //string errorMessage = "";
-                        var parseResult = field.TryDecode(reader);
+                        var parseResult = fieldInstances[i].CanDecode(_tableData, _dataIndex, out int bytesRead, out string error);
                         if (!parseResult)
                         {
-                            output.Error = $"Error parsing column {field.Name} for row {rowIndex + 1} : {field.Value}";
+                            output.Error = $"Error parsing column {columnDefinitions[i].MetaData.Name} for row {rowIndex + 1} - Error : {error}";
                             break;
                         }
+
+                        _dataIndex += bytesRead;
                     }
                     if (output.HasError)
                         break;
                 }
             }
 
-            CheckForEndOfTableError(reader, streamCapacity, output);
+            CheckForEndOfTableError(output);
             return output;
         }
 
-        private static void CheckForEndOfTableError(BinaryReader reader, int streamCapacity, TableResult output)
+        private void CheckForEndOfTableError( TableResult output)
         {
             if (!output.HasError)
             {
-                var bytesLeftInStream = streamCapacity - (int)reader.BaseStream.Position;
+                var bytesLeftInStream = _tableData.Length - _dataIndex;
                 if (bytesLeftInStream != 0)
                     output.Error = $"Error: Bytes left in stream after parsing : {bytesLeftInStream * 4}";
             }

@@ -29,7 +29,7 @@ namespace PackFileManagerUnitTests.SbSchemaDecoder
                     Data = bytes
                 }
             };
-            state.DbSchemaFields = table.CurrentType.Fields;
+            //state.DbSchemaFields = table.CurrentType.Fields;
 
             Assert.AreEqual(4, controller.ViewModel.EntityTable.Columns.Count);
             Assert.AreEqual(3, controller.ViewModel.EntityTable.Rows.Count);

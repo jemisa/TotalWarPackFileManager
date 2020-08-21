@@ -1,6 +1,7 @@
 ﻿using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
 using Filetypes;
+using Filetypes.DB;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DbSchemaDecoder.Controllers
@@ -106,7 +108,7 @@ namespace DbSchemaDecoder.Controllers
         }
 
 
-        bool AreEqual(List<FieldInfo> newItems, ObservableCollection<FieldInfoViewModel> oldItems)
+        bool AreEqual(List<DbColumnDefinition> newItems, ObservableCollection<FieldInfoViewModel> oldItems)
         {
             if (newItems.Count != oldItems.Count)
                 return false;
@@ -122,7 +124,7 @@ namespace DbSchemaDecoder.Controllers
             return true;
         }
 
-        public void Set(List<FieldInfo> fields)
+        public void Set(List<DbColumnDefinition> fields)
         {
             // Avoid circular triggering
             if (AreEqual(fields, TableTypeInformationRows))
@@ -153,9 +155,16 @@ namespace DbSchemaDecoder.Controllers
 
         private void OnCreateNewDbDefinitionCommand()
         {
-            var type = Types.StringType();
-            type.Name = "Column_" + TableTypeInformationRows.Count() + 1;
-            var item = new FieldInfoViewModel(type, TableTypeInformationRows.Count() + 1);
+            DbColumnDefinition typeDef = new DbColumnDefinition()
+            {
+                MetaData = new DbFieldMetaData()
+                {
+                    Name = "Column_" + TableTypeInformationRows.Count() + 1
+                },
+                Type = DbTypesEnum.String_ascii
+            };
+
+            var item = new FieldInfoViewModel(typeDef, TableTypeInformationRows.Count() + 1);
             item.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;
             TableTypeInformationRows.Add(item);
             OnDefinitionChanged();
@@ -255,8 +264,15 @@ namespace DbSchemaDecoder.Controllers
 
         void AppendRowOfTypeEventHandler(object e, DbTypesEnum type)
         {
-            var newType = Types.FromEnum(type);
-            var newFieldInfoViewModel = new FieldInfoViewModel(newType, 99);
+            DbColumnDefinition typeDef = new DbColumnDefinition()
+            {
+                MetaData = new DbFieldMetaData()
+                {
+                    Name = "Column_" + TableTypeInformationRows.Count() + 1
+                },
+                Type = DbTypesEnum.String_ascii
+            };
+            var newFieldInfoViewModel = new FieldInfoViewModel(typeDef, 99);
             newFieldInfoViewModel.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;
             TableTypeInformationRows.Add(newFieldInfoViewModel);
             

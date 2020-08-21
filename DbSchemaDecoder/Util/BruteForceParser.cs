@@ -14,7 +14,7 @@ using System.Numerics;
 namespace DbSchemaDecoder.Util
 {
 
-
+/*
     class BruteForceParser : IThreadableTask
     {
         public event EventHandler<FieldParserEnum[]> OnCombintionFoundEvent;
@@ -86,12 +86,9 @@ namespace DbSchemaDecoder.Util
         void OnEvaluatePermutation(FieldParserEnum[] combination)
         {
             var possibleSchema = combination.Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
-            _permutationReader.BaseStream.Position = _headerLength;
 
-            TableEntriesParser p = new TableEntriesParser();
+            TableEntriesParser p = new TableEntriesParser(_file.DbFile.Data, _headerLength);
             var updateRes = p.CanParseTable(
-                _permutationReader,
-                _permutationStream.Capacity,
                 possibleSchema,
                 _HeaderEntryCount);
 
@@ -276,5 +273,5 @@ namespace DbSchemaDecoder.Util
             else
                 return _allCombinations.GetPossibleCombinations(index);
         }
-    }
+    }*/
 }

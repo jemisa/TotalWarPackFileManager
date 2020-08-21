@@ -1,4 +1,7 @@
 ﻿using DbSchemaDecoder.Util;
+using Filetypes;
+using System.IO;
+using System.Reflection;
 
 namespace DbSchemaDecoder.Controllers
 {
@@ -6,7 +9,7 @@ namespace DbSchemaDecoder.Controllers
     {
         public NextItemController NextItemController { get; set; }
         public DbTableDefinitionController DbTableDefinitionController { get; set; }
-        public BruteForceController BruteForceController { get; set; }
+        //public BruteForceController BruteForceController { get; set; }
         public CaSchemaController CaSchemaController { get; set; }
         public TableEntriesController TableEntriesController { get; set; }
         public HeaderInformationController SelectedFileHeaderInformationController { get; set; }
@@ -19,7 +22,7 @@ namespace DbSchemaDecoder.Controllers
 
             TableEntriesController = new TableEntriesController(_windowState, dbTableItemSourceUpdater);
             NextItemController = new NextItemController(_windowState);
-            BruteForceController = new BruteForceController(_windowState);
+            //BruteForceController = new BruteForceController(_windowState);
             CaSchemaController = new CaSchemaController(_windowState);
             DbTableDefinitionController = new DbTableDefinitionController(_windowState);
             SelectedFileHeaderInformationController = new HeaderInformationController(_windowState);

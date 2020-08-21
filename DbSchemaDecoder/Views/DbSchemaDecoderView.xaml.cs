@@ -1,29 +1,17 @@
-﻿using DbSchemaDecoder.Controllers;
+﻿using Common;
+using DbSchemaDecoder.Controllers;
 using DbSchemaDecoder.DisplayTableDefinitionView;
 using DbSchemaDecoder.EditTableDefinitionView;
 using DbSchemaDecoder.Util;
 using Filetypes;
-using Filetypes.Codecs;
-using GalaSoft.MvvmLight.CommandWpf;
+using Filetypes.DB;
 using GalaSoft.MvvmLight.Threading;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DbSchemaDecoder
 {
@@ -34,12 +22,13 @@ namespace DbSchemaDecoder
     {
         DbSchemaDecoderController _mainController;
         FileListController _fileListController;
-        Util.WindowState _windowState = new Util.WindowState();
+        readonly Util.WindowState _windowState = new Util.WindowState();
 
-        public DbSchemaDecoder()
+        public DbSchemaDecoder(Game currentGame, SchemaManager schemaManager)
         {
             DispatcherHelper.Initialize();
-
+            _windowState.CurrentGame = currentGame;
+            _windowState.SchemaManager = schemaManager;
             InitializeComponent();
             Loaded += SettingsControl_Loaded;
         }
@@ -84,7 +73,7 @@ namespace DbSchemaDecoder
 
         void UpdateSelection()
         {
-            try
+            /*try
             {
                 HexEdit.CustomBackgroundBlockItems.Clear();
                 using (BinaryReader reader = new BinaryReader(new MemoryStream(_windowState.SelectedFile.DbFile.Data)))
@@ -119,7 +108,7 @@ namespace DbSchemaDecoder
                 HexEdit.RefreshView();
             }
             catch
-            { }
+            { }*/
         }
 
 
@@ -187,7 +176,43 @@ namespace DbSchemaDecoder
                 rowDef.Height = new GridLength(0, GridUnitType.Pixel);
         }
 
+        private void OnCreateColumDefinitionsFromDepricatedData(object sender, RoutedEventArgs e)
+        {
+            var allFiles = _fileListController.ViewModel.FileList;
+            var currentGame = _windowState.CurrentGame;
+            var schemas = _windowState.SchemaManager.GetDepricated();
+            if (schemas == null)
+            {
+                MessageBox.Show("Unable to get old table definitions");
+                return;
+            }
 
+            if (currentGame == null)
+            {
+                MessageBox.Show("A game is not selected");
+                return;
+            }
+
+            Dictionary<string, List<DbTableDefinition>> output = new Dictionary<string, List<DbTableDefinition>>();
+            foreach (var file in allFiles)
+            {
+                if (schemas.ContainsKey(file.DataBaseFile.TableType))
+                {
+                    output.Add(file.DataBaseFile.TableType, new List<DbTableDefinition>());
+                    foreach (var schema in schemas[file.DataBaseFile.TableType])
+                    {
+                        TableEntriesParser parser = new TableEntriesParser(file.DataBaseFile.DbFile.Data, 0);
+                        var result = parser.CanParseTable(schema.ColumnDefinitions, 30);
+                        if (result.HasError == false)
+                        {
+                            output[file.DataBaseFile.TableType].Add(schema);
+                        }
+                    }
+                }
+            }
+
+            _fileListController.StartEvaluation();
+        }
     }
 
 

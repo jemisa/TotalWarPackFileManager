@@ -2,6 +2,7 @@
 using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
+using Filetypes.DB;
 using GalaSoft.MvvmLight.Command;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +33,7 @@ namespace DbSchemaDecoder.Controllers
                 var newVersion = ViewModel.Versions.FirstOrDefault(x => x.DisplayValue == ViewModel.SelectedVersion);
                 if (newVersion != null)
                 {
-                    _windowState.DbSchemaFields = newVersion.TypeInfo.Fields;
+                    _windowState.DbSchemaFields = newVersion.TypeInfo.ColumnDefinitions;
                 }
             }
         }
@@ -41,9 +42,9 @@ namespace DbSchemaDecoder.Controllers
         {
             var newVersion = ViewModel.Versions.FirstOrDefault(x => x.DisplayValue == ViewModel.SelectedVersion);
             if (newVersion != null)
-                _windowState.DbSchemaFields =  newVersion.TypeInfo.Fields;
+                _windowState.DbSchemaFields =  newVersion.TypeInfo.ColumnDefinitions;
             else
-                _windowState.DbSchemaFields = new List<FieldInfo>();
+                _windowState.DbSchemaFields = new List<DbColumnDefinition>();
         }
 
         void ParseDatabaseFile(DataBaseFile item)
@@ -58,7 +59,7 @@ namespace DbSchemaDecoder.Controllers
             using (BinaryReader reader = new BinaryReader(new MemoryStream(bytes)))
             {
                 DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                ViewModel.Update(header, item);
+                ViewModel.Update(header, item, _windowState.SchemaManager, _windowState.CurrentGame.GameType);
                 OnReloadTable();
             }
         }

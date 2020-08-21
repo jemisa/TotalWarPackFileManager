@@ -19,8 +19,7 @@
                     Header="File"
                     RenderTransformOrigin="0.656,0.769">
                     <MenuItem
-                        x:Name="OpenMenu"
-                        Header="Open..."/>
+                        Header="Create Column definition from depricated data" Click="OnCreateColumDefinitionsFromDepricatedData"/>
                     <Separator />
                 </MenuItem>
                 <Button Content="Show Filelist" Click="OnShowFileListClick"></Button>

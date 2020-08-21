@@ -47,6 +47,9 @@ namespace DbSchemaDecoder.Util
             File.WriteAllText(@"C:\temp\DepricatedMasterSchema.json", strContent);
         }
 
+
+        //public Dictionary<string, List<DbTableDefinition>> CreateGameSpesificDefinition(string game, filel)
+
         List<DbColumnDefinition> ConvertFieldInfos(List<FieldInfo> fieldInfos)
         {
             var output = new List<DbColumnDefinition>();

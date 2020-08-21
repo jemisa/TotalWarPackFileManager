@@ -2,6 +2,7 @@
 using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
+using Filetypes.DB;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +17,6 @@ namespace DbSchemaDecoder.Controllers
         public DbTableViewModel ViewModel { get; set; } = new DbTableViewModel();
 
         readonly DataGridItemSourceUpdater _dataGridUpdater;
-        readonly TableEntriesParser _parser = new TableEntriesParser();
 
         WindowState _windowState;
         public TableEntriesController(WindowState windowState, DataGridItemSourceUpdater dataGridUpdater)
@@ -26,7 +26,7 @@ namespace DbSchemaDecoder.Controllers
             _windowState.OnSetDbSchema += (sender, schema) => { Update(schema); };
         }
 
-        void Update(IEnumerable<FieldInfo> schema)
+        void Update(IEnumerable<DbColumnDefinition> schema)
         {
             if (_windowState.SelectedFile == null)
                 return;
@@ -40,7 +40,8 @@ namespace DbSchemaDecoder.Controllers
                     using (var reader = new BinaryReader(stream))
                     {
                         DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                        var parseResult = _parser.ParseTable(reader, stream.Capacity, schema.ToList(), (int)header.EntryCount);
+                        TableEntriesParser parser = new TableEntriesParser(_windowState.SelectedFile.DbFile.Data, header.Length);
+                        var parseResult = parser.ParseTable(schema.ToList(), (int)header.EntryCount);
                         if (parseResult.HasError)
                             ViewModel.ParseResult = parseResult.Error;
 

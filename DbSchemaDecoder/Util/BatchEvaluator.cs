@@ -1,4 +1,5 @@
-﻿using DbSchemaDecoder.Controllers;
+﻿using Common;
+using DbSchemaDecoder.Controllers;
 using Filetypes;
 using Filetypes.Codecs;
 using System;
@@ -25,10 +26,15 @@ namespace DbSchemaDecoder.Util
         }
 
         IEnumerable<DataBaseFile> _files;
-        public BatchEvaluator(IEnumerable<DataBaseFile> files)
+        SchemaManager _schemaManager;
+        GameTypeEnum _currentGame;
+        public BatchEvaluator(IEnumerable<DataBaseFile> files, SchemaManager schemaManager, GameTypeEnum currentGame)
         {
             _files = files;
+            _schemaManager = schemaManager;
+            _currentGame = currentGame;
         }
+
         public void Evaluate()
         {
             List<Result> results = new List<Result>();
@@ -62,7 +68,7 @@ namespace DbSchemaDecoder.Util
 
                 result.CaTableColumnCount = caSchemaResult.Entries.Count();
 
-                var allTableDefinitions = DBTypeMap.Instance.GetAllInfos(file.TableType);
+                var allTableDefinitions = _schemaManager.GetTableDefinitionsForTable(_currentGame, file.TableType);
                 var fieldCollections = allTableDefinitions.Where(x => x.Version == header.Version);
                 if (fieldCollections.Count() == 0)
                 {
@@ -75,14 +81,12 @@ namespace DbSchemaDecoder.Util
                 else
                 {
                     var fieldCollection = fieldCollections.First();
-                    result.TabelColumnCount = fieldCollection.Fields.Count;
+                    result.TabelColumnCount = fieldCollection.ColumnDefinitions.Count;
 
                     // Read table
-                    TableEntriesParser tableParser = new TableEntriesParser();
+                    TableEntriesParser tableParser = new TableEntriesParser(file.DbFile.Data, header.Length);
                     var parseResult = tableParser.CanParseTable(
-                        dbStreamReader,
-                        nemoryStream.Capacity,
-                        fieldCollection.Fields,
+                        fieldCollection.ColumnDefinitions,
                         (int)header.EntryCount);
 
                     if (parseResult.HasError)

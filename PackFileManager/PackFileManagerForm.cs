@@ -182,11 +182,16 @@ namespace PackFileManager
 
             var form = new Form()
             { 
-            Width = 1400,
-            Height = 900
+                Width = 1400,
+                Height = 900
             };
-           
-            var r = WpfPackedFileEditorHost.Create<DbSchemaDecoder.DbSchemaDecoder>();
+
+
+            SchemaManager schemaManager = new SchemaManager();
+            schemaManager.Create();
+
+            var window = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame, schemaManager);
+            var r = WpfPackedFileEditorHost.Create(window);
             r.Dock = DockStyle.Fill;
             form.Controls.Add(r);
             form.Show();
@@ -990,34 +995,9 @@ namespace PackFileManager
             OpenExternal();
         }
 
-        private void openDecodeToolMenuItem_Click(object sender, EventArgs e) {
-            PackedFile packedFile = _packTreeView.GetSelectedNodeContent() as PackedFile;
-            if (packedFile != null) {
-                DecodeTool.DecodeTool decoder = null;
-                // best used if a db file...
-                try {
-                    string key = DBFile.Typename(packedFile.FullPath);
-                    bool unicode = false;
-
-                    if (GameManager.Instance.CurrentGame == Game.ETW ||
-                        GameManager.Instance.CurrentGame == Game.NTW ||
-                        GameManager.Instance.CurrentGame == Game.STW) {
-                        unicode = true;
-                    }
-                    decoder = new DecodeTool.DecodeTool(unicode) { TypeName = key, Bytes = packedFile.Data };
-                    decoder.ShowDialog();
-                } catch (Exception ex) {
-                    MessageBox.Show (string.Format("DecodeTool could not be opened:\n{0}", ex.Message), 
-                                     "DecodeTool problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
-#if DEBUG
-                    Console.WriteLine(ex);
-#endif
-                } finally {
-                    if (decoder != null) {
-                        decoder.Dispose();
-                    }
-                }
-            }
+        private void openDecodeToolMenuItem_Click(object sender, EventArgs e)
+        {
+            throw new Exception("Woops, this is wrong");
         }
 
         private void OpenPackedFileEditor(PackedFile packedFile) 

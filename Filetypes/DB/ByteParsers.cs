@@ -266,7 +266,40 @@ namespace Filetypes.DB
     {
         public static ByteParser Create(DbTypesEnum typeEnum)
         {
-            return null;
+            switch (typeEnum)
+            {
+                case DbTypesEnum.String:
+                    return ByteParsers.String;
+
+                case DbTypesEnum.String_ascii:
+                    return ByteParsers.StringAscii;
+
+                case DbTypesEnum.Optstring:
+                    return ByteParsers.OptString;
+
+                case DbTypesEnum.Optstring_ascii:
+                    return ByteParsers.OptStringAscii;
+
+                case DbTypesEnum.Integer:
+                case DbTypesEnum.Autonumber:
+                    return ByteParsers.Int32;
+
+                case DbTypesEnum.Short:
+                    return ByteParsers.Short;
+
+                case DbTypesEnum.Float:
+                case DbTypesEnum.Single:
+                    return ByteParsers.Single;
+
+                case DbTypesEnum.Boolean:
+                    return ByteParsers.Bool;
+
+                case DbTypesEnum.Decimal:
+                case DbTypesEnum.Double:
+                case DbTypesEnum.List:
+                    throw new NotImplementedException();
+            }
+            throw new NotImplementedException();
         }
         // From string?
         // FromEnum

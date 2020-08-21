@@ -33,16 +33,25 @@ namespace DbSchemaDecoder.Controllers
         WindowState _windowState;
         Thread _evaluateThradHandle;
 
+
+
         public FileListController(WindowState windowState)
         {
             _windowState = windowState;
-            Load(@"C:\Program Files (x86)\Steam\steamapps\common\Total War WARHAMMER II");
-            BatchEvaluator batchEvaluator = new BatchEvaluator(_internalFileList);
-            batchEvaluator.OnCompleted += BatchEvaluator_OnCompleted;
+            Load(windowState.CurrentGame.GameDirectory);
 
             FileSelectedCommand = new RelayCommand<DatabaseFileViewModel>(OnFileSelected);
             FilterButtonCommand = new RelayCommand(OnFilter);
             OnlyShowTablesWithErrorCommand = new RelayCommand(OnShowOnlyTablesWithErrors);
+
+            StartEvaluation();
+        }
+
+        public void StartEvaluation()
+        {
+
+            BatchEvaluator batchEvaluator = new BatchEvaluator(_internalFileList, _windowState.SchemaManager, _windowState.CurrentGame.GameType);
+            batchEvaluator.OnCompleted += BatchEvaluator_OnCompleted;
 
             // Evaluate db files in a new thread to await waiting
             _evaluateThradHandle = new Thread(new ThreadStart(batchEvaluator.Evaluate));
@@ -125,8 +134,6 @@ namespace DbSchemaDecoder.Controllers
                         {
                             TableType = dbEntry.Value.Item1,
                             DbFile = dbEntry.Value.Item2,
-                            //HasDefinitionError = !canDecode,
-                            //ErrorMessage = errorMessage
                         });
                     }
                 }

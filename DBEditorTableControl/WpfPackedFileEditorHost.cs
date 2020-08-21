@@ -55,6 +55,16 @@ namespace DBTableControl {
             };
             return host;
         }
+
+        public static WpfPackedFileEditorHost Create<T>(T instance) where T : System.Windows.Controls.UserControl
+        {
+            var host = new WpfPackedFileEditorHost
+            {
+                Child = instance,
+                Dock = DockStyle.Fill
+            };
+            return host;
+        }
     }
 }
 

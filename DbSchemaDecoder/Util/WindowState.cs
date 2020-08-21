@@ -1,6 +1,8 @@
-﻿using DbSchemaDecoder.Controllers;
+﻿using Common;
+using DbSchemaDecoder.Controllers;
 using DbSchemaDecoder.Models;
 using Filetypes;
+using Filetypes.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +26,9 @@ namespace DbSchemaDecoder.Util
 
 
         // DataBase schema
-        List<FieldInfo> _DbSchema;
-        public List<FieldInfo> DbSchemaFields { get { return _DbSchema; } set { _DbSchema = value; OnSetDbSchema?.Invoke(null, _DbSchema); } }
-        public event EventHandler<List<FieldInfo>> OnSetDbSchema;
+        List<DbColumnDefinition> _DbSchema;
+        public List<DbColumnDefinition> DbSchemaFields { get { return _DbSchema; } set { _DbSchema = value; OnSetDbSchema?.Invoke(null, _DbSchema); } }
+        public event EventHandler<List<DbColumnDefinition>> OnSetDbSchema;
 
 
         FieldInfoViewModel _selectedDbSchemaRow;
@@ -41,5 +43,9 @@ namespace DbSchemaDecoder.Util
         List<Result> _parsingErrors;
         public List<Result> FileParsingErrors { get { return _parsingErrors; } set { _parsingErrors = value; OnErrorParsingCompleted?.Invoke(null, _parsingErrors); } }
         public event EventHandler<List<Result>> OnErrorParsingCompleted;
+
+        // Game
+        public Game CurrentGame { get; set; }
+        public SchemaManager SchemaManager { get; set; }
     }
 }

@@ -15,7 +15,7 @@ using static DbSchemaDecoder.Models.BruteForceViewModel;
 
 namespace DbSchemaDecoder.Controllers
 {
-    public class BruteForceController : NotifyPropertyChangedImpl
+   /* public class BruteForceController : NotifyPropertyChangedImpl
     {
         public enum BruteForceCalculatorType
         { 
@@ -308,5 +308,5 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.RunningStatus = "Stopped";
             return foundRunninProcess;
         }
-    }
+    }*/
 }

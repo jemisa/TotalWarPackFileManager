@@ -2,6 +2,7 @@
 using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
+using Filetypes.DB;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
@@ -100,15 +101,14 @@ namespace DbSchemaDecoder.Controllers
             Items.Add(viewModel);
         }
 
-        void UpdateViewModel(NextItemControllerItem viewModelRef, BinaryReader reader)
+        void UpdateViewModel(NextItemControllerItem viewModelRef, byte[] data, int index)
         {
-            var type = Types.FromEnum(viewModelRef.EnumValue);
-            var instanece = type.CreateInstance();
-            var result = instanece.TryDecode(reader);
-            if(result == false)
-                viewModelRef.ValueText = "Error:" + instanece.Value;
+            var parser = ParserFactory.Create(viewModelRef.EnumValue);
+            var result = parser.TryDecode(data, index, out string value, out var _, out string error);
+            if (result == false)
+                viewModelRef.ValueText = "Error:" + error;
             else
-                viewModelRef.ValueText = instanece.Value;
+                viewModelRef.ValueText = value;
         }
 
         public void OnButtonPressed(NextItemControllerItem val)
@@ -140,20 +140,22 @@ namespace DbSchemaDecoder.Controllers
                 using (var reader = new BinaryReader(stream))
                 {
                     DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-
+                    int index = header.Length;
                     var endIndex = _windowState.DbSchemaFields.Count();
                     if (_windowState.SelectedDbSchemaRow != null)
                         endIndex = _windowState.SelectedDbSchemaRow.Index - 1;
                     for (int i = 0; i < endIndex; i++)
                     {
-                        _windowState.DbSchemaFields[i].CreateInstance().TryDecode(reader);
+                        var byteParserType = _windowState.DbSchemaFields[i].Type;
+                        var parser = ParserFactory.Create(byteParserType);
+                        parser.TryDecode(_windowState.SelectedFile.DbFile.Data, index, out _, out var bytesRead, out _);
+                        index += bytesRead;
                     }
 
-                    var refPos = reader.BaseStream.Position;
+
                     for (int i = 0; i < Items.Count; i++)
                     {
-                        UpdateViewModel(Items[i], reader);
-                        reader.BaseStream.Position = refPos;
+                        UpdateViewModel(Items[i], _windowState.SelectedFile.DbFile.Data, index);
                     }
                 }
             }
