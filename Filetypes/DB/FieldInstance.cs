@@ -7,7 +7,6 @@ using Common;
 
 namespace Filetypes
 {
-
     [DebuggerDisplay("{Value}:{Info}; ")]
     public abstract class FieldInstance {
         public FieldInstance(FieldInfo fieldInfo, string value = "") {
@@ -195,7 +194,6 @@ namespace Filetypes
         }
     }
     
-
     public class BoolField : FieldInstance {
         public BoolField() : base(Types.BoolType(), false.ToString()) { Length = 1; }
         public override void Decode(BinaryReader reader) {

@@ -18,32 +18,6 @@ namespace Filetypes
 
 	public class Types 
     {
-        public static FieldInfo FromEnum(DbTypesEnum typeEnum)
-        {
-            switch (typeEnum)
-            {
-                case DbTypesEnum.String:
-                    return StringType();
-                case DbTypesEnum.String_ascii:
-                    return StringTypeAscii();
-                case DbTypesEnum.Optstring:
-                    return OptStringType();
-                case DbTypesEnum.Optstring_ascii:
-                    return OptStringTypeAscii();
-                case DbTypesEnum.Integer:
-                    return IntType();
-                case DbTypesEnum.Short:
-                    return ShortType();
-                case DbTypesEnum.Single:
-                    return SingleType();
-                case DbTypesEnum.Boolean:
-                    return BoolType();
-                case DbTypesEnum.List:
-                    return ListType();
-            }
-            throw new InvalidOperationException(String.Format("Cannot create field info from {0}", typeEnum.ToString()));
-        }
-
         public static FieldInfo StringType() { return new StringType() { Name = "unknown" }; }
         public static FieldInfo StringTypeAscii() { return new StringTypeAscii() { Name = "unknown" }; }
         public static FieldInfo IntType() { return new IntType() { Name = "unknown" }; }
@@ -52,7 +26,6 @@ namespace Filetypes
         public static FieldInfo OptStringType() { return new OptStringType() { Name = "unknown" }; }
         public static FieldInfo OptStringTypeAscii() { return new OptStringTypeAscii() { Name = "unknown" }; }
         public static FieldInfo SingleType() { return new SingleType() { Name = "unknown" }; }
-        public static FieldInfo ListType() { return new ListType() { Name = "unknown" }; }
     }
  
     /*

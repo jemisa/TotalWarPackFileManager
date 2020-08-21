@@ -93,7 +93,7 @@ namespace DbSchemaDecoder.Controllers
 
         void Create(DbTypesEnum enumValue)
         {
-            var type = Types.FromEnum(enumValue);
+            var type = ParserFactory.Create(enumValue);
             NextItemControllerItem viewModel = new NextItemControllerItem();
             viewModel.EnumValue = enumValue;
             viewModel.CustomDisplayText = type.TypeName;

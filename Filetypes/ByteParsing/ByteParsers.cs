@@ -7,6 +7,7 @@ namespace Filetypes.ByteParsing
 {
     public interface ByteParser
     {
+        string TypeName { get; }
         DbTypesEnum Type { get; }
         bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string error);
         bool CanDecode(byte[] buffer, int index, out int bytesRead, out string error);
@@ -22,6 +23,8 @@ namespace Filetypes.ByteParsing
     {
         protected abstract int FieldSize { get; }
         public abstract DbTypesEnum Type { get; }
+
+        public abstract string TypeName { get; }
 
         protected abstract T Decode(byte[] buffer, int index);
 
@@ -57,6 +60,7 @@ namespace Filetypes.ByteParsing
 
     public class IntParser : NumberParser<int>
     {
+        public override string TypeName { get { return "Int"; } }
         public override DbTypesEnum Type => DbTypesEnum.Integer;
 
         protected override int FieldSize => 4;
@@ -69,6 +73,7 @@ namespace Filetypes.ByteParsing
 
     public class SingleParser : NumberParser<float>
     {
+        public override string TypeName { get { return "Float"; } }
         public override DbTypesEnum Type => DbTypesEnum.Single;
         protected override int FieldSize => 4;
 
@@ -80,6 +85,7 @@ namespace Filetypes.ByteParsing
 
     public class ShortParser : NumberParser<short>
     {
+        public override string TypeName { get { return "Short"; } }
         public override DbTypesEnum Type => DbTypesEnum.Short;
         protected override int FieldSize => 2;
 
@@ -92,6 +98,9 @@ namespace Filetypes.ByteParsing
     public class BoolParser : SpesificByteParser<bool>
     {
         public DbTypesEnum Type => DbTypesEnum.Boolean;
+
+        public string TypeName { get { return "Bool"; } }
+
         protected int FieldSize => 1;
 
         public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string _error)
@@ -138,6 +147,8 @@ namespace Filetypes.ByteParsing
 
         virtual protected Encoding StringEncoding => Encoding.UTF8;
         virtual protected bool IsOptStr => false;
+
+        public virtual string TypeName { get { return "String"; } }
 
         bool TryReadReadCAStringAsArray(byte[] buffer, int index, Encoding encoding, bool isOptString,
              out string errorMessage, out int stringStart, out int stringLength, out int bytesInString)
@@ -228,6 +239,7 @@ namespace Filetypes.ByteParsing
 
     public class StringAsciiParser : StringParser
     {
+        public override string TypeName { get { return "StringAscii"; } }
         public override DbTypesEnum Type => DbTypesEnum.String_ascii;
         protected override Encoding StringEncoding => Encoding.ASCII;
         protected override bool IsOptStr => false;
@@ -235,6 +247,7 @@ namespace Filetypes.ByteParsing
 
     public class OptionalStringParser : StringParser
     {
+        public override string TypeName { get { return "Optstring"; } }
         public override DbTypesEnum Type => DbTypesEnum.Optstring;
         protected override Encoding StringEncoding => Encoding.UTF8;
         protected override bool IsOptStr => true;
@@ -242,6 +255,7 @@ namespace Filetypes.ByteParsing
 
     public class OptionalStringAsciiParser : StringParser
     {
+        public override string TypeName { get { return "OptStringAscii"; } }
         public override DbTypesEnum Type => DbTypesEnum.Optstring_ascii;
         protected override Encoding StringEncoding => Encoding.ASCII;
         protected override bool IsOptStr => true;
