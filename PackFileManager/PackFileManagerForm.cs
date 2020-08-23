@@ -93,9 +93,7 @@ namespace PackFileManager
             catch {}
 
             try {
-                if (!DBTypeMap.Instance.Initialized) {
-                    DBTypeMap.Instance.InitializeTypeMap(Path.GetDirectoryName(Application.ExecutablePath));
-                }
+                SchemaManager.Instance.Create(); 
             } catch (Exception e) {
                 if (MessageBox.Show(string.Format("Could not initialize type map: {0}.\nTry autoupdate?", e.Message),
                     "Initialize failed", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes) {
@@ -1170,6 +1168,10 @@ namespace PackFileManager
         
         #region DB Descriptions Menu
         private void saveToDirectoryToolStripMenuItem_Click(object sender, EventArgs e) {
+
+            throw new NotImplementedException("TODO");
+            /*
+            
             try {
                 DBTypeMap.Instance.SaveToFile(Path.GetDirectoryName(Application.ExecutablePath), 
                                               "user");
@@ -1183,7 +1185,7 @@ namespace PackFileManager
             } catch (Exception x) {
                 MessageBox.Show(string.Format("Could not save user db descriptions: {0}\n" + 
                                               "User file won't be used anymore. A backup has been made.", x.Message));
-            }
+            }*/
         }
 
         private void updateAllToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -1206,7 +1208,7 @@ namespace PackFileManager
         private void reloadToolStripMenuItem_Click(object sender, EventArgs e) {
             OpenFileDialog dlg = new OpenFileDialog();
             if (dlg.ShowDialog() == DialogResult.OK) {
-                DBTypeMap.Instance.initializeFromFile(dlg.FileName);
+                SchemaManager.Instance.Create();
             }
             if (CurrentPackFile != null) {
                 Refresh();
@@ -1220,9 +1222,11 @@ namespace PackFileManager
         static void TryUpdate(bool showSuccess = true, string currentPackFile = null) {
             try {
                 DBFileTypesUpdater updater = new DBFileTypesUpdater(Settings.Default.SubscribeToBetaSchema);
-                if (updater.NeedsSchemaUpdate) {
+                if (false) 
+                {
+                    // TODO
                     updater.UpdateSchema();
-                    DBTypeMap.Instance.InitializeTypeMap(Path.GetDirectoryName(Application.ExecutablePath));
+                    SchemaManager.Instance.Create();
                     if (showSuccess) {
                         MessageBox.Show("DB File description updated.", "Update result", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }

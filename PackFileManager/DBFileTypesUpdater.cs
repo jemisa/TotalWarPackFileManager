@@ -43,25 +43,6 @@ namespace PackFileManager
         }
         
         #region Query Update Neccessary
-        /*
-         * Query if a new schema update is available.
-         */
-        public bool NeedsSchemaUpdate {
-            get {
-                int currentVersion, latestVersion;
-                int.TryParse(CurrentSchemaVersion, out currentVersion);
-                int.TryParse(LatestSchemaVersion, out latestVersion);
-                bool result = latestVersion > currentVersion;
-                if (!result) {
-                    // check if we have all game schema files; if not, force update
-                    string appBaseDir = Path.GetDirectoryName(Application.ExecutablePath);
-                    foreach(Game g in Game.Games) {
-                        result |= !File.Exists(Path.Combine(appBaseDir, g.MaxVersionFilename));
-                    }
-                }
-                return result;
-            }
-        }
         
         /*
          * Query if a new software version is available.

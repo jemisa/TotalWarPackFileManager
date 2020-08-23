@@ -35,7 +35,9 @@ namespace Filetypes.DB
 
         public GameTypeEnum CurrentGame { get; set; }
 
-        public static SchemaManager Instance { get; private set; }
+        public static SchemaManager Instance { get; private set; } = new SchemaManager();
+
+        public bool IsCreated { get; private set; } = false;
         public SchemaManager()
         {
             BasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -43,6 +45,9 @@ namespace Filetypes.DB
 
         public void Create()
         {
+            if (IsCreated)
+                return;
+            
             // Depricated fool
             string path = BasePath + "\\Files\\" + "DepricatedMasterSchema.json";
             var content = LoadSchemaFile(path);
@@ -54,6 +59,8 @@ namespace Filetypes.DB
             {
                 Load(game.GameType);
             }
+
+            IsCreated = true;
         }
 
         public Dictionary<string, List<DbTableDefinition>> GetTableDefinitions(GameTypeEnum gameType)
@@ -61,6 +68,11 @@ namespace Filetypes.DB
             if (!_gameTableDefinitions.ContainsKey(gameType))
                 return null;
             return _gameTableDefinitions[gameType].TableDefinitions;
+        }
+
+        public bool IsSupported(string tableName)
+        {
+            return true;
         }
 
         public List<DbTableDefinition> GetTableDefinitionsForTable(GameTypeEnum gameType, string tableName)

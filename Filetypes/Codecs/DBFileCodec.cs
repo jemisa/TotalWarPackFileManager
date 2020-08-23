@@ -11,10 +11,6 @@ namespace Filetypes.Codecs
     public class PackedFileDbCodec : ICodec<DBFile> 
     {
         string _typeName;
-        public delegate void EntryLoaded(FieldInfo info, string value);
-        public delegate void HeaderLoaded(DBFileHeader header);
-        public delegate void LoadingPackedFile(PackedFile packed);
-
 
         #region Internal
         // header markers
@@ -111,10 +107,11 @@ namespace Filetypes.Codecs
 
         public static bool CanDecode(PackedFile packedFile, out string display) 
         {
+            display = "";
             bool result = true;
             string key = DBFile.Typename(packedFile.FullPath);
-            if (DBTypeMap.Instance.IsSupported(key)) {
-                try {
+            if (SchemaManager.Instance.IsSupported(key)) {
+                /*try {
                     DBFileHeader header = readHeader(packedFile);
                     int maxVersion = DBTypeMap.Instance.MaxVersion(key);
                     if (maxVersion != 0 && header.Version > maxVersion) {
@@ -125,7 +122,7 @@ namespace Filetypes.Codecs
                     }
                 } catch (Exception x) {
                     display = string.Format("{0}: {1}", key, x.Message);
-                }
+                }*/
             } else {
                 display = string.Format("{0}: no definition available", key);
                 result = false;

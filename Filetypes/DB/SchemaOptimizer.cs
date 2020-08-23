@@ -6,7 +6,14 @@ using Common;
 using Filetypes.Codecs;
 
 namespace Filetypes {
-    
+
+
+    public class TypeVersionTuple
+    {
+        public string Type { get; set; }
+        public int MaxVersion { get; set; }
+    }
+
     /*
      * Will go through all packs in a given directory, 
      * and determine the maximum version for all db files of any type.

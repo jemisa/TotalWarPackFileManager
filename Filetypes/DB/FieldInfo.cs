@@ -18,17 +18,7 @@ namespace Filetypes
         List,
     }
 
-	public class Types 
-    {
-        public static FieldInfo StringType() { return new StringType() { Name = "unknown" }; }
-        public static FieldInfo StringTypeAscii() { return new StringTypeAscii() { Name = "unknown" }; }
-        public static FieldInfo IntType() { return new IntType() { Name = "unknown" }; }
-        public static FieldInfo ShortType() { return new ShortType() { Name = "unknown" }; }
-        public static FieldInfo BoolType() { return new BoolType() { Name = "unknown" }; }
-        public static FieldInfo OptStringType() { return new OptStringType() { Name = "unknown" }; }
-        public static FieldInfo OptStringTypeAscii() { return new OptStringTypeAscii() { Name = "unknown" }; }
-        public static FieldInfo SingleType() { return new SingleType() { Name = "unknown" }; }
-    }
+
  
     /*
      * A reference to a field in a specific table.
@@ -112,123 +102,6 @@ namespace Filetypes
         }
 	}
 
-	public class StringType : FieldInfo {
-		public StringType () {
-			TypeName = "string";
-			TypeCode = TypeCode.String;
-            TypeEnum = DbTypesEnum.String;
-
-        }
-        public override FieldInstance CreateInstance() {
-            return new StringField() {
-                Name = this.Name,
-                Value = ""
-            };
-        }
-    }
-
-    public class StringTypeAscii : FieldInfo {
-         public StringTypeAscii () {
-             TypeName = "string_ascii";
-             TypeCode = TypeCode.String;
-            TypeEnum = DbTypesEnum.String_ascii;
-         }
-        public override FieldInstance CreateInstance() {
-            return new StringFieldAscii() {
-                Name = this.Name,
-                Value = ""
-            };
-        }
-    }
-
-    public class IntType : FieldInfo {
-		public IntType () {
-			TypeName = "int";
-			TypeCode = TypeCode.Int32;
-            TypeEnum = DbTypesEnum.Integer;
-
-        }
-        public override FieldInstance CreateInstance() {
-            return new IntField() {
-                Name = this.Name,
-                Value = "0"
-            };
-        }
-    }
-
-    public class ShortType : FieldInfo {
-		public ShortType () {
-			TypeName = "short";
-			TypeCode = TypeCode.Int16;
-            TypeEnum = DbTypesEnum.Short;
-        }
-        public override FieldInstance CreateInstance() {
-            return new ShortField() {
-                Name = this.Name,
-                Value = "0"
-            };
-        }
-
-    }
-
-    public class SingleType : FieldInfo {
-		public SingleType () {
-			TypeName = "float";
-			TypeCode = TypeCode.Single;
-            TypeEnum = DbTypesEnum.Single;
-
-        }
-        public override FieldInstance CreateInstance() {
-            return new SingleField() {
-                Name = this.Name,
-                Value = "0"
-            };
-        }
-    }
-
-    public class BoolType : FieldInfo {
-		public BoolType () {
-			TypeName = "boolean";
-			TypeCode = TypeCode.Boolean;
-            TypeEnum = DbTypesEnum.Boolean;
-
-        }
-        public override FieldInstance CreateInstance() {
-            return new BoolField() {
-                Name = this.Name,
-                Value = "false"
-            };
-        }
-    }
-
-	class OptStringType : FieldInfo {
-		public OptStringType () {
-			TypeName = "optstring";
-			TypeCode = TypeCode.String;
-            TypeEnum = DbTypesEnum.Optstring;
-
-        }
-        public override FieldInstance CreateInstance() {
-            return new OptStringField() {
-                Name = this.Name,
-                Value = ""
-            };
-        }
-    }
-
-    class OptStringTypeAscii : FieldInfo {
-        public OptStringTypeAscii () {
-            TypeName = "optstring_ascii";
-            TypeCode = TypeCode.String;
-            TypeEnum = DbTypesEnum.Optstring_ascii;
-        }
-        public override FieldInstance CreateInstance() {
-            return new OptStringFieldAscii() {
-                Name = this.Name,
-                Value = ""
-            };
-        }
-    }
 
     public class ListType : FieldInfo {
         public ListType() {

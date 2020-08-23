@@ -46,7 +46,6 @@
     <Compile Include="Codecs\ICodec.cs" />
     <Compile Include="Codecs\AtlasCodec.cs" />
     <Compile Include="Codecs\BitmapCodec.cs" />
-    <Compile Include="Codecs\DelegatingDbFileCodec.cs" />
     <Compile Include="Codecs\DelegatingEsfCodec.cs" />
     <Compile Include="Codecs\TextCodec.cs" />
     <Compile Include="Codecs\UnitVariantCodec.cs" />
@@ -54,12 +53,10 @@
     <Compile Include="Codecs\DBFileCodec.cs" />
     <Compile Include="DB\DBFileNotSupportedException.cs" />
     <Compile Include="DB\DBReferenceMap.cs" />
-    <Compile Include="DB\DBTypeMap.cs" />
     <Compile Include="DB\FieldInfo.cs" />
     <Compile Include="DB\FieldInstance.cs" />
     <Compile Include="ByteParsing\ByteParsers.cs" />
     <Compile Include="DB\SchemaManager.cs" />
-    <Compile Include="DB\TypeInfo.cs" />
     <Compile Include="Codecs\LocCodec.cs" />
     <Compile Include="Esf\AbcaCodec.cs" />
     <Compile Include="Esf\AbceCodec.cs" />

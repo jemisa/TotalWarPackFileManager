@@ -8,6 +8,7 @@ using CommonDialogs;
 
 using TableVersions = System.Collections.Generic.SortedList<string, int>;
 using System.Linq;
+using Filetypes.DB;
 
 namespace PackFileManager
 {
@@ -34,7 +35,7 @@ namespace PackFileManager
         }
         private GameManager()
         {
-            DBTypeMap.Instance.InitializeTypeMap(PackFileManagerSettingService.InstallationPath);
+            SchemaManager.Instance.Create();
 
             PackFileManagerSettingService.Load();
 
@@ -109,9 +110,6 @@ namespace PackFileManager
                         PackFileManagerSettingService.CurrentSettings.CurrentGame = current.GameType;
                         PackFileManagerSettingService.Save();
 
-                        // load the appropriate type map
-                        LoadGameMaxDbVersions();
-
                         // invalidate cache of reference map cache
                         var seq = new PackLoadSequence(){ IgnorePack = PackLoadSequence.IsDbCaPack };
                         List<string> loaded = seq.GetPacksLoadedFrom(current.GameDirectory);
@@ -150,61 +148,6 @@ namespace PackFileManager
                 SaveGameDirs();
             }
         }
-        
-        #region Game-specific schema (typemap) handling
-        private void LoadGameMaxDbVersions() 
-        {
-            try 
-            {
-                Game game = CurrentGame;
-                if (_gameDbVersions.ContainsKey(game)) 
-                    return;
-                
-                string schemaFile = Path.Combine(PackFileManagerSettingService.InstallationPath, game.MaxVersionFilename);
-                if (File.Exists(schemaFile)) 
-                {
-                    var versions = SchemaOptimizer.ReadTypeVersions(schemaFile);
-                    if (versions != null) 
-                        _gameDbVersions.Add(game, versions);
-                } 
-                else 
-                {
-                    // rebuild from master schema
-                    CreateSchemaFile(game);
-                }
-            } catch { }
-        }
-
-        public void CreateSchemaFile(Game game) 
-        {
-            string filePath = Path.Combine(PackFileManagerSettingService.InstallationPath, game.MaxVersionFilename);
-            if (game.IsInstalled && !File.Exists(filePath)) 
-            {
-                SchemaOptimizer optimizer = new SchemaOptimizer()
-                {
-                    PackDirectory = Path.Combine(game.GameDirectory, "data"),
-                    SchemaFilename = filePath
-                };
-                optimizer.FilterExistingPacks();
-
-#if DEBUG
-                createdGameSchemata = true;
-#endif
-            }
-        }
-        
-        private Dictionary<Game, TableVersions> _gameDbVersions = new Dictionary<Game, TableVersions>();
-        public int GetMaxDbVersion(string tableName) 
-        {
-            int result = -1;
-            if (_gameDbVersions.TryGetValue(CurrentGame, out var tablesToVersion))
-            {
-                if (!tablesToVersion.TryGetValue(tableName, out result))
-                    result = -1;
-            }
-            return result;
-        }
-        #endregion
     }
 }
 

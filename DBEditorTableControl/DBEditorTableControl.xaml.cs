@@ -1681,7 +1681,9 @@ namespace DBTableControl
 
         public void showDBFileNotSupportedMessage(string message)
         {
-            // Set the warning box as visible.
+            throw new NotImplementedException("TODO");
+            
+            /*// Set the warning box as visible.
             dbDataGrid.Visibility = System.Windows.Visibility.Hidden;
             unsupportedDBErrorTextBox.Visibility = System.Windows.Visibility.Visible;
 
@@ -1692,7 +1694,7 @@ namespace DBTableControl
             // Most controls useability are bound by TableReadOnly, so set it.
             _readOnly = true;
             // Modify the remaining controls manually.
-            exportAsButton.IsEnabled = false;
+            exportAsButton.IsEnabled = false;*/
         }
 
         static public Type GetTypeFromCode(TypeCode code)

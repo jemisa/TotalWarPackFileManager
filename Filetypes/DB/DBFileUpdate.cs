@@ -53,10 +53,11 @@ namespace Filetypes {
         /*
          * Find the type info for the given type and version to update to.
          */
+        /*
         TypeInfo GetTargetTypeInfo(string key, int maxVersion) {
             TypeInfo targetInfo = DBTypeMap.Instance.GetVersionedInfos(key, maxVersion)[0];
             return targetInfo;
-        }
+        }*/
     }
 }
 

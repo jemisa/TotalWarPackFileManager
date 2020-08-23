@@ -15,13 +15,13 @@ namespace PackFileManagerUnitTests.Utility
     {
         public static DBFile CreateTestPeopleTable()
         {
-            var fields = new List<FieldInfo>()
+            /*var fields = new List<FieldInfo>()
             {
                 new StringTypeAscii() { Name = "FirstName"},
                 new StringTypeAscii() { Name = "LastName"},
                 new IntType() { Name = "Age"},
                 new SingleType() { Name = "Height"},
-            };
+            };*/
 
             DbTableDefinition type = new DbTableDefinition()
             {

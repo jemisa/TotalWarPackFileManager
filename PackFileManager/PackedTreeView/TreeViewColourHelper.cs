@@ -57,8 +57,10 @@ namespace PackFileManager.PackedTreeView
         {
             DBFileHeader header = PackedFileDbCodec.readHeader(packedFile);
             string type = DBFile.Typename(packedFile.FullPath);
-            int maxVersion = GameManager.Instance.GetMaxDbVersion(type);
-            return DBTypeMap.Instance.IsSupported(type) && maxVersion != 0 && (header.Version < maxVersion);
+            //int maxVersion = GameManager.Instance.GetMaxDbVersion(type);
+            // throw new notimplementedException("TODO");
+            return false;
+            //return DBTypeMap.Instance.IsSupported(type) && maxVersion != 0 && (header.Version < maxVersion);
         }
 
         static void SetColourForAllParents(TreeNode node, Color c)

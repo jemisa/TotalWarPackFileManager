@@ -206,11 +206,6 @@ namespace Common {
         /*
          * Retrieve the schema filename for this game.
          */
-        public string MaxVersionFilename {
-            get {
-                return string.Format("maxVersions_{0}.xml", Id);
-            }
-        }
 
         // usual installation nodes in the registry (for installation autodetect)
         private static string WOW_NODE = @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Steam App {0}";
