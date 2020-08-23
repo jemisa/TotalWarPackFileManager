@@ -14,8 +14,8 @@ namespace Filetypes.Codecs
 
         #region Internal
         // header markers
-        static UInt32 GUID_MARKER = BitConverter.ToUInt32(new byte[] { 0xFD, 0xFE, 0xFC, 0xFF }, 0);
-        static UInt32 VERSION_MARKER = BitConverter.ToUInt32(new byte[] { 0xFC, 0xFD, 0xFE, 0xFF }, 0);
+        static uint GUID_MARKER = BitConverter.ToUInt32(new byte[] { 0xFD, 0xFE, 0xFC, 0xFF }, 0);
+        static uint VERSION_MARKER = BitConverter.ToUInt32(new byte[] { 0xFC, 0xFD, 0xFE, 0xFF }, 0);
         #endregion
 
         public static DBFile Decode(PackedFile file)
@@ -104,7 +104,6 @@ namespace Filetypes.Codecs
         }
         #endregion
 
-
         public static bool CanDecode(PackedFile packedFile, out string display) 
         {
             display = "";
@@ -139,45 +138,36 @@ namespace Filetypes.Codecs
 
         public static DBFileHeader readHeader(ByteChunk byteChunk) 
         {
-            byte index = byteChunk.ReadByte();
             int version = 0;
             string guid = "";
             bool hasMarker = false;
-            uint entryCount = 0;
 
-            try {
-                if (index != 1) 
-                {
-                    // I don't think those can actually occur more than once per file
-                    while (index == 0xFC || index == 0xFD) {
-                        var bytes = new List<byte>(4);
-                        bytes.Add(index);
-                        bytes.Add(byteChunk.ReadByte());
-                        bytes.Add(byteChunk.ReadByte());
-                        bytes.Add(byteChunk.ReadByte());
-                        UInt32 marker = BitConverter.ToUInt32(bytes.ToArray(), 0);
-                        if (marker == GUID_MARKER) 
-                        {
-                            guid = byteChunk.ReadStringAscii();
-                            index = byteChunk.ReadByte();
-                        } 
-                        else if (marker == VERSION_MARKER) {
-                            hasMarker = true;
-                            version = byteChunk.ReadInt32();
-                            index = byteChunk.ReadByte();
-                        } 
-                        else 
-                        {
-                            throw new DBFileNotSupportedException(string.Format("could not interpret {0}", marker));
-                        }
-                    }
-                }
-                entryCount = byteChunk.ReadUInt32();
-            } 
-            catch 
+            var guidByte = byteChunk.PeakUint32();
+            if (guidByte == GUID_MARKER)
             {
+                byteChunk.ReadUInt32();
+                guid = byteChunk.ReadStringAscii();
             }
-            DBFileHeader header = new DBFileHeader(guid, version, entryCount, hasMarker);
+
+            var marker = byteChunk.PeakUint32();
+            if (marker == VERSION_MARKER)
+            {
+                byteChunk.ReadInt32();
+                hasMarker = true;
+                version = byteChunk.ReadInt32();
+            }
+
+            var unknownByte = byteChunk.ReadByte();
+            var entryCount = byteChunk.ReadUInt32();
+
+            DBFileHeader header = new DBFileHeader()
+            {
+                GUID = guid,
+                EntryCount = entryCount,
+                HasVersionMarker = hasMarker,
+                Version = version,
+                UnknownByte = unknownByte
+            };
             return header;
         }
         #endregion

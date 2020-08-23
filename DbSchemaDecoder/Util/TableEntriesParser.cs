@@ -29,7 +29,7 @@ namespace DbSchemaDecoder.Util
                 // Create the headers
                 output.ColumnNames = new string[columnDefinitions.Count];
                 for (int i = 0; i < columnDefinitions.Count; i++)
-                    output.ColumnNames[i] = columnDefinitions[i].MetaData.Name;
+                    output.ColumnNames[i] = columnDefinitions[i].Name;
 
                 // Find the actuall parsers
                 var fieldInstances = columnDefinitions.Select(x => ByteParserFactory.Create(x.Type)).ToArray();
@@ -66,7 +66,7 @@ namespace DbSchemaDecoder.Util
                 result.Content[i] = value;
                 if (!parseResult)
                 {
-                    result.Error = $"Error parsing column {columnDefinitions[i].MetaData.Name} for row {rowIndex + 1} : {error}";
+                    result.Error = $"Error parsing column {columnDefinitions[i].Name} for row {rowIndex + 1} : {error}";
                     break;
                 }
                 _dataIndex += bytesReas;
@@ -91,7 +91,7 @@ namespace DbSchemaDecoder.Util
                         var parseResult = fieldInstances[i].CanDecode(_tableData, _dataIndex, out int bytesRead, out string error);
                         if (!parseResult)
                         {
-                            output.Error = $"Error parsing column {columnDefinitions[i].MetaData.Name} for row {rowIndex + 1} - Error : {error}";
+                            output.Error = $"Error parsing column {columnDefinitions[i].Name} for row {rowIndex + 1} - Error : {error}";
                             break;
                         }
 

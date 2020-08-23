@@ -158,10 +158,7 @@ namespace DbSchemaDecoder.Controllers
         {
             DbColumnDefinition typeDef = new DbColumnDefinition()
             {
-                MetaData = new DbFieldMetaData()
-                {
-                    Name = "Column_" + TableTypeInformationRows.Count() + 1
-                },
+                Name = "Column_" + TableTypeInformationRows.Count() + 1,                
                 Type = DbTypesEnum.String_ascii
             };
 
@@ -267,10 +264,7 @@ namespace DbSchemaDecoder.Controllers
         {
             DbColumnDefinition typeDef = new DbColumnDefinition()
             {
-                MetaData = new DbFieldMetaData()
-                {
-                    Name = "Column_" + TableTypeInformationRows.Count() + 1
-                },
+                Name = "Column_" + TableTypeInformationRows.Count() + 1,
                 Type = DbTypesEnum.String_ascii
             };
             var newFieldInfoViewModel = new FieldInfoViewModel(typeDef, 99);

@@ -29,7 +29,14 @@ namespace PackFileManagerUnitTests.Utility
                 Version = 4,
             };
 
-            DBFileHeader header = new DBFileHeader(Guid.NewGuid().ToString(), type.Version, 0, false);
+            DBFileHeader header = new DBFileHeader()
+            {
+                EntryCount = 0,
+                GUID = Guid.NewGuid().ToString(),
+                Version = type.Version,
+                HasVersionMarker = true,
+                UnknownByte = 0,
+            };
             DBFile dbFile = new DBFile(header, type);
             return dbFile;
         }

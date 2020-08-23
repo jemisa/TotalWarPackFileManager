@@ -71,8 +71,15 @@ namespace Filetypes.Codecs {
                     entries.Add(new DBRow(tableSchema, item));
                 }
       
-                String guid = "";
-                DBFileHeader header = new DBFileHeader (guid, version, (uint)entries.Count, version != 0);
+                DBFileHeader header = new DBFileHeader()
+                {
+                    GUID = "",
+                    EntryCount = (uint)entries.Count,
+                    HasVersionMarker = version != 0,
+                    Version = version,
+                    UnknownByte = 0
+                };
+
                 file = new DBFile (header, tableSchema);
                 file.Entries.AddRange (entries);
                 
@@ -90,7 +97,7 @@ namespace Filetypes.Codecs {
 
             List<string> toWrite = new List<string>();
             foreach (var field in file.CurrentType.ColumnDefinitions)
-                toWrite.Add(field.MetaData.Name);
+                toWrite.Add(field.Name);
 
             writer.WriteLine(string.Join("\t", toWrite));
             // write entries

@@ -252,7 +252,7 @@ namespace Filetypes.ByteParsing
                 }
 
                 stringStart = (index + 2 + offset);
-                stringLength = num;
+                stringLength = bytes;
                 bytesInString = bytes + 2;
             }
 
@@ -285,7 +285,7 @@ namespace Filetypes.ByteParsing
     {
         public override string TypeName { get { return "StringAscii"; } }
         public override DbTypesEnum Type => DbTypesEnum.String_ascii;
-        protected override Encoding StringEncoding => Encoding.ASCII;
+        protected override Encoding StringEncoding => Encoding.Unicode;
         protected override bool IsOptStr => false;
     }
 
@@ -349,6 +349,9 @@ namespace Filetypes.ByteParsing
                 case DbTypesEnum.Boolean:
                     return ByteParsers.Bool;
 
+                case DbTypesEnum.uint32:
+                    return ByteParsers.UInt32;
+
                 case DbTypesEnum.List:
                     throw new NotImplementedException();
             }
@@ -381,6 +384,14 @@ namespace Filetypes.ByteParsing
             return value;
         }
 
+        T Peak<T>(SpesificByteParser<T> parser)
+        {
+            if (!parser.TryDecodeValue(_buffer, _currentIndex, out T value, out int bytesRead, out string error))
+                throw new Exception("Unable to parse :" + error);
+
+            return value;
+        }
+
         public void Read(IByteParser parser, out string value, out string error)
         {
             if (!parser.TryDecode(_buffer, _currentIndex, out  value, out int bytesRead, out error))
@@ -397,6 +408,9 @@ namespace Filetypes.ByteParsing
         public short ReadShort() => Read(ByteParsers.Short);
         public bool ReadBool() => Read(ByteParsers.Bool);
         public byte ReadByte() => Read(ByteParsers.Byte);
+
+
+        public uint PeakUint32() => Peak(ByteParsers.UInt32);
     }
 
 

@@ -18,6 +18,7 @@ namespace Filetypes {
         public bool HasVersionMarker { get; set; }
         public int Version { get; set; }
         public uint EntryCount { get; set; }
+        public byte UnknownByte { get; set; }
         /*
          * The length of the encoded header.
          */
@@ -32,11 +33,8 @@ namespace Filetypes {
         /*
          * Create header with the given GUID, version and entry count.
          */
-        public DBFileHeader(string guid, int version, uint entryCount, bool marker) {
-            GUID = guid;
-            Version = version;
-            EntryCount = entryCount;
-            HasVersionMarker = marker;
+        public DBFileHeader() 
+        {
         }
         
 		#region Framework Overrides
@@ -116,24 +114,18 @@ namespace Filetypes {
 		}
 	}
 
-    public class DbFieldMetaData : ICloneable
+    public class DbColumnDefinition
     {
         public string Name { get; set; }
         public string FieldReference { get; set; }
         public string TableReference { get; set; }
-        public bool IsKey { get; set; }
+        public bool IsKey { get; set; } = false;
         public bool IsOptional { get; set; }
         public int MaxLength { get; set; }
+        public bool IsFileName { get; set; } = false;
+        public string Description { get; set; }
+        public string FilenameRelativePath { get; set; }
 
-        public object Clone()
-        {
-            return MemberwiseClone();
-        }
-    }
-
-    public class DbColumnDefinition
-    {
-        public DbFieldMetaData MetaData { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public DbTypesEnum Type { get; set; }
@@ -206,7 +198,7 @@ namespace Filetypes {
         {
             for (int i = 0; i < info.ColumnDefinitions.Count; i++)
             {
-                if (info.ColumnDefinitions[i].MetaData.Name == fieldName)
+                if (info.ColumnDefinitions[i].Name == fieldName)
                     return i;
             }
             throw new IndexOutOfRangeException(string.Format("Field name {0} not valid for type {1}", fieldName, info.TableName));

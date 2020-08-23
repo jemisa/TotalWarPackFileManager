@@ -430,7 +430,7 @@ namespace DBTableControl
 
                     dbDataGrid.Columns.Add(constructionColumn);
                 }
-                else if(EditedFile.CurrentType.ColumnDefinitions.First(n => n.MetaData.Name.Equals(column.ColumnName)).Type == DbTypesEnum.Boolean)
+                else if(EditedFile.CurrentType.ColumnDefinitions.First(n => n.Name.Equals(column.ColumnName)).Type == DbTypesEnum.Boolean)
                 {
                     // Checkbox Column
                     DataGridCheckBoxColumn constructionColumn = new DataGridCheckBoxColumn();
@@ -540,11 +540,11 @@ namespace DBTableControl
             {
                 // Create the new column, using object as the data type for all columns, this way we avoid the WPF DataGrid's built in
                 // data validation abilities in favor of our own implementation.
-                constructionColumn = new DataColumn(columnInfo.MetaData.Name, typeof(string));
+                constructionColumn = new DataColumn(columnInfo.Name, typeof(string));
 
                 if (columnInfo.Type == DbTypesEnum.Short || columnInfo.Type == DbTypesEnum.Integer || columnInfo.Type == DbTypesEnum.Single)
                 {
-                    constructionColumn = new DataColumn(columnInfo.MetaData.Name, typeof(double));
+                    constructionColumn = new DataColumn(columnInfo.Name, typeof(double));
                 }
 
                 constructionColumn.AllowDBNull = true;
@@ -552,13 +552,13 @@ namespace DBTableControl
                 constructionColumn.ReadOnly = _readOnly;
 
                 // Save the FKey if it exists
-                if (!String.IsNullOrEmpty(columnInfo.MetaData.TableReference))
+                if (!String.IsNullOrEmpty(columnInfo.TableReference))
                 {
-                    constructionColumn.ExtendedProperties.Add("FKey", columnInfo.MetaData.TableReference);
+                    constructionColumn.ExtendedProperties.Add("FKey", columnInfo.TableReference);
                 }
 
                 // If the column is a primary key, save it for later adding
-                if (columnInfo.MetaData.IsKey)
+                if (columnInfo.IsKey)
                 {
                     keyList.Add(constructionColumn);
                 }
@@ -1598,7 +1598,7 @@ namespace DBTableControl
 
             for (int i = 0; i < _currentTable.Columns.Count; i++)
             {
-                if (EditedFile.CurrentType.ColumnDefinitions[i].MetaData.IsKey)
+                if (EditedFile.CurrentType.ColumnDefinitions[i].IsKey)
                 {
                     pksequence.Add(_currentTable.Rows[rowindex][i].ToString());
                 }

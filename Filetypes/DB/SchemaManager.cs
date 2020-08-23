@@ -19,7 +19,7 @@ namespace Filetypes.DB
         public List<DbColumnDefinition> ColumnDefinitions { get; set; } = new List<DbColumnDefinition>();
     }
 
-    class SchemaFile
+    public class SchemaFile
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public GameTypeEnum GameEnum { get; set; }
@@ -29,6 +29,7 @@ namespace Filetypes.DB
 
     public class SchemaManager
     {
+        public static string LocTableName { get { return "LocTable"; } }
         public string BasePath { get; set; }
 
         Dictionary<GameTypeEnum, SchemaFile> _gameTableDefinitions = new Dictionary<GameTypeEnum, SchemaFile>();
@@ -61,6 +62,12 @@ namespace Filetypes.DB
             }
 
             IsCreated = true;
+        }
+
+        public void UpdateCurrentTableDefinitions(SchemaFile schemaFile)
+        {
+            _gameTableDefinitions[CurrentGame] = schemaFile;
+            Save(CurrentGame);
         }
 
         public Dictionary<string, List<DbTableDefinition>> GetTableDefinitions(GameTypeEnum gameType)
@@ -100,7 +107,7 @@ namespace Filetypes.DB
             if (!_gameTableDefinitions.ContainsKey(game))
                 return false;
             string path = BasePath + "\\Files\\" + Game.GetByEnum(game).Id + "_schema.json";
-            var content = JsonConvert.SerializeObject(_gameTableDefinitions[game]);
+            var content = JsonConvert.SerializeObject(_gameTableDefinitions[game], Formatting.Indented);
             File.WriteAllText(path, content);
             return true;
         }
