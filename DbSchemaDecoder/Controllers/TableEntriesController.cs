@@ -36,36 +36,31 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.ParseResult = "";
             try
             {
-                using (var stream = new MemoryStream(_windowState.SelectedFile.DbFile.Data))
+                DBFileHeader header = PackedFileDbCodec.readHeader(_windowState.SelectedFile.DbFile);
+                TableEntriesParser parser = new TableEntriesParser(_windowState.SelectedFile.DbFile.Data, header.Length);
+                var parseResult = parser.ParseTable(schema.ToList(), (int)header.EntryCount);
+                if (parseResult.HasError)
+                    ViewModel.ParseResult = parseResult.Error;
+
+                try
                 {
-                    using (var reader = new BinaryReader(stream))
+                    if (parseResult.ColumnNames != null)
                     {
-                        DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                        TableEntriesParser parser = new TableEntriesParser(_windowState.SelectedFile.DbFile.Data, header.Length);
-                        var parseResult = parser.ParseTable(schema.ToList(), (int)header.EntryCount);
-                        if (parseResult.HasError)
-                            ViewModel.ParseResult = parseResult.Error;
+                        foreach (var columnName in parseResult.ColumnNames)
+                            table.Columns.Add(columnName);
 
-                        try
+                        if (parseResult.DataRows != null)
                         {
-                            if (parseResult.ColumnNames != null)
-                            {
-                                foreach (var columnName in parseResult.ColumnNames)
-                                    table.Columns.Add(columnName);
-
-                                if (parseResult.DataRows != null)
-                                {
-                                    foreach (var row in parseResult.DataRows)
-                                        table.Rows.Add(row);
-                                }
-                            }
-                        }
-                        catch
-                        { 
-                            
+                            foreach (var row in parseResult.DataRows)
+                                table.Rows.Add(row);
                         }
                     }
                 }
+                catch
+                { 
+                            
+                }
+             
             }
             catch (Exception e)
             {

@@ -53,10 +53,7 @@ namespace DbSchemaDecoder.Util
 
             try
             {
-                var nemoryStream = new MemoryStream(file.DbFile.Data);
-                var dbStreamReader = new BinaryReader(nemoryStream);
-
-                DBFileHeader header = PackedFileDbCodec.readHeader(dbStreamReader);
+                DBFileHeader header = PackedFileDbCodec.readHeader(file.DbFile);
 
                 CaSchemaFileParser caSchemaFileParser = new CaSchemaFileParser();
                 var caSchemaResult = caSchemaFileParser.Load(file.TableType);

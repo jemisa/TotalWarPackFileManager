@@ -961,7 +961,7 @@ namespace PackFileManager
                             } else {
                                 DBFile file = new TextDbCodec().Decode(filestream);
                                 data = PackedFileDbCodec.FromFilename(openDBFileDialog.FileName).Encode(file);
-                                addBase = String.Format("/db/{0}/", file.CurrentType.Name);
+                                addBase = String.Format("/db/{0}/", file.CurrentType.TableName);
                             }
 
                             PackedFile packedFile = new PackedFile { Data = data, Name = filename };

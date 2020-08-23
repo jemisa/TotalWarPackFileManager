@@ -23,7 +23,7 @@ namespace PackFileManagerUnitTests.SbSchemaDecoder
 
             state.SelectedFile = new DataBaseFile()
             {
-                TableType = table.CurrentType.Name,
+                TableType = table.CurrentType.TableName,
                 DbFile = new PackedFile()
                 {
                     Data = bytes

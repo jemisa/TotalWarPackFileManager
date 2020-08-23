@@ -84,10 +84,6 @@ namespace Common {
         }
 
 
-
-
-
-
         /*
          * Read a zero-terminated Unicode string.
          */
@@ -115,13 +111,7 @@ namespace Common {
 
             return Encoding.ASCII.GetString(staticBuffer, 0, index);
         }
-        /*
-         * Write the given zero-terminated ASCII string to the given writer.
-         */
-        public static void WriteZeroTerminatedAscii(BinaryWriter writer, string toWrite) {
-            writer.Write(toWrite.ToCharArray());
-            writer.Write((byte) 0);
-        }
+
         /*
          * Write the given string to the given writer in Unicode.
          */
@@ -149,38 +139,6 @@ namespace Common {
             writer.Write(array);
         }
   
-        /*
-         * Fills the given list from the given reader with data created by the given item reader.
-         */
-        public static void FillList<T>(List<T> toFill, ItemReader<T> readItem, BinaryReader reader, 
-                                          bool skipIndex = true, int itemCount = -1) {
-            try {
-
-#if DEBUG
-                long listStartPosition = reader.BaseStream.Position;
-#endif
-                if (itemCount == -1) {
-                    itemCount = reader.ReadInt32();
-                }
-#if DEBUG
-                Console.WriteLine("Reading list at {0:x}, {1} entries", listStartPosition, itemCount);
-#endif
-                for (int i = 0; i < itemCount; i++) {
-                    try {
-                        if (skipIndex) {
-                            reader.ReadInt32();
-                        }
-                        toFill.Add(readItem(reader));
-                    } catch (Exception ex) {
-                        throw new ParseException(string.Format("Failed to read item {0}", i), 
-                                                 reader.BaseStream.Position, ex);
-                    }
-                }
-            } catch (Exception ex) {
-                throw new ParseException(string.Format("Failed to entries for list {0}"), 
-                                         reader.BaseStream.Position, ex);
-            }
-        }
         /*
          * Delegate for methods reading data from a reader.
          */

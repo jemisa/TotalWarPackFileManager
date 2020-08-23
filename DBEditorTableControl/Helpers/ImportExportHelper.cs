@@ -122,17 +122,17 @@ namespace DBEditorTableControl
 
         static public void ImportTSV(DBTableControl.DBEditorTableControl _parentDbEdtiorTable)
         {
-            Import(_parentDbEdtiorTable, String.Format("{0}.csv", _parentDbEdtiorTable.EditedFile.CurrentType.Name), new TextDbCodec());
+            Import(_parentDbEdtiorTable, String.Format("{0}.csv", _parentDbEdtiorTable.EditedFile.CurrentType.TableName), new TextDbCodec());
         }
 
         static public void ImportCSV(DBTableControl.DBEditorTableControl _parentDbEdtiorTable)
         {
-            Import(_parentDbEdtiorTable, String.Format("{0}.tsv", _parentDbEdtiorTable.EditedFile.CurrentType.Name), new TextDbCodec());
+            Import(_parentDbEdtiorTable, String.Format("{0}.tsv", _parentDbEdtiorTable.EditedFile.CurrentType.TableName), new TextDbCodec());
         }
 
         static public void ImportBinary(DBTableControl.DBEditorTableControl _parentDbEdtiorTable)
         {
-            Import(_parentDbEdtiorTable, _parentDbEdtiorTable.EditedFile.CurrentType.Name, _parentDbEdtiorTable._codec);
+            Import(_parentDbEdtiorTable, _parentDbEdtiorTable.EditedFile.CurrentType.TableName, _parentDbEdtiorTable._codec);
         }
 
         static public void ImportCAXml(DBTableControl.DBEditorTableControl _parentDbEdtiorTable)

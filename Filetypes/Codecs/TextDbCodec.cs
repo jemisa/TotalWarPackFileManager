@@ -1,4 +1,6 @@
 using Common;
+using Filetypes.ByteParsing;
+using Filetypes.DB;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,62 +45,53 @@ namespace Filetypes.Codecs {
             }
 
             DBFile file = null;
+
             // skip table header
             reader.ReadLine();
             List<String> read = new List<String>();
-            while(!reader.EndOfStream) {
+            while(!reader.EndOfStream) 
                 read.Add(reader.ReadLine());
-            }
             
-            List<TypeInfo> infos = DBTypeMap.Instance.GetVersionedInfos(typeInfoName, version);
-            foreach(TypeInfo info in infos) {
-                bool parseSuccessful = true;
-                
+            var tableSchema = SchemaManager.Instance.GetTableDefinitionsForTable(typeInfoName, version);
+            foreach(var columnDefinition in tableSchema.ColumnDefinitions) 
+            {
                 List<DBRow> entries = new List<DBRow> ();
-                foreach(String line in read) {
-                    try {
-                        String[] strArray = line.Split (TABS, StringSplitOptions.None);
-                        if (strArray.Length != info.Fields.Count) {
-                            parseSuccessful = false;
-                            break;
-                        }
-                        List<FieldInstance> item = new List<FieldInstance> ();
-                        for (int i = 0; i < strArray.Length; i++) {
-                            FieldInstance field = info.Fields [i].CreateInstance();
-                            string fieldValue = CsvUtil.Unformat (strArray [i]);
-                            field.Value = fieldValue;
-                            item.Add (field);
-                        }
-                        entries.Add (new DBRow(info, item));
-#if DEBUG
-                    } catch (Exception x) {
-                        Console.WriteLine (x);
-#else
-                    } catch {
-#endif
-                        parseSuccessful = false;
-                        break;
+                foreach(var line in read) 
+                {
+                    var strArray = line.Split(TABS, StringSplitOptions.None);
+
+                    List<DbField> item = new List<DbField>();
+                    for (int i = 0; i < strArray.Length; i++)
+                    {
+                        DbField field = new DbField(columnDefinition.Type);
+                        string fieldValue = CsvUtil.Unformat(strArray[i]);
+                        field.Value = fieldValue;
+                        item.Add(field);
                     }
+                    entries.Add(new DBRow(tableSchema, item));
                 }
-                if (parseSuccessful) {
-                    String guid = "";
-                    DBFileHeader header = new DBFileHeader (guid, version, (uint)entries.Count, version != 0);
-                    file = new DBFile (header, info);
-                    file.Entries.AddRange (entries);
-                    break;
-                }
+      
+                String guid = "";
+                DBFileHeader header = new DBFileHeader (guid, version, (uint)entries.Count, version != 0);
+                file = new DBFile (header, tableSchema);
+                file.Entries.AddRange (entries);
+                
             }
             return file;
         }
 
         // write the given file to stream
-        public void Encode(Stream stream, DBFile file) {
+        public void Encode(Stream stream, DBFile file) 
+        {
             StreamWriter writer = new StreamWriter (stream);
             // write header
-            writer.WriteLine (file.CurrentType.Name);
+            writer.WriteLine (file.CurrentType.TableName);
             writer.WriteLine (Convert.ToString (file.Header.Version));
+
             List<string> toWrite = new List<string>();
-            file.CurrentType.Fields.ForEach(f => toWrite.Add(f.Name));
+            foreach (var field in file.CurrentType.ColumnDefinitions)
+                toWrite.Add(field.MetaData.Name);
+
             writer.WriteLine(string.Join("\t", toWrite));
             // write entries
             file.Entries.ForEach(e => {

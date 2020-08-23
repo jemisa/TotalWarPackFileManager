@@ -1,5 +1,7 @@
 ﻿using Filetypes;
+using Filetypes.ByteParsing;
 using Filetypes.Codecs;
+using Filetypes.DB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -21,9 +23,9 @@ namespace PackFileManagerUnitTests.Utility
                 new SingleType() { Name = "Height"},
             };
 
-            TypeInfo type = new TypeInfo(fields)
+            DbTableDefinition type = new DbTableDefinition()
             {
-                Name = "TestPeople",
+                TableName = "TestPeople",
                 Version = 4,
             };
 
@@ -35,10 +37,10 @@ namespace PackFileManagerUnitTests.Utility
 
         public static void AddRow(DBFile file, string[] values)
         {
-            Assert.AreEqual(file.CurrentType.Fields.Count, values.Count());
+            Assert.AreEqual(file.CurrentType.ColumnDefinitions.Count, values.Count());
 
             var row = new DBRow(file.CurrentType);
-            for (int i = 0; i < file.CurrentType.Fields.Count; i++)
+            for (int i = 0; i < file.CurrentType.ColumnDefinitions.Count; i++)
             {
                 row[i].Value = values[i];
             }
@@ -47,7 +49,7 @@ namespace PackFileManagerUnitTests.Utility
 
         public static byte[] GetBytes(DBFile file)
         {
-            PackedFileDbCodec codec = new PackedFileDbCodec(file.CurrentType.Name);
+            PackedFileDbCodec codec = new PackedFileDbCodec(file.CurrentType.TableName);
             var bytes = codec.Encode(file);
             return bytes;
         }

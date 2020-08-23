@@ -87,7 +87,6 @@
     <Compile Include="DB\DBFileUpdate.cs" />
     <Compile Include="DB\SchemaOptimizer.cs" />
     <Compile Include="Codecs\TextDbCodec.cs" />
-    <Compile Include="DB\DBRow.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

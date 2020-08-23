@@ -33,6 +33,9 @@ namespace Filetypes.DB
 
         Dictionary<GameTypeEnum, SchemaFile> _gameTableDefinitions = new Dictionary<GameTypeEnum, SchemaFile>();
 
+        public GameTypeEnum CurrentGame { get; set; }
+
+        public static SchemaManager Instance { get; private set; }
         public SchemaManager()
         {
             BasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -68,6 +71,11 @@ namespace Filetypes.DB
             if (_gameTableDefinitions[gameType].TableDefinitions.ContainsKey(tableName))
                 return _gameTableDefinitions[gameType].TableDefinitions[tableName];
             return new List<DbTableDefinition>();
+        }
+
+        public DbTableDefinition GetTableDefinitionsForTable(string tableName, int version)
+        {
+            throw new NotImplementedException();
         }
 
         public Dictionary<string, List<DbTableDefinition>> GetDepricated()

@@ -51,7 +51,7 @@ namespace DbSchemaDecoder.Util
             return output;
         }
 
-        RowResult ParseRow( ByteParser[] fields, List<DbColumnDefinition> columnDefinitions, int rowIndex)
+        RowResult ParseRow( IByteParser[] fields, List<DbColumnDefinition> columnDefinitions, int rowIndex)
         {
             int fieldsCount = fields.Count();
             RowResult result = new RowResult()

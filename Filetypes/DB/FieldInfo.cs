@@ -5,11 +5,13 @@ namespace Filetypes
 {
     public enum DbTypesEnum
     { 
+        Byte,
         String,
         String_ascii,
         Optstring,
         Optstring_ascii,
         Integer,
+        uint32,
         Short,
         Single,
         Boolean,

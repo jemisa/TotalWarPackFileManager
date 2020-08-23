@@ -1,4 +1,5 @@
 ﻿using DBTableControl;
+using Filetypes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -94,14 +95,15 @@ namespace DBEditorTableControl
 
         private static bool IsLineARow(DBTableControl.DBEditorTableControl mainTable, string line)
         {
-            if (line.Count(n => n == '\t') >= mainTable.EditedFile.CurrentType.Fields.Count - 1)
+            if (line.Count(n => n == '\t') >= mainTable.EditedFile.CurrentType.ColumnDefinitions.Count - 1)
             {
                 bool fullrow = true;
-                string[] cells = line.Split('\t').Take(mainTable.EditedFile.CurrentType.Fields.Count).ToArray();
+                string[] cells = line.Split('\t').Take(mainTable.EditedFile.CurrentType.ColumnDefinitions.Count).ToArray();
                 for (int i = 0; i < cells.Length; i++)
                 {
-                    if (String.IsNullOrEmpty(cells[i]) &&
-                        (mainTable.EditedFile.CurrentType.Fields[i].TypeCode != TypeCode.String) && !mainTable.EditedFile.CurrentType.Fields[i].TypeName.Contains("optstring"))
+                    bool isOptStr = mainTable.EditedFile.CurrentType.ColumnDefinitions[i].Type == DbTypesEnum.Optstring ||
+                        mainTable.EditedFile.CurrentType.ColumnDefinitions[i].Type == DbTypesEnum.Optstring_ascii;
+                    if (String.IsNullOrEmpty(cells[i]) && (mainTable.EditedFile.CurrentType.ColumnDefinitions[i].Type != DbTypesEnum.String) && !isOptStr)
                     {
                         fullrow = false;
                         break;
@@ -207,13 +209,16 @@ namespace DBEditorTableControl
 
             for (int i = 0; i < mainTable.CurrentTable.Columns.Count; i++)
             {
-                TypeCode fieldtypecode = mainTable.EditedFile.CurrentType.Fields[fieldorder[i]].TypeCode;
+                var fieldtypecode = mainTable.EditedFile.CurrentType.ColumnDefinitions[fieldorder[i]].Type;
 
-                if (fieldtypecode == TypeCode.String)
+                if (fieldtypecode == DbTypesEnum.String ||
+                    fieldtypecode == DbTypesEnum.Optstring ||
+                    fieldtypecode == DbTypesEnum.String_ascii ||
+                        fieldtypecode == DbTypesEnum.Optstring_ascii)
                 {
                     continue;
                 }
-                else if (fieldtypecode == TypeCode.Single)
+                else if (fieldtypecode == DbTypesEnum.Single)
                 {
                     float temp;
                     if (!float.TryParse(fields[i], out temp))
@@ -223,7 +228,7 @@ namespace DBEditorTableControl
                         return false;
                     }
                 }
-                else if (fieldtypecode == TypeCode.Int32)
+                else if (fieldtypecode == DbTypesEnum.Integer)
                 {
                     int temp;
                     if (!int.TryParse(fields[i], out temp))
@@ -233,7 +238,7 @@ namespace DBEditorTableControl
                         return false;
                     }
                 }
-                else if (fieldtypecode == TypeCode.Int16)
+                else if (fieldtypecode == DbTypesEnum.Short)
                 {
                     short temp;
                     if (!short.TryParse(fields[i], out temp))
@@ -368,7 +373,7 @@ namespace DBEditorTableControl
                                 // Data is being displayed with keys moved, so assume the clipboard data matches the visual appearance and not
                                 // the order of the data source.
                                 object tempitem;
-                                List<object> itemarray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.Fields.Count).ToList<object>();
+                                List<object> itemarray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.ColumnDefinitions.Count).ToList<object>();
                                 for (int i = mainTable.CurrentTable.PrimaryKey.Count() - 1; i >= 0; i--)
                                 {
                                     tempitem = itemarray[i];
@@ -382,7 +387,7 @@ namespace DBEditorTableControl
                             else
                             {
                                 // Data is displayed as it is stored, so assume the clipboard data is ordered the same way.
-                                newrow.ItemArray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.Fields.Count).ToArray<object>();
+                                newrow.ItemArray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.ColumnDefinitions.Count).ToArray<object>();
                             }
 
                             mainTable.CurrentTable.Rows.Add(newrow);
@@ -473,7 +478,7 @@ namespace DBEditorTableControl
             else
             {
                 // Paste Rows, with no floater cells.
-                if (mainTable.dbDataGrid.SelectedCells.Count == (mainTable.dbDataGrid.SelectedItems.Count * mainTable.EditedFile.CurrentType.Fields.Count))
+                if (mainTable.dbDataGrid.SelectedCells.Count == (mainTable.dbDataGrid.SelectedItems.Count * mainTable.EditedFile.CurrentType.ColumnDefinitions.Count))
                 {
                     // Only rows are selected.
                     // Since the SelectedItems list is in the order of selection and NOT in the order of appearance we need
@@ -525,7 +530,7 @@ namespace DBEditorTableControl
                                 // Data is being displayed with keys moved, so assume the clipboard data matches the visual appearance and not
                                 // the order of the data source.
                                 object tempitem;
-                                List<object> itemarray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.Fields.Count).ToList<object>();
+                                List<object> itemarray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.ColumnDefinitions.Count).ToList<object>();
                                 for (int i = mainTable.CurrentTable.PrimaryKey.Count() - 1; i >= 0; i--)
                                 {
                                     tempitem = itemarray[i];
@@ -539,7 +544,7 @@ namespace DBEditorTableControl
                             else
                             {
                                 // Data is displayed as it is stored, so assume the clipboard data is ordered the same way.
-                                newrow.ItemArray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.Fields.Count).ToArray<object>();
+                                newrow.ItemArray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.ColumnDefinitions.Count).ToArray<object>();
                             }
 
                             mainTable.CurrentTable.Rows.Add(newrow);
@@ -554,7 +559,7 @@ namespace DBEditorTableControl
                             // Data is being displayed with keys moved, so assume the clipboard data matches the visual appearance and not
                             // the order of the data source.
                             object tempitem;
-                            List<object> itemarray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.Fields.Count).ToList<object>();
+                            List<object> itemarray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.ColumnDefinitions.Count).ToList<object>();
                             for (int i = mainTable.CurrentTable.PrimaryKey.Count() - 1; i >= 0; i--)
                             {
                                 tempitem = itemarray[i];
@@ -568,7 +573,7 @@ namespace DBEditorTableControl
                         else
                         {
                             // Data is displayed as it is stored, so assume the clipboard data is ordered the same way.
-                            mainTable.CurrentTable.Rows[dataindiciesToPaste[currentindex]].ItemArray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.Fields.Count).ToArray<object>();
+                            mainTable.CurrentTable.Rows[dataindiciesToPaste[currentindex]].ItemArray = line.Split('\t').Take(mainTable.EditedFile.CurrentType.ColumnDefinitions.Count).ToArray<object>();
                         }
 
                         mainTable.CurrentTable.Rows[dataindiciesToPaste[currentindex]].EndEdit();

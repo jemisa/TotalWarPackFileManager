@@ -171,8 +171,8 @@ namespace CommonUtilities {
             if(file1 == null || file2 == null)
                 return false;
 
-            List<FieldInfo> infos1 = file1.CurrentType.Fields;
-            List<FieldInfo> infos2 = file2.CurrentType.Fields;
+            var infos1 = file1.CurrentType.ColumnDefinitions;
+            var infos2 = file2.CurrentType.ColumnDefinitions;
 
             if(infos1.Count != infos2.Count)
                 return false;

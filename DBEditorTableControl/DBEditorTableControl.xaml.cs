@@ -15,6 +15,7 @@ using Common;
 using DBEditorTableControl;
 using DBEditorTableControl.Dialogs;
 using Filetypes;
+using Filetypes.ByteParsing;
 using Filetypes.Codecs;
 using static DBEditorTableControl.FilterHelper;
 
@@ -230,8 +231,10 @@ namespace DBTableControl
                 NotifyPropertyChanged(this, "CurrentPackedFile");
 
                 // cannot edit contained complex types
-                foreach(FieldInfo f in EditedFile.CurrentType.Fields) {
-                    if (f is ListType) {
+                foreach(var f in EditedFile.CurrentType.ColumnDefinitions) 
+                {
+                    if (f is ListType) 
+                    {
                         Console.WriteLine("cannot edit this");
                         ReadOnly = true;
                         break;
@@ -362,9 +365,9 @@ namespace DBTableControl
             {
                 _hiddenColumns.Clear();
 
-                if (_savedconfig.HiddenColumns.ContainsKey(EditedFile.CurrentType.Name))
+                if (_savedconfig.HiddenColumns.ContainsKey(EditedFile.CurrentType.TableName))
                 {
-                    _hiddenColumns = new List<string>(_savedconfig.HiddenColumns[EditedFile.CurrentType.Name]);
+                    _hiddenColumns = new List<string>(_savedconfig.HiddenColumns[EditedFile.CurrentType.TableName]);
                 }
             }
 
@@ -410,7 +413,7 @@ namespace DBTableControl
 
                     // Setup the column header's tooltip.
                     string headertooltip = String.Format("Column Data Type: {0}\nReference Table: {1}\nReference Column: {2}",
-                                                    EditedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString(),
+                                                    EditedFile.CurrentType.ColumnDefinitions[CurrentTable.Columns.IndexOf(column)].Type.ToString(),
                                                     column.ExtendedProperties["FKey"].ToString().Split('.')[0],
                                                     column.ExtendedProperties["FKey"].ToString().Split('.')[1]);
 
@@ -438,7 +441,7 @@ namespace DBTableControl
 
                     dbDataGrid.Columns.Add(constructionColumn);
                 }
-                else if(EditedFile.CurrentType.Fields.First(n => n.Name.Equals(column.ColumnName)).TypeCode == TypeCode.Boolean)
+                else if(EditedFile.CurrentType.ColumnDefinitions.First(n => n.MetaData.Name.Equals(column.ColumnName)).Type == DbTypesEnum.Boolean)
                 {
                     // Checkbox Column
                     DataGridCheckBoxColumn constructionColumn = new DataGridCheckBoxColumn();
@@ -447,7 +450,7 @@ namespace DBTableControl
 
                     // Setup the column header's tooltip.
                     string headertooltip = String.Format("Column Data Type: {0}",
-                                                    EditedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString());
+                                                    EditedFile.CurrentType.ColumnDefinitions[CurrentTable.Columns.IndexOf(column)].Type.ToString());
 
                     Binding constructionBinding = new Binding(String.Format("{0}", column.ColumnName));
                     if (!column.ReadOnly)
@@ -487,7 +490,7 @@ namespace DBTableControl
 
                     // Setup the column header's tooltip.
                     string headertooltip = String.Format("Column Data Type: {0}",
-                                                    EditedFile.CurrentType.Fields[CurrentTable.Columns.IndexOf(column)].TypeCode.ToString());
+                                                    EditedFile.CurrentType.ColumnDefinitions[CurrentTable.Columns.IndexOf(column)].Type.ToString());
 
                     Binding constructionBinding = new Binding(String.Format("{0}", column.ColumnName));
                     if (!column.ReadOnly)
@@ -544,15 +547,15 @@ namespace DBTableControl
             List<DataColumn> keyList = new List<DataColumn>();
             constructionTable.BeginLoadData();
 
-            foreach (FieldInfo columnInfo in table.CurrentType.Fields)
+            foreach (var columnInfo in table.CurrentType.ColumnDefinitions)
             {
                 // Create the new column, using object as the data type for all columns, this way we avoid the WPF DataGrid's built in
                 // data validation abilities in favor of our own implementation.
-                constructionColumn = new DataColumn(columnInfo.Name, typeof(string));
+                constructionColumn = new DataColumn(columnInfo.MetaData.Name, typeof(string));
 
-                if (columnInfo.TypeCode == TypeCode.Int16 || columnInfo.TypeCode == TypeCode.Int32 || columnInfo.TypeCode == TypeCode.Single)
+                if (columnInfo.Type == DbTypesEnum.Short || columnInfo.Type == DbTypesEnum.Integer || columnInfo.Type == DbTypesEnum.Single)
                 {
-                    constructionColumn = new DataColumn(columnInfo.Name, typeof(double));
+                    constructionColumn = new DataColumn(columnInfo.MetaData.Name, typeof(double));
                 }
 
                 constructionColumn.AllowDBNull = true;
@@ -560,13 +563,13 @@ namespace DBTableControl
                 constructionColumn.ReadOnly = _readOnly;
 
                 // Save the FKey if it exists
-                if (!String.IsNullOrEmpty(columnInfo.ForeignReference))
+                if (!String.IsNullOrEmpty(columnInfo.MetaData.TableReference))
                 {
-                    constructionColumn.ExtendedProperties.Add("FKey", columnInfo.ForeignReference);
+                    constructionColumn.ExtendedProperties.Add("FKey", columnInfo.MetaData.TableReference);
                 }
 
                 // If the column is a primary key, save it for later adding
-                if (columnInfo.PrimaryKey)
+                if (columnInfo.MetaData.IsKey)
                 {
                     keyList.Add(constructionColumn);
                 }
@@ -581,7 +584,7 @@ namespace DBTableControl
             }
 
             // Now that the DataTable schema is constructed, add in all the data.
-            foreach (List<FieldInstance> rowentry in table.Entries)
+            foreach (List<DbField> rowentry in table.Entries)
             {
                 constructionTable.Rows.Add(rowentry.Select(n => n.Value).ToArray<object>());
             }
@@ -619,7 +622,7 @@ namespace DBTableControl
             }
 
             // Since Data.Rows lacks an AddRange method, enumerate through the entries manually.
-            foreach (List<FieldInstance> entry in importfile.Entries)
+            foreach (var entry in importfile.Entries)
             {
                 DataRow row = _currentTable.NewRow();
                 row.ItemArray = entry.Select(n => n.Value).ToArray();
@@ -675,7 +678,7 @@ namespace DBTableControl
             DataRow row = _currentTable.NewRow();
             List<object> items = new List<object>();
             
-            for (int i = 0; i < EditedFile.CurrentType.Fields.Count; i++)
+            for (int i = 0; i < EditedFile.CurrentType.ColumnDefinitions.Count; i++)
             {
                 items.Add(GetDefaultValue(i));
             }
@@ -1029,7 +1032,8 @@ namespace DBTableControl
             filtervalues.Add("");
 
             // If we are dealing with an optional column, add the options to filter by cells that either have any, or no value.
-            if (EditedFile.CurrentType.Fields[_currentTable.Columns.IndexOf(colname)].TypeName.Contains("optstring"))
+            if (EditedFile.CurrentType.ColumnDefinitions[_currentTable.Columns.IndexOf(colname)].Type == DbTypesEnum.Optstring ||
+                EditedFile.CurrentType.ColumnDefinitions[_currentTable.Columns.IndexOf(colname)].Type == DbTypesEnum.Optstring_ascii)
             {
                 filtervalues.Add("Any Value");
                 filtervalues.Add("No Value");
@@ -1209,15 +1213,15 @@ namespace DBTableControl
         void CurrentTable_TableNewRow(object sender, DataTableNewRowEventArgs e)
         {
             // Add the new row to editedfile.
-            List<FieldInstance> dbfileconstructionRow = new List<FieldInstance>();
+            var dbfileconstructionRow = new List<DbField>();
             for (int i = 0; i < e.Row.ItemArray.Length; i++)
             {
-                dbfileconstructionRow.Add(EditedFile.CurrentType.Fields[i].CreateInstance());
+                dbfileconstructionRow.Add(new DbField(EditedFile.CurrentType.ColumnDefinitions[i].Type));
             }
 
             // Modify the new row to have default data initially.
             List<object> vals = new List<object>();
-            for (int i = 0; i < EditedFile.CurrentType.Fields.Count; i++)
+            for (int i = 0; i < EditedFile.CurrentType.ColumnDefinitions.Count; i++)
             {
                 vals.Add(GetDefaultValue(i));
             }
@@ -1605,7 +1609,7 @@ namespace DBTableControl
 
             for (int i = 0; i < _currentTable.Columns.Count; i++)
             {
-                if (EditedFile.CurrentType.Fields[i].PrimaryKey)
+                if (EditedFile.CurrentType.ColumnDefinitions[i].MetaData.IsKey)
                 {
                     pksequence.Add(_currentTable.Rows[rowindex][i].ToString());
                 }
@@ -1659,16 +1663,16 @@ namespace DBTableControl
             _savedconfig.ExportDirectory = _exportDirectory;
             _savedconfig.ShowFilters = _showFilters;
 
-            if (_savedconfig.HiddenColumns.ContainsKey(EditedFile.CurrentType.Name))
+            if (_savedconfig.HiddenColumns.ContainsKey(EditedFile.CurrentType.TableName))
             {
                 // Overwrite the old hidden column list for this table.
-                _savedconfig.HiddenColumns[EditedFile.CurrentType.Name].Clear();
-                _savedconfig.HiddenColumns[EditedFile.CurrentType.Name].AddRange(_hiddenColumns);
+                _savedconfig.HiddenColumns[EditedFile.CurrentType.TableName].Clear();
+                _savedconfig.HiddenColumns[EditedFile.CurrentType.TableName].AddRange(_hiddenColumns);
             }
             else
             {
                 // Create a new list for the table.
-                _savedconfig.HiddenColumns.Add(new KeyValuePair<string, List<string>>(EditedFile.CurrentType.Name, new List<string>(_hiddenColumns)));
+                _savedconfig.HiddenColumns.Add(new KeyValuePair<string, List<string>>(EditedFile.CurrentType.TableName, new List<string>(_hiddenColumns)));
             }
           
 
@@ -1768,9 +1772,11 @@ namespace DBTableControl
 
         private object GetDefaultValue(int colindex)
         {
-            if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.String)
+            throw new NotImplementedException("TODO");
+            /*
+            if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.String)
             {
-                if (EditedFile.CurrentType.Fields[colindex].TypeName.Contains("optstring"))
+                if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type.Contains("optstring"))
                 {
                     return "";
                 }// We have a combo box column, so default any non optional string to the first value in the list.
@@ -1791,7 +1797,7 @@ namespace DBTableControl
             else
             {
                 return 0;
-            }
+            }*/
         }
 
         public void InsertRow(int rowindex = -1)
@@ -1799,7 +1805,7 @@ namespace DBTableControl
             // Create a new row with default values.
             DataRow newrow = _currentTable.NewRow();
             List<object> defaultvalues = new List<object>();
-            for (int i = 0; i < EditedFile.CurrentType.Fields.Count; i++)
+            for (int i = 0; i < EditedFile.CurrentType.ColumnDefinitions.Count; i++)
             {
                 defaultvalues.Add(GetDefaultValue(i));
             }
@@ -1991,7 +1997,7 @@ namespace DBTableControl
             object currentvalue = _currentTable.Rows[rowindex][colindex];
 
             // Test value against required data type.
-            if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
+            if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Short)
             {
                 short test;
                 haserrors = !short.TryParse(currentvalue.ToString(), out test);
@@ -2004,7 +2010,7 @@ namespace DBTableControl
                     AddError(rowindex, colindex, errormessage);
                 }
             }
-            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32)
+            else if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Integer)
             {
                 int test;
                 haserrors = !int.TryParse(currentvalue.ToString(), out test);
@@ -2017,7 +2023,7 @@ namespace DBTableControl
                     AddError(rowindex, colindex, errormessage);
                 }
             }
-            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Single)
+            else if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Single)
             {
                 float test;
                 haserrors = !float.TryParse(currentvalue.ToString(), out test);
@@ -2030,7 +2036,7 @@ namespace DBTableControl
                     AddError(rowindex, colindex, errormessage);
                 }
             }
-            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
+            else if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Boolean)
             {
                 if(!(currentvalue.ToString().Equals("True") || currentvalue.ToString().Equals("False")))
                 {
@@ -2132,22 +2138,22 @@ namespace DBTableControl
         private bool ValueIsValid(object testval, int colindex)
         {
             // Test value against required data type.
-            if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
+            if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Short)
             {
                 short test;
                 return short.TryParse(testval.ToString(), out test);
             }
-            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32)
+            else if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Integer)
             {
                 int test;
                 return int.TryParse(testval.ToString(), out test);
             }
-            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Single)
+            else if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Single)
             {
                 float test;
                 return float.TryParse(testval.ToString(), out test);
             }
-            else if (EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Boolean)
+            else if (EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Boolean)
             {
                 if (!(testval.ToString().Equals("True") || testval.ToString().Equals("False")))
                 {

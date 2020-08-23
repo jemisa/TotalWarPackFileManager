@@ -3,11 +3,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Filetypes.ByteParsing
 {
-    public interface ByteParser
+    public interface IByteParser
     {
         string TypeName { get; }
         DbTypesEnum Type { get; }
@@ -16,7 +17,7 @@ namespace Filetypes.ByteParsing
         //public abstract bool Encode();
     }
 
-    public interface SpesificByteParser<T> : ByteParser
+    public interface SpesificByteParser<T> : IByteParser
     {
         bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string error);
     }
@@ -62,7 +63,7 @@ namespace Filetypes.ByteParsing
 
     public class IntParser : NumberParser<int>
     {
-        public override string TypeName { get { return "Int"; } }
+        public override string TypeName { get { return "Int32"; } }
         public override DbTypesEnum Type => DbTypesEnum.Integer;
 
         protected override int FieldSize => 4;
@@ -70,6 +71,32 @@ namespace Filetypes.ByteParsing
         protected override int Decode(byte[] buffer, int index)
         {
             return BitConverter.ToInt32(buffer, index);
+        }
+    }
+
+    public class UIntParser : NumberParser<uint>
+    {
+        public override string TypeName { get { return "UInt32"; } }
+        public override DbTypesEnum Type => DbTypesEnum.Integer;
+
+        protected override int FieldSize => 4;
+
+        protected override uint Decode(byte[] buffer, int index)
+        {
+            return BitConverter.ToUInt32(buffer, index);
+        }
+    }
+
+    public class ByteParser : NumberParser<byte>
+    {
+        public override string TypeName { get { return "Byte"; } }
+        public override DbTypesEnum Type => DbTypesEnum.Byte;
+
+        protected override int FieldSize => 1;
+
+        protected override byte Decode(byte[] buffer, int index)
+        {
+            return buffer[index];
         }
     }
 
@@ -265,7 +292,9 @@ namespace Filetypes.ByteParsing
 
     public static class ByteParsers
     {
+        public static ByteParser Byte { get; set; } = new ByteParser();
         public static IntParser Int32 { get; set; } = new IntParser();
+        public static UIntParser UInt32 { get; set; } = new UIntParser();
         public static SingleParser Single { get; set; } = new SingleParser();
         public static ShortParser Short { get; set; } = new ShortParser();
         public static BoolParser Bool { get; set; } = new BoolParser();
@@ -277,7 +306,7 @@ namespace Filetypes.ByteParsing
 
     public static class ByteParserFactory
     {
-        public static ByteParser Create(DbTypesEnum typeEnum)
+        public static IByteParser Create(DbTypesEnum typeEnum)
         {
             switch (typeEnum)
             {
@@ -337,7 +366,7 @@ namespace Filetypes.ByteParsing
             return value;
         }
 
-        public void Read(ByteParser parser, out string value, out string error)
+        public void Read(IByteParser parser, out string value, out string error)
         {
             if (!parser.TryDecode(_buffer, _currentIndex, out  value, out int bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
@@ -345,10 +374,14 @@ namespace Filetypes.ByteParsing
             _currentIndex += bytesRead;
         }
 
+        public string ReadStringAscii() => Read(ByteParsers.StringAscii);
+        public string ReadString() => Read(ByteParsers.String);
         public int ReadInt32() => Read(ByteParsers.Int32);
+        public uint ReadUInt32() => Read(ByteParsers.UInt32);
         public float ReadSingle() => Read(ByteParsers.Single);
         public short ReadShort() => Read(ByteParsers.Short);
         public bool ReadBool() => Read(ByteParsers.Bool);
+        public byte ReadByte() => Read(ByteParsers.Byte);
     }
 
 
@@ -377,7 +410,7 @@ namespace Filetypes.ByteParsing
 
     public class DbField : ICloneable
     {
-        ByteParser _parser;
+        IByteParser _parser;
         string _error = "";
         string _value = "";
 
@@ -386,7 +419,7 @@ namespace Filetypes.ByteParsing
             Type = type;
         }
 
-        public ByteParser Parser { get { return _parser; } }
+        public IByteParser Parser { get { return _parser; } }
         public string Value { get { return _value; } set { _value = value; } }
         public string Error { get { return _error; } }
         public bool HasError { get { return !string.IsNullOrWhiteSpace(_error); } }
@@ -396,7 +429,7 @@ namespace Filetypes.ByteParsing
             chunk.Read(_parser, out _value, out _error);
         }
 
-        public void Encode()
+        public void Encode(BinaryWriter writer)
         { }
 
         public object Clone()

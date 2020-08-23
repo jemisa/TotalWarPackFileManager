@@ -136,30 +136,21 @@ namespace DbSchemaDecoder.Controllers
                 Items.ForEach(x => x.ButtonText = "Add");
             }
 
-            using (var stream = new MemoryStream(_windowState.SelectedFile.DbFile.Data))
+            DBFileHeader header = PackedFileDbCodec.readHeader(_windowState.SelectedFile.DbFile);
+            int index = header.Length;
+            var endIndex = _windowState.DbSchemaFields.Count();
+            if (_windowState.SelectedDbSchemaRow != null)
+                endIndex = _windowState.SelectedDbSchemaRow.Index - 1;
+            for (int i = 0; i < endIndex; i++)
             {
-                using (var reader = new BinaryReader(stream))
-                {
-                    DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                    int index = header.Length;
-                    var endIndex = _windowState.DbSchemaFields.Count();
-                    if (_windowState.SelectedDbSchemaRow != null)
-                        endIndex = _windowState.SelectedDbSchemaRow.Index - 1;
-                    for (int i = 0; i < endIndex; i++)
-                    {
-                        var byteParserType = _windowState.DbSchemaFields[i].Type;
-                        var parser = ByteParserFactory.Create(byteParserType);
-                        parser.TryDecode(_windowState.SelectedFile.DbFile.Data, index, out _, out var bytesRead, out _);
-                        index += bytesRead;
-                    }
-
-
-                    for (int i = 0; i < Items.Count; i++)
-                    {
-                        UpdateViewModel(Items[i], _windowState.SelectedFile.DbFile.Data, index);
-                    }
-                }
+                var byteParserType = _windowState.DbSchemaFields[i].Type;
+                var parser = ByteParserFactory.Create(byteParserType);
+                parser.TryDecode(_windowState.SelectedFile.DbFile.Data, index, out _, out var bytesRead, out _);
+                index += bytesRead;
             }
+
+            for (int i = 0; i < Items.Count; i++)
+                UpdateViewModel(Items[i], _windowState.SelectedFile.DbFile.Data, index);
         }
 
     }

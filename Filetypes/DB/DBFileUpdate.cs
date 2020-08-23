@@ -18,8 +18,9 @@ namespace Filetypes {
         // this could do with an update; since the transition to schema.xml,
         // we also know obsolete fields and can remove them,
         // and we can add fields in the middle instead of assuming they got appended.
-        public void UpdatePackedFile(PackedFile packedFile) {
-            string key = DBFile.Typename(packedFile.FullPath);
+        public void UpdatePackedFile(PackedFile packedFile) 
+        {
+           /* string key = DBFile.Typename(packedFile.FullPath);
             if (DBTypeMap.Instance.IsSupported(key)) {
                 PackedFileDbCodec codec = PackedFileDbCodec.FromFilename(packedFile.FullPath);
                 int maxVersion = DBTypeMap.Instance.MaxVersion(key);
@@ -28,7 +29,7 @@ namespace Filetypes {
                     // found a more recent db definition; read data from db file
                     DBFile updatedFile = PackedFileDbCodec.Decode(packedFile);
 
-                    TypeInfo dbFileInfo = updatedFile.CurrentType;
+                    var dbFileInfo = updatedFile.CurrentType;
                     TypeInfo targetInfo = GetTargetTypeInfo (key, maxVersion);
                     if (targetInfo == null) {
                         throw new Exception(string.Format("Can't decide new structure for {0} version {1}.", key, maxVersion));
@@ -36,9 +37,9 @@ namespace Filetypes {
      
                     // identify FieldInstances missing in db file
                     for (int i = 0; i < targetInfo.Fields.Count; i++) {
-                        FieldInfo oldField = dbFileInfo[targetInfo.Fields[i].Name];
+                        var oldField = dbFileInfo[targetInfo.Fields[i].Name];
                         if (oldField == null) {
-                            foreach(List<FieldInstance> entry in updatedFile.Entries) {
+                            foreach(var entry in updatedFile.Entries) {
                                 entry.Insert(i, targetInfo.Fields[i].CreateInstance());
                             }
                         }
@@ -47,7 +48,7 @@ namespace Filetypes {
                     updatedFile.Header.Version = maxVersion;
                     packedFile.Data = codec.Encode(updatedFile);
                 }
-            }
+            }*/
         }
         /*
          * Find the type info for the given type and version to update to.

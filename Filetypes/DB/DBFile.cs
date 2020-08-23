@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Filetypes.ByteParsing;
+using Filetypes.DB;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -56,9 +58,9 @@ namespace Filetypes {
 	 * Class representing a database file.
 	 */
     public class DBFile {
-        private List<DBRow> entries = new List<DBRow>();
-        public DBFileHeader Header;
-        public TypeInfo CurrentType {
+        private List<DBRow> _entries = new List<DBRow>();
+        public DBFileHeader Header { get; private set; }
+        public DbTableDefinition CurrentType {
             get;
             set;
         }
@@ -67,14 +69,14 @@ namespace Filetypes {
 		// the entries of this file
         public List<DBRow> Entries {
             get {
-                return this.entries;
+                return this._entries;
             }
         }
 
         // access by row/column
-		public FieldInstance this [int row, int column] {
+		public DbField this [int row, int column] {
 			get {
-				return entries [row][column];
+				return _entries [row][column];
 			}
 		}
 		#endregion
@@ -83,7 +85,7 @@ namespace Filetypes {
         /*
          * Create db file with the given header and the given type.
          */
-        public DBFile (DBFileHeader h, TypeInfo info) {
+        public DBFile (DBFileHeader h, DbTableDefinition info) {
 			Header = h;
 			CurrentType = info;
 		}

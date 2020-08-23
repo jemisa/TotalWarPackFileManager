@@ -57,12 +57,11 @@ namespace DbSchemaDecoder.Controllers
             if (bytes == null)
                 return;
 
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(bytes)))
-            {
-                DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                ViewModel.Update(header, item, _windowState.SchemaManager, _windowState.CurrentGame.GameType);
-                OnReloadTable();
-            }
+          
+            DBFileHeader header = PackedFileDbCodec.readHeader(item.DbFile);
+            ViewModel.Update(header, item, _windowState.SchemaManager, _windowState.CurrentGame.GameType);
+            OnReloadTable();
+            
         }
     }
 }

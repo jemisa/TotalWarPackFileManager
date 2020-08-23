@@ -16,13 +16,17 @@ namespace DBEditorTableControl
     {
         public static void Open(object sender, DBTableControl.DBEditorTableControl mainTable)
         {
+
+            throw new NotImplementedException("TODO");
+            /*
+
             ContextMenu currentmenu = (ContextMenu)sender;
             DataGridColumn col = (currentmenu.PlacementTarget as DataGridColumnHeader).Column;
 
             string colname = (string)col.Header;
             var currentColumn = mainTable.CurrentTable.Columns.IndexOf(colname);
-            var typeCode = mainTable.EditedFile.CurrentType.Fields[currentColumn].TypeCode;
-            Type columntype = DBTableControl.DBEditorTableControl.GetTypeFromCode(typeCode); ;
+            var typeCode = mainTable.EditedFile.CurrentType.ColumnDefinitions[currentColumn].Type;
+            var columntype = DBTableControl.DBEditorTableControl.GetTypeFromCode(typeCode); ;
             
             foreach (MenuItem item in currentmenu.Items.OfType<MenuItem>())
             {
@@ -51,7 +55,7 @@ namespace DBEditorTableControl
                     var state = !mainTable.ReadOnly && typeCode == TypeCode.String;
                     item.IsEnabled = state;
                 }
-            }
+            }*/
         }
 
 
@@ -104,8 +108,8 @@ namespace DBEditorTableControl
                     int colindex = mainTable.CurrentTable.Columns.IndexOf(colname);
 
                     // For integer based columns, do a round first if necessary.
-                    if (mainTable.EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int32 ||
-                        mainTable.EditedFile.CurrentType.Fields[colindex].TypeCode == TypeCode.Int16)
+                    if (mainTable.EditedFile.CurrentType.ColumnDefinitions[colindex].Type == Filetypes.DbTypesEnum.Integer||
+                        mainTable.EditedFile.CurrentType.ColumnDefinitions[colindex].Type == Filetypes.DbTypesEnum.Short)
                     {
                         int newintvalue;
                         if (!Int32.TryParse(newvalue.ToString(), out newintvalue))
@@ -400,6 +404,8 @@ namespace DBEditorTableControl
         
         public static void DataGridContextMenu(object sender, DBTableControl.DBEditorTableControl mainTable)
         {
+            throw new NotImplementedException("TODO");
+
             bool cellsselected = false;
 
             if (mainTable.dbDataGrid.SelectedCells.Count > 0)
@@ -431,32 +437,32 @@ namespace DBEditorTableControl
                     item.IsEnabled = cellsselected;
                     if (cellsselected)
                     {
-                        Type columntype;
-                        foreach (DataGridCellInfo cellinfo in mainTable.dbDataGrid.SelectedCells)
-                        {
-                            columntype = DBTableControl.DBEditorTableControl.GetTypeFromCode(mainTable.EditedFile.CurrentType.Fields[mainTable.CurrentTable.Columns.IndexOf((string)cellinfo.Column.Header)].TypeCode);
-                            if (mainTable.ReadOnly || !(columntype.Name.Equals("Single") || columntype.Name.Equals("Int32") || columntype.Name.Equals("Int16")))
-                            {
-                                item.IsEnabled = false;
-                                break;
-                            }
-                        }
+                        //Type columntype;
+                        //foreach (DataGridCellInfo cellinfo in mainTable.dbDataGrid.SelectedCells)
+                        //{
+                        //    columntype = DBTableControl.DBEditorTableControl.GetTypeFromCode(mainTable.EditedFile.CurrentType.Fields[mainTable.CurrentTable.Columns.IndexOf((string)cellinfo.Column.Header)].TypeCode);
+                        //    if (mainTable.ReadOnly || !(columntype.Name.Equals("Single") || columntype.Name.Equals("Int32") || columntype.Name.Equals("Int16")))
+                        //    {
+                        //        item.IsEnabled = false;
+                        //        break;
+                        //    }
+                        //}
                     }
                 }
                 else if (item.Header.Equals("Mass Edit String Cells"))
                 {
-                    item.IsEnabled = cellsselected;
-                    if (cellsselected)
-                    {
-                        foreach (int colindex in mainTable.dbDataGrid.SelectedCells.Select(n => mainTable.CurrentTable.Columns[(string)n.Column.Header].Ordinal).Distinct())
-                        {
-                            if (mainTable.EditedFile.CurrentType.Fields[colindex].TypeCode != TypeCode.String)
-                            {
-                                item.IsEnabled = false;
-                                break;
-                            }
-                        }
-                    }
+                    //item.IsEnabled = cellsselected;
+                    //if (cellsselected)
+                    //{
+                    //    foreach (int colindex in mainTable.dbDataGrid.SelectedCells.Select(n => mainTable.CurrentTable.Columns[(string)n.Column.Header].Ordinal).Distinct())
+                    //    {
+                    //        if (mainTable.EditedFile.CurrentType.Fields[colindex].TypeCode != TypeCode.String)
+                    //        {
+                    //            item.IsEnabled = false;
+                    //            break;
+                    //        }
+                    //    }
+                    //}
                 }
                 else if (item.Header.Equals("Revert Cell to Original Value"))
                 {
@@ -512,8 +518,8 @@ namespace DBEditorTableControl
                     object newvalue = mainTable.CurrentTable.Compute(expression, "");
 
                     // For integer based columns, do a round first if necessary.
-                    if (mainTable.EditedFile.CurrentType.Fields[columnindex].TypeCode == TypeCode.Int32 ||
-                        mainTable.EditedFile.CurrentType.Fields[columnindex].TypeCode == TypeCode.Int16)
+                    if (mainTable.EditedFile.CurrentType.ColumnDefinitions[columnindex].Type == Filetypes.DbTypesEnum.Integer||
+                        mainTable.EditedFile.CurrentType.ColumnDefinitions[columnindex].Type == Filetypes.DbTypesEnum.Short)
                     {
                         int newintvalue;
                         if (!Int32.TryParse(newvalue.ToString(), out newintvalue))

@@ -38,7 +38,7 @@ namespace DBEditorTableControl.Dialogs
             filterList.Clear();
             _parentDbController._autofilterList.Clear();
 
-            string tableName = parentDbController.EditedFile.CurrentType.Name;
+            string tableName = parentDbController.EditedFile.CurrentType.TableName;
 
             // If the saved config has not filters, skip.
             if (!_parentDbController._savedconfig.Filters.ContainsKey(tableName))
@@ -56,7 +56,7 @@ namespace DBEditorTableControl.Dialogs
 
         void SaveFilters()
         {
-            var tableName = _parentDbController.EditedFile.CurrentType.Name;
+            var tableName = _parentDbController.EditedFile.CurrentType.TableName;
             if (_parentDbController._savedconfig.Filters.ContainsKey(tableName))
             {
                 _parentDbController._savedconfig.Filters[tableName].Clear();
