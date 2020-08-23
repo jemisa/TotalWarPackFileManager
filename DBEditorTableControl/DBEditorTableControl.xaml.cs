@@ -229,17 +229,6 @@ namespace DBTableControl
                 CurrentTable = CreateTable(EditedFile);
 
                 NotifyPropertyChanged(this, "CurrentPackedFile");
-
-                // cannot edit contained complex types
-                foreach(var f in EditedFile.CurrentType.ColumnDefinitions) 
-                {
-                    if (f is ListType) 
-                    {
-                        Console.WriteLine("cannot edit this");
-                        ReadOnly = true;
-                        break;
-                    }
-                }
             }
         }
 

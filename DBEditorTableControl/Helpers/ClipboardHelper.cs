@@ -1,5 +1,6 @@
 ﻿using DBTableControl;
 using Filetypes;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Data;

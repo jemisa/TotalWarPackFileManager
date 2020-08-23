@@ -25,14 +25,14 @@ namespace DbSchemaDecoder.Util
     {
         public class ParseResult
         {
-            public FieldInfo FieldInfo { get; set; }
+            public object FieldInfo { get; set; }
             public long OffsetAfter { get; set; }
             public bool Completed { get; set; }
         }
 
         abstract public ParseResult CanParse(BinaryReader reader, long startStreamPos);
 
-        abstract public FieldInfo Instance();
+        abstract public object Instance();
 
         abstract public string InstanceName();
 

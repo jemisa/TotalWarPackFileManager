@@ -1,5 +1,6 @@
 ﻿using CommonDialogs;
 using DBTableControl;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -108,8 +109,8 @@ namespace DBEditorTableControl
                     int colindex = mainTable.CurrentTable.Columns.IndexOf(colname);
 
                     // For integer based columns, do a round first if necessary.
-                    if (mainTable.EditedFile.CurrentType.ColumnDefinitions[colindex].Type == Filetypes.DbTypesEnum.Integer||
-                        mainTable.EditedFile.CurrentType.ColumnDefinitions[colindex].Type == Filetypes.DbTypesEnum.Short)
+                    if (mainTable.EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Integer||
+                        mainTable.EditedFile.CurrentType.ColumnDefinitions[colindex].Type == DbTypesEnum.Short)
                     {
                         int newintvalue;
                         if (!Int32.TryParse(newvalue.ToString(), out newintvalue))
@@ -518,8 +519,8 @@ namespace DBEditorTableControl
                     object newvalue = mainTable.CurrentTable.Compute(expression, "");
 
                     // For integer based columns, do a round first if necessary.
-                    if (mainTable.EditedFile.CurrentType.ColumnDefinitions[columnindex].Type == Filetypes.DbTypesEnum.Integer||
-                        mainTable.EditedFile.CurrentType.ColumnDefinitions[columnindex].Type == Filetypes.DbTypesEnum.Short)
+                    if (mainTable.EditedFile.CurrentType.ColumnDefinitions[columnindex].Type == DbTypesEnum.Integer||
+                        mainTable.EditedFile.CurrentType.ColumnDefinitions[columnindex].Type == DbTypesEnum.Short)
                     {
                         int newintvalue;
                         if (!Int32.TryParse(newvalue.ToString(), out newintvalue))

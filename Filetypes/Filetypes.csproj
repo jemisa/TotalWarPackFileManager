@@ -53,8 +53,6 @@
     <Compile Include="Codecs\DBFileCodec.cs" />
     <Compile Include="DB\DBFileNotSupportedException.cs" />
     <Compile Include="DB\DBReferenceMap.cs" />
-    <Compile Include="DB\FieldInfo.cs" />
-    <Compile Include="DB\FieldInstance.cs" />
     <Compile Include="ByteParsing\ByteParsers.cs" />
     <Compile Include="DB\SchemaManager.cs" />
     <Compile Include="Codecs\LocCodec.cs" />
