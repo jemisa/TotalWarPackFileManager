@@ -9,14 +9,49 @@ using Filetypes.ByteParsing;
 
 namespace DbSchemaDecoder.Util
 {
+
+    class PreCalc
+    {
+        public List<Dictionary<DbTypesEnum, int>> _preComputeTable = new List<Dictionary<DbTypesEnum, int>>();
+
+        AllCombinations _allCombinations = new AllCombinations();
+
+        public void PreCompute(byte[] buffer, int dataIndex)
+        {
+            _preComputeTable = new List<Dictionary<DbTypesEnum, int>>(dataIndex);
+            for (int i = 0; i < dataIndex; i++)
+            {
+                var possibleList = new Dictionary<DbTypesEnum, int>();
+                _preComputeTable.Add(possibleList);
+            }
+
+            var allCombinations = _allCombinations.GetPossibleCombinations(0);
+            for (int i = dataIndex; i < buffer.Length; i++)
+            {
+                var possibleList = new Dictionary<DbTypesEnum, int>();
+                foreach (var parserEnum in allCombinations)
+                {
+                    var parser = FieldParser.CreateFromEnum(parserEnum);
+                    var result =parser.CanParse(buffer, i);
+                    if (result.Completed == true)
+                    {
+                        possibleList.Add(parserEnum, result.OffsetAfter);
+                    }
+                }
+
+                _preComputeTable.Add(possibleList);
+            }
+        }
+    }
+
     class BruteForceParser : IThreadableTask
     {
         public event EventHandler<DbTypesEnum[]> OnCombintionFoundEvent;
         public event EventHandler OnThreadCompleted;
 
-        public BigInteger EvaluatedCombinations { get { return _permutationHelper.ComputedPermutations; } }
-        public BigInteger SkippedEarlyCombinations { get { return _permutationHelper.SkippedEarlyPermutations; } }
-        public BigInteger PossibleFirstRows { get { return _permutationHelper.PossibleFirstRows; } }
+        public BigInteger EvaluatedCombinations { get { return _permutationHelper != null ? _permutationHelper.ComputedPermutations : 0; } }
+        public BigInteger SkippedEarlyCombinations { get { return _permutationHelper != null? _permutationHelper.SkippedEarlyPermutations : 0; } }
+        public BigInteger PossibleFirstRows { get { return _permutationHelper != null? _permutationHelper.PossibleFirstRows : 0; } }
 
         static DbTypesEnum[] GetPossibleFields()
         {
@@ -44,10 +79,13 @@ namespace DbSchemaDecoder.Util
             return BigInteger.Pow(GetPossibleFields().Count(), numFields);
         }
 
-        List<DbColumnDefinition> _dbColumnDefinitions;
         public List<DbTypesEnum[]> PossiblePermutations { get; set; } = new List<DbTypesEnum[]>();
         PermutationHelper _permutationHelper;
         IBruteForceCombinationProvider _combinationProvider;
+
+
+        PreCalc _preCalc;
+
         public BruteForceParser(DataBaseFile dataBaseFile, IBruteForceCombinationProvider combinationProvider, int maxNumberOfFields)
         {
             _file = dataBaseFile;
@@ -56,22 +94,19 @@ namespace DbSchemaDecoder.Util
 
             _tableData = dataBaseFile.DbFile.Data;
             DBFileHeader header = PackedFileDbCodec.readHeader(dataBaseFile.DbFile);
+
             _headerLength = header.Length;
             _HeaderEntryCount = (int)header.EntryCount;
-
-            _dbColumnDefinitions = new List<DbColumnDefinition>();
-            for (int i = 0; i < maxNumberOfFields; i++)
-            {
-                _dbColumnDefinitions.Add(new DbColumnDefinition()
-                {
-                    Name = "Unkown" + i
-                });
-            }
         }
         public void Compute()
         {
-            _permutationHelper = new PermutationHelper(OnEvaluatePermutation);
+            _preCalc = new PreCalc();
+            _preCalc.PreCompute(_tableData, _headerLength);
+
+            var max = new AllCombinations().GetPossibleCombinations(0).Length;
+            _permutationHelper = new PermutationHelper(OnEvaluatePermutation, _maxNumberOfFields, max);
             _permutationHelper.ComputePermutations(
+                _preCalc,
                 _tableData,
                 new DbTypesEnum[_maxNumberOfFields],
                 _combinationProvider,
@@ -84,18 +119,16 @@ namespace DbSchemaDecoder.Util
         }
 
         void OnEvaluatePermutation(DbTypesEnum[] combination)
-        {
-            for(int i = 0; i < combination.Count(); i++)
-                _dbColumnDefinitions[i].Type = combination[i];
-
+        { 
             TableEntriesParser p = new TableEntriesParser(_tableData, _headerLength);
-            var updateRes = p.CanParseTable(
-                _dbColumnDefinitions,
+            var updateRes = p.CanParseTableFaster(
+                _preCalc,
+                combination,
                 _HeaderEntryCount);
 
-            if (!updateRes.HasError)
+            if (updateRes)
             {
-                UpdatePossiblePermutation(combination);
+                UpdatePossiblePermutation(combination.Select(x => x).ToArray());
             }
         }
         void UpdatePossiblePermutation(DbTypesEnum[] combination)
@@ -113,17 +146,23 @@ namespace DbSchemaDecoder.Util
         public BigInteger ComputedPermutations { get; set; } = 0;
         public BigInteger SkippedEarlyPermutations { get; set; } = 0;
         public BigInteger PossibleFirstRows { get; set; } = 0;
-        public PermutationHelper(OnCombintionFoundDelegate callback)
+
+        List<BigInteger> _powTable = new List<BigInteger>();
+        public PermutationHelper(OnCombintionFoundDelegate callback, int maxNumberOfFields, int nPossibleItems)
         {
             _evaluateCallback = callback;
+            for (int i = 0; i < maxNumberOfFields+1; i++)
+            {
+                var realCount = maxNumberOfFields - i;
+                _powTable.Add(BigInteger.Pow(nPossibleItems, realCount));
+            }
         }
 
-        public void ComputePermutations(byte[] buffer, DbTypesEnum[] n, IBruteForceCombinationProvider combinationProvider, int idx, int bufferIndex, int maxNumberOfFields)
+        public void ComputePermutations(PreCalc precalc, byte[] buffer, DbTypesEnum[] n, IBruteForceCombinationProvider combinationProvider, int idx, int bufferIndex, int maxNumberOfFields)
         {
             if (idx == n.Length)
             {
-                var newItem = n.Select(x => x).ToArray();
-                _evaluateCallback(newItem);
+                _evaluateCallback(n);
                 ComputedPermutations++;
                 PossibleFirstRows++;
                 return;
@@ -132,18 +171,18 @@ namespace DbSchemaDecoder.Util
             for (int i = 0; i < states.Length; i++)
             {
                 var currentState = states[i];
-
-                var parser = FieldParser.CreateFromEnum(currentState);
-                var parseResult = parser.CanParse(buffer, bufferIndex);
-                if (parseResult.Completed)
+                var possible = precalc._preComputeTable[bufferIndex];
+                if (possible.ContainsKey(currentState))
                 {
+                    var offset = possible[currentState];
                     n[idx] = currentState;
-                    ComputePermutations(buffer, n, combinationProvider, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
+                    ComputePermutations(precalc, buffer, n, combinationProvider, idx + 1, offset, maxNumberOfFields);
                 }
                 else
                 {
-                    var realCount = n.Count() - idx - 1;
-                    var skippedCount = BigInteger.Pow(states.Length, realCount);
+                    var realCount = n.Count() - idx -1;
+                    var skippedCount = _powTable[idx+1];
+
 
                     SkippedEarlyPermutations += skippedCount;
                     ComputedPermutations += skippedCount;

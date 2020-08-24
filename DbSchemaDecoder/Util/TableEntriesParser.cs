@@ -82,7 +82,6 @@ namespace DbSchemaDecoder.Util
             {
                 // Find the actuall parsers
                 var fieldInstances = columnDefinitions.Select(x => ByteParserFactory.Create(x.Type)).ToArray();
-
                 for (int rowIndex = 0; rowIndex < expectedEntries; rowIndex++)
                 {
                     for (int i = 0; i < fieldInstances.Length; i++)
@@ -106,6 +105,28 @@ namespace DbSchemaDecoder.Util
             return output;
         }
 
+        public bool CanParseTableFaster(PreCalc preCalc, DbTypesEnum[] combination, int expectedEntries)
+        {
+            var length = _tableData.Length;
+            for (int rowIndex = 0; rowIndex < expectedEntries; rowIndex++)
+            {
+                foreach (var field in combination)
+                {
+                    if (_dataIndex >= length)
+                        return false;
+
+                    var hasKey = preCalc._preComputeTable[_dataIndex].ContainsKey(field);
+                    if (!hasKey)
+                        return false;
+
+                    var offset = preCalc._preComputeTable[_dataIndex][field];
+                    _dataIndex = offset;
+                }
+            }
+
+            return CheckForEndOfTableErrorFaster();
+        }
+
         private void CheckForEndOfTableError( TableResult output)
         {
             if (!output.HasError)
@@ -114,6 +135,16 @@ namespace DbSchemaDecoder.Util
                 if (bytesLeftInStream != 0)
                     output.Error = $"Error: Bytes left in stream after parsing : {bytesLeftInStream * 4}";
             }
+        }
+
+        private bool CheckForEndOfTableErrorFaster()
+        {
+           
+            var bytesLeftInStream = _tableData.Length - _dataIndex;
+            if (bytesLeftInStream != 0)
+                return false;
+            return true;
+            
         }
 
         public class TableResult

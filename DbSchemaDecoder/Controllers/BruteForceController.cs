@@ -113,6 +113,8 @@ namespace DbSchemaDecoder.Controllers
 
         void OnItemDoubleClicked(ItemView clickedItem)
         {
+            if (clickedItem == null)
+                return;
             List<DbColumnDefinition> dbColumnDefinitions = new List<DbColumnDefinition>();
             for (int i = 0; i < clickedItem.Enums.Count; i++)
             {
@@ -122,7 +124,6 @@ namespace DbSchemaDecoder.Controllers
                     Name = "Unknown" + i
                 });
             }
-
 
             _windowState.DbSchemaFields = dbColumnDefinitions;
         }
