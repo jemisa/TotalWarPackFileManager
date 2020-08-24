@@ -28,8 +28,8 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition x:Name="FileListColumn" Width="350" />
-                    <ColumnDefinition x:Name="HexViewColumn" Width="600"/>
-                    <ColumnDefinition Width="600*"/>
+                    <ColumnDefinition x:Name="HexViewColumn" Width="650"/>
+                    <ColumnDefinition Width="650*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition  Height="100" />
@@ -39,6 +39,7 @@
                 </Grid.RowDefinitions>
                 <local:FileListView Grid.Column="0" Grid.RowSpan="3"/>
                 <control:HexEditor
+                    
                     AllowByteCount="False"
                     AllowCustomBackgroundBlock="True"
                     AllowDrop="false"
@@ -56,7 +57,7 @@
                     OffSetStringVisual="Hexadecimal"
                     AllowContextMenu="false"
                     AllowAutoHighLightSelectionByte="False"
-                    x:Name="HexEdit" HorizontalAlignment="Left" Width="585" Margin="10,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                    x:Name="HexEdit" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
                     Grid.RowSpan="2" Grid.Column="1"/>
                 <Grid Grid.Row="2" Grid.Column="1">
                     <DockPanel>
@@ -79,22 +80,27 @@
 
                         <RowDefinition  Height="16" />
                         <RowDefinition  x:Name="TableAnalyticsRow"/>
+                        <RowDefinition  Height="16" />
                     </Grid.RowDefinitions>
                     
                     <Button Content="Information view" Grid.Row="0"  Click="OnInformationViewButtonClicked"/>
                     <local:InformationView  Grid.Row="1" HorizontalAlignment="Left" MaxHeight="100" VerticalContentAlignment="Top" VerticalAlignment="Top" />
-
+                    
                     <Button Content="Db view" Grid.Row="2" Click="OnDbParsedEntitiesTablesButtonClicked" />
                     <DisplayTableDefinitionView:DbParsedEntitiesTableView  Grid.Row="3" />
 
                     <Button Content="Table definition view" Grid.Row="4"  Click="OnTableDefinitionViewButtonClicked"/>
                     <DisplayTableDefinitionView:TableDefinitionView Grid.Row="5" />
-
+             
                     <Button Content="Table analytics view" Grid.Row="6"  Click="OnTableAnalyticsViewButtonClicked"/>
                     <local1:ConfigureTableRowsView 
                         Grid.Row="7" 
                         VerticalAlignment="Stretch"/>
-             
+                    <StackPanel Orientation="Horizontal" Grid.Row="8" HorizontalAlignment="Center">
+                        <Button Content="Save"  Width="100"/>
+                        <Button Content="Reset" Width="100" />
+                        <Button Content="Re-evaluate" Width="100"/>
+                    </StackPanel>
                 </Grid>
             </Grid>
 

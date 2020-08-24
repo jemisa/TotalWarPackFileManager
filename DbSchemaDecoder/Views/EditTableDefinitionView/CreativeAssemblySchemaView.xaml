@@ -9,8 +9,7 @@
     <Grid>
         <GroupBox Header="Creative Assembly Schema Explorer">
             <Grid>
-                <ListView Margin="0,0,0,37" ItemsSource="{Binding CaSchemaController.CaSchemaEntries}">  
-                    
+                <ListView  ItemsSource="{Binding CaSchemaController.CaSchemaEntries}">  
                     <ListView.View>
                         <GridView x:Name="grdTest">
                             <GridViewColumn Header="No." DisplayMemberBinding="{Binding index}"  Width="auto"/>
@@ -25,10 +24,7 @@
 
                     </ListView.View>
                 </ListView>
-                <Button Content="Use all" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="131"/>
-                <Button Content="Use selected row" HorizontalAlignment="Left" Margin="136,0,0,5" VerticalAlignment="Bottom" Width="131"/>
-                <Button Content="Parse table entries" HorizontalAlignment="Left" Margin="272,0,0,5" VerticalAlignment="Bottom" Width="131"  Command="{Binding ParseTbTableUsingCaSchemaCommand}"/>
-            </Grid>
+                </Grid>
         </GroupBox>
     </Grid>
 </UserControl>

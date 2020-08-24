@@ -4,6 +4,8 @@ using DbSchemaDecoder.DisplayTableDefinitionView;
 using DbSchemaDecoder.EditTableDefinitionView;
 using DbSchemaDecoder.Util;
 using Filetypes;
+using Filetypes.ByteParsing;
+using Filetypes.Codecs;
 using Filetypes.DB;
 using GalaSoft.MvvmLight.Threading;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace DbSchemaDecoder
 {
@@ -73,42 +76,47 @@ namespace DbSchemaDecoder
 
         void UpdateSelection()
         {
-            /*try
+            return;
+            try
             {
                 HexEdit.CustomBackgroundBlockItems.Clear();
-                using (BinaryReader reader = new BinaryReader(new MemoryStream(_windowState.SelectedFile.DbFile.Data)))
-                {
-                    DBFileHeader header = PackedFileDbCodec.readHeader(reader);
-                    HexEdit.CustomBackgroundBlockItems.Add(
-                        new WpfHexaEditor.Core.CustomBackgroundBlock(0, header.Length, new SolidColorBrush(Color.FromRgb(254, 0, 0)), "Header"));
+             
+                DBFileHeader header = PackedFileDbCodec.readHeader(_windowState.SelectedFile.DbFile);
+                HexEdit.CustomBackgroundBlockItems.Add(
+                    new WpfHexaEditor.Core.CustomBackgroundBlock(0, header.Length, new SolidColorBrush(Color.FromRgb(254, 0, 0)), "Header"));
      
-                    if (_windowState.SelectedDbSchemaRow != null && _windowState.DbSchemaFields != null)
+                if (_windowState.SelectedDbSchemaRow != null && _windowState.DbSchemaFields != null)
+                {
+                    int index = header.Length;
+
+                    for (int i = 0; i < header.EntryCount; i++)
                     {
-                        for (int i = 0; i < header.EntryCount; i++)
+                        foreach (var field in _windowState.DbSchemaFields)
                         {
-                            foreach (var field in _windowState.DbSchemaFields)
+                            var factory = ByteParserFactory.Create(field.Type);
+                            var start = index;
+                            factory.TryDecode(_windowState.SelectedFile.DbFile.Data, index, out _, out var bytesRead, out _);
+                            index += bytesRead;
+
+                            var end = index;
+                            if (field.Name == _windowState.SelectedDbSchemaRow.Name)
                             {
-                                var start = reader.BaseStream.Position;
-                                var value = field.CreateInstance().TryDecode(reader);
-                                var end = reader.BaseStream.Position;
-                                if (field.Name == _windowState.SelectedDbSchemaRow.Name)
+                                HexEdit.CustomBackgroundBlockItems.Add(
+                                new WpfHexaEditor.Core.CustomBackgroundBlock()
                                 {
-                                    HexEdit.CustomBackgroundBlockItems.Add(
-                                    new WpfHexaEditor.Core.CustomBackgroundBlock()
-                                    {
-                                        Color = new SolidColorBrush(Color.FromRgb(0, 255, 0)),
-                                        StartOffset = start ,
-                                        Length = end - start
-                                    });
-                                }
+                                    Color = new SolidColorBrush(Color.FromRgb(0, 255, 0)),
+                                    StartOffset = start ,
+                                    Length = end - start
+                                });
                             }
                         }
                     }
                 }
+              
                 HexEdit.RefreshView();
             }
             catch
-            { }*/
+            { }
         }
 
 
@@ -135,7 +143,7 @@ namespace DbSchemaDecoder
         private void OnShowHexClick(object sender, RoutedEventArgs e)
         {
             if (HexViewColumn.Width.Value == 0)
-                HexViewColumn.Width = new GridLength(600);
+                HexViewColumn.Width = new GridLength(650);
             else
                 HexViewColumn.Width = new GridLength(0);
         }

@@ -43,7 +43,7 @@ namespace DbSchemaDecoder.Controllers
         {
             var newVersion = ViewModel.Versions.FirstOrDefault(x => x.DisplayValue == ViewModel.SelectedVersion);
             if (newVersion != null)
-                _windowState.DbSchemaFields =  newVersion.TypeInfo.ColumnDefinitions;
+                _windowState.DbSchemaFields =  newVersion.TypeInfo.ColumnDefinitions.Select(x=>(DbColumnDefinition)x.Clone()).ToList();
             else
                 _windowState.DbSchemaFields = new List<DbColumnDefinition>();
         }

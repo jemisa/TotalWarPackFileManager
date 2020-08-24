@@ -1,47 +1,39 @@
 ﻿using DbSchemaDecoder.Controllers;
-using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.Codecs;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Numerics;
+using Filetypes.ByteParsing;
 
 namespace DbSchemaDecoder.Util
 {
-
-/*
     class BruteForceParser : IThreadableTask
     {
-        public event EventHandler<FieldParserEnum[]> OnCombintionFoundEvent;
+        public event EventHandler<DbTypesEnum[]> OnCombintionFoundEvent;
         public event EventHandler OnThreadCompleted;
 
         public BigInteger EvaluatedCombinations { get { return _permutationHelper.ComputedPermutations; } }
         public BigInteger SkippedEarlyCombinations { get { return _permutationHelper.SkippedEarlyPermutations; } }
         public BigInteger PossibleFirstRows { get { return _permutationHelper.PossibleFirstRows; } }
 
-        static FieldParserEnum[] GetPossibleFields()
+        static DbTypesEnum[] GetPossibleFields()
         {
-            return new FieldParserEnum[]
+            return new DbTypesEnum[]
             {
-                FieldParserEnum.OptStringTypeAscii,
-                FieldParserEnum.StringTypeAscii,
-                FieldParserEnum.OptStringType,
-                FieldParserEnum.StringType,
-                FieldParserEnum.IntType,
-                FieldParserEnum.BoolType,
+                DbTypesEnum.Optstring_ascii,
+                DbTypesEnum.String_ascii,
+                DbTypesEnum.Optstring,
+                DbTypesEnum.String,
+                DbTypesEnum.Integer,
+                DbTypesEnum.Boolean,
             };
         }
 
         DataBaseFile _file;
         int _maxNumberOfFields;
 
-        MemoryStream _permutationStream;
-        BinaryReader _permutationReader;
         int _headerLength;
         int _HeaderEntryCount;
 
@@ -50,7 +42,7 @@ namespace DbSchemaDecoder.Util
             return BigInteger.Pow(GetPossibleFields().Count(), numFields);
         }
 
-        public List<FieldParserEnum[]> PossiblePermutations { get; set; } = new List<FieldParserEnum[]>();
+        public List<DbTypesEnum[]> PossiblePermutations { get; set; } = new List<DbTypesEnum[]>();
         PermutationHelper _permutationHelper;
         IBruteForceCombinationProvider _combinationProvider;
         public BruteForceParser(DataBaseFile dataBaseFile, IBruteForceCombinationProvider combinationProvider, int maxNumberOfFields)
@@ -59,10 +51,7 @@ namespace DbSchemaDecoder.Util
             _maxNumberOfFields = maxNumberOfFields;
             _combinationProvider = combinationProvider;
 
-            _permutationStream = new MemoryStream(_file.DbFile.Data);
-            _permutationReader = new BinaryReader(_permutationStream);
-
-            DBFileHeader header = PackedFileDbCodec.readHeader(_permutationReader);
+            DBFileHeader header = PackedFileDbCodec.readHeader(dataBaseFile.DbFile);
             _headerLength = header.Length;
             _HeaderEntryCount = (int)header.EntryCount;
         }
@@ -70,26 +59,33 @@ namespace DbSchemaDecoder.Util
         {
             _permutationHelper = new PermutationHelper(OnEvaluatePermutation);
             _permutationHelper.ComputePermutations(
-                _permutationReader,
-                new FieldParserEnum[_maxNumberOfFields],
+                _file.DbFile.Data,
+                new DbTypesEnum[_maxNumberOfFields],
                 _combinationProvider,
                 0,
                 _headerLength,
                 _maxNumberOfFields);
 
-            _permutationReader.Dispose();
-            _permutationStream.Dispose();
 
             OnThreadCompleted?.Invoke(this, null);
         }
 
-        void OnEvaluatePermutation(FieldParserEnum[] combination)
+        void OnEvaluatePermutation(DbTypesEnum[] combination)
         {
-            var possibleSchema = combination.Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
+            List<DbColumnDefinition> dbColumnDefinitions = new List<DbColumnDefinition>(combination.Count());
+            for(int i = 0; i < combination.Count(); i++)
+            {
+                dbColumnDefinitions.Add(new DbColumnDefinition()
+                {
+                    Type = combination[i],
+                    Name = "Unkown" + i
+                });
+
+            }
 
             TableEntriesParser p = new TableEntriesParser(_file.DbFile.Data, _headerLength);
             var updateRes = p.CanParseTable(
-                possibleSchema,
+                dbColumnDefinitions,
                 _HeaderEntryCount);
 
             if (!updateRes.HasError)
@@ -97,7 +93,7 @@ namespace DbSchemaDecoder.Util
                 UpdatePossiblePermutation(combination);
             }
         }
-        void UpdatePossiblePermutation(FieldParserEnum[] combination)
+        void UpdatePossiblePermutation(DbTypesEnum[] combination)
         {
             PossiblePermutations.Add(combination);
             OnCombintionFoundEvent?.Invoke(this, combination);
@@ -107,7 +103,7 @@ namespace DbSchemaDecoder.Util
 
     class PermutationHelper
     {
-        public delegate void OnCombintionFoundDelegate(FieldParserEnum[] combination);
+        public delegate void OnCombintionFoundDelegate(DbTypesEnum[] combination);
         OnCombintionFoundDelegate _evaluateCallback;
         public BigInteger ComputedPermutations { get; set; } = 0;
         public BigInteger SkippedEarlyPermutations { get; set; } = 0;
@@ -117,7 +113,7 @@ namespace DbSchemaDecoder.Util
             _evaluateCallback = callback;
         }
 
-        public void ComputePermutations(BinaryReader reader, FieldParserEnum[] n, IBruteForceCombinationProvider combinationProvider, int idx, long streamOffset, int maxNumberOfFields)
+        public void ComputePermutations(byte[] buffer, DbTypesEnum[] n, IBruteForceCombinationProvider combinationProvider, int idx, int bufferIndex, int maxNumberOfFields)
         {
             if (idx == n.Length)
             {
@@ -131,12 +127,13 @@ namespace DbSchemaDecoder.Util
             for (int i = 0; i < states.Length; i++)
             {
                 var currentState = states[i];
+
                 var parser = FieldParser.CreateFromEnum(currentState);
-                var parseResult = parser.CanParse(reader, streamOffset);
+                var parseResult = parser.CanParse(buffer, bufferIndex);
                 if (parseResult.Completed)
                 {
                     n[idx] = currentState;
-                    ComputePermutations(reader, n, combinationProvider, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
+                    ComputePermutations(buffer, n, combinationProvider, idx + 1, parseResult.OffsetAfter, maxNumberOfFields);
                 }
                 else
                 {
@@ -152,24 +149,24 @@ namespace DbSchemaDecoder.Util
 
     interface IBruteForceCombinationProvider
     {
-        FieldParserEnum[] GetPossibleCombinations(int index);
+        DbTypesEnum[] GetPossibleCombinations(int index);
     }
     class AllCombinations : IBruteForceCombinationProvider
     {
-        FieldParserEnum[] _possibleCombinations;
+        DbTypesEnum[] _possibleCombinations;
         public AllCombinations()
         {
-            _possibleCombinations = new FieldParserEnum[]
+            _possibleCombinations = new DbTypesEnum[]
             {
-                FieldParserEnum.OptStringTypeAscii,
-                FieldParserEnum.StringTypeAscii,
-                FieldParserEnum.OptStringType,
-                FieldParserEnum.StringType,
-                FieldParserEnum.IntType,
-                FieldParserEnum.BoolType,
+                DbTypesEnum.Optstring_ascii,
+                DbTypesEnum.String_ascii,
+                DbTypesEnum.Optstring,
+                DbTypesEnum.String,
+                DbTypesEnum.Integer,
+                DbTypesEnum.Boolean,
             };
         }
-        public FieldParserEnum[] GetPossibleCombinations(int index)
+        public DbTypesEnum[] GetPossibleCombinations(int index)
         {
             return _possibleCombinations;
         }
@@ -177,11 +174,11 @@ namespace DbSchemaDecoder.Util
 
     class CaTableCombinations : IBruteForceCombinationProvider
     {
-        FieldParserEnum[][] _possibleCombinations;
+        DbTypesEnum[][] _possibleCombinations;
         public CaTableCombinations(IEnumerable<CaSchemaEntry> caSchemaEntries)
         {
             var schemasAsList = caSchemaEntries.ToList();
-            _possibleCombinations = new FieldParserEnum[schemasAsList.Count][];
+            _possibleCombinations = new DbTypesEnum[schemasAsList.Count][];
             
             for(int i = 0; i < schemasAsList.Count; i++)
             {
@@ -190,24 +187,24 @@ namespace DbSchemaDecoder.Util
             }
         }
 
-        FieldParserEnum[] GetCombinationsForType(CaSchemaEntry entry)
+        DbTypesEnum[] GetCombinationsForType(CaSchemaEntry entry)
         {
             switch (entry.field_type)
             {
                 case "yesno":
-                    return new FieldParserEnum[] { FieldParserEnum.BoolType };
+                    return new DbTypesEnum[] { DbTypesEnum.Boolean };
                 case "single":
                 case "decimal":
                 case "double":
-                    return new FieldParserEnum[] { FieldParserEnum.SingleType };
+                    return new DbTypesEnum[] { DbTypesEnum.Single };
                 case "autonumber":
                 case "integer":
-                    return new FieldParserEnum[] { FieldParserEnum.IntType};
+                    return new DbTypesEnum[] { DbTypesEnum.Integer};
                 case "text":
-                    return new FieldParserEnum[] 
-                    { 
-                        FieldParserEnum.OptStringTypeAscii, FieldParserEnum.StringTypeAscii, 
-                        FieldParserEnum.OptStringType, FieldParserEnum.StringType 
+                    return new DbTypesEnum[] 
+                    {
+                        DbTypesEnum.Optstring_ascii, DbTypesEnum.String_ascii,
+                        DbTypesEnum.Optstring, DbTypesEnum.String 
                     };
             }
 
@@ -215,7 +212,7 @@ namespace DbSchemaDecoder.Util
             throw new Exception($"Field '{entry.name}' contains unkown type '{entry.field_type}'");
         }
 
-        public FieldParserEnum[] GetPossibleCombinations(int index)
+        public DbTypesEnum[] GetPossibleCombinations(int index)
         {
             return _possibleCombinations[index];
         }
@@ -223,55 +220,27 @@ namespace DbSchemaDecoder.Util
 
     class AppendTableCombinations : IBruteForceCombinationProvider
     {
-        FieldParserEnum[][] _existingFields;
+        DbTypesEnum[][] _existingFields;
         AllCombinations _allCombinations = new AllCombinations();
 
         public AppendTableCombinations(DbTypesEnum[] existingFields)
         {
-            _existingFields = new FieldParserEnum[existingFields.Count()][];
+            _existingFields = new DbTypesEnum[existingFields.Count()][];
             for(int i = 0; i < existingFields.Count(); i++)
                 _existingFields[i] = GetCombinationsForType(existingFields[i]);
         }
 
-        FieldParserEnum[] GetCombinationsForType(DbTypesEnum entry)
+        DbTypesEnum[] GetCombinationsForType(DbTypesEnum entry)
         {
-            switch (entry)
-            {
-                case DbTypesEnum.String:
-                    return new FieldParserEnum[] { FieldParserEnum.StringType };
-
-                case DbTypesEnum.String_ascii:
-                    return new FieldParserEnum[] { FieldParserEnum.StringTypeAscii };
-
-                case DbTypesEnum.Optstring:
-                    return new FieldParserEnum[] { FieldParserEnum.OptStringType };
-
-                case DbTypesEnum.Optstring_ascii:
-                    return new FieldParserEnum[] { FieldParserEnum.OptStringTypeAscii };
-
-                case DbTypesEnum.Integer:
-                case DbTypesEnum.Autonumber:
-                    return new FieldParserEnum[] { FieldParserEnum.IntType };
-
-                case DbTypesEnum.Float:
-                case DbTypesEnum.Single:
-                case DbTypesEnum.Decimal:
-                case DbTypesEnum.Double:
-                    return new FieldParserEnum[] { FieldParserEnum.SingleType };
-
-                case DbTypesEnum.Boolean:
-                    return new FieldParserEnum[] { FieldParserEnum.BoolType };
-            }
-
-            throw new Exception($"Field '{entry}' contains unkown type");
+            return new DbTypesEnum[] { entry };
         }
 
-        public FieldParserEnum[] GetPossibleCombinations(int index)
+        public DbTypesEnum[] GetPossibleCombinations(int index)
         {
             if (_existingFields.Length > index)
                 return _existingFields[index];
             else
                 return _allCombinations.GetPossibleCombinations(index);
         }
-    }*/
+    }
 }

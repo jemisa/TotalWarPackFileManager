@@ -114,7 +114,7 @@ namespace Filetypes {
 		}
 	}
 
-    public class DbColumnDefinition
+    public class DbColumnDefinition : ICloneable
     {
         public string Name { get; set; }
         public string FieldReference { get; set; }
@@ -129,6 +129,11 @@ namespace Filetypes {
 
         [JsonConverter(typeof(StringEnumConverter))]
         public DbTypesEnum Type { get; set; }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 
     public class DbField : ICloneable

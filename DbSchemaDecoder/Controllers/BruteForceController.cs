@@ -1,6 +1,7 @@
 ﻿using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
 using Filetypes;
+using Filetypes.ByteParsing;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
 using System;
@@ -15,7 +16,7 @@ using static DbSchemaDecoder.Models.BruteForceViewModel;
 
 namespace DbSchemaDecoder.Controllers
 {
-   /* public class BruteForceController : NotifyPropertyChangedImpl
+    public class BruteForceController : NotifyPropertyChangedImpl
     {
         public enum BruteForceCalculatorType
         { 
@@ -112,11 +113,18 @@ namespace DbSchemaDecoder.Controllers
 
         void OnItemDoubleClicked(ItemView clickedItem)
         {
-            var items = clickedItem.Enums.Select(x => FieldParser.CreateFromEnum(x).Instance()).ToList();
-            for (int i = 0; i < items.Count(); i++)
-                items[i].Name = "Unknown" + i;
+            List<DbColumnDefinition> dbColumnDefinitions = new List<DbColumnDefinition>();
+            for (int i = 0; i < clickedItem.Enums.Count; i++)
+            {
+                dbColumnDefinitions.Add(new DbColumnDefinition()
+                {
+                    Type = clickedItem.Enums[i],
+                    Name = "Unknown" + i
+                });
+            }
 
-            _windowState.DbSchemaFields = items;
+
+            _windowState.DbSchemaFields = dbColumnDefinitions;
         }
 
         void OnCompute()
@@ -218,7 +226,7 @@ namespace DbSchemaDecoder.Controllers
 
                     case BruteForceCalculatorType.BruteForceUsingExistingTables:
                     case BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount:
-                        return new AppendTableCombinations(_windowState.DbSchemaFields.Select(x => x.TypeEnum).ToArray());
+                        return new AppendTableCombinations(_windowState.DbSchemaFields.Select(x => x.Type).ToArray());
                 }
             }
             catch (Exception e)
@@ -230,7 +238,7 @@ namespace DbSchemaDecoder.Controllers
             throw new NotImplementedException("Unknown compute type");
         }
 
-        void CombinationFoundEventHandler(object sender, FieldParserEnum[] val)
+        void CombinationFoundEventHandler(object sender, DbTypesEnum[] val)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
@@ -308,5 +316,5 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.RunningStatus = "Stopped";
             return foundRunninProcess;
         }
-    }*/
+    }
 }

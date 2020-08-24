@@ -4,6 +4,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Filetypes.ByteParsing
@@ -15,6 +16,7 @@ namespace Filetypes.ByteParsing
         String_ascii,
         Optstring,
         Optstring_ascii,
+        Int64,
         Integer,
         uint32,
         Short,
@@ -86,6 +88,19 @@ namespace Filetypes.ByteParsing
         protected override int Decode(byte[] buffer, int index)
         {
             return BitConverter.ToInt32(buffer, index);
+        }
+    }
+
+    public class Int64Parser : NumberParser<long>
+    {
+        public override string TypeName { get { return "Int64"; } }
+        public override DbTypesEnum Type => DbTypesEnum.Int64;
+
+        protected override int FieldSize => 8;
+
+        protected override long Decode(byte[] buffer, int index)
+        {
+            return BitConverter.ToInt64(buffer, index);
         }
     }
 
@@ -206,13 +221,13 @@ namespace Filetypes.ByteParsing
             bool readTheString = true;
             if (isOptString)
             {
-                if (bytesLeft < 4)
+                if (bytesLeft < 1)
                 {
                     errorMessage = $"Cannot read optString flag {bytesLeft} bytes left";
                     return false;
                 }
 
-                var flag = BitConverter.ToInt32(buffer, index);
+                var flag = buffer[index];
                 if (flag == 0)
                 {
                     readTheString = false;
@@ -222,8 +237,8 @@ namespace Filetypes.ByteParsing
                     errorMessage = $"Invalid flag {flag} at beginnning of optStr";
                     return false;
                 }
-                offset += 4;
-                bytesLeft -= 4;
+                offset += 1;
+                bytesLeft -= 1;
             }
 
             if (readTheString)
@@ -276,7 +291,12 @@ namespace Filetypes.ByteParsing
             value = null;
             var result = TryReadReadCAStringAsArray(buffer, index, StringEncoding, IsOptStr, out error, out int stringStrt, out int stringLength, out bytesRead);
             if (result)
-                value = StringEncoding.GetString(buffer, stringStrt, stringLength);
+            {
+                if (stringLength != 0)
+                    value = StringEncoding.GetString(buffer, stringStrt, stringLength);
+                else
+                    value = "";
+            }
             return result;
         }
     }
@@ -309,6 +329,7 @@ namespace Filetypes.ByteParsing
     {
         public static ByteParser Byte { get; set; } = new ByteParser();
         public static IntParser Int32 { get; set; } = new IntParser();
+        public static Int64Parser Int64 { get; set; } = new Int64Parser();
         public static UIntParser UInt32 { get; set; } = new UIntParser();
         public static SingleParser Single { get; set; } = new SingleParser();
         public static ShortParser Short { get; set; } = new ShortParser();
@@ -339,6 +360,9 @@ namespace Filetypes.ByteParsing
 
                 case DbTypesEnum.Integer:
                     return ByteParsers.Int32;
+
+                case DbTypesEnum.Int64:
+                    return ByteParsers.Int64;
 
                 case DbTypesEnum.Short:
                     return ByteParsers.Short;

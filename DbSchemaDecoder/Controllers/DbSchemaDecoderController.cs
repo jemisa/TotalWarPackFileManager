@@ -17,7 +17,7 @@ namespace DbSchemaDecoder.Controllers
     {
         public NextItemController NextItemController { get; set; }
         public DbTableDefinitionController DbTableDefinitionController { get; set; }
-        //public BruteForceController BruteForceController { get; set; }
+        public BruteForceController BruteForceController { get; set; }
         public CaSchemaController CaSchemaController { get; set; }
         public TableEntriesController TableEntriesController { get; set; }
         public HeaderInformationController SelectedFileHeaderInformationController { get; set; }
@@ -30,7 +30,7 @@ namespace DbSchemaDecoder.Controllers
 
             TableEntriesController = new TableEntriesController(_windowState, dbTableItemSourceUpdater);
             NextItemController = new NextItemController(_windowState);
-            //BruteForceController = new BruteForceController(_windowState);
+            BruteForceController = new BruteForceController(_windowState);
             CaSchemaController = new CaSchemaController(_windowState);
             DbTableDefinitionController = new DbTableDefinitionController(_windowState);
             SelectedFileHeaderInformationController = new HeaderInformationController(_windowState);
@@ -90,14 +90,38 @@ namespace DbSchemaDecoder.Controllers
                 }
             }
 
-            SchemaManager.Instance.UpdateCurrentTableDefinitions(schemaFile);
+            //SchemaManager.Instance.UpdateCurrentTableDefinitions(schemaFile);
             //SchemaManager.Instance.UpdateCurrentTableDefinition("tableName", new List<DbTableDefinition>())
         }
 
         public DbTypesEnum GetTypeEnum(string value)
         {
-            throw new NotImplementedException("Todo");
-            return DbTypesEnum.uint32;
+            switch (value)
+            {
+                case "StringU8":
+                    return DbTypesEnum.String;
+
+                case "OptionalStringU8":
+                    return DbTypesEnum.Optstring;
+
+                case "StringU16":
+                    return DbTypesEnum.String_ascii;
+
+                case "Boolean":
+                    return DbTypesEnum.Boolean;
+
+                case "I32":
+                    return DbTypesEnum.Integer;
+                
+                case "I64":
+                    return DbTypesEnum.Int64;
+
+                case "F32":
+                    return DbTypesEnum.Single;
+            }
+
+                
+            throw new NotImplementedException("Unknown type " + value);
         }
 
 

@@ -1,6 +1,8 @@
 ﻿using Filetypes;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 namespace DbSchemaDecoder.Util
 {
 
-    public enum FieldParserEnum
+    /*public enum FieldParserEnum
     {
         OptStringTypeAscii,
         StringTypeAscii,
@@ -18,7 +20,7 @@ namespace DbSchemaDecoder.Util
         BoolType,
         IntType,
         SingleType
-    }
+    }*/
 
 
     abstract class FieldParser
@@ -26,39 +28,39 @@ namespace DbSchemaDecoder.Util
         public class ParseResult
         {
             public object FieldInfo { get; set; }
-            public long OffsetAfter { get; set; }
+            public int OffsetAfter { get; set; }
             public bool Completed { get; set; }
         }
 
-        abstract public ParseResult CanParse(BinaryReader reader, long startStreamPos);
+        abstract public ParseResult CanParse(byte[] buffer, int index);
 
-        abstract public object Instance();
+        //abstract public object Instance();
 
         abstract public string InstanceName();
 
-       /* public static FieldParser CreateFromEnum(FieldParserEnum parserEnum) 
+        public static FieldParser CreateFromEnum(DbTypesEnum parserEnum) 
         {
             switch (parserEnum)
             {
-                case FieldParserEnum.OptStringTypeAscii:
+                case DbTypesEnum.Optstring_ascii:
                     return new OptStringTypeAscii();
-                case FieldParserEnum.StringTypeAscii:
+                case DbTypesEnum.String_ascii:
                     return new StringTypeAscii();
-                case FieldParserEnum.OptStringType:
+                case DbTypesEnum.Optstring:
                     return new OptStringType();
-                case FieldParserEnum.StringType:
+                case DbTypesEnum.String:
                     return new StringType();
-                case FieldParserEnum.BoolType:
+                case DbTypesEnum.Boolean:
                     return new BoolType();
-                case FieldParserEnum.IntType:
+                case DbTypesEnum.Integer:
                     return new IntType();
-                case FieldParserEnum.SingleType:
+                case DbTypesEnum.Single:
                     return new SingleType();
             }
 
             throw new NotImplementedException();
-        }*/
-/*
+        }
+
     class OptStringTypeAscii : FieldParser
     {
         public override string InstanceName()
@@ -66,22 +68,19 @@ namespace DbSchemaDecoder.Util
             return "OptStringTypeAscii";
         }
 
-        public override ParseResult CanParse(BinaryReader reader, long startStreamPos)
+        public override ParseResult CanParse(byte[] buffer, int index)
         {
-            reader.BaseStream.Position = startStreamPos;
-            var instance = Types.OptStringTypeAscii().CreateInstance();
-            if (instance.TryDecode(reader))
+            var parser = ByteParsers.OptStringAscii;
+            if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
             {
-                var value = instance.Value;
-
                 byte[] bytes = Encoding.ASCII.GetBytes(value);
                 var isAscii = bytes.All(b => b >= 32 && b <= 127);
                 if (isAscii)
                 {
                     return new ParseResult()
                     {
-                        FieldInfo = Types.OptStringTypeAscii(),
-                        OffsetAfter = reader.BaseStream.Position,
+                        //FieldInfo = Types.OptStringTypeAscii(),
+                        OffsetAfter = index + bytesRead,
                         Completed = true
                     };
                 }
@@ -93,10 +92,10 @@ namespace DbSchemaDecoder.Util
             };
         }
 
-        public override FieldInfo Instance()
-        {
-            return Types.OptStringTypeAscii();
-        }
+        //public override FieldInfo Instance()
+        //{
+        //    return Types.OptStringTypeAscii();
+        //}
 
 
     }
@@ -109,38 +108,40 @@ namespace DbSchemaDecoder.Util
         }
 
 
-        public override ParseResult CanParse(BinaryReader reader, long startStreamPos)
-        {
-           
-            reader.BaseStream.Position = startStreamPos;
-            var instance = Types.StringTypeAscii().CreateInstance();
-            if (instance.TryDecode(reader))
+            public override ParseResult CanParse(byte[] buffer, int index)
             {
-                var value = instance.Value;
-
-                byte[] bytes = Encoding.ASCII.GetBytes(value);
-                var isAscii = bytes.All(b => b >= 32 && b <= 127);
-                if (isAscii)
+                var parser = ByteParsers.StringAscii;
+                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
                 {
-                    return new ParseResult()
+                    if (string.IsNullOrWhiteSpace(value))
+                        return new ParseResult()
+                        {
+                            Completed = false
+                        };
+
+                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                    if (isAscii)
                     {
-                        FieldInfo = Types.StringTypeAscii(),
-                        OffsetAfter = reader.BaseStream.Position,
-                        Completed = true
-                    };
+                        return new ParseResult()
+                        {
+                            //FieldInfo = Types.OptStringTypeAscii(),
+                            OffsetAfter = index + bytesRead,
+                            Completed = true
+                        };
+                    }
                 }
+
+                return new ParseResult()
+                {
+                    Completed = false
+                };
             }
 
-            return new ParseResult()
-            {
-                Completed = false
-            };
-        }
-
-        public override FieldInfo Instance()
-        {
-            return Types.StringTypeAscii();
-        }
+        //public override FieldInfo Instance()
+        //{
+        //    return Types.StringTypeAscii();
+        //}
     }
 
     class OptStringType : FieldParser
@@ -150,37 +151,35 @@ namespace DbSchemaDecoder.Util
             return "OptStringType";
         }
 
-        public override ParseResult CanParse(BinaryReader reader, long startStreamPos)
+        public override ParseResult CanParse(byte[] buffer, int index)
         {
-            reader.BaseStream.Position = startStreamPos;
-            var instance = Types.OptStringType().CreateInstance();
-            if (instance.TryDecode(reader))
+            var parser = ByteParsers.OptString;
+            if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
             {
-                var value = instance.Value;
-
-                byte[] bytes = Encoding.ASCII.GetBytes(value);
-                var isAscii = bytes.All(b => b >= 32 && b <= 127);
-                if (!isAscii)
+                byte[] bytes = Encoding.UTF8.GetBytes(value);
+                var isCorrectType = bytes.All(b => b >= 32 && b <= 127);
+                if (isCorrectType)
                 {
                     return new ParseResult()
                     {
-                        FieldInfo = Types.OptStringType(),
-                        OffsetAfter = reader.BaseStream.Position,
+                        //FieldInfo = Types.OptStringTypeAscii(),
+                        OffsetAfter = index + bytesRead,
                         Completed = true
                     };
                 }
             }
- 
+
             return new ParseResult()
             {
                 Completed = false
             };
         }
 
-        public override FieldInfo Instance()
-        {
-            return Types.OptStringType();
-        }
+
+        //public override FieldInfo Instance()
+        //{
+        //    return Types.OptStringType();
+        //}
     }
 
     class StringType : FieldParser
@@ -190,37 +189,40 @@ namespace DbSchemaDecoder.Util
             return "StringType";
         }
 
-        public override ParseResult CanParse(BinaryReader reader, long startStreamPos)
-        {
-            reader.BaseStream.Position = startStreamPos;
-            var instance = Types.StringType().CreateInstance();
-            if (instance.TryDecode(reader))
+            public override ParseResult CanParse(byte[] buffer, int index)
             {
-                var value = instance.Value;
+                var parser = ByteParsers.String;
+                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                        return new ParseResult()
+                        {
+                            Completed = false
+                        };
 
-                byte[] bytes = Encoding.ASCII.GetBytes(value);
-                var isAscii = bytes.All(b => b >= 32 && b <= 127);
-                if (isAscii)
-                { 
-                    return new ParseResult()
+                    byte[] bytes = Encoding.UTF8.GetBytes(value);
+                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                    if (isAscii)
                     {
-                        FieldInfo = Types.StringType(),
-                        OffsetAfter = reader.BaseStream.Position,
-                        Completed = true
-                    };
+                        return new ParseResult()
+                        {
+                            //FieldInfo = Types.OptStringTypeAscii(),
+                            OffsetAfter = index + bytesRead,
+                            Completed = true
+                        };
+                    }
                 }
+
+                return new ParseResult()
+                {
+                    Completed = false
+                };
             }
 
-            return new ParseResult()
-            {
-                Completed = false
-            };
-        }
-
-        public override FieldInfo Instance()
-        {
-            return Types.StringType();
-        }
+        //public override FieldInfo Instance()
+        //{
+        //    return Types.StringType();
+        //}
     }
 
     class BoolType : FieldParser
@@ -230,32 +232,29 @@ namespace DbSchemaDecoder.Util
             return "BoolType";
         }
 
-        public override ParseResult CanParse(BinaryReader reader, long startStreamPos)
-        {
-
-            reader.BaseStream.Position = startStreamPos;
-            var instance = Types.BoolType().CreateInstance();
-            if (instance.TryDecode(reader))
+            public override ParseResult CanParse(byte[] buffer, int index)
             {
+                var parser = ByteParsers.Bool;
+                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
+                {
+                    return new ParseResult()
+                    {
+                        //FieldInfo = Types.OptStringTypeAscii(),
+                        OffsetAfter = index + bytesRead,
+                        Completed = true
+                    };
+                }
 
                 return new ParseResult()
                 {
-                    FieldInfo = Types.BoolType(),
-                    OffsetAfter = reader.BaseStream.Position,
-                    Completed = true
+                    Completed = false
                 };
             }
 
-            return new ParseResult()
-            {
-                Completed = false
-            };
-        }
-
-        public override FieldInfo Instance()
-        {
-            return Types.BoolType();
-        }
+        //public override FieldInfo Instance()
+        //{
+        //    return Types.BoolType();
+        //}
     }
 
     class IntType : FieldParser
@@ -265,33 +264,29 @@ namespace DbSchemaDecoder.Util
             return "IntType";
         }
 
-        public override ParseResult CanParse(BinaryReader reader, long startStreamPos)
-        {
-          
-            reader.BaseStream.Position = startStreamPos;
-            var instance = Types.IntType().CreateInstance();
-            if (instance.TryDecode(reader))
+            public override ParseResult CanParse(byte[] buffer, int index)
             {
+                var parser = ByteParsers.Int32;
+                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
+                {
+                    return new ParseResult()
+                    {
+                        //FieldInfo = Types.OptStringTypeAscii(),
+                        OffsetAfter = index + bytesRead,
+                        Completed = true
+                    };
+                }
 
                 return new ParseResult()
                 {
-                    FieldInfo = Types.IntType(),
-                    OffsetAfter = reader.BaseStream.Position,
-                    Completed = true
+                    Completed = false
                 };
             }
-    
 
-            return new ParseResult()
-            {
-                Completed = false
-            };
-        }
-
-        public override FieldInfo Instance()
-        {
-            return Types.IntType();
-        }
+        //    public override FieldInfo Instance()
+        //{
+        //    return Types.IntType();
+        //}
     }
 
     class SingleType : FieldParser
@@ -301,32 +296,30 @@ namespace DbSchemaDecoder.Util
             return "SingleType";
         }
 
-        public override ParseResult CanParse(BinaryReader reader, long startStreamPos)
-        {
-            reader.BaseStream.Position = startStreamPos;
-            var instance = Types.SingleType().CreateInstance();
-            if (instance.TryDecode(reader))
+            public override ParseResult CanParse(byte[] buffer, int index)
             {
+                var parser = ByteParsers.Single;
+                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
+                {
+                    return new ParseResult()
+                    {
+                        //FieldInfo = Types.OptStringTypeAscii(),
+                        OffsetAfter = index + bytesRead,
+                        Completed = true
+                    };
+                }
 
                 return new ParseResult()
                 {
-                    FieldInfo = Types.SingleType(),
-                    OffsetAfter = reader.BaseStream.Position,
-                    Completed = true,
+                    Completed = false
                 };
             }
 
-            return new ParseResult()
-            {
-                Completed = false
-            };
-        }
-
-        public override FieldInfo Instance()
-        {
-            return Types.SingleType();
-        }
+       //    public override FieldInfo Instance()
+       //{
+       //    return Types.SingleType();
+       //}
     }
-        */
+        
     }
 }

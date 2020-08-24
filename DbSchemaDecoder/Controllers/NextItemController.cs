@@ -110,6 +110,28 @@ namespace DbSchemaDecoder.Controllers
                 viewModelRef.ValueText = "Error:" + error;
             else
                 viewModelRef.ValueText = value;
+
+            if (value == null)
+                return;
+            if (viewModelRef.EnumValue == DbTypesEnum.String)
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(value);
+                var isCorrect = bytes.All(b => b >= 32 && b <= 127);
+                if (isCorrect)
+                {
+                   
+                }
+            }
+
+            if (viewModelRef.EnumValue == DbTypesEnum.String_ascii)
+            {
+                byte[] bytes = Encoding.Unicode.GetBytes(value);
+                var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                if (isAscii)
+                {
+
+                }
+            }
         }
 
         public void OnButtonPressed(NextItemControllerItem val)

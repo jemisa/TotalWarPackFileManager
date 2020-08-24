@@ -265,7 +265,7 @@ namespace DbSchemaDecoder.Controllers
             DbColumnDefinition typeDef = new DbColumnDefinition()
             {
                 Name = "Column_" + TableTypeInformationRows.Count() + 1,
-                Type = DbTypesEnum.String_ascii
+                Type = type
             };
             var newFieldInfoViewModel = new FieldInfoViewModel(typeDef, 99);
             newFieldInfoViewModel.PropertyChanged += NewFieldInfoViewModel_PropertyChanged;

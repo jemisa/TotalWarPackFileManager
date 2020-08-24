@@ -1,4 +1,5 @@
 ﻿using DbSchemaDecoder.Util;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,7 +14,7 @@ namespace DbSchemaDecoder.Models
     {
         public class ItemView
         {
-            public List<FieldParserEnum> Enums { get; set; }
+            public List<DbTypesEnum> Enums { get; set; }
             public int Idx { get; set; }
             public string Value { get; set; }
             public int Columns { get; set; }
