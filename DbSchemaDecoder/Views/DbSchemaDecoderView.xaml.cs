@@ -184,42 +184,9 @@ namespace DbSchemaDecoder
                 rowDef.Height = new GridLength(0, GridUnitType.Pixel);
         }
 
-        private void OnCreateColumDefinitionsFromDepricatedData(object sender, RoutedEventArgs e)
+        private void OnTest(object sender, RoutedEventArgs e)
         {
-            var allFiles = _fileListController.ViewModel.FileList;
-            var currentGame = _windowState.CurrentGame;
-            var schemas = _windowState.SchemaManager.GetDepricated();
-            if (schemas == null)
-            {
-                MessageBox.Show("Unable to get old table definitions");
-                return;
-            }
-
-            if (currentGame == null)
-            {
-                MessageBox.Show("A game is not selected");
-                return;
-            }
-
-            Dictionary<string, List<DbTableDefinition>> output = new Dictionary<string, List<DbTableDefinition>>();
-            foreach (var file in allFiles)
-            {
-                if (schemas.ContainsKey(file.DataBaseFile.TableType))
-                {
-                    output.Add(file.DataBaseFile.TableType, new List<DbTableDefinition>());
-                    foreach (var schema in schemas[file.DataBaseFile.TableType])
-                    {
-                        TableEntriesParser parser = new TableEntriesParser(file.DataBaseFile.DbFile.Data, 0);
-                        var result = parser.CanParseTable(schema.ColumnDefinitions, 30);
-                        if (result.HasError == false)
-                        {
-                            output[file.DataBaseFile.TableType].Add(schema);
-                        }
-                    }
-                }
-            }
-
-            _fileListController.StartEvaluation();
+            
         }
     }
 
