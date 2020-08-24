@@ -37,11 +37,14 @@ namespace DbSchemaDecoder.Util
         int _headerLength;
         int _HeaderEntryCount;
 
+        byte[] _tableData;
+
         public static BigInteger PossibleCombinations(int numFields)
         {
             return BigInteger.Pow(GetPossibleFields().Count(), numFields);
         }
 
+        List<DbColumnDefinition> _dbColumnDefinitions;
         public List<DbTypesEnum[]> PossiblePermutations { get; set; } = new List<DbTypesEnum[]>();
         PermutationHelper _permutationHelper;
         IBruteForceCombinationProvider _combinationProvider;
@@ -51,15 +54,25 @@ namespace DbSchemaDecoder.Util
             _maxNumberOfFields = maxNumberOfFields;
             _combinationProvider = combinationProvider;
 
+            _tableData = dataBaseFile.DbFile.Data;
             DBFileHeader header = PackedFileDbCodec.readHeader(dataBaseFile.DbFile);
             _headerLength = header.Length;
             _HeaderEntryCount = (int)header.EntryCount;
+
+            _dbColumnDefinitions = new List<DbColumnDefinition>();
+            for (int i = 0; i < maxNumberOfFields; i++)
+            {
+                _dbColumnDefinitions.Add(new DbColumnDefinition()
+                {
+                    Name = "Unkown" + i
+                });
+            }
         }
         public void Compute()
         {
             _permutationHelper = new PermutationHelper(OnEvaluatePermutation);
             _permutationHelper.ComputePermutations(
-                _file.DbFile.Data,
+                _tableData,
                 new DbTypesEnum[_maxNumberOfFields],
                 _combinationProvider,
                 0,
@@ -72,20 +85,12 @@ namespace DbSchemaDecoder.Util
 
         void OnEvaluatePermutation(DbTypesEnum[] combination)
         {
-            List<DbColumnDefinition> dbColumnDefinitions = new List<DbColumnDefinition>(combination.Count());
             for(int i = 0; i < combination.Count(); i++)
-            {
-                dbColumnDefinitions.Add(new DbColumnDefinition()
-                {
-                    Type = combination[i],
-                    Name = "Unkown" + i
-                });
+                _dbColumnDefinitions[i].Type = combination[i];
 
-            }
-
-            TableEntriesParser p = new TableEntriesParser(_file.DbFile.Data, _headerLength);
+            TableEntriesParser p = new TableEntriesParser(_tableData, _headerLength);
             var updateRes = p.CanParseTable(
-                dbColumnDefinitions,
+                _dbColumnDefinitions,
                 _HeaderEntryCount);
 
             if (!updateRes.HasError)
@@ -158,12 +163,14 @@ namespace DbSchemaDecoder.Util
         {
             _possibleCombinations = new DbTypesEnum[]
             {
-                DbTypesEnum.Optstring_ascii,
+                 DbTypesEnum.Boolean,
                 DbTypesEnum.String_ascii,
-                DbTypesEnum.Optstring,
                 DbTypesEnum.String,
                 DbTypesEnum.Integer,
-                DbTypesEnum.Boolean,
+                
+                DbTypesEnum.Optstring_ascii,
+                DbTypesEnum.Optstring,
+               
             };
         }
         public DbTypesEnum[] GetPossibleCombinations(int index)

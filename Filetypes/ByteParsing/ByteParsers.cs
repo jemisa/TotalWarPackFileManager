@@ -266,6 +266,12 @@ namespace Filetypes.ByteParsing
                     return false;
                 }
 
+                if (isOptString && bytes == 0)
+                {
+                    errorMessage = "Opstring with size = 0";
+                    return false;
+                }
+
                 stringStart = (index + 2 + offset);
                 stringLength = bytes;
                 bytesInString = bytes + 2;
@@ -297,6 +303,8 @@ namespace Filetypes.ByteParsing
                 else
                     value = "";
             }
+           
+
             return result;
         }
     }
@@ -321,7 +329,7 @@ namespace Filetypes.ByteParsing
     {
         public override string TypeName { get { return "OptStringAscii"; } }
         public override DbTypesEnum Type => DbTypesEnum.Optstring_ascii;
-        protected override Encoding StringEncoding => Encoding.ASCII;
+        protected override Encoding StringEncoding => Encoding.Unicode;
         protected override bool IsOptStr => true;
     }
 

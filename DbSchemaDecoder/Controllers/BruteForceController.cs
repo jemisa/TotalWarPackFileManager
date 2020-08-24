@@ -242,13 +242,12 @@ namespace DbSchemaDecoder.Controllers
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
-                var values = val.Select(x => FieldParser.CreateFromEnum(x).InstanceName());
-                var v = string.Join(", ", values);
+                var values = val.Select(x => ByteParserFactory.Create(x).TypeName);
 
                 ViewModel.Values.Add(new ItemView() 
                 { 
                     Idx= ViewModel.Values.Count() + 1,
-                    Value = v,
+                    Value = string.Join(", ", values),
                     Enums = val.ToList(),
                     Columns = val.Count(),
                 });

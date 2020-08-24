@@ -1,42 +1,19 @@
-﻿using Filetypes;
-using Filetypes.ByteParsing;
+﻿using Filetypes.ByteParsing;
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DbSchemaDecoder.Util
 {
-
-    /*public enum FieldParserEnum
-    {
-        OptStringTypeAscii,
-        StringTypeAscii,
-        OptStringType,
-        StringType,
-        BoolType,
-        IntType,
-        SingleType
-    }*/
-
-
     abstract class FieldParser
     {
         public class ParseResult
         {
-            public object FieldInfo { get; set; }
             public int OffsetAfter { get; set; }
             public bool Completed { get; set; }
         }
 
         abstract public ParseResult CanParse(byte[] buffer, int index);
-
-        //abstract public object Instance();
-
-        abstract public string InstanceName();
 
         public static FieldParser CreateFromEnum(DbTypesEnum parserEnum) 
         {
@@ -63,23 +40,17 @@ namespace DbSchemaDecoder.Util
 
     class OptStringTypeAscii : FieldParser
     {
-        public override string InstanceName()
-        {
-            return "OptStringTypeAscii";
-        }
-
         public override ParseResult CanParse(byte[] buffer, int index)
         {
             var parser = ByteParsers.OptStringAscii;
             if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
             {
-                byte[] bytes = Encoding.ASCII.GetBytes(value);
+                byte[] bytes = Encoding.UTF8.GetBytes(value);
                 var isAscii = bytes.All(b => b >= 32 && b <= 127);
                 if (isAscii)
                 {
                     return new ParseResult()
                     {
-                        //FieldInfo = Types.OptStringTypeAscii(),
                         OffsetAfter = index + bytesRead,
                         Completed = true
                     };
@@ -91,65 +62,42 @@ namespace DbSchemaDecoder.Util
                 Completed = false
             };
         }
-
-        //public override FieldInfo Instance()
-        //{
-        //    return Types.OptStringTypeAscii();
-        //}
-
-
     }
 
     class StringTypeAscii : FieldParser
     {
-        public override string InstanceName()
+        public override ParseResult CanParse(byte[] buffer, int index)
         {
-            return "StringTypeAscii";
-        }
-
-
-            public override ParseResult CanParse(byte[] buffer, int index)
+            var parser = ByteParsers.StringAscii;
+            if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
             {
-                var parser = ByteParsers.StringAscii;
-                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
-                {
-                    if (string.IsNullOrWhiteSpace(value))
-                        return new ParseResult()
-                        {
-                            Completed = false
-                        };
-
-                    byte[] bytes = Encoding.ASCII.GetBytes(value);
-                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
-                    if (isAscii)
+                if (string.IsNullOrWhiteSpace(value))
+                    return new ParseResult()
                     {
-                        return new ParseResult()
-                        {
-                            //FieldInfo = Types.OptStringTypeAscii(),
-                            OffsetAfter = index + bytesRead,
-                            Completed = true
-                        };
-                    }
-                }
+                        Completed = false
+                    };
 
-                return new ParseResult()
+                byte[] bytes = Encoding.UTF8.GetBytes(value);
+                var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                if (isAscii)
                 {
-                    Completed = false
-                };
+                    return new ParseResult()
+                    {
+                        OffsetAfter = index + bytesRead,
+                        Completed = true
+                    };
+                }
             }
 
-        //public override FieldInfo Instance()
-        //{
-        //    return Types.StringTypeAscii();
-        //}
+            return new ParseResult()
+            {
+                Completed = false
+            };
+        }
     }
 
     class OptStringType : FieldParser
     {
-        public override string InstanceName()
-        {
-            return "OptStringType";
-        }
 
         public override ParseResult CanParse(byte[] buffer, int index)
         {
@@ -162,6 +110,38 @@ namespace DbSchemaDecoder.Util
                 {
                     return new ParseResult()
                     {
+                        OffsetAfter = index + bytesRead,
+                        Completed = true
+                    };
+                }
+            }
+
+            return new ParseResult()
+            {
+                Completed = false
+            };
+        }
+    }
+
+    class StringType : FieldParser
+    {
+        public override ParseResult CanParse(byte[] buffer, int index)
+        {
+            var parser = ByteParsers.String;
+            if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    return new ParseResult()
+                    {
+                        Completed = false
+                    };
+
+                byte[] bytes = Encoding.UTF8.GetBytes(value);
+                var isAscii = bytes.All(b => b >= 32 && b <= 127);
+                if (isAscii)
+                {
+                    return new ParseResult()
+                    {
                         //FieldInfo = Types.OptStringTypeAscii(),
                         OffsetAfter = index + bytesRead,
                         Completed = true
@@ -174,151 +154,70 @@ namespace DbSchemaDecoder.Util
                 Completed = false
             };
         }
-
-
-        //public override FieldInfo Instance()
-        //{
-        //    return Types.OptStringType();
-        //}
-    }
-
-    class StringType : FieldParser
-    {
-        public override string InstanceName()
-        {
-            return "StringType";
-        }
-
-            public override ParseResult CanParse(byte[] buffer, int index)
-            {
-                var parser = ByteParsers.String;
-                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
-                {
-                    if (string.IsNullOrWhiteSpace(value))
-                        return new ParseResult()
-                        {
-                            Completed = false
-                        };
-
-                    byte[] bytes = Encoding.UTF8.GetBytes(value);
-                    var isAscii = bytes.All(b => b >= 32 && b <= 127);
-                    if (isAscii)
-                    {
-                        return new ParseResult()
-                        {
-                            //FieldInfo = Types.OptStringTypeAscii(),
-                            OffsetAfter = index + bytesRead,
-                            Completed = true
-                        };
-                    }
-                }
-
-                return new ParseResult()
-                {
-                    Completed = false
-                };
-            }
-
-        //public override FieldInfo Instance()
-        //{
-        //    return Types.StringType();
-        //}
     }
 
     class BoolType : FieldParser
     {
-        public override string InstanceName()
+        public override ParseResult CanParse(byte[] buffer, int index)
         {
-            return "BoolType";
-        }
-
-            public override ParseResult CanParse(byte[] buffer, int index)
+            var parser = ByteParsers.Bool;
+            if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
             {
-                var parser = ByteParsers.Bool;
-                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
-                {
-                    return new ParseResult()
-                    {
-                        //FieldInfo = Types.OptStringTypeAscii(),
-                        OffsetAfter = index + bytesRead,
-                        Completed = true
-                    };
-                }
-
                 return new ParseResult()
                 {
-                    Completed = false
+                    OffsetAfter = index + bytesRead,
+                    Completed = true
                 };
             }
 
-        //public override FieldInfo Instance()
-        //{
-        //    return Types.BoolType();
-        //}
+            return new ParseResult()
+            {
+                Completed = false
+            };
+        }
     }
 
     class IntType : FieldParser
     {
-        public override string InstanceName()
+        public override ParseResult CanParse(byte[] buffer, int index)
         {
-            return "IntType";
-        }
-
-            public override ParseResult CanParse(byte[] buffer, int index)
+            var parser = ByteParsers.Int32;
+            if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
             {
-                var parser = ByteParsers.Int32;
-                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
-                {
-                    return new ParseResult()
-                    {
-                        //FieldInfo = Types.OptStringTypeAscii(),
-                        OffsetAfter = index + bytesRead,
-                        Completed = true
-                    };
-                }
-
                 return new ParseResult()
                 {
-                    Completed = false
+                    OffsetAfter = index + bytesRead,
+                    Completed = true
                 };
             }
 
-        //    public override FieldInfo Instance()
-        //{
-        //    return Types.IntType();
-        //}
+            return new ParseResult()
+            {
+                Completed = false
+            };
+        }
     }
 
     class SingleType : FieldParser
     {
-        public override string InstanceName()
+        public override ParseResult CanParse(byte[] buffer, int index)
         {
-            return "SingleType";
-        }
-
-            public override ParseResult CanParse(byte[] buffer, int index)
+            var parser = ByteParsers.Single;
+            if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
             {
-                var parser = ByteParsers.Single;
-                if (parser.TryDecode(buffer, index, out string value, out var bytesRead, out string error))
-                {
-                    return new ParseResult()
-                    {
-                        //FieldInfo = Types.OptStringTypeAscii(),
-                        OffsetAfter = index + bytesRead,
-                        Completed = true
-                    };
-                }
-
                 return new ParseResult()
                 {
-                    Completed = false
+                    OffsetAfter = index + bytesRead,
+                    Completed = true
                 };
             }
 
-       //    public override FieldInfo Instance()
-       //{
-       //    return Types.SingleType();
-       //}
+            return new ParseResult()
+            {
+                Completed = false
+            };
+        }
+
     }
         
     }
