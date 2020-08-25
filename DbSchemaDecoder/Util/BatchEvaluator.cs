@@ -3,6 +3,7 @@ using DbSchemaDecoder.Controllers;
 using Filetypes;
 using Filetypes.Codecs;
 using Filetypes.DB;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,8 @@ namespace DbSchemaDecoder.Util
 {
     public class BatchEvaluator
     {
+        ILogger _logger = Logging.Create<BatchEvaluator>();
+
         public event EventHandler<List<Result>> OnCompleted;
         public class Result
         {
@@ -25,17 +28,14 @@ namespace DbSchemaDecoder.Util
         }
 
         IEnumerable<DataBaseFile> _files;
-        SchemaManager _schemaManager;
-        GameTypeEnum _currentGame;
-        public BatchEvaluator(IEnumerable<DataBaseFile> files, SchemaManager schemaManager, GameTypeEnum currentGame)
+        public BatchEvaluator(IEnumerable<DataBaseFile> files)
         {
             _files = files;
-            _schemaManager = schemaManager;
-            _currentGame = currentGame;
         }
 
         public void Evaluate()
         {
+            _logger.Information("Starting evaluation");
             List<Result> results = new List<Result>();
             foreach (var file in _files)
             {
@@ -43,6 +43,7 @@ namespace DbSchemaDecoder.Util
                 results.Add(result);
             }
 
+            _logger.Information($"Starting completed {results.Count} errors");
             OnCompleted?.Invoke(this, results);
         }
 
@@ -59,20 +60,27 @@ namespace DbSchemaDecoder.Util
                 var caSchemaResult = caSchemaFileParser.Load(file.TableType);
                 if (result.HasError)
                 {
-                    result.Errors.Add($"CA schama parsing failed: {caSchemaResult.Error}");
+                    var error = $"CA schama parsing failed: {caSchemaResult.Error}";
+                    _logger.Error(error);
+                    result.Errors.Add(error);
                 }
 
                 result.CaTableColumnCount = caSchemaResult.Entries.Count();
 
-                var allTableDefinitions = _schemaManager.GetTableDefinitionsForTable(_currentGame, file.TableType);
+                var allTableDefinitions = SchemaManager.Instance.GetTableDefinitionsForTable(file.TableType);
                 var fieldCollections = allTableDefinitions.Where(x => x.Version == header.Version);
                 if (fieldCollections.Count() == 0)
                 {
-                    result.Errors.Add($"No definition for current version");
+                    var error = $"No definition for current version";
+                    _logger.Error(error);
+                    result.Errors.Add(error);
                 }
                 else if (fieldCollections.Count() != 1)
                 {
-                    result.Errors.Add($"More then one definition for current version");
+
+                    var error = $"More then one definition for current version";
+                    _logger.Error(error);
+                    result.Errors.Add(error);
                 }
                 else
                 {
@@ -87,13 +95,17 @@ namespace DbSchemaDecoder.Util
 
                     if (parseResult.HasError)
                     {
-                        result.Errors.Add($"Unable to parse table: {parseResult.Error}");
+                        var error = $"Unable to parse table: {parseResult.Error}";
+                        _logger.Error(error);
+                        result.Errors.Add(error);
                     }
                 }
             }
             catch (Exception e)
             {
-                result.Errors.Add("Unknown error:" + e.Message);
+                var error = "Unknown error:" + e.Message;
+                _logger.Error(error);
+                result.Errors.Add(error);
             }
 
             return result;

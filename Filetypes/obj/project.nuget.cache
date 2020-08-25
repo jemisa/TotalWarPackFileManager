@@ -1,11 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "b/mbDvqEm6NSU76/xNOorGVp4frobD04OXARxGM8x191UKGSnBnZzmAciNKF07EnpiwZkhlbD8vnapgeI3IngA==",
+  "dgSpecHash": "D24PY2H/7dV5seKMiHWHNBEp4Xj6Jj5ewmhHLwt2Q1EL6BjmQsTwlq0hWifuOTxMXesixMoQj7ZYnCX+WH5iiw==",
   "success": true,
   "projectFilePath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ole_k\\.nuget\\packages\\freeimage.standard\\4.3.8\\freeimage.standard.4.3.8.nupkg.sha512",
     "C:\\Users\\ole_k\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\serilog\\2.9.0\\serilog.2.9.0.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\serilog.enrichers.thread\\3.1.0\\serilog.enrichers.thread.3.1.0.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\serilog.sinks.console\\3.1.1\\serilog.sinks.console.3.1.1.nupkg.sha512",
+    "C:\\Users\\ole_k\\.nuget\\packages\\serilog.sinks.file\\4.1.0\\serilog.sinks.file.4.1.0.nupkg.sha512",
     "C:\\Users\\ole_k\\.nuget\\packages\\sevenzip\\19.0.0\\sevenzip.19.0.0.nupkg.sha512",
     "C:\\Users\\ole_k\\.nuget\\packages\\system.drawing.common\\4.5.1\\system.drawing.common.4.5.1.nupkg.sha512",
     "C:\\Users\\ole_k\\.nuget\\packages\\system.drawing.primitives\\4.3.0\\system.drawing.primitives.4.3.0.nupkg.sha512"

@@ -59,7 +59,7 @@ namespace DbSchemaDecoder.Controllers
 
           
             DBFileHeader header = PackedFileDbCodec.readHeader(item.DbFile);
-            ViewModel.Update(header, item, _windowState.SchemaManager, _windowState.CurrentGame.GameType);
+            ViewModel.Update(header, item);
             OnReloadTable();
             
         }

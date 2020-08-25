@@ -15,7 +15,7 @@ namespace DbSchemaDecoder.Models
 {
     public class HeaderInformationViewModel : NotifyPropertyChangedImpl
     {
-        public void Update(DBFileHeader header, DataBaseFile item, SchemaManager schemaManager, GameTypeEnum currentGame)
+        public void Update(DBFileHeader header, DataBaseFile item)
         {
             if (header != null)
             {
@@ -36,7 +36,7 @@ namespace DbSchemaDecoder.Models
             }
 
 
-            var allTableDefinitions = schemaManager.GetTableDefinitionsForTable(currentGame, item.TableType);
+            var allTableDefinitions = SchemaManager.Instance.GetTableDefinitionsForTable(item.TableType);
 
             NumVersions = allTableDefinitions.Count();
             var groupedVersions = allTableDefinitions.GroupBy(x => x.Version).ToList();

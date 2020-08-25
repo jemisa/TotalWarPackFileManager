@@ -26,12 +26,12 @@ namespace DbSchemaDecoder
         DbSchemaDecoderController _mainController;
         FileListController _fileListController;
         readonly Util.WindowState _windowState = new Util.WindowState();
+        readonly Game _currentGame;
 
-        public DbSchemaDecoder(Game currentGame, SchemaManager schemaManager)
+        public DbSchemaDecoder(Game currentGame)
         {
+            _currentGame = currentGame;
             DispatcherHelper.Initialize();
-            _windowState.CurrentGame = currentGame;
-            _windowState.SchemaManager = schemaManager;
             InitializeComponent();
             Loaded += SettingsControl_Loaded;
         }
@@ -44,7 +44,7 @@ namespace DbSchemaDecoder
 
             DataGridItemSourceUpdater dbTableItemSourceUpdater = new DataGridItemSourceUpdater();
 
-            _fileListController = new FileListController(_windowState);
+            _fileListController = new FileListController(_windowState, _currentGame.GameDirectory);
             _mainController = new DbSchemaDecoderController(_windowState, dbTableItemSourceUpdater);
 
             // Hex stuff

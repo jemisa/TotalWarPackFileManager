@@ -1,9 +1,11 @@
-﻿using DbSchemaDecoder.Models;
+﻿using Common;
+using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.ByteParsing;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +20,8 @@ namespace DbSchemaDecoder.Controllers
 {
     public class BruteForceController : NotifyPropertyChangedImpl
     {
+        ILogger _logger = Logging.Create<BruteForceController>();
+
         public enum BruteForceCalculatorType
         { 
             BruteForceUsingCaSchama = 0,
@@ -37,11 +41,13 @@ namespace DbSchemaDecoder.Controllers
 
         public BruteForceController(Util.WindowState windowState)
         {
+            _logger.Information("Created");
             _windowState = windowState;
             _windowState.OnCaSchemaLoaded += (sender, caSchema) => { ViewModel.ColumnCount = caSchema.Count(); };
 
             _windowState.OnFileSelected += (sender, file) => 
-            { 
+            {
+                _logger.Information($"File selected => {file.DbFile.FullPath}");
                 Cancel(); 
                 ViewModel.Values.Clear(); 
             };
@@ -65,7 +71,9 @@ namespace DbSchemaDecoder.Controllers
 
         void UpdateBruteForceDisplay()
         {
-            if(_windowState.CaSchema != null)
+            _logger.Information($"Updating");
+
+            if (_windowState.CaSchema != null)
                 ViewModel.ColumnCount = _windowState.CaSchema.Count();
 
             var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
@@ -115,6 +123,9 @@ namespace DbSchemaDecoder.Controllers
         {
             if (clickedItem == null)
                 return;
+
+            _logger.Information($"Item clicked {clickedItem.Value}");
+
             List<DbColumnDefinition> dbColumnDefinitions = new List<DbColumnDefinition>();
             for (int i = 0; i < clickedItem.Enums.Count; i++)
             {
@@ -131,9 +142,12 @@ namespace DbSchemaDecoder.Controllers
         void OnCompute()
         {
             if (Cancel())
+            {
+                _logger.Information($"Computing cancled");
                 return;
+            }
 
-
+            _logger.Information($"Computing");
             var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
             IBruteForceCombinationProvider combinationProvider = GetCombinationProvider(bruteForceMethod);
             if (combinationProvider == null)
@@ -209,6 +223,8 @@ namespace DbSchemaDecoder.Controllers
                 ViewModel.CalculateButtonText = "Calculate";
             }
             ViewModel.ColumnVariationsCompleted = $"{doneProcesses}/{_timedProcess.Length}";
+
+            _logger.Information($"Brute force compute completed");
             Update(arg);
         }
 
@@ -236,6 +252,7 @@ namespace DbSchemaDecoder.Controllers
                 return null;
             }
 
+            _logger.Fatal($"Unknown compute type {type}");
             throw new NotImplementedException("Unknown compute type");
         }
 
@@ -244,11 +261,13 @@ namespace DbSchemaDecoder.Controllers
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
                 var values = val.Select(x => ByteParserFactory.Create(x).TypeName);
+                var valuesAsList = string.Join(", ", values);
+                _logger.Information($"New combination found {valuesAsList}");
 
                 ViewModel.Values.Add(new ItemView() 
                 { 
                     Idx= ViewModel.Values.Count() + 1,
-                    Value = string.Join(", ", values),
+                    Value = valuesAsList,
                     Enums = val.ToList(),
                     Columns = val.Count(),
                 });
@@ -269,6 +288,8 @@ namespace DbSchemaDecoder.Controllers
         BigInteger _possibleCombinations = 0;
         void Update(TimedThreadEvent<BruteForceParser> arg)
         {
+            _logger.Information($"Updating after thead trigger");
+
             var parser = arg.TaskHandler;
             var current = _viewHolder[parser];
             current.EvaluatedCombinations = parser.EvaluatedCombinations;

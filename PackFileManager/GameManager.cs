@@ -1,38 +1,31 @@
 using System.Collections.Generic;
-using System.IO;
 using Common;
 using Filetypes;
-using PackFileManager.Properties;
 using System.Windows.Forms;
 using CommonDialogs;
-
-using TableVersions = System.Collections.Generic.SortedList<string, int>;
 using System.Linq;
 using Filetypes.DB;
 
 namespace PackFileManager
 {
-    /*
-     * Manager for the available games.
-     */
-    public class GameManager {
+    public class GameManager 
+    {
 
         public delegate void GameChange();
         public event GameChange GameChanged;
-
-#if DEBUG
-        bool createdGameSchemata = false;
-#endif
         
         private static GameManager instance;
-        public static GameManager Instance {
+        public static GameManager Instance 
+        {
             get {
-                if (instance == null) {
+                if (instance == null) 
+                {
                     instance = new GameManager();
                 }
                 return instance;
             }
         }
+
         private GameManager()
         {
             SchemaManager.Instance.Create();
@@ -63,12 +56,6 @@ namespace PackFileManager
             if (CurrentGame == null) {
                 CurrentGame = DefaultGame;
             }
-
-#if DEBUG
-            if (createdGameSchemata) {
-                MessageBox.Show("Had to create game schema file");
-            }
-#endif
         }
 
         // load the given game's directory from the gamedirs file
@@ -97,27 +84,27 @@ namespace PackFileManager
         
 
         static Game DefaultGame = Game.TWH2;
-        Game current;
+        Game _current;
         public Game CurrentGame {
             get {
-                return current;
+                return _current;
             }
             set {
-                if (current != value) {
-                    current = value != null ? value : DefaultGame;
-                    if (current != null) 
+                if (_current != value) {
+                    _current = value != null ? value : DefaultGame;
+                    if (_current != null) 
                     {
-                        PackFileManagerSettingService.CurrentSettings.CurrentGame = current.GameType;
+                        PackFileManagerSettingService.CurrentSettings.CurrentGame = _current.GameType;
                         PackFileManagerSettingService.Save();
+
+                        SchemaManager.Instance.CurrentGame = value.GameType;
 
                         // invalidate cache of reference map cache
                         var seq = new PackLoadSequence(){ IgnorePack = PackLoadSequence.IsDbCaPack };
-                        List<string> loaded = seq.GetPacksLoadedFrom(current.GameDirectory);
+                        List<string> loaded = seq.GetPacksLoadedFrom(_current.GameDirectory);
                         DBReferenceMap.Instance.GamePacks = loaded;
                     }
-                    if (GameChanged != null) {
-                        GameChanged();
-                    }
+                    GameChanged?.Invoke();
                 }
             }
         }

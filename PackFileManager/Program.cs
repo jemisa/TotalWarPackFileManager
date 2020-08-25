@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.IO;
 using System.Windows.Forms;
 
@@ -11,12 +12,19 @@ namespace PackFileManager
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            Logging.Create<Program>().Here().Fatal(e.ExceptionObject.ToString());
             MessageBox.Show(e.ExceptionObject.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
         }
 
         [STAThread]
         public static void Main(string[] args)
         {
+            DirectoryHelper.EnsureCreated();
+            Logging.Configure(Serilog.Events.LogEventLevel.Information);
+            var logger = Logging.Create<Program>();
+
+            logger.Information("Application starting");
+
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(Program.CurrentDomain_UnhandledException);
             Application.EnableVisualStyles();
             try
@@ -26,22 +34,11 @@ namespace PackFileManager
             }
             catch (Exception exception)
             {
+                logger.Here().Fatal(exception.Message);
                 MessageBox.Show(exception.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
-        }
-        
-        /*
-         * Get path to PFM setting folder; creates it if neccessary.
-         */
-        public static string ApplicationFolder {
-            get {
-                string localAppDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                localAppDir = Path.Combine(localAppDir, "PackFileManager");
-                if (!Directory.Exists(localAppDir)) {
-                    Directory.CreateDirectory(localAppDir);
-                }
-                return localAppDir;
-            }
+
+            logger.Information("Application terminated sucsessfully");
         }
     }
 }

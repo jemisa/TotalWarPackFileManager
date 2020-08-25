@@ -74,16 +74,4 @@ namespace Common {
             return result.Trim();
         }
     }
-
-    public static class OSHelper
-    {
-        public static bool IsWindows()
-        {
-#if __MonoCS__
-            return false;
-#else
-            return true;
-#endif
-        }
-    }
 }

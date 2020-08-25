@@ -29,20 +29,11 @@ namespace PackFileManager
 
     class PackFileManagerSettingService
     {
-        public static string InstallationPath
-        {
-            get
-            {
-                return Path.GetDirectoryName(Application.ExecutablePath);
-            }
-        }
-
-
         public static string SettingsFile
         {
             get
             {
-                return Path.Combine(InstallationPath, "PackFileManagerSettings.txt");
+                return Path.Combine(DirectoryHelper.FpmDirectory, "PackFileManagerSettings.txt");
             }
         }
 

@@ -5,13 +5,64 @@
   },
   "projects": {
     "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj": {
+      "version": "1.0.0",
       "restore": {
         "projectUniqueName": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj",
         "projectName": "Common",
-        "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj"
+        "projectPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\Common.csproj",
+        "packagesPath": "C:\\Users\\ole_k\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Common\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\ole_k\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
       },
       "frameworks": {
-        "net472": {}
+        "net472": {
+          "dependencies": {
+            "Serilog": {
+              "target": "Package",
+              "version": "[2.9.0, )"
+            },
+            "Serilog.Enrichers.Thread": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
       }
     },
     "C:\\Users\\ole_k\\source\\repos\\TotalWarPackFileManager\\Filetypes\\Filetypes.csproj": {

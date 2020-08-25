@@ -97,9 +97,7 @@
                         Grid.Row="7" 
                         VerticalAlignment="Stretch"/>
                     <StackPanel Orientation="Horizontal" Grid.Row="8" HorizontalAlignment="Center">
-                        <Button Content="Save"  Width="100"/>
-                        <Button Content="Reset" Width="100" />
-                        <Button Content="Re-evaluate" Width="100"/>
+                        <Button Content="Save current table definition"  Width="200"/>
                     </StackPanel>
                 </Grid>
             </Grid>

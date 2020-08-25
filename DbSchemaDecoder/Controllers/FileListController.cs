@@ -35,10 +35,10 @@ namespace DbSchemaDecoder.Controllers
 
 
 
-        public FileListController(WindowState windowState)
+        public FileListController(WindowState windowState, string packFileDirectory)
         {
             _windowState = windowState;
-            Load(windowState.CurrentGame.GameDirectory);
+            Load(packFileDirectory);
 
             FileSelectedCommand = new RelayCommand<DatabaseFileViewModel>(OnFileSelected);
             FilterButtonCommand = new RelayCommand(OnFilter);
@@ -49,8 +49,7 @@ namespace DbSchemaDecoder.Controllers
 
         public void StartEvaluation()
         {
-
-            BatchEvaluator batchEvaluator = new BatchEvaluator(_internalFileList, _windowState.SchemaManager, _windowState.CurrentGame.GameType);
+            BatchEvaluator batchEvaluator = new BatchEvaluator(_internalFileList);
             batchEvaluator.OnCompleted += BatchEvaluator_OnCompleted;
 
             // Evaluate db files in a new thread to await waiting
@@ -129,7 +128,6 @@ namespace DbSchemaDecoder.Controllers
                     var dbEntry = IsDb(f);
                     if (dbEntry.HasValue)
                     {
-                        bool canDecode = PackedFileDbCodec.CanDecode(dbEntry.Value.Item2, out string errorMessage);
                         _internalFileList.Add(new DataBaseFile()
                         {
                             TableType = dbEntry.Value.Item1,

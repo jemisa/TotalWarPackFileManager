@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
+﻿using System.IO;
 using System.Text;
 
-namespace Common {
+namespace Common
+{
 
     /*
      * Utility methods to read common data from streams.
@@ -41,48 +39,6 @@ namespace Common {
             var strByteData = reader.ReadBytes(bytes);
             return encoding.GetString(strByteData);
         }
-
-        public static bool TryReadReadCAString(BinaryReader reader, Encoding encoding, out string stringResult)
-        {
-            var result = TryReadReadCAStringAsArray(reader, encoding, out var errorMessage, out var strByteData);
-            if (result)
-                stringResult = encoding.GetString(strByteData);
-            else
-                stringResult = errorMessage;
-            return result;
-        }
-
-        private static bool TryReadReadCAStringAsArray(BinaryReader reader, Encoding encoding, out string errorMessage, out byte[] stringArray)
-        {
-            stringArray = null;
-            if (reader.BaseStream.Length - reader.BaseStream.Position < 2)
-            {
-                errorMessage = $"Cannot read length of string {reader.BaseStream.Length - reader.BaseStream.Position} bytes left";
-                return false;
-            }
-
-            int num = reader.ReadInt16();
-            if (0 > num)
-            {
-                errorMessage = "Negative file length";
-                return false;
-            }
-
-            // Unicode is 2 bytes per character; UTF8 is variable, but the number stored is the number of bytes, so use that
-            int bytes = (encoding == Encoding.Unicode ? 2 : 1) * num;
-            // enough data left?
-            if (reader.BaseStream.Length - reader.BaseStream.Position < bytes)
-            {
-                errorMessage = string.Format("Cannot read string of length {0}: only {1} bytes left",
-                    bytes, reader.BaseStream.Length - reader.BaseStream.Position);
-                return false;
-            }
-
-            stringArray = reader.ReadBytes(bytes);
-            errorMessage = null;
-            return true;
-        }
-
 
         /*
          * Read a zero-terminated Unicode string.

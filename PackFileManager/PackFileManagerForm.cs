@@ -50,13 +50,8 @@ namespace PackFileManager
 
         private void CreateEditors()
         {
-            if (OSHelper.IsWindows())
-            {
-                // relies on win32 dll, so can't use it on Linux
-                PackedFileEditorRegistry.Editors.Add(new AtlasFileEditorControl { Dock = DockStyle.Fill });
-                PackedFileEditorRegistry.Editors.Add(WpfPackedFileEditorHost.Create<DBTableControl.DBEditorTableControl>());
-            }
-
+            PackedFileEditorRegistry.Editors.Add(new AtlasFileEditorControl { Dock = DockStyle.Fill });
+            PackedFileEditorRegistry.Editors.Add(WpfPackedFileEditorHost.Create<DBTableControl.DBEditorTableControl>());
             PackedFileEditorRegistry.Editors.Add(new ImageViewerControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new LocFileEditorControl { Dock = DockStyle.Fill });
             PackedFileEditorRegistry.Editors.Add(new GroupformationEditor { Dock = DockStyle.Fill });
@@ -185,11 +180,7 @@ namespace PackFileManager
                 Height = 900
             };
 
-
-            SchemaManager schemaManager = new SchemaManager();
-            schemaManager.Create();
-
-            var window = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame, schemaManager);
+            var window = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);
             var r = WpfPackedFileEditorHost.Create(window);
             r.Dock = DockStyle.Fill;
             form.Controls.Add(r);
@@ -264,7 +255,7 @@ namespace PackFileManager
         
         private string SizeLocationFile {
             get {
-                return Path.Combine(Program.ApplicationFolder, "window_state.txt");
+                return Path.Combine(DirectoryHelper.FpmDirectory, "window_state.txt");
             }
         }
 

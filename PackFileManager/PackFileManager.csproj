@@ -7,7 +7,7 @@
     <ProjectGuid>{BED0F2F6-BD7B-4D6D-8959-98A6E9B6F88A}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <AssemblyName>PackFileManager</AssemblyName>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
@@ -66,6 +66,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\Warhammer2.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

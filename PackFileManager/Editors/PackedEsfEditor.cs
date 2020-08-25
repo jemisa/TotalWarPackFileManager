@@ -98,7 +98,7 @@ namespace PackFileManager {
         }
         string BookmarkPath {
             get {
-                return Path.Combine(Program.ApplicationFolder, BOOKMARKS_FILE_NAME);
+                return Path.Combine(DirectoryHelper.FpmDirectory, BOOKMARKS_FILE_NAME);
             }
         }
         private void SaveBookmarks() {

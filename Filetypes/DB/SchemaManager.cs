@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Filetypes.ByteParsing;
+using System.Runtime.CompilerServices;
 
 namespace Filetypes.DB
 {
@@ -41,25 +42,15 @@ namespace Filetypes.DB
         public bool IsCreated { get; private set; } = false;
         public SchemaManager()
         {
-            BasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
         public void Create()
         {
             if (IsCreated)
                 return;
-            
-            // Depricated fool
-            string path = BasePath + "\\Files\\" + "DepricatedMasterSchema.json";
-            var content = LoadSchemaFile(path);
-            if (content != null)
-                _gameTableDefinitions.Add(GameTypeEnum.Unknown, content);
-
-            // Games
+           
             foreach (var game in Game.Games)
-            {
                 Load(game.GameType);
-            }
 
             IsCreated = true;
         }
@@ -79,27 +70,28 @@ namespace Filetypes.DB
 
         public bool IsSupported(string tableName)
         {
-            return true;
+            var definition = GetTableDefinitionsForTable(tableName);
+            if (definition.Count != 0)
+                return true;
+            return false;
         }
 
-        public List<DbTableDefinition> GetTableDefinitionsForTable(GameTypeEnum gameType, string tableName)
+        public List<DbTableDefinition> GetTableDefinitionsForTable( string tableName)
         {
-            if (!_gameTableDefinitions.ContainsKey(gameType))
+            if (!_gameTableDefinitions.ContainsKey(CurrentGame))
                 return new List<DbTableDefinition>();
 
-            if (_gameTableDefinitions[gameType].TableDefinitions.ContainsKey(tableName))
-                return _gameTableDefinitions[gameType].TableDefinitions[tableName];
+            if (_gameTableDefinitions[CurrentGame].TableDefinitions.ContainsKey(tableName))
+                return _gameTableDefinitions[CurrentGame].TableDefinitions[tableName];
             return new List<DbTableDefinition>();
         }
 
         public DbTableDefinition GetTableDefinitionsForTable(string tableName, int version)
         {
-            throw new NotImplementedException();
-        }
-
-        public Dictionary<string, List<DbTableDefinition>> GetDepricated()
-        {
-            return GetTableDefinitions(GameTypeEnum.Unknown);
+            var def = GetTableDefinitionsForTable(tableName).FirstOrDefault(x => x.Version == version);
+            if (def != null)
+                return def;
+            return new  DbTableDefinition();
         }
 
         public bool Save(GameTypeEnum game)
@@ -116,11 +108,11 @@ namespace Filetypes.DB
         {
             if (_gameTableDefinitions.ContainsKey(game))
                 return;
-            string path = BasePath + "\\Files\\" + Game.GetByEnum(game).Id + "_schema.json";
+            
+            string path = DirectoryHelper.SchemaDirectory + "\\" + Game.GetByEnum(game).Id + "_schema.json";
             var content = LoadSchemaFile(path);
             if (content != null)
                 _gameTableDefinitions.Add(game, content);
-
         }
 
         SchemaFile LoadSchemaFile(string path)

@@ -277,7 +277,7 @@ namespace PackFileManager {
         }
         string ModListSaveFile {
             get {
-                return Path.Combine(Program.ApplicationFolder, "modlist.txt");
+                return Path.Combine(DirectoryHelper.FpmDirectory, "modlist.txt");
             }
         }
         #endregion
@@ -330,7 +330,7 @@ namespace PackFileManager {
         }
         static string CurrentModSaveFile {
             get {
-                return Path.Combine(Program.ApplicationFolder, "currentMod.txt");
+                return Path.Combine(DirectoryHelper.FpmDirectory, "currentMod.txt");
             }
         }
         #endregion

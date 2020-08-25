@@ -46,7 +46,6 @@ namespace DbSchemaDecoder.Util
         public event EventHandler<List<Result>> OnErrorParsingCompleted;
 
         // Game
-        public Game CurrentGame { get; set; }
         public SchemaManager SchemaManager { get; set; }
     }
 }
