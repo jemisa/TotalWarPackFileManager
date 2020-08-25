@@ -203,14 +203,12 @@ namespace DbSchemaDecoder.Util
         {
             _possibleCombinations = new DbTypesEnum[]
             {
-                 DbTypesEnum.Boolean,
                 DbTypesEnum.String_ascii,
                 DbTypesEnum.String,
-                DbTypesEnum.Integer,
-                
                 DbTypesEnum.Optstring_ascii,
                 DbTypesEnum.Optstring,
-               
+                DbTypesEnum.Boolean,
+                DbTypesEnum.Integer,
             };
         }
         public DbTypesEnum[] GetPossibleCombinations(int index)
@@ -245,6 +243,7 @@ namespace DbSchemaDecoder.Util
                 case "double":
                     return new DbTypesEnum[] { DbTypesEnum.Single };
                 case "autonumber":
+                    return new DbTypesEnum[] { DbTypesEnum.Integer, DbTypesEnum.Int64 };
                 case "integer":
                     return new DbTypesEnum[] { DbTypesEnum.Integer};
                 case "text":

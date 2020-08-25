@@ -14,13 +14,15 @@
         </Grid.ColumnDefinitions>
         <Label x:Name="DescriptionTextBox" VerticalAlignment="Top"  Grid.Column="0"
                Content="{Binding Path=CustomDisplayText, UpdateSourceTrigger=PropertyChanged}" Height="23" />
+        
         <TextBox x:Name="ValueTextBox" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1"
                  Text="{Binding Path=ValueText, UpdateSourceTrigger=PropertyChanged}"
-                 IsReadOnly="True"/>
+                 IsReadOnly="True"
+                 Background="{Binding Path=BackgroundColour, UpdateSourceTrigger=PropertyChanged}"/>
+        
         <Button x:Name="UseButton" Content="{Binding Path=ButtonText, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Height="23" Grid.Column="2"
                 Command="{Binding CustomButtonPressedCommand}"
-                CommandParameter="{Binding}"
-                />
+                CommandParameter="{Binding}"/>
         
     </Grid>
 </UserControl>

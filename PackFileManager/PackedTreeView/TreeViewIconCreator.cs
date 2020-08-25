@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Common;
+using Serilog;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PackFileManager.PackedTreeView
 {
     public class TreeViewIconCreator
     {
+        ILogger _logger = Logging.Create<TreeViewIconCreator>();
         int _imagePixelSize = 16;
 
         public Image Folder { get; set; }
@@ -20,10 +19,17 @@ namespace PackFileManager.PackedTreeView
 
         public void Load()
         {
-            Folder = LoadAndResize(@"Resources\TreeViewIcons\icons8-folder-48.png");
-            DefaultFile = LoadAndResize(@"Resources\TreeViewIcons\icons8-file-48.png");
-            TextFile = LoadAndResize(@"Resources\TreeViewIcons\icons8-txt-48.png");
-            DatabaseFile = LoadAndResize(@"Resources\TreeViewIcons\icons8-database-48.png");
+            try
+            {
+                Folder = LoadAndResize(@"Resources\TreeViewIcons\icons8-folder-48.png");
+                DefaultFile = LoadAndResize(@"Resources\TreeViewIcons\icons8-file-48.png");
+                TextFile = LoadAndResize(@"Resources\TreeViewIcons\icons8-txt-48.png");
+                DatabaseFile = LoadAndResize(@"Resources\TreeViewIcons\icons8-database-48.png");
+            }
+            catch (Exception e)
+            {
+                _logger.Fatal(e.Message);
+            }
         }
 
         Image LoadAndResize(string path)

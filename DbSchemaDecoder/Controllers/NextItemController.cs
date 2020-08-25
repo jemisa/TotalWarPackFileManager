@@ -14,12 +14,24 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DbSchemaDecoder.Controllers
 {
 
     public class NextItemControllerItem : NotifyPropertyChangedImpl
     {
+        SolidColorBrush _backgroundColour = new SolidColorBrush(Colors.White);
+        public SolidColorBrush BackgroundColour
+        {
+            get { return _backgroundColour; }
+            set
+            {
+                _backgroundColour = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         string _CustomDisplayText;
         public string CustomDisplayText
         {
@@ -80,8 +92,11 @@ namespace DbSchemaDecoder.Controllers
             Create(DbTypesEnum.Optstring_ascii);
             Create(DbTypesEnum.String);
             Create(DbTypesEnum.Optstring);
+            Create(DbTypesEnum.Int64);
             Create(DbTypesEnum.Integer);
             Create(DbTypesEnum.Single);
+            Create(DbTypesEnum.Short);
+            Create(DbTypesEnum.Byte);
             Create(DbTypesEnum.Boolean);
 
             _windowState = windowState;
@@ -107,31 +122,18 @@ namespace DbSchemaDecoder.Controllers
             var parser = ByteParserFactory.Create(viewModelRef.EnumValue);
             var result = parser.TryDecode(data, index, out string value, out var _, out string error);
             if (result == false)
+            {
                 viewModelRef.ValueText = "Error:" + error;
+                viewModelRef.BackgroundColour = new SolidColorBrush(Colors.Pink); 
+            }
             else
+            {
                 viewModelRef.ValueText = value;
+                viewModelRef.BackgroundColour = new SolidColorBrush(Colors.White);
+            }
 
             if (value == null)
                 return;
-            if (viewModelRef.EnumValue == DbTypesEnum.String)
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(value);
-                var isCorrect = bytes.All(b => b >= 32 && b <= 127);
-                if (isCorrect)
-                {
-                   
-                }
-            }
-
-            if (viewModelRef.EnumValue == DbTypesEnum.String_ascii)
-            {
-                byte[] bytes = Encoding.Unicode.GetBytes(value);
-                var isAscii = bytes.All(b => b >= 32 && b <= 127);
-                if (isAscii)
-                {
-
-                }
-            }
         }
 
         public void OnButtonPressed(NextItemControllerItem val)

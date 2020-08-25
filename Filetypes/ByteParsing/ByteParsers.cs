@@ -384,6 +384,9 @@ namespace Filetypes.ByteParsing
                 case DbTypesEnum.uint32:
                     return ByteParsers.UInt32;
 
+                case DbTypesEnum.Byte:
+                    return ByteParsers.Byte;
+
                 case DbTypesEnum.List:
                     throw new NotImplementedException();
             }

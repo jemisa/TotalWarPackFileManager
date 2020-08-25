@@ -150,15 +150,7 @@
             dict.TryGetValue(key, out result);
             return result != null ? result : new SortedSet<string>();
         }
-        public void ResetIgnores(string key)
-        {
-            Dictionary<string, SortedSet<string>> dict = decode(IgnoreColumns);
-            if (dict.ContainsKey(key))
-            {
-                dict.Remove(key);
-            }
-            IgnoreColumns = encode(dict);
-        }
+
         private string encode(Dictionary<string, SortedSet<string>> encode)
         {
             string encoded = "";
@@ -193,34 +185,6 @@
                 }
             }
             return result;
-        }
-
-        [DefaultSettingValue("False"), UserScopedSetting]
-        public bool ShowAllColumns
-        {
-            get
-            {
-                return (bool)this["ShowAllColumns"];
-            }
-            set
-            {
-                this["ShowAllColumns"] = value;
-                Save();
-            }
-        }
-
-        [DebuggerNonUserCode, DefaultSettingValue("True"), UserScopedSetting]
-        public bool UseComboboxCells
-        {
-            get
-            {
-                return (bool)this["UseComboboxCells"];
-            }
-            set
-            {
-                this["UseComboboxCells"] = value;
-                Save();
-            }
         }
 
         [DebuggerNonUserCode, DefaultSettingValue("True"), UserScopedSetting]

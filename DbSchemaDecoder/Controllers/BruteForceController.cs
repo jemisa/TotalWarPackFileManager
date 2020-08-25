@@ -148,6 +148,12 @@ namespace DbSchemaDecoder.Controllers
                 return;
             }
 
+            if (_windowState.SelectedFile == null)
+            {
+                _logger.Information($"No file selected");
+                return;
+            }
+
             _logger.Information($"Computing");
             var bruteForceMethod = (BruteForceCalculatorType)ViewModel.ComputeType;
             IBruteForceCombinationProvider combinationProvider = GetCombinationProvider(bruteForceMethod);
@@ -167,10 +173,11 @@ namespace DbSchemaDecoder.Controllers
 
             _viewHolder = new Dictionary<BruteForceParser, TempDisplayValues>();
 
-      
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
             DBFileHeader header = PackedFileDbCodec.readHeader(_windowState.SelectedFile.DbFile);
             var preCalc = new PreCalc();
             preCalc.PreCompute(_windowState.SelectedFile.DbFile.Data, header.Length);
+            Mouse.OverrideCursor = null;
 
             ViewModel.RunningStatus = "Running";
 

@@ -2,6 +2,7 @@
 using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.ByteParsing;
+using Filetypes.Codecs;
 using Filetypes.DB;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
@@ -42,6 +43,8 @@ namespace DbSchemaDecoder.Controllers
         public ICommand DbMetaDataAppliedCommand { get; private set; }
         public ICommand OnRemoveMetaDataCommand { get; private set; }
 
+        public ICommand OnSaveCommand { get; private set; }
+
         WindowState _windowState;
 
         public DbTableDefinitionController(WindowState windowState)
@@ -59,6 +62,22 @@ namespace DbSchemaDecoder.Controllers
             DeselectCommand = new RelayCommand(OnDeselectCommand);
             OnRemoveMetaDataCommand = new RelayCommand(OnRemoveMetaData);
             DbMetaDataAppliedCommand = new RelayCommand<CaSchemaEntry>(OnMetaDataApplied);
+            OnSaveCommand = new RelayCommand(OnSave);
+        }
+
+        void OnSave()
+        {
+            DBFileHeader header = PackedFileDbCodec.readHeader(_windowState.SelectedFile.DbFile);
+            var def = new DbTableDefinition()
+            {
+                ColumnDefinitions = TableTypeInformationRows.Select(x => x.GetFieldInfo()).ToList(),
+                Version = header.Version,
+                TableName = _windowState.SelectedFile.TableType
+            };
+
+            SchemaManager.Instance.UpdateCurrentTableDefinition(def);
+
+            _windowState.TriggerErrorCheck();
         }
 
         void UpdateMetaDataList()

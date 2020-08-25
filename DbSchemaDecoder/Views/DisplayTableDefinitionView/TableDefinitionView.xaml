@@ -65,7 +65,7 @@
 
         </util:DataGridEx>
         <StackPanel Grid.Row="1" Grid.Column="1">
-            <Button Content="Save current table definition"  Width="200" />
+            <Button Content="Save current table definition"  Width="200"   Command="{Binding DbTableDefinitionController.OnSaveCommand}" />
         </StackPanel>
     </Grid>
 </UserControl>

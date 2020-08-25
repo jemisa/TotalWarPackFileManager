@@ -8,6 +8,7 @@ using GalaSoft.MvvmLight.Threading;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Threading;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -41,8 +42,9 @@ namespace DbSchemaDecoder.Controllers
         public FileListController(WindowState windowState, string packFileDirectory)
         {
             _windowState = windowState;
+            _windowState.OnTriggerErrorCheck += (sender, arg) => StartEvaluation();
+            
             Load(packFileDirectory);
-
             FileSelectedCommand = new RelayCommand<DatabaseFileViewModel>(OnFileSelected);
             FilterButtonCommand = new RelayCommand(OnFilter);
             OnlyShowTablesWithErrorCommand = new RelayCommand(OnFilter);

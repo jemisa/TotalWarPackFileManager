@@ -61,6 +61,9 @@ namespace DbSchemaDecoder
             var dbParsedEntitiesTableView = ControllerHelper.FindController<DbParsedEntitiesTableView>(parent);
             dbParsedEntitiesTableView.DataContext = _mainController;
             dbTableItemSourceUpdater.Grid = dbParsedEntitiesTableView.DbEntriesViewDataGrid;
+
+            // Hide hex view
+            OnShowHexClick(null, null);
         }
 
 

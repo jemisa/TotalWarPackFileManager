@@ -45,7 +45,7 @@ namespace DbSchemaDecoder.Util
         public List<Result> FileParsingErrors { get { return _parsingErrors; } set { _parsingErrors = value; OnErrorParsingCompleted?.Invoke(null, _parsingErrors); } }
         public event EventHandler<List<Result>> OnErrorParsingCompleted;
 
-        // Game
-        public SchemaManager SchemaManager { get; set; }
+        public void TriggerErrorCheck() { OnTriggerErrorCheck?.Invoke(null, null); }
+        public event EventHandler OnTriggerErrorCheck;
     }
 }

@@ -14,8 +14,6 @@ using Filetypes.Codecs;
 using DBTableControl;
 using PackFileManager.Editors;
 using System.Linq;
-using System.Collections.ObjectModel;
-using Aga.Controls.Tree;
 using PackFileManager.Dialogs.Settings;
 using Filetypes.DB;
 
@@ -82,8 +80,6 @@ namespace PackFileManager
                         "First start", MessageBoxButtons.YesNo) == DialogResult.Yes);
                     Settings.Default.FirstStart = false;
                 }
-                //if (Settings.Default.UpdateOnStartup)
-                    //TryUpdate (false);
             }
             catch {}
 
@@ -172,19 +168,6 @@ namespace PackFileManager
             _packTreeView.GetTreeView().SelectionChanged += packTreeView_AfterSelect;
             _packTreeView.GetTreeView().PreviewKeyDown += packTreeView_PreviewKeyDown;
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
-
-
-            var form = new Form()
-            { 
-                Width = 1400,
-                Height = 900
-            };
-
-            var window = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);
-            var r = WpfPackedFileEditorHost.Create(window);
-            r.Dock = DockStyle.Fill;
-            form.Controls.Add(r);
-            form.Show();
         }
         
         #region Form Management
@@ -509,11 +492,9 @@ namespace PackFileManager
             deleteFileToolStripMenuItem.Enabled = CanWriteCurrentPack && nodeSelected && !isRootNode;
         }
 
-        private void OpenDirectory(object sender, EventArgs args) {
-            string pathToOpen = ((ToolStripMenuItem)sender).Tag as string;
-            if (pathToOpen != null && Directory.Exists(pathToOpen)) {
-                Process.Start("explorer", pathToOpen);
-            }
+        private void OpenDirectory(object sender, EventArgs args) 
+        {
+            Process.Start("explorer", DirectoryHelper.FpmDirectory);
         }
         #endregion
 
@@ -1272,7 +1253,8 @@ namespace PackFileManager
             Settings.Default.UpdateOnStartup = updateOnStartupToolStripMenuItem.Checked;
         }
 
-        private void subscribeToBetaToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void subscribeToBetaToolStripMenuItem_Click(object sender, EventArgs e) 
+        {
             Settings.Default.SubscribeToBetaSchema = subscribeToBetaToolStripMenuItem.Checked;
         }
 
@@ -1466,6 +1448,20 @@ namespace PackFileManager
             {
                 form.ShowDialog();
             }
+        }
+
+        private void dBDecoderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var containerForm = new Form()
+            {
+                Width = 1600,
+                Height = 1000
+            };
+
+            var dbDecoder = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);
+            var wpfWindow = WpfPackedFileEditorHost.Create(dbDecoder);
+            containerForm.Controls.Add(wpfWindow);
+            containerForm.Show();
         }
     }
 }

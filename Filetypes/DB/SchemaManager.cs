@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Filetypes.ByteParsing;
 using System.Runtime.CompilerServices;
+using Serilog;
 
 namespace Filetypes.DB
 {
@@ -30,8 +31,9 @@ namespace Filetypes.DB
 
     public class SchemaManager
     {
+        ILogger _logger = Logging.Create<SchemaManager>();
+
         public static string LocTableName { get { return "LocTable"; } }
-        public string BasePath { get; set; }
 
         Dictionary<GameTypeEnum, SchemaFile> _gameTableDefinitions = new Dictionary<GameTypeEnum, SchemaFile>();
 
@@ -48,7 +50,10 @@ namespace Filetypes.DB
         {
             if (IsCreated)
                 return;
-           
+
+            _logger.Information("Created");
+
+
             foreach (var game in Game.Games)
                 Load(game.GameType);
 
@@ -58,7 +63,34 @@ namespace Filetypes.DB
         public void UpdateCurrentTableDefinitions(SchemaFile schemaFile)
         {
             _gameTableDefinitions[CurrentGame] = schemaFile;
-            Save(CurrentGame);
+            Save();
+        }
+
+        public void UpdateCurrentTableDefinition(DbTableDefinition newTableDefinition)
+        {
+            if (_gameTableDefinitions[CurrentGame].TableDefinitions.ContainsKey(newTableDefinition.TableName))
+            {
+                var added = false;
+                var defs = _gameTableDefinitions[CurrentGame].TableDefinitions[newTableDefinition.TableName];
+                for (int i = 0; i < defs.Count; i++)
+                {
+                    if (defs[i].Version == newTableDefinition.Version)
+                    {
+                        defs[i].ColumnDefinitions = newTableDefinition.ColumnDefinitions;
+                        added = true;
+                        break;
+                    }
+                }
+
+                if (added == false)
+                    _gameTableDefinitions[CurrentGame].TableDefinitions[newTableDefinition.TableName].Add(newTableDefinition);
+            }
+            else
+            {
+                _gameTableDefinitions[CurrentGame].TableDefinitions.Add(newTableDefinition.TableName, new List<DbTableDefinition>());
+                _gameTableDefinitions[CurrentGame].TableDefinitions[newTableDefinition.TableName].Add(newTableDefinition);
+            }
+            Save();
         }
 
         public Dictionary<string, List<DbTableDefinition>> GetTableDefinitions(GameTypeEnum gameType)
@@ -94,14 +126,23 @@ namespace Filetypes.DB
             return new  DbTableDefinition();
         }
 
-        public bool Save(GameTypeEnum game)
+        public bool Save()
         {
-            if (!_gameTableDefinitions.ContainsKey(game))
-                return false;
-            string path = BasePath + "\\Files\\" + Game.GetByEnum(game).Id + "_schema.json";
-            var content = JsonConvert.SerializeObject(_gameTableDefinitions[game], Formatting.Indented);
-            File.WriteAllText(path, content);
-            return true;
+            _logger.Information("Trying to save file");
+            try
+            {
+                if (!_gameTableDefinitions.ContainsKey(CurrentGame))
+                    return false;
+                string path = DirectoryHelper.SchemaDirectory + "\\" + Game.GetByEnum(CurrentGame).Id + "_schema.json";
+                var content = JsonConvert.SerializeObject(_gameTableDefinitions[CurrentGame], Formatting.Indented);
+                File.WriteAllText(path, content);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.Fatal(e.Message);
+                throw e;
+            }
         }
 
         void Load(GameTypeEnum game)
