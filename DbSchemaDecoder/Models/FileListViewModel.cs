@@ -69,6 +69,47 @@ namespace DbSchemaDecoder.Models
             }
         }
 
+        bool _onlyShowUniqueTables;
+        public bool OnlyShowUniqueTables
+        {
+            get
+            {
+                return _onlyShowUniqueTables;
+            }
+            set
+            {
+                _onlyShowUniqueTables = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        bool _onlyShowTablesWithContent;
+        public bool OnlyShowTablesWithContent
+        {
+            get
+            {
+                return _onlyShowTablesWithContent;
+            }
+            set
+            {
+                _onlyShowTablesWithContent = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int _itemsInFilter = 0;
+        public int ItemsInFilter
+        {
+            get
+            {
+                return _itemsInFilter;
+            }
+            set
+            {
+                _itemsInFilter = value;
+                NotifyPropertyChanged();
+            }
+        }
         public ObservableCollection<DatabaseFileViewModel> FileList { get; set; } = new ObservableCollection<DatabaseFileViewModel>();
 
     }

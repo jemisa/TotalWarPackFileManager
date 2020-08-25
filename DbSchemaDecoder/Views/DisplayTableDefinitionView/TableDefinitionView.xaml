@@ -12,6 +12,10 @@
             <ColumnDefinition Width="20"></ColumnDefinition>
             <ColumnDefinition Width="1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="16"></RowDefinition>
+        </Grid.RowDefinitions>
         <DockPanel Grid.Column="0" LastChildFill="false">
             <Button DockPanel.Dock="Top" Content="▲" Height="20" Command="{Binding DbTableDefinitionController.DbDefinitionMovedUpCommand}"></Button>
             <Button DockPanel.Dock="Bottom" Content="▼" Height="20" Command="{Binding DbTableDefinitionController.DbDefinitionMovedDownCommand}"></Button>
@@ -59,9 +63,9 @@
                     Command="{Binding DbTableDefinitionController.DbDefinitionRemovedCommand}" />
             </DataGrid.InputBindings>
 
-
-
         </util:DataGridEx>
-
+        <StackPanel Grid.Row="1" Grid.Column="1">
+            <Button Content="Save current table definition"  Width="200" />
+        </StackPanel>
     </Grid>
 </UserControl>

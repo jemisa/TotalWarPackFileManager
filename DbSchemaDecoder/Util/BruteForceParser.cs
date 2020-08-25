@@ -86,8 +86,9 @@ namespace DbSchemaDecoder.Util
 
         PreCalc _preCalc;
 
-        public BruteForceParser(DataBaseFile dataBaseFile, IBruteForceCombinationProvider combinationProvider, int maxNumberOfFields)
+        public BruteForceParser(PreCalc preCalc, DataBaseFile dataBaseFile, IBruteForceCombinationProvider combinationProvider, int maxNumberOfFields)
         {
+            _preCalc = preCalc;
             _file = dataBaseFile;
             _maxNumberOfFields = maxNumberOfFields;
             _combinationProvider = combinationProvider;
@@ -100,8 +101,8 @@ namespace DbSchemaDecoder.Util
         }
         public void Compute()
         {
-            _preCalc = new PreCalc();
-            _preCalc.PreCompute(_tableData, _headerLength);
+            //_preCalc = new PreCalc();
+            //_preCalc.PreCompute(_tableData, _headerLength);
 
             var max = new AllCombinations().GetPossibleCombinations(0).Length;
             _permutationHelper = new PermutationHelper(OnEvaluatePermutation, _maxNumberOfFields, max);
@@ -171,21 +172,21 @@ namespace DbSchemaDecoder.Util
             for (int i = 0; i < states.Length; i++)
             {
                 var currentState = states[i];
-                var possible = precalc._preComputeTable[bufferIndex];
-                if (possible.ContainsKey(currentState))
+                if (bufferIndex < precalc._preComputeTable.Count)
                 {
-                    var offset = possible[currentState];
-                    n[idx] = currentState;
-                    ComputePermutations(precalc, buffer, n, combinationProvider, idx + 1, offset, maxNumberOfFields);
-                }
-                else
-                {
-                    var realCount = n.Count() - idx -1;
-                    var skippedCount = _powTable[idx+1];
-
-
-                    SkippedEarlyPermutations += skippedCount;
-                    ComputedPermutations += skippedCount;
+                    var possible = precalc._preComputeTable[bufferIndex];
+                    if (possible.ContainsKey(currentState))
+                    {
+                        var offset = possible[currentState];
+                        n[idx] = currentState;
+                        ComputePermutations(precalc, buffer, n, combinationProvider, idx + 1, offset, maxNumberOfFields);
+                    }
+                    else
+                    {
+                        var skippedCount = _powTable[idx + 1];
+                        SkippedEarlyPermutations += skippedCount;
+                        ComputedPermutations += skippedCount;
+                    }
                 }
             }
         }

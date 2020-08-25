@@ -1,6 +1,7 @@
 ﻿using Common;
 using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
+using Filetypes;
 using Filetypes.Codecs;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
@@ -27,6 +28,8 @@ namespace DbSchemaDecoder.Controllers
         public ICommand FileSelectedCommand { get; private set; }
         public ICommand FilterButtonCommand { get; private set; }
         public ICommand OnlyShowTablesWithErrorCommand { get; private set; }
+        public ICommand OnlyShowUniqueTablesCommand { get; private set; }
+        public ICommand OnlyShowTablesWithContentCommand { get; private set; }
 
         // Internal variables
         List<DataBaseFile> _internalFileList = new List<DataBaseFile>();
@@ -42,8 +45,9 @@ namespace DbSchemaDecoder.Controllers
 
             FileSelectedCommand = new RelayCommand<DatabaseFileViewModel>(OnFileSelected);
             FilterButtonCommand = new RelayCommand(OnFilter);
-            OnlyShowTablesWithErrorCommand = new RelayCommand(OnShowOnlyTablesWithErrors);
-
+            OnlyShowTablesWithErrorCommand = new RelayCommand(OnFilter);
+            OnlyShowUniqueTablesCommand = new RelayCommand(OnFilter);
+            OnlyShowTablesWithContentCommand = new RelayCommand(OnFilter);
             StartEvaluation();
         }
 
@@ -73,11 +77,6 @@ namespace DbSchemaDecoder.Controllers
                 _windowState.SelectedFile = state.DataBaseFile;
         }
 
-        private void OnShowOnlyTablesWithErrors()
-        {
-            BuildFileList();
-        }
-
         private void OnFilter()
         {
             BuildFileList();
@@ -91,6 +90,22 @@ namespace DbSchemaDecoder.Controllers
                 items = _internalFileList.Where(x => _windowState.FileParsingErrors.First(e => e.TableType == x.TableType).HasError);
             else
                 items = _internalFileList.AsEnumerable();
+
+            if (ViewModel.OnlyShowUniqueTables)
+                items = items.GroupBy(x => x.TableType).Select(x => x.First());
+
+            if (ViewModel.OnlyShowTablesWithContent)
+            {
+                List<DataBaseFile> itemsWithContent = new List<DataBaseFile>();
+                foreach (var item in items)
+                {
+                    DBFileHeader header = PackedFileDbCodec.readHeader(item.DbFile);
+                    if (header.EntryCount != 0)
+                        itemsWithContent.Add(item);
+                }
+
+                items = itemsWithContent;
+            }
 
             if (!string.IsNullOrWhiteSpace(ViewModel.SearchFilter))
                 items = items.Where(x => CultureInfo.CurrentCulture.CompareInfo.IndexOf(x.TableType, ViewModel.SearchFilter, CompareOptions.IgnoreCase) >= 0);
@@ -107,6 +122,8 @@ namespace DbSchemaDecoder.Controllers
                 model.DataBaseFile = item;  
                 ViewModel.FileList.Add(model);
             }
+
+            ViewModel.ItemsInFilter = ViewModel.FileList.Count;
         }
 
         public void Load(string gameDir)

@@ -343,14 +343,18 @@ namespace Common {
             if (containedFiles.ContainsKey(file.Name)) 
             {
                 PackedFile contained = null;
-                foreach (var f in containedFiles) 
+                if (containedFiles.ContainsKey(file.Name))
+                {
+                    contained = containedFiles[file.Name];
+                }
+                /*foreach (var f in containedFiles) 
                 {
                     if (f.Value.Name == file.Name) 
                     {
                         contained = f.Value;
                         break;
                     }
-                }
+                }*/
                 if (contained.Deleted || overwrite) 
                 {
                     containedFiles.Remove (file.Name);

@@ -187,6 +187,19 @@ namespace DbSchemaDecoder.Models
             }
         }
 
+        public bool _replaceMetaData;
+
+        public bool ReplaceMetaData
+        {
+            get { return _replaceMetaData; }
+            set
+            {
+                _replaceMetaData = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
 
     }
 }

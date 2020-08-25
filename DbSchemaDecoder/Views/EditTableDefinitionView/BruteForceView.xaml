@@ -104,6 +104,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content= "{Binding Path=BruteForceController.ViewModel.CalculateButtonText, UpdateSourceTrigger=PropertyChanged}"  Margin="10,0,0,0" Width="70" Command="{Binding BruteForceController.ComputeBruteForceCommand}"></Button>
                 <Button Content="Save" Width="100" Margin="10,0,0,0" Command="{Binding BruteForceController.SaveResultCommand}"></Button>
+                <CheckBox Content="Replace Metadata on application" IsChecked="{Binding BruteForceController.ViewModel.ReplaceMetaData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
         </StackPanel>
         <ListView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" x:Name="listView1"

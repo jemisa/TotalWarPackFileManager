@@ -10,7 +10,7 @@
     <Grid>
         <ListView x:Name="FileListView1"  
                   ItemsSource="{Binding ViewModel.FileList}" SelectedItem="{Binding SelectedItem}" 
-                  Margin="0,0,0,50">
+                  Margin="0,0,0,75">
 
 
 
@@ -23,7 +23,7 @@
             </i:Interaction.Triggers>
 
 
-            
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock  Text="{Binding DataBaseFile.TableType , UpdateSourceTrigger=PropertyChanged}">
@@ -41,30 +41,49 @@
             TextWrapping="Wrap" 
             HorizontalContentAlignment="Stretch" 
             Height="25" 
-            Margin="0,400,74,25" 
+            Margin="0,0,74,50" 
             VerticalAlignment="Bottom" FontSize="18">
 
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding FilterButtonCommand}"/>
             </TextBox.InputBindings>
         </TextBox>
-            
+
 
         <Button 
             Content="Filter"
             HorizontalAlignment="Right"
-            Margin="0,0,0,25" 
+            Margin="0,0,0,50" 
             VerticalAlignment="Bottom" 
             Width="74" 
             Height="25"
             Command="{Binding FilterButtonCommand}"
             />
-        
+
+     
+        <ToggleButton 
+            Content="Only show with content" 
+            IsChecked="{Binding ViewModel.OnlyShowTablesWithContent, Mode=TwoWay}"
+            HorizontalAlignment="Right" 
+            Margin="0,0,79,25" 
+            VerticalAlignment="Bottom" 
+            Width="140"
+            Command="{Binding OnlyShowTablesWithContentCommand}"/>
+
+        <ToggleButton 
+            Content="Only Unique" 
+            IsChecked="{Binding ViewModel.OnlyShowUniqueTables, Mode=TwoWay}"
+            HorizontalAlignment="Left" 
+            Margin="0,0,224,25" 
+            VerticalAlignment="Bottom" 
+            Width="76"
+            Command="{Binding OnlyShowUniqueTablesCommand}"/>
+
         <ToggleButton 
             Content="Only errors" 
             IsChecked="{Binding ViewModel.OnlyShowTablesWithErrors, Mode=TwoWay}"
             HorizontalAlignment="Right" 
-            Margin="226,428,0,0" 
+            Margin="0,0,0,25" 
             VerticalAlignment="Bottom" 
             Width="74"
             Command="{Binding OnlyShowTablesWithErrorCommand}"/>
@@ -75,6 +94,8 @@
                 <Run Text="{Binding ViewModel.TotalDbFiles}"/>
                 <Run Text="   With error:"></Run>
                 <Run Text="{Binding ViewModel.DbFilesWithError}"/>
+                <Run Text="   In Filter:"></Run>
+                <Run Text="{Binding ViewModel.ItemsInFilter}"/>
             </TextBlock>
         </Label>
     </Grid>

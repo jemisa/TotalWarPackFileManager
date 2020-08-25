@@ -165,10 +165,13 @@ namespace DbSchemaDecoder.Controllers
                 endIndex = _windowState.SelectedDbSchemaRow.Index - 1;
             for (int i = 0; i < endIndex; i++)
             {
-                var byteParserType = _windowState.DbSchemaFields[i].Type;
-                var parser = ByteParserFactory.Create(byteParserType);
-                parser.TryDecode(_windowState.SelectedFile.DbFile.Data, index, out _, out var bytesRead, out _);
-                index += bytesRead;
+                if (i < _windowState.DbSchemaFields.Count)
+                {
+                    var byteParserType = _windowState.DbSchemaFields[i].Type;
+                    var parser = ByteParserFactory.Create(byteParserType);
+                    parser.TryDecode(_windowState.SelectedFile.DbFile.Data, index, out _, out var bytesRead, out _);
+                    index += bytesRead;
+                }
             }
 
             for (int i = 0; i < Items.Count; i++)

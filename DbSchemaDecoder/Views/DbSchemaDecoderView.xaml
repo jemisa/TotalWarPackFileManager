@@ -80,7 +80,6 @@
 
                         <RowDefinition  Height="16" />
                         <RowDefinition  x:Name="TableAnalyticsRow"/>
-                        <RowDefinition  Height="16" />
                     </Grid.RowDefinitions>
                     
                     <Button Content="Information view" Grid.Row="0"  Click="OnInformationViewButtonClicked"/>
@@ -96,9 +95,7 @@
                     <local1:ConfigureTableRowsView 
                         Grid.Row="7" 
                         VerticalAlignment="Stretch"/>
-                    <StackPanel Orientation="Horizontal" Grid.Row="8" HorizontalAlignment="Center">
-                        <Button Content="Save current table definition"  Width="200"/>
-                    </StackPanel>
+           
                 </Grid>
             </Grid>
 

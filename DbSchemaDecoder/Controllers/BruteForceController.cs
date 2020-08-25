@@ -3,6 +3,7 @@ using DbSchemaDecoder.Models;
 using DbSchemaDecoder.Util;
 using Filetypes;
 using Filetypes.ByteParsing;
+using Filetypes.Codecs;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Threading;
 using Serilog;
@@ -156,7 +157,7 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.Values.Clear();
             ViewModel.PossibleCombinationsFound = "0";
             ViewModel.RunTime = "";
-            ViewModel.RunningStatus = "Running";
+            ViewModel.RunningStatus = "Pre Calc";
             ViewModel.TotalPossibleCombinations = "";
             ViewModel.EvaluatedCombinations = "";
             ViewModel.SkippedEarlyCombinations = "";
@@ -165,7 +166,14 @@ namespace DbSchemaDecoder.Controllers
             ViewModel.CalculateButtonText = "Cancel";
 
             _viewHolder = new Dictionary<BruteForceParser, TempDisplayValues>();
-     
+
+      
+            DBFileHeader header = PackedFileDbCodec.readHeader(_windowState.SelectedFile.DbFile);
+            var preCalc = new PreCalc();
+            preCalc.PreCompute(_windowState.SelectedFile.DbFile.Data, header.Length);
+
+            ViewModel.RunningStatus = "Running";
+
             if (bruteForceMethod == BruteForceCalculatorType.BruteForceUnknownTableCount ||
                 bruteForceMethod == BruteForceCalculatorType.BruteForceUsingExistingTableUnknownTableCount)
             {
@@ -175,7 +183,7 @@ namespace DbSchemaDecoder.Controllers
                     _possibleCombinations += BruteForceParser.PossibleCombinations(i);
 
                 for (int i = 1; i < ViewModel.ColumnCount + 1; i++)
-                    BruteForce(_windowState.SelectedFile, i, combinationProvider, i - 1);
+                    BruteForce(preCalc, _windowState.SelectedFile, i, combinationProvider, i - 1);
 
                 ViewModel.ColumnVariationsCompleted = "0/" + ViewModel.ColumnCount;
                 ViewModel.TotalPossibleCombinations = _possibleCombinations.ToString("N0");
@@ -184,7 +192,7 @@ namespace DbSchemaDecoder.Controllers
             {
                 _possibleCombinations = BruteForceParser.PossibleCombinations(ViewModel.ColumnCount);
                 _timedProcess = new TimedThreadProcess<BruteForceParser>[1];
-                BruteForce(_windowState.SelectedFile, ViewModel.ColumnCount, combinationProvider, 0);
+                BruteForce(preCalc, _windowState.SelectedFile, ViewModel.ColumnCount, combinationProvider, 0);
 
                 ViewModel.ColumnVariationsCompleted = "0/1";
                 ViewModel.TotalPossibleCombinations = _possibleCombinations.ToString("N0"); ;
@@ -196,16 +204,15 @@ namespace DbSchemaDecoder.Controllers
             File.WriteAllLines(@"C:\temp\output.text", ViewModel.Values.Select(x => x.Value));
         }
 
-        void BruteForce(DataBaseFile file, int maxNumberOfFields, IBruteForceCombinationProvider combinationProvider, int threadIndex)
+        void BruteForce(PreCalc precalc, DataBaseFile file, int maxNumberOfFields, IBruteForceCombinationProvider combinationProvider, int threadIndex)
         {
-            var bruteForceparser = new BruteForceParser(file, combinationProvider, maxNumberOfFields);
+            var bruteForceparser = new BruteForceParser(precalc, file, combinationProvider, maxNumberOfFields);
             bruteForceparser.OnCombintionFoundEvent += CombinationFoundEventHandler;
             _viewHolder.Add(bruteForceparser, new TempDisplayValues());
             _timedProcess[threadIndex] = new TimedThreadProcess<BruteForceParser>(bruteForceparser);
             _timedProcess[threadIndex].OnThreadCompletedEvent += BruteForceController_OnThreadCompletedEvent;
             _timedProcess[threadIndex].OnUpdate += BruteForceController_OnUpdate;
             _timedProcess[threadIndex].Start(bruteForceparser.Compute);
-
         }
 
         private void BruteForceController_OnUpdate(object sender, TimedThreadEvent<BruteForceParser> arg)
@@ -264,15 +271,18 @@ namespace DbSchemaDecoder.Controllers
                 var valuesAsList = string.Join(", ", values);
                 _logger.Information($"New combination found {valuesAsList}");
 
-                ViewModel.Values.Add(new ItemView() 
-                { 
-                    Idx= ViewModel.Values.Count() + 1,
-                    Value = valuesAsList,
-                    Enums = val.ToList(),
-                    Columns = val.Count(),
-                });
+                lock(ViewModel)
+                {
+                    ViewModel.Values.Add(new ItemView()
+                    {
+                        Idx = ViewModel.Values.Count() + 1,
+                        Value = valuesAsList,
+                        Enums = val.ToList(),
+                        Columns = val.Count(),
+                    });
 
-                ViewModel.PossibleCombinationsFound = ViewModel.Values.Count().ToString();
+                    ViewModel.PossibleCombinationsFound = ViewModel.Values.Count().ToString();
+                }
             });
         }
 
@@ -288,35 +298,39 @@ namespace DbSchemaDecoder.Controllers
         BigInteger _possibleCombinations = 0;
         void Update(TimedThreadEvent<BruteForceParser> arg)
         {
-            _logger.Information($"Updating after thead trigger");
-
-            var parser = arg.TaskHandler;
-            var current = _viewHolder[parser];
-            current.EvaluatedCombinations = parser.EvaluatedCombinations;
-            current.SkippedEarlyCombinations = parser.SkippedEarlyCombinations;
-            current.PossibleFirstRows = parser.PossibleFirstRows;
-
-            BigInteger EvaluatedCombinations = 0;
-            BigInteger SkippedEarlyCombinations = 0;
-            BigInteger PossibleFirstRows = 0;
-            foreach (var item in _viewHolder.Values)
+            lock (_viewHolder)
             {
-                EvaluatedCombinations += item.EvaluatedCombinations;
-                SkippedEarlyCombinations += item.SkippedEarlyCombinations;
-                PossibleFirstRows += item.PossibleFirstRows;
+                _logger.Information($"Updating after thead trigger");
+
+                var parser = arg.TaskHandler;
+                var current = _viewHolder[parser];
+                current.EvaluatedCombinations = parser.EvaluatedCombinations;
+                current.SkippedEarlyCombinations = parser.SkippedEarlyCombinations;
+                current.PossibleFirstRows = parser.PossibleFirstRows;
+
+                BigInteger EvaluatedCombinations = 0;
+                BigInteger SkippedEarlyCombinations = 0;
+                BigInteger PossibleFirstRows = 0;
+
+                foreach (var item in _viewHolder.Values)
+                {
+                    EvaluatedCombinations += item.EvaluatedCombinations;
+                    SkippedEarlyCombinations += item.SkippedEarlyCombinations;
+                    PossibleFirstRows += item.PossibleFirstRows;
+                }
+
+                ViewModel.RunTime = (int)arg.Process.RunTimeInSec() + "s";
+
+                ViewModel.EvaluatedCombinations = EvaluatedCombinations.ToString("N0");
+                ViewModel.SkippedEarlyCombinations = SkippedEarlyCombinations.ToString("N0");
+                ViewModel.PossibleFirstRows = PossibleFirstRows.ToString("N0");
+
+                BigFloat bigFloatEvaluatedCombinations = new BigFloat(EvaluatedCombinations);
+                BigFloat bigFloatTotal = new BigFloat(_possibleCombinations);
+
+                var percentageDone = ((bigFloatEvaluatedCombinations / bigFloatTotal) * 100).ToString().Take(10);
+                ViewModel.EstimatedRunTime = new string(percentageDone.ToArray()) + "%";
             }
-
-            ViewModel.RunTime = (int)arg.Process.RunTimeInSec() + "s";
-
-            ViewModel.EvaluatedCombinations = EvaluatedCombinations.ToString("N0");
-            ViewModel.SkippedEarlyCombinations = SkippedEarlyCombinations.ToString("N0");
-            ViewModel.PossibleFirstRows = PossibleFirstRows.ToString("N0");
-   
-            BigFloat bigFloatEvaluatedCombinations = new BigFloat(EvaluatedCombinations);
-            BigFloat bigFloatTotal = new BigFloat(_possibleCombinations);
-
-            var percentageDone = ((bigFloatEvaluatedCombinations / bigFloatTotal) * 100).ToString().Take(10);
-            ViewModel.EstimatedRunTime = new string(percentageDone.ToArray()) + "%";
         }
 
         public bool Cancel()

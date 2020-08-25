@@ -16,7 +16,7 @@ namespace PackFileManager.Dialogs.Settings
         public SettingsForm(SettingsFormInput settings)
         {
             InitializeComponent();
-            this.settingsControl1.Configure(settings);
+            //this.settingsControl1.Configure(settings);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)

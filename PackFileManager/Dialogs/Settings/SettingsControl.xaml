@@ -8,113 +8,83 @@
              d:DesignHeight="500.5" d:DesignWidth="692" HorizontalAlignment="Center">
     <Grid Margin="0,0,-0,0 ">
         <GroupBox Header="Paths" Margin="0,0,0,0" VerticalAlignment="Top" >
-            <Grid VerticalAlignment="Stretch" Margin="0,-10,0,-4">
-                <Label x:Name="_gameLabel" Content="My mod's" HorizontalAlignment="Left" Margin="10,9,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton" Content="..." HorizontalAlignment="Right" Margin="445,16,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseModDirButtonClicked" IsEnabled="False"/>
-                <TextBox x:Name="_modDirectoryTextBox" Height="23" Margin="132,13,66,0" TextWrapping="Wrap" Text="Mod directory" VerticalAlignment="Top" KeyUp="OnModKeyUp" IsEnabled="False"/>
-                <Label x:Name="_gameLabel_Copy" Content="Arena" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy" Content="..." HorizontalAlignment="Right" Margin="0,44,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>Arena</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy" Height="23" Margin="132,41,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>Arena</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy1" Content="Attila" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy1" Content="..." HorizontalAlignment="Right" Margin="0,72,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>Attila</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy1" Height="23" Margin="132,69,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>Attila</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy2" Content="Empire" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy2" Content="..." HorizontalAlignment="Right" Margin="0,100,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>Empire</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy2" Height="23" Margin="132,97,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>Empire</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy3" Content="Napoleon" HorizontalAlignment="Left" Margin="10,121,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy3" Content="..." HorizontalAlignment="Right" Margin="0,128,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>Napoleon</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy3" Height="23" Margin="132,125,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>Napoleon</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy4" Content="Rome 2" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy4" Content="..." HorizontalAlignment="Right" Margin="0,156,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>Rome_2</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy4" Height="23" Margin="132,153,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>Rome_2</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy5" Content="Shogun 2" HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy5" Content="..." HorizontalAlignment="Right" Margin="0,184,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>Shogun_2</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy5" Height="23" Margin="132,181,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>Shogun_2</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy6" Content="Three Kingdoms" HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy6" Content="..." HorizontalAlignment="Right" Margin="0,212,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>ThreeKingdoms</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy6" Height="23" Margin="132,209,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>ThreeKingdoms</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy7" Content="Thrones of Britannia" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy7" Content="..." HorizontalAlignment="Right" Margin="0,240,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>ThronesOfBritannia</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy7" Height="23" Margin="132,237,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>ThronesOfBritannia</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy8" Content="Warhammer 1" HorizontalAlignment="Left" Margin="10,260,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy8" Content="..." HorizontalAlignment="Right" Margin="0,267,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked">
-                    <Button.Tag>
-                        <local:GameTypeEnum>Warhammer1</local:GameTypeEnum>
-                    </Button.Tag>
-                </Button>
-                <TextBox x:Name="_gamePathTextBox_Copy8" Height="23" Margin="132,264,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp">
-                    <TextBox.Tag>
-                        <local:GameTypeEnum>Warhammer1</local:GameTypeEnum>
-                    </TextBox.Tag>
-                </TextBox>
-                <Label x:Name="_gameLabel_Copy9" Content="Warhammer 2" HorizontalAlignment="Left" Margin="10,288,0,0" VerticalAlignment="Top"/>
-                <Button x:Name="_gameBrowseButton_Copy9" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..." HorizontalAlignment="Right" Margin="0,295,0,0" VerticalAlignment="Top" Width="61" RenderTransformOrigin="-0.058,-3.267" Click="BrowseGameDirButtonClicked"/>
-                <TextBox x:Name="_gamePathTextBox_Copy9" Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" Margin="132,292,66,0" TextWrapping="Wrap" Text="Game directory, path to .exe" VerticalAlignment="Top" KeyUp="OnKeyUp"/>
+            <Grid VerticalAlignment="Stretch">
+                <StackPanel Orientation="Vertical">
+                    
+                    <DockPanel LastChildFill="True">
+                        <Label  Content="My mod's" Width="150" DockPanel.Dock="Left" />
+                        <Button Content="..."  DockPanel.Dock="Right"  Width="60"  Click="BrowseModDirButtonClicked" IsEnabled="False"/>
+                        <TextBox x:Name="_modDirectoryTextBox" Height="23"  TextWrapping="Wrap" Text="Mod directory" KeyUp="OnModKeyUp" IsEnabled="False" />
+                    </DockPanel>
 
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Arena" Width="150" DockPanel.Dock="Left" />
+                        <Button Tag="{x:Static local:GameTypeEnum.Arena}" Content="..." DockPanel.Dock="Right" Click="BrowseGameDirButtonClicked" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Arena}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe" KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Attila" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Attila}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60">
+                        </Button>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Attila}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Empire" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Empire}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Empire}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Napoleon" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Napoleon}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Napoleon}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Rome 2" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Rome_2}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Rome_2}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Shogun 2" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Shogun_2}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Shogun_2}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="ThreeKingdoms" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.ThreeKingdoms}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.ThreeKingdoms}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="ThronesOfBritannia" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.ThronesOfBritannia}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.ThronesOfBritannia}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Warhammer 1" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Warhammer1}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60"/>
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Warhammer1}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Warhammer 2" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Warhammer2}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60" />
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Warhammer2}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="True">
+                        <Label Content="Troy" Width="150" DockPanel.Dock="Left"/>
+                        <Button Tag="{x:Static local:GameTypeEnum.Troy}" Content="..."  Click="BrowseGameDirButtonClicked"  DockPanel.Dock="Right" Width="60" />
+                        <TextBox Tag="{x:Static local:GameTypeEnum.Troy}" Height="23" TextWrapping="Wrap" Text="Game directory, path to .exe"  KeyUp="OnKeyUp"/>
+                    </DockPanel>
+
+                </StackPanel>
 
             </Grid>
         </GroupBox>

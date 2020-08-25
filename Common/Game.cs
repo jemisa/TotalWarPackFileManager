@@ -19,7 +19,8 @@ namespace Common {
         ThreeKingdoms,
         ThronesOfBritannia,
         Warhammer1,
-        Warhammer2
+        Warhammer2,
+        Troy
     }
 
     /*
@@ -60,9 +61,12 @@ namespace Common {
             DefaultPfhType = "PFH5"
         };
 
-        private static readonly Game[] GAMES = new Game[] {
-            TW3K, TOB, TWH2, TWH, ATW, R2TW, STW, NTW, ETW
+        public static readonly Game Troy = new Game(GameTypeEnum.Troy, "Troy", "779340", "TroySage")
+        {
+            DefaultPfhType = "PFH5"
         };
+
+        private static readonly Game[] GAMES = new Game[] {TW3K, TOB, TWH2, TWH, ATW, R2TW, STW, NTW, ETW, Troy};
 
         /*
          * Constructor.
