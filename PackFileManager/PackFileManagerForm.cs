@@ -168,6 +168,8 @@ namespace PackFileManager
             _packTreeView.GetTreeView().SelectionChanged += packTreeView_AfterSelect;
             _packTreeView.GetTreeView().PreviewKeyDown += packTreeView_PreviewKeyDown;
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
+
+            dBDecoderToolStripMenuItem_Click(null, null);
         }
         
         #region Form Management
@@ -1458,10 +1460,13 @@ namespace PackFileManager
                 Height = 1000
             };
 
-            var dbDecoder = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);
-            var wpfWindow = WpfPackedFileEditorHost.Create(dbDecoder);
-            containerForm.Controls.Add(wpfWindow);
-            containerForm.Show();
+            var dbDecoder = new Viewer.wpf();
+            dbDecoder.Show();
+
+            //var dbDecoder = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);
+            //var wpfWindow = WpfPackedFileEditorHost.Create(dbDecoder);
+            //containerForm.Controls.Add(wpfWindow);
+            //containerForm.Show();
         }
     }
 }

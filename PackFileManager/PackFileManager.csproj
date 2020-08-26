@@ -253,6 +253,10 @@
       <Project>{89BF640C-76D4-4A04-A997-98594475D60C}</Project>
       <Name>AutoUpdater</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Viewer\Viewer.csproj">
+      <Project>{ab737a44-ee52-4979-a385-b275a38457e9}</Project>
+      <Name>Viewer</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
