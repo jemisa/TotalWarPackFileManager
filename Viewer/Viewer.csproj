@@ -50,6 +50,7 @@
     <Compile Include="MonoGameControlls\MonoGameGraphicsDeviceService.cs" />
     <Compile Include="MonoGameControlls\MonoGameServiceProvider.cs" />
     <Compile Include="MonoGameControlls\MonoGameViewModel.cs" />
+    <Compile Include="NHew\Camera.cs" />
     <Compile Include="NHew\CubeDemoScene.cs" />
     <Compile Include="NHew\UserControl1.xaml.cs">
       <DependentUpon>UserControl1.xaml</DependentUpon>

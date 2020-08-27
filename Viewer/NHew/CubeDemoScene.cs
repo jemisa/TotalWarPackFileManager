@@ -1,9 +1,14 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Filetypes.ByteParsing;
+using Filetypes.RigidModel;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
+using System;
+using System.IO;
 using System.Windows;
+using Viewer.NHew;
 
 namespace WpfTest.Scenes
 {
@@ -26,8 +31,13 @@ namespace WpfTest.Scenes
         private Matrix _worldMatrix;
         private bool _disposed;
 
+        Camera camera;
+        ArcBallCamera _camera2;
         protected override void Initialize()
         {
+
+   
+
             _disposed = false;
             new WpfGraphicsDeviceService(this);
             //Components.Add(new FpsComponent(this));
@@ -59,8 +69,8 @@ namespace WpfTest.Scenes
                 if (_basicEffect.DirectionalLight0.Enabled)
                 {
                     // x direction
-                    _basicEffect.DirectionalLight0.DiffuseColor = new Vector3(1, 0, 0); // range is 0 to 1
-                    _basicEffect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(-1, 0, 0));
+                    _basicEffect.DirectionalLight0.DiffuseColor = new Vector3(0.5f, 0.5f, 0.5f); // range is 0 to 1
+                    _basicEffect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(-1, -1, 0));
                     // points from the light to the origin of the scene
                     _basicEffect.DirectionalLight0.SpecularColor = Vector3.One;
                 }
@@ -69,7 +79,7 @@ namespace WpfTest.Scenes
                 if (_basicEffect.DirectionalLight1.Enabled)
                 {
                     // y direction
-                    _basicEffect.DirectionalLight1.DiffuseColor = new Vector3(0, 0.75f, 0);
+                    _basicEffect.DirectionalLight1.DiffuseColor = new Vector3(0.5f, 0.5f, 0.5f);
                     _basicEffect.DirectionalLight1.Direction = Vector3.Normalize(new Vector3(0, -1, 0));
                     _basicEffect.DirectionalLight1.SpecularColor = Vector3.One;
                 }
@@ -78,7 +88,7 @@ namespace WpfTest.Scenes
                 if (_basicEffect.DirectionalLight2.Enabled)
                 {
                     // z direction
-                    _basicEffect.DirectionalLight2.DiffuseColor = new Vector3(0, 0, 0.5f);
+                    _basicEffect.DirectionalLight2.DiffuseColor = new Vector3(0.5f, 0.5f, 0.5f);
                     _basicEffect.DirectionalLight2.Direction = Vector3.Normalize(new Vector3(0, 0, -1));
                     _basicEffect.DirectionalLight2.SpecularColor = Vector3.One;
                 }
@@ -90,15 +100,70 @@ namespace WpfTest.Scenes
                 new VertexElement(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
             );
 
-            _vertexBuffer = CreateBuffer();
+            //_vertexBuffer = CreateBuffer();
 
-
+            _vertexBuffer = CreateModel();
             _keyboard = new WpfKeyboard(this);
             _mouse = new WpfMouse(this);
 
+            float distance = 5;
+            camera = new Camera(_mouse, _keyboard, new Vector3(distance, distance, distance), Vector3.Zero, Vector3.Up);
+            camera.Initialize();
+
+            _camera2 = new ArcBallCamera(1, new Vector3(0));
+            _camera2.Zoom = 10;
             base.Initialize();
         }
 
+
+        VertexBuffer CreateModel()
+        {
+            var chunk = ByteChunk.FromFile(@"C:\Users\ole_k\Downloads\sphere_coord_1_2_3_r_4_scaled_2_5_2_rotated_90_0_0.rigid_model_v2");
+            //var chunk = ByteChunk.FromFile(@"C:\temp\datafiles\vmp_black_coach_01.rigid_model_v2");
+            RigidModel rigidModel = RigidModel.Create(chunk, out var error);
+
+            var lodModel = rigidModel.LodModels[0];
+            //int faceCount = lodModel.IndicesBuffer.Length / 3;
+            var cubeVertices = new VertexPositionNormalTexture[lodModel.IndicesBuffer.Length];
+
+
+            /*for (int i = 0; i < faceCount; i++)
+            {
+                var index0 = lodModel.IndicesBuffer[(i * 3) + 0];
+                var index1 = lodModel.IndicesBuffer[(i * 3) + 1];
+                var index2 = lodModel.IndicesBuffer[(i * 3) + 2];
+
+                var vert0 = lodModel.VertexArray[index0];
+                var vert1 = lodModel.VertexArray[index1];
+                var vert2 = lodModel.VertexArray[index2];
+
+
+                Vector3 vertexPos = new Vector3();
+                Vector3 normal = new Vector3(-1.0f, 1.0f, 1.0f);
+                Vector2 textureTopLeft = new Vector2(0.0f, 0.0f);
+                cubeVertices[i] = new VertexPositionNormalTexture(vertexPos, normal, textureTopLeft);
+            }*/
+
+
+
+            for (int i = 0; i < lodModel.IndicesBuffer.Length; i++)
+            {
+                var index = lodModel.IndicesBuffer[i];
+
+
+                var vert = lodModel.VertexArray[index];
+                
+
+                Vector3 vertexPos = new Vector3(vert.X, vert.Y, vert.Z);
+                Vector3 normal = new Vector3(vert.Normal_X, vert.Normal_Y, vert.Normal_Z);
+                Vector2 textureTopLeft = new Vector2(0.0f, 0.0f);
+                cubeVertices[i] = new VertexPositionNormalTexture(vertexPos, normal, textureTopLeft);
+            }
+
+            VertexBuffer vertexBuffer = new VertexBuffer(GraphicsDevice, _vertexDeclaration, cubeVertices.Length, BufferUsage.None);
+            vertexBuffer.SetData(cubeVertices);
+            return vertexBuffer;
+        }
 
         VertexBuffer CreateBuffer()
         {
@@ -216,12 +281,58 @@ namespace WpfTest.Scenes
 
         protected override void Update(GameTime gameTime)
         {
+
             _mouseState = _mouse.GetState();
             _keyboardState = _keyboard.GetState();
 
+            if (_mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (_mousePressedLastFrame == false)
+                {
+                    Console.WriteLine("Pressed");
+                    mouseX = _mouseState.X;
+                    mouseY = _mouseState.Y;
+                }
+                else
+                {
+                    var speed = 0.01f;
+                    var diffX = mouseX - _mouseState.X;
+                    var diffY = mouseY - _mouseState.Y;
+                    mouseX = _mouseState.X;
+                    mouseY = _mouseState.Y;
+                    _camera2.Yaw += diffX * speed;
+                    _camera2.Pitch += diffY * speed;
+                    Console.WriteLine($"{diffX }, {diffY} - {_camera2.Yaw}, {_camera2.Pitch }");
+                }
+                _mousePressedLastFrame = true;
+            }
+
+            if (_mouseState.LeftButton == ButtonState.Released && _mousePressedLastFrame)
+            {
+                _mousePressedLastFrame = false;
+                Console.WriteLine("Release");
+            }
+
+            var moseSpeed = -0.5f;
+            if (_keyboardState.IsKeyDown(Keys.W))
+            {
+                _camera2.Zoom +=moseSpeed;
+            }
+
+ 
+            if (_keyboardState.IsKeyDown(Keys.S))
+            {
+                _camera2.Zoom -= moseSpeed;
+            }
+
+            // camera.Update(gameTime);
             base.Update(gameTime);
         }
 
+        bool _mousePressedLastFrame = false;
+
+        float mouseX;
+        float mouseY;
         private float _rotation;
 
         protected override void Draw(GameTime time)
@@ -231,21 +342,28 @@ namespace WpfTest.Scenes
             // we need to refresh the values each draw call, otherwise cube will look distorted to user
             RefreshProjection();
 
-            GraphicsDevice.Clear(_mouseState.LeftButton == ButtonState.Pressed ? Color.Black : Color.CornflowerBlue);
+            GraphicsDevice.Clear( Color.CornflowerBlue);
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             GraphicsDevice.SetVertexBuffer(_vertexBuffer);
 
             // Rotate cube around up-axis.
             // only update cube when the game is active
-            if (IsActive)
-                _rotation += (float)time.ElapsedGameTime.TotalMilliseconds / 1000 * MathHelper.TwoPi;
-            _basicEffect.World = Matrix.CreateRotationY(_rotation) * _worldMatrix;
+            //if (IsActive)
+            //    _rotation += (float)time.ElapsedGameTime.TotalMilliseconds / 1000 * MathHelper.TwoPi;
+            //_basicEffect.World = Matrix.CreateRotationY(_rotation) * _worldMatrix;
+            //_basicEffect.View = _viewMatrix;
+            
+            //_basicEffect.World = Matrix.CreateTranslation(-camera.cameraPosition);
+            //_basicEffect.Projection = _camera2.ProjectionMatrix;
+            _basicEffect.View = _camera2.ViewMatrix;
+            
+
 
             foreach (var pass in _basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, _vertexBuffer.VertexCount);
             }
 
             base.Draw(time);
