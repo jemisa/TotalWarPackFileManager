@@ -75,3 +75,5 @@
 /PackFileManagerUnitTests/obj
 /Viewer/bin/Debug
 /Viewer/obj
+/ExternalProjects/MonoGame.Framework.WpfInterop/bin/Debug
+/ExternalProjects/MonoGame.Framework.WpfInterop/obj

@@ -48,6 +48,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackFileManagerUnitTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Viewer", "Viewer\Viewer.csproj", "{AB737A44-EE52-4979-A385-B275A38457E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.WpfInterop", "ExternalProjects\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj", "{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -248,6 +250,18 @@ Global
 		{AB737A44-EE52-4979-A385-B275A38457E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB737A44-EE52-4979-A385-B275A38457E9}.Release|x86.ActiveCfg = Release|Any CPU
 		{AB737A44-EE52-4979-A385-B275A38457E9}.Release|x86.Build.0 = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Debug|x86.Build.0 = Debug|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Linux|Any CPU.ActiveCfg = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Linux|Any CPU.Build.0 = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Linux|x86.ActiveCfg = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Linux|x86.Build.0 = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Release|x86.ActiveCfg = Release|Any CPU
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -271,6 +285,7 @@ Global
 		{2DD7C02C-770F-40AC-9CE9-0F2258C49DC9} = {A144169D-F8F2-469D-911F-AC74D91B3EE7}
 		{9AB3AA6E-484F-430B-84C6-29D991F42B61} = {06C8C53D-D91A-44DE-A289-79632BC3939B}
 		{AB737A44-EE52-4979-A385-B275A38457E9} = {760490AD-8443-49C5-86AA-6FAF17A4F737}
+		{809F0D79-AEDC-4754-A213-FDBE97CCD6D6} = {A144169D-F8F2-469D-911F-AC74D91B3EE7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94862628-5F00-4811-B75B-77E36BB90B78}

@@ -1460,12 +1460,12 @@ namespace PackFileManager
                 Height = 1000
             };
 
-            var dbDecoder = new Viewer.wpf();
-            dbDecoder.Show();
-
+            var dbDecoder = new Viewer.NHew.UserControl1();
+            //dbDecoder.Show();
+            
             //var dbDecoder = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);
-            //var wpfWindow = WpfPackedFileEditorHost.Create(dbDecoder);
-            //containerForm.Controls.Add(wpfWindow);
+            var wpfWindow = WpfPackedFileEditorHost.Create(dbDecoder);
+            splitContainer1.Panel2.Controls.Add(wpfWindow);
             //containerForm.Show();
         }
     }

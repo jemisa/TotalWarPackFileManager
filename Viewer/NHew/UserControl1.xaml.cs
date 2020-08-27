@@ -13,21 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Viewer
+namespace Viewer.NHew
 {
     /// <summary>
-    /// Interaction logic for wpf.xaml
+    /// Interaction logic for UserControl1.xaml
     /// </summary>
-    public partial class wpf : UserControl
+    public partial class UserControl1 : UserControl
     {
-
-        IntPtr _handle;
-        public wpf(IntPtr handle)
+        public UserControl1()
         {
-            _handle = handle;
-
             InitializeComponent();
-            tempName.Handle = _handle;
         }
     }
 }

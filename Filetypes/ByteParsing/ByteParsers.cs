@@ -307,6 +307,24 @@ namespace Filetypes.ByteParsing
 
             return result;
         }
+
+        public bool TryDecodeFixedLength(byte[] buffer, int index, int length, out string value, out int bytesRead)
+        {
+            value = StringEncoding.GetString(buffer, index, length);
+            bytesRead = length;
+            return true;
+        }
+
+
+        public bool TryDecodeZeroTerminatedString(byte[] buffer, int index, out string value, out int bytesRead)
+        {
+            bytesRead = 1;
+            while (buffer[index] != 0)
+                bytesRead++;
+
+            value = BitConverter.ToString(buffer, index, bytesRead);
+            return true;
+        }
     }
 
     public class StringAsciiParser : StringParser
@@ -409,6 +427,7 @@ namespace Filetypes.ByteParsing
         }
 
         public int BytesLeft => _buffer.Length - _currentIndex;
+        public int Index { get { return _currentIndex; } set { _currentIndex = value;} }
 
         T Read<T>(SpesificByteParser<T> parser)
         {
@@ -419,12 +438,48 @@ namespace Filetypes.ByteParsing
             return value;
         }
 
+        string ReadFixedLengthString(StringParser parser, int length)
+        {
+            if (!parser.TryDecodeFixedLength(_buffer, _currentIndex, length, out var value, out int bytesRead))
+                throw new Exception("Unable to parse");
+
+            _currentIndex += bytesRead;
+            return value;
+        }
+
+        string ReadZeroTerminatedString(StringParser parser)
+        {
+            if (!parser.TryDecodeZeroTerminatedString(_buffer, _currentIndex, out var value, out int bytesRead))
+                throw new Exception("Unable to parse");
+
+            _currentIndex += bytesRead;
+            return value;
+            
+        }
+
         T Peak<T>(SpesificByteParser<T> parser)
         {
             if (!parser.TryDecodeValue(_buffer, _currentIndex, out T value, out int bytesRead, out string error))
                 throw new Exception("Unable to parse :" + error);
 
             return value;
+        }
+
+        public byte[] ReadBytesUntil(int index)
+        {
+            var length = index - _currentIndex;
+            byte[] destination = new byte[length];
+            Array.Copy(_buffer, index, destination, 0, length);
+            _currentIndex += length;
+            return destination;
+        }
+
+        public byte[] ReadBytes(int count)
+        {
+            byte[] destination = new byte[count];
+            Array.Copy(_buffer, _currentIndex, destination, 0, count);
+            _currentIndex += count;
+            return destination;
         }
 
         public void Read(IByteParser parser, out string value, out string error)
@@ -439,13 +494,20 @@ namespace Filetypes.ByteParsing
         public string ReadString() => Read(ByteParsers.String);
         public int ReadInt32() => Read(ByteParsers.Int32);
         public uint ReadUInt32() => Read(ByteParsers.UInt32);
+        public long ReadInt64() => Read(ByteParsers.Int64);
         public float ReadSingle() => Read(ByteParsers.Single);
         public short ReadShort() => Read(ByteParsers.Short);
         public bool ReadBool() => Read(ByteParsers.Bool);
         public byte ReadByte() => Read(ByteParsers.Byte);
+        
 
 
         public uint PeakUint32() => Peak(ByteParsers.UInt32);
+        public long PeakInt64() => Peak(ByteParsers.Int64);
+
+        public string ReadFixedLength(int length) => ReadFixedLengthString(ByteParsers.String, length);
+        public string ReadZeroTerminatedStr() => ReadZeroTerminatedString(ByteParsers.String);
+
     }
 
 

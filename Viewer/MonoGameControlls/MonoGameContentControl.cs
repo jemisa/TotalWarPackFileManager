@@ -42,6 +42,8 @@ namespace MonoGame.WpfCore.MonoGameControls
         private bool _isFirstLoad = true;
         private bool _isInitialized;
 
+        public IntPtr Handle { get; set; }
+
         public MonoGameContentControl()
         {
             if (DesignerProperties.GetIsInDesignMode(this))
@@ -84,6 +86,41 @@ namespace MonoGame.WpfCore.MonoGameControls
                 _graphicsDeviceService?.Dispose();
 
             IsDisposed = true;
+
+            //Loaded += TestUserControl_Loaded;
+        }
+
+
+        void TestUserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Get PresentationSource
+         
+
+           
+
+            
+        }
+
+        void TestUserControl_ContentRendered(object sender, EventArgs e)
+        {
+            // Don't forget to unsubscribe from the event
+            var x = ((PresentationSource)sender);
+
+            // ..
+
+
+            x.ContentRendered += (sender2, args) =>
+            {
+                if (_isFirstLoad)
+                {
+                    _graphicsDeviceService.StartDirect3D(Handle);
+                    _viewModel?.Initialize();
+                    _viewModel?.LoadContent();
+                    _isFirstLoad = false;
+                }
+            };
+            DataContext = new MonoGameViewModel();
+
         }
 
         ~MonoGameContentControl()
@@ -108,22 +145,22 @@ namespace MonoGame.WpfCore.MonoGameControls
             if(_isInitialized)
                 return;
 
-            var x = this.Parent;
-            Window yourParentWindow = Window.GetWindow(this);
-            if (yourParentWindow == null)
-                throw new InvalidOperationException("The application must have a MainWindow");
+            //var x = this.Parent;
+            //Window yourParentWindow = Window.GetWindow(this);
+            //if (yourParentWindow == null)
+            //    throw new InvalidOperationException("The application must have a MainWindow");
 
-            yourParentWindow.Closing += (sender, args) => _viewModel?.OnExiting(this, EventArgs.Empty);
-            yourParentWindow.ContentRendered += (sender, args) =>
-            {
-                if (_isFirstLoad)
-                {
-                    _graphicsDeviceService.StartDirect3D(yourParentWindow);
-                    _viewModel?.Initialize();
-                    _viewModel?.LoadContent();
-                    _isFirstLoad = false;
-                }
-            };
+            ////yourParentWindow.Closing += (sender, args) => _viewModel?.OnExiting(this, EventArgs.Empty);
+            //yourParentWindow.ContentRendered += (sender, args) =>
+            //{
+            //    if (_isFirstLoad)
+            //    {
+            //        _graphicsDeviceService.StartDirect3D(yourParentWindow);
+            //        _viewModel?.Initialize();
+            //        _viewModel?.LoadContent();
+            //        _isFirstLoad = false;
+            //    }
+            //};
             
             _direct3DImage = new D3DImage();
 
@@ -149,6 +186,10 @@ namespace MonoGame.WpfCore.MonoGameControls
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             Start();
+            PresentationSource presentationSource = PresentationSource.FromVisual((Visual)sender);
+
+            // Subscribe to PresentationSource's ContentRendered event
+            presentationSource.ContentRendered += TestUserControl_ContentRendered;
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)

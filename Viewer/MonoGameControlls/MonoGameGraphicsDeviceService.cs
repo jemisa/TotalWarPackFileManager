@@ -28,7 +28,7 @@ namespace MonoGame.WpfCore.MonoGameControls
         public event EventHandler<EventArgs> DeviceReset;
         public event EventHandler<EventArgs> DeviceResetting;
 
-        public void StartDirect3D(Window window)
+        public void StartDirect3D(IntPtr Handle)
         {
             Direct3DContext = new Direct3DEx();
 
@@ -36,7 +36,7 @@ namespace MonoGame.WpfCore.MonoGameControls
             {
                 Windowed = true,
                 SwapEffect = SwapEffect.Discard,
-                DeviceWindowHandle = new WindowInteropHelper(window).Handle,
+                DeviceWindowHandle = Handle,
                 PresentationInterval = SharpDX.Direct3D9.PresentInterval.Default
             };
 
@@ -49,7 +49,7 @@ namespace MonoGame.WpfCore.MonoGameControls
             // we will make sure the back buffer is large enough for the window we're rendering into.
             // Also, the handle doesn't matter because we call GraphicsDevice.Present(...) with the
             // actual window handle to render into.
-            GraphicsDevice = CreateGraphicsDevice(new WindowInteropHelper(window).Handle, 1, 1);
+            GraphicsDevice = CreateGraphicsDevice(Handle, 1, 1);
             DeviceCreated?.Invoke(this, EventArgs.Empty);
         }
         
