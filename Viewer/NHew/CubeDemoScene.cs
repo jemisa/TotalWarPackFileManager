@@ -90,6 +90,18 @@ namespace WpfTest.Scenes
                 new VertexElement(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
             );
 
+            _vertexBuffer = CreateBuffer();
+
+
+            _keyboard = new WpfKeyboard(this);
+            _mouse = new WpfMouse(this);
+
+            base.Initialize();
+        }
+
+
+        VertexBuffer CreateBuffer()
+        {
             Vector3 topLeftFront = new Vector3(-1.0f, 1.0f, 1.0f);
             Vector3 bottomLeftFront = new Vector3(-1.0f, -1.0f, 1.0f);
             Vector3 topRightFront = new Vector3(1.0f, 1.0f, 1.0f);
@@ -112,6 +124,8 @@ namespace WpfTest.Scenes
             Vector3 rightNormal = new Vector3(1.0f, 0.0f, 0.0f);
 
             var cubeVertices = new VertexPositionNormalTexture[36];
+
+
 
             // Front face.
             cubeVertices[0] = new VertexPositionNormalTexture(topLeftFront, frontNormal, textureTopLeft);
@@ -161,13 +175,9 @@ namespace WpfTest.Scenes
             cubeVertices[34] = new VertexPositionNormalTexture(topRightFront, rightNormal, textureTopLeft);
             cubeVertices[35] = new VertexPositionNormalTexture(bottomRightBack, rightNormal, textureBottomRight);
 
-            _vertexBuffer = new VertexBuffer(GraphicsDevice, _vertexDeclaration, cubeVertices.Length, BufferUsage.None);
-            _vertexBuffer.SetData(cubeVertices);
-
-            _keyboard = new WpfKeyboard(this);
-            _mouse = new WpfMouse(this);
-
-            base.Initialize();
+            VertexBuffer vertexBuffer = new VertexBuffer(GraphicsDevice, _vertexDeclaration, cubeVertices.Length, BufferUsage.None);
+            vertexBuffer.SetData(cubeVertices);
+            return vertexBuffer;
         }
 
         protected override void Dispose(bool disposing)

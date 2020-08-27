@@ -1,4 +1,5 @@
-﻿using Filetypes.DB;
+﻿using Common.SystemHalf;
+using Filetypes.DB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
@@ -20,7 +21,9 @@ namespace Filetypes.ByteParsing
         Integer,
         uint32,
         Short,
+        UShort,
         Single,
+        Float16,
         Boolean,
         List,
     }
@@ -142,6 +145,18 @@ namespace Filetypes.ByteParsing
         }
     }
 
+    public class Float16Parser : NumberParser<Half>
+    {
+        public override string TypeName { get { return "Float16"; } }
+        public override DbTypesEnum Type => DbTypesEnum.Float16;
+        protected override int FieldSize => 2;
+
+        protected override Half Decode(byte[] buffer, int index)
+        {
+            return Half.ToHalf(buffer, index);
+        }
+    }
+
     public class ShortParser : NumberParser<short>
     {
         public override string TypeName { get { return "Short"; } }
@@ -151,6 +166,18 @@ namespace Filetypes.ByteParsing
         protected override short Decode(byte[] buffer, int index)
         {
             return BitConverter.ToInt16(buffer, index);
+        }
+    }
+
+    public class UShortParser : NumberParser<ushort>
+    {
+        public override string TypeName { get { return "UShort"; } }
+        public override DbTypesEnum Type => DbTypesEnum.UShort;
+        protected override int FieldSize => 2;
+
+        protected override ushort Decode(byte[] buffer, int index)
+        {
+            return BitConverter.ToUInt16(buffer, index);
         }
     }
 
@@ -358,7 +385,9 @@ namespace Filetypes.ByteParsing
         public static Int64Parser Int64 { get; set; } = new Int64Parser();
         public static UIntParser UInt32 { get; set; } = new UIntParser();
         public static SingleParser Single { get; set; } = new SingleParser();
+        public static Float16Parser Float16 { get; set; } = new Float16Parser();
         public static ShortParser Short { get; set; } = new ShortParser();
+        public static UShortParser UShort { get; set; } = new UShortParser();
         public static BoolParser Bool { get; set; } = new BoolParser();
         public static OptionalStringParser OptString { get; set; } = new OptionalStringParser();
         public static StringParser String { get; set; } = new StringParser();
@@ -395,6 +424,9 @@ namespace Filetypes.ByteParsing
 
                 case DbTypesEnum.Single:
                     return ByteParsers.Single;
+
+                case DbTypesEnum.Float16:
+                    return ByteParsers.Float16;
 
                 case DbTypesEnum.Boolean:
                     return ByteParsers.Bool;
@@ -496,7 +528,9 @@ namespace Filetypes.ByteParsing
         public uint ReadUInt32() => Read(ByteParsers.UInt32);
         public long ReadInt64() => Read(ByteParsers.Int64);
         public float ReadSingle() => Read(ByteParsers.Single);
+        public Half ReadFloat16() => Read(ByteParsers.Float16);
         public short ReadShort() => Read(ByteParsers.Short);
+        public ushort ReadUShort() => Read(ByteParsers.UShort);
         public bool ReadBool() => Read(ByteParsers.Bool);
         public byte ReadByte() => Read(ByteParsers.Byte);
         

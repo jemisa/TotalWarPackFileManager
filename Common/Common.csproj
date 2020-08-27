@@ -25,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -51,6 +52,8 @@
     <Compile Include="ParseException.cs" />
     <Compile Include="PackLoadSequence.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="SystemHalf\HalfHelper.cs" />
+    <Compile Include="SystemHalf\SystemHalf.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="PackFileEnumeration.cs" />
   </ItemGroup>
