@@ -110,59 +110,25 @@ namespace Filetypes.RigidModel
                     var subChucnk = new ByteChunk(bytes);
                     var vertex = new Vertex()
                     {
-                        X = subChucnk.ReadFloat16(),
-                        Y = subChucnk.ReadFloat16(),
-                        Z = subChucnk.ReadFloat16(),
+                        X = subChucnk.ReadFloat16(),        // 0
+                        Y = subChucnk.ReadFloat16(),        // 2
+                        Z = subChucnk.ReadFloat16(),        // 4
                     };
 
-                    var u0 = subChucnk.ReadFloat16();       // 4
-                    var u1 = subChucnk.ReadFloat16();       // 5
-                    var u2 = subChucnk.ReadFloat16();       // 6
-                    var u3 = subChucnk.ReadFloat16();       // 7
-                    var u4 = subChucnk.ReadFloat16();       // 8
+                    var u = subChucnk.ReadByte();           // 6
+                    var u0 = subChucnk.ReadByte();          // 7      
+                    var boneIndex = subChucnk.ReadByte();   // 8
+                    var u1 = subChucnk.ReadByte();          // 9
+                    var boneWeight0 = subChucnk.ReadByte(); // 10
 
-                    var b0 = subChucnk.ReadByte();
-                    var t0 = (b0 / 255.0f * 2.0f) - 1.0f;
+                    var u2 = subChucnk.ReadByte();          // 11
+                    vertex.Normal_X = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //12
+                    vertex.Normal_Y = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //13
+                    vertex.Normal_Z = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //14
+                    var u3 = subChucnk.ReadByte();          // 11
+                    var uv0 = subChucnk.ReadFloat16();      // 16
+                    var u4 = subChucnk.ReadBytes(10);       // 18
 
-                    var b1 = subChucnk.ReadByte();
-                    var t1 = (b1 / 255.0f * 2.0f) - 1.0f;
-
-                    var b2 = subChucnk.ReadByte();
-                    var t2 = (b2 / 255.0f * 2.0f) - 1.0f;
-
-                    vertex.Normal_X = t0;
-                    vertex.Normal_Y = t1;
-                    vertex.Normal_Z = t2;
-                    //var unknown = subChucnk.ReadFloat16();   //8
-                    //
-                    //var uv0 = subChucnk.ReadFloat16();   //10
-                    //var uv1 = subChucnk.ReadFloat16();   //12
-                    //
-                    //var u0 = subChucnk.ReadFloat16();   //14
-                    //var u1 = subChucnk.ReadFloat16();   //16
-                    //var u2 = subChucnk.ReadFloat16();   //18
-                    //var u3 = subChucnk.ReadFloat16();   //20
-                    //var u4 = subChucnk.ReadFloat16();   //22
-                    //var u5 = subChucnk.ReadFloat16();   //24
-                    //var u6 = subChucnk.ReadFloat16();   //26
-                    //var u7 = subChucnk.ReadFloat16();   //28
-
-                    //vertex.Normal_X = -subChucnk.ReadFloat16();   //24
-                    //vertex.Normal_Y = -subChucnk.ReadFloat16();   //26
-                    //vertex.Normal_Z = -subChucnk.ReadFloat16();   //28
-
-
-                    //var Normal_X = subChucnk.ReadFloat16(),
-                    //var Normal_Y = subChucnk.ReadFloat16(),
-                    //var Normal_Z = subChucnk.ReadFloat16(),
-
-
-                    /*
-                     
-                     	rapi.rpgBindUV1BufferOfs(VertBuff, noesis.RPGEODATA_HALFFLOAT, VbufferSize, 16)
-	                    rapi.rpgBindBoneIndexBufferOfs(VertBuff, noesis.RPGEODATA_UBYTE, VbufferSize, 8, 1) # bones
-	                    rapi.rpgBindBoneWeightBufferOfs(VertBuff, noesis.RPGEODATA_UBYTE, VbufferSize, 10, 1) # weights
-                     */
                     output[i] = vertex;
                 }
             }
@@ -190,39 +156,57 @@ namespace Filetypes.RigidModel
                     var t0 = (b0 / 255.0f * 2.0f) - 1.0f;
 
                     var b1 = subChucnk.ReadByte();
-                    var t1= (b1 / 255.0f * 2.0f) - 1.0f;
+                    var t1 = (b1 / 255.0f * 2.0f) - 1.0f;
 
                     var b2 = subChucnk.ReadByte();
                     var t2 = (b2 / 255.0f * 2.0f) - 1.0f;
-
-                    //var t0  = ((subChucnk.ReadByte() / 127.0f) - 1.0f);
-                    //var t1  = ((subChucnk.ReadByte() / 127.0f) - 1.0f);
-                    //var t2  = ((subChucnk.ReadByte() / 127.0f) - 1.0f);
-                    ////(byteVal / 255.0f * 2.0f) + 1.0f
-                    /*   var u5 = subChucnk.ReadFloat16();
-                       var u6 = subChucnk.ReadFloat16();
-                       var u7 = subChucnk.ReadFloat16();
-                       var u8 = subChucnk.ReadFloat16();
-                       var u9 = subChucnk.ReadFloat16();
-                       var u10 = subChucnk.ReadFloat16();
-                       var u11 = subChucnk.ReadFloat16();
-                       var u12 = subChucnk.ReadFloat16();*/
 
                     vertex.Normal_X = t0;
                     vertex.Normal_Y = t1;
                     vertex.Normal_Z = t2;
 
-                    
+
                     output[i] = vertex;
                 }
 
-                    /*
-                             if VertType == 0: #buffer 32
-                    rapi.rpgBindUV1BufferOfs(VertBuff, noesis.RPGEODATA_HALFFLOAT, VbufferSize, 8)
-                    rapi.rpgBindBoneIndexBufferOfs(VertBuff, noesis.RPGEODATA_UBYTE, VbufferSize, 8, 4) # bones
-                    rapi.rpgBindBoneWeightBufferOfs(VertBuff, noesis.RPGEODATA_UBYTE, VbufferSize, 12, 4) # weights
-                     */
+            }
+            else if (vertexType == 262144)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    var bytes = chunk.ReadBytes(32);
+                    var subChucnk = new ByteChunk(bytes);
+                    var vertex = new Vertex()
+                    {
+                        X = subChucnk.ReadFloat16(),
+                        Y = subChucnk.ReadFloat16(),
+                        Z = subChucnk.ReadFloat16(),
+                    };
+
+
+                    var u0 = subChucnk.ReadFloat16();       // 4
+                    var u1 = subChucnk.ReadFloat16();       // 5
+                    var u2 = subChucnk.ReadFloat16();       // 6
+                    var u3 = subChucnk.ReadFloat16();       // 7
+                    var u4 = subChucnk.ReadFloat16();       // 8
+
+                    var b0 = subChucnk.ReadByte();
+                    var t0 = (b0 / 255.0f * 2.0f) - 1.0f;
+
+                    var b1 = subChucnk.ReadByte();
+                    var t1 = (b1 / 255.0f * 2.0f) - 1.0f;
+
+                    var b2 = subChucnk.ReadByte();
+                    var t2 = (b2 / 255.0f * 2.0f) - 1.0f;
+
+                    vertex.Normal_X = t0;
+                    vertex.Normal_Y = t1;
+                    vertex.Normal_Z = t2;
+
+
+                    output[i] = vertex;
                 }
+            }
             else
                 throw new NotImplementedException();
 

@@ -1,11 +1,13 @@
 ﻿using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
+using Filetypes.RigidModel.Animation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using Viewer.NHew;
@@ -25,7 +27,7 @@ namespace WpfTest.Scenes
         private WpfMouse _mouse;
         private MouseState _mouseState;
         private Matrix _projectionMatrix;
-        private VertexBuffer _vertexBuffer;
+        private List<VertexBuffer> _vertexBuffer;
         private VertexDeclaration _vertexDeclaration;
         private Matrix _viewMatrix;
         private Matrix _worldMatrix;
@@ -111,58 +113,61 @@ namespace WpfTest.Scenes
             camera.Initialize();
 
             _camera2 = new ArcBallCamera(1, new Vector3(0));
+            _camera2.NearPlane = 0.001f;
             _camera2.Zoom = 10;
             base.Initialize();
         }
 
+        /*
+         / Inside your Game.Draw method
+basicEffect.CurrentTechnique.Passes[0].Apply();
+var vertices = new[] { new VertexPositionColor(startPoint, Color.White),  new VertexPositionColor(endPoint, Color.White) };
+GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+         */
 
-        VertexBuffer CreateModel()
+
+        List<VertexBuffer> CreateModel()
         {
-            var chunk = ByteChunk.FromFile(@"C:\Users\ole_k\Downloads\sphere_coord_1_2_3_r_4_scaled_2_5_2_rotated_90_0_0.rigid_model_v2");
-            //var chunk = ByteChunk.FromFile(@"C:\temp\datafiles\vmp_black_coach_01.rigid_model_v2");
-            RigidModel rigidModel = RigidModel.Create(chunk, out var error);
+            List<VertexBuffer> outputList = new List<VertexBuffer>();
 
-            var lodModel = rigidModel.LodModels[0];
-            //int faceCount = lodModel.IndicesBuffer.Length / 3;
-            var cubeVertices = new VertexPositionNormalTexture[lodModel.IndicesBuffer.Length];
+            var model = @"C:\temp\datafiles\vmp_black_coach_01.rigid_model_v2";
+            var path = @"C:\Users\ole_k\Desktop\ModelDecoding\brt_paladin\";
+            var models = new string[] { "brt_paladin_head_01", "brt_paladin_head_04", "brt_paladin_torso_03", "brt_paladin_legs_01" , "brt_paladin_torso_02" };
 
 
-            /*for (int i = 0; i < faceCount; i++)
+            //var skeletonByteChunk = ByteChunk.FromFile(path + @"Skeleton\humanoid01.anim");
+
+//            var skel = Skeleton.Create(skeletonByteChunk, out string tt);
+
+            //var chunk = ByteChunk.FromFile(@"C:\Users\ole_k\Downloads\sphere_coord_1_2_3_r_4_scaled_2_5_2_rotated_90_0_0.rigid_model_v2");
+            for (int i = 0; i < models.Length; i++)
             {
-                var index0 = lodModel.IndicesBuffer[(i * 3) + 0];
-                var index1 = lodModel.IndicesBuffer[(i * 3) + 1];
-                var index2 = lodModel.IndicesBuffer[(i * 3) + 2];
+                var chunk = ByteChunk.FromFile(path + models[i] + ".rigid_model_v2");
+                //var chunk = ByteChunk.FromFile(model);
+                RigidModel rigidModel = RigidModel.Create(chunk, out var error);
 
-                var vert0 = lodModel.VertexArray[index0];
-                var vert1 = lodModel.VertexArray[index1];
-                var vert2 = lodModel.VertexArray[index2];
+                var lodModel = rigidModel.LodModels[0];
+                var cubeVertices = new VertexPositionNormalTexture[lodModel.IndicesBuffer.Length];
 
+                for (int j = 0; j < lodModel.IndicesBuffer.Length; j++)
+                {
+                    var index = lodModel.IndicesBuffer[j];
+                    var vert = lodModel.VertexArray[index];
 
-                Vector3 vertexPos = new Vector3();
-                Vector3 normal = new Vector3(-1.0f, 1.0f, 1.0f);
-                Vector2 textureTopLeft = new Vector2(0.0f, 0.0f);
-                cubeVertices[i] = new VertexPositionNormalTexture(vertexPos, normal, textureTopLeft);
-            }*/
+                    Vector3 vertexPos = new Vector3(vert.X, vert.Y, vert.Z);
+                    Vector3 normal = new Vector3(vert.Normal_X, vert.Normal_Y, vert.Normal_Z);
+                    Vector2 textureTopLeft = new Vector2(0.0f, 0.0f);
+                    cubeVertices[j] = new VertexPositionNormalTexture(vertexPos, normal, textureTopLeft);
+                }
 
-
-
-            for (int i = 0; i < lodModel.IndicesBuffer.Length; i++)
-            {
-                var index = lodModel.IndicesBuffer[i];
-
-
-                var vert = lodModel.VertexArray[index];
-                
-
-                Vector3 vertexPos = new Vector3(vert.X, vert.Y, vert.Z);
-                Vector3 normal = new Vector3(vert.Normal_X, vert.Normal_Y, vert.Normal_Z);
-                Vector2 textureTopLeft = new Vector2(0.0f, 0.0f);
-                cubeVertices[i] = new VertexPositionNormalTexture(vertexPos, normal, textureTopLeft);
+                VertexBuffer vertexBuffer = new VertexBuffer(GraphicsDevice, _vertexDeclaration, cubeVertices.Length, BufferUsage.None);
+                vertexBuffer.SetData(cubeVertices);
+                outputList.Add(vertexBuffer);
             }
-
-            VertexBuffer vertexBuffer = new VertexBuffer(GraphicsDevice, _vertexDeclaration, cubeVertices.Length, BufferUsage.None);
-            vertexBuffer.SetData(cubeVertices);
-            return vertexBuffer;
+            
+            
+            
+            return outputList;
         }
 
         VertexBuffer CreateBuffer()
@@ -253,7 +258,7 @@ namespace WpfTest.Scenes
             Components.Clear();
             _disposed = true;
 
-            _vertexBuffer.Dispose();
+            //_vertexBuffer.Dispose();
             _vertexBuffer = null;
 
             _vertexDeclaration.Dispose();
@@ -275,7 +280,7 @@ namespace WpfTest.Scenes
                 MathHelper.ToRadians(45), // 45 degree angle
                 (float)GraphicsDevice.Viewport.Width /
                 (float)GraphicsDevice.Viewport.Height,
-                1.0f, 100.0f);
+                .001f, 100.0f);
             _basicEffect.Projection = _projectionMatrix;
         }
 
@@ -316,13 +321,22 @@ namespace WpfTest.Scenes
             var moseSpeed = -0.5f;
             if (_keyboardState.IsKeyDown(Keys.W))
             {
-                _camera2.Zoom +=moseSpeed;
+                _camera2.Zoom +=moseSpeed * 0.1f;
             }
 
  
             if (_keyboardState.IsKeyDown(Keys.S))
             {
-                _camera2.Zoom -= moseSpeed;
+                _camera2.Zoom -= moseSpeed * 0.1f;
+            }
+            if (_keyboardState.IsKeyDown(Keys.Q))
+            {
+                _camera2.MoveCameraUp(moseSpeed * 0.1f);
+            }
+
+            if (_keyboardState.IsKeyDown(Keys.E))
+            {
+                _camera2.MoveCameraUp(-moseSpeed*0.1f);
             }
 
             // camera.Update(gameTime);
@@ -345,7 +359,8 @@ namespace WpfTest.Scenes
             GraphicsDevice.Clear( Color.CornflowerBlue);
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            GraphicsDevice.SetVertexBuffer(_vertexBuffer);
+     
+
 
             // Rotate cube around up-axis.
             // only update cube when the game is active
@@ -353,17 +368,20 @@ namespace WpfTest.Scenes
             //    _rotation += (float)time.ElapsedGameTime.TotalMilliseconds / 1000 * MathHelper.TwoPi;
             //_basicEffect.World = Matrix.CreateRotationY(_rotation) * _worldMatrix;
             //_basicEffect.View = _viewMatrix;
-            
+
             //_basicEffect.World = Matrix.CreateTranslation(-camera.cameraPosition);
             //_basicEffect.Projection = _camera2.ProjectionMatrix;
             _basicEffect.View = _camera2.ViewMatrix;
-            
 
-
-            foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+            foreach (var mesh in _vertexBuffer)
             {
-                pass.Apply();
-                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, _vertexBuffer.VertexCount);
+                GraphicsDevice.SetVertexBuffer(mesh);
+
+                foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, mesh.VertexCount);
+                }
             }
 
             base.Draw(time);

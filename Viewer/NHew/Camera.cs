@@ -67,6 +67,12 @@ namespace Viewer.NHew
             LookAt += right * amount;
         }
 
+        public void MoveCameraUp(float amount)
+        {
+            lookAt.Y += amount;
+            viewMatrixDirty = true;
+        }
+
         /// <summary>
         /// Moves the camera and lookAt forward,
         /// as seen from the camera, while keeping the same height

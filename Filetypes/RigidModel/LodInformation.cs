@@ -9,7 +9,7 @@ namespace Filetypes.RigidModel
         public uint Unknown1 { get; set; }
         public uint StartOffset { get; set; }
         public float Scale { get; set; }
-        public uint Unknown2 { get; set; }
+        public uint LodLevel { get; set; }//??
         public uint Unknown3 { get; set; }
 
         public static LodInformation Create(ByteChunk chunk)
@@ -21,7 +21,7 @@ namespace Filetypes.RigidModel
                 Unknown1 = chunk.ReadUInt32(),
                 StartOffset = chunk.ReadUInt32(),
                 Scale = chunk.ReadSingle(),
-                Unknown2 = chunk.ReadUInt32(),
+                LodLevel = chunk.ReadUInt32(),
                 Unknown3 = chunk.ReadUInt32()
             };
             return data;

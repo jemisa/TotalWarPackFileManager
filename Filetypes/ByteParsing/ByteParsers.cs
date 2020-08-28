@@ -458,6 +458,11 @@ namespace Filetypes.ByteParsing
             _currentIndex = index;
         }
 
+        public void Reset()
+        {
+            Index = 0;
+        }
+
         public static ByteChunk FromFile(string fileName)
         {
             var bytes = File.ReadAllBytes(fileName);
