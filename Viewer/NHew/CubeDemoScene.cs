@@ -9,6 +9,7 @@ using MonoGame.Framework.WpfInterop.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using Viewer.NHew;
 
@@ -33,7 +34,6 @@ namespace WpfTest.Scenes
         private Matrix _worldMatrix;
         private bool _disposed;
 
-        Camera camera;
         ArcBallCamera _camera2;
         protected override void Initialize()
         {
@@ -63,6 +63,7 @@ namespace WpfTest.Scenes
             _basicEffect.SpecularColor = new Vector3(0.25f, 0.25f, 0.25f);
             _basicEffect.SpecularPower = 5.0f;
             _basicEffect.Alpha = 1.0f;
+           
 
             _basicEffect.LightingEnabled = true;
             if (_basicEffect.LightingEnabled)
@@ -102,15 +103,12 @@ namespace WpfTest.Scenes
                 new VertexElement(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
             );
 
-            //_vertexBuffer = CreateBuffer();
-
+   
             _vertexBuffer = CreateModel();
             _keyboard = new WpfKeyboard(this);
             _mouse = new WpfMouse(this);
 
-            float distance = 5;
-            camera = new Camera(_mouse, _keyboard, new Vector3(distance, distance, distance), Vector3.Zero, Vector3.Up);
-            camera.Initialize();
+
 
             _camera2 = new ArcBallCamera(1, new Vector3(0));
             _camera2.NearPlane = 0.001f;
@@ -118,27 +116,86 @@ namespace WpfTest.Scenes
             base.Initialize();
         }
 
-        /*
-         / Inside your Game.Draw method
-basicEffect.CurrentTechnique.Passes[0].Apply();
-var vertices = new[] { new VertexPositionColor(startPoint, Color.White),  new VertexPositionColor(endPoint, Color.White) };
-GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
-         */
 
 
+
+        class SkeletonModel
+        {
+            public class BoneInfo
+            {
+                public Matrix Position { get; set; }
+                public Matrix WorldPosition { get; set; }
+                public int Index { get; set; }
+                public int ParentIndex { get; set; }
+            }
+
+            public List<VertexBuffer> Buffers = new List<VertexBuffer>();
+            VertexDeclaration _vertDec;
+
+            public List<BoneInfo> Bones = new List<BoneInfo>();
+            public static SkeletonModel Create(Skeleton skeleton, GraphicsDevice graphicsDevice)
+            {
+                SkeletonModel model = new SkeletonModel();
+                for (int i = 0; i < skeleton.Bones.Count(); i++)
+                {
+                    var x = new Quaternion(
+                        skeleton.Bones[i].Rotation_X,
+                        skeleton.Bones[i].Rotation_Y,
+                        skeleton.Bones[i].Rotation_Z,
+                        skeleton.Bones[i].Rotation_W);
+                    x.Normalize();
+
+                    var pos = Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(skeleton.Bones[i].Position_X, skeleton.Bones[i].Position_Y, skeleton.Bones[i].Position_Z);
+                    var info = new BoneInfo()
+                    {
+                        Index = skeleton.Bones[i].Id,
+                        ParentIndex = skeleton.Bones[i].ParentId,
+                        Position = pos,
+                        WorldPosition = pos
+                    };
+                    model.Bones.Add(info);
+                }
+
+
+                for (int i = 0; i < model.Bones.Count(); i++)
+                {
+                    if (model.Bones[i].ParentIndex == -1)
+                        continue;
+                    model.Bones[i].WorldPosition = model.Bones[i].WorldPosition * model.Bones[model.Bones[i].ParentIndex].WorldPosition;
+                }
+
+               /* model._vertDec = new VertexDeclaration(
+                            new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                             new VertexElement(12, VertexElementFormat.Color, VertexElementUsage.Color, 0),);
+
+                var cubeVertices = new VertexPositionColor[2];
+                cubeVertices[0] = new VertexPositionColor(new Vector3(0, 0, 0), Color.Red);
+                cubeVertices[1] = new VertexPositionColor(new Vector3(0, 10, 0), Color.Red);
+                VertexBuffer vertexBuffer = new VertexBuffer(graphicsDevice, model._vertDec, 2, BufferUsage.None);
+                vertexBuffer.SetData(cubeVertices);
+                model.Buffers.Add(vertexBuffer);*/
+
+                return model;
+            }
+
+
+        
+        }
+
+        SkeletonModel skelModel;
         List<VertexBuffer> CreateModel()
         {
             List<VertexBuffer> outputList = new List<VertexBuffer>();
 
             var model = @"C:\temp\datafiles\vmp_black_coach_01.rigid_model_v2";
             var path = @"C:\Users\ole_k\Desktop\ModelDecoding\brt_paladin\";
-            var models = new string[] { "brt_paladin_head_01", "brt_paladin_head_04", "brt_paladin_torso_03", "brt_paladin_legs_01" , "brt_paladin_torso_02" };
+            var models = new string[] { /*"brt_paladin_head_01", "brt_paladin_head_04", "brt_paladin_torso_03", "brt_paladin_legs_01" ,*/ "brt_paladin_torso_02" };
 
 
-            //var skeletonByteChunk = ByteChunk.FromFile(path + @"Skeleton\humanoid01.anim");
+             var skeletonByteChunk = ByteChunk.FromFile(path + @"Skeleton\humanoid01.anim");
 
-//            var skel = Skeleton.Create(skeletonByteChunk, out string tt);
-
+           var skel = Skeleton.Create(skeletonByteChunk, out string tt);
+            skelModel = SkeletonModel.Create(skel, GraphicsDevice);
             //var chunk = ByteChunk.FromFile(@"C:\Users\ole_k\Downloads\sphere_coord_1_2_3_r_4_scaled_2_5_2_rotated_90_0_0.rigid_model_v2");
             for (int i = 0; i < models.Length; i++)
             {
@@ -146,7 +203,7 @@ GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
                 //var chunk = ByteChunk.FromFile(model);
                 RigidModel rigidModel = RigidModel.Create(chunk, out var error);
 
-                var lodModel = rigidModel.LodModels[0];
+                var lodModel = rigidModel.LodInformations[0].LodModels[0];
                 var cubeVertices = new VertexPositionNormalTexture[lodModel.IndicesBuffer.Length];
 
                 for (int j = 0; j < lodModel.IndicesBuffer.Length; j++)
@@ -373,18 +430,45 @@ GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
             //_basicEffect.Projection = _camera2.ProjectionMatrix;
             _basicEffect.View = _camera2.ViewMatrix;
 
-            foreach (var mesh in _vertexBuffer)
-            {
-                GraphicsDevice.SetVertexBuffer(mesh);
+           foreach (var mesh in _vertexBuffer)
+           {
+               GraphicsDevice.SetVertexBuffer(mesh);
+           
+               foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+               {
+                   pass.Apply();
+                   GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, mesh.VertexCount);
+               }
+           }
 
-                foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+            foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+            {
+
+                //GraphicsDevice.SetVertexBuffer(skelModel.Buffers[0]);
+                pass.Apply();
+
+                for (int i = 0; i < skelModel.Bones.Count; i++)
                 {
-                    pass.Apply();
-                    GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, mesh.VertexCount);
+                    if (skelModel.Bones[i].ParentIndex == -1)
+                        continue;
+
+                    var posA = skelModel.Bones[i].WorldPosition;
+                    var posB = skelModel.Bones[skelModel.Bones[i].ParentIndex].WorldPosition;
+
+                    var vertices = new[]
+                    {
+                        new VertexPositionNormalTexture(posA.Translation, new Vector3(0,0,0), new Vector2(0,0)),
+                        new VertexPositionNormalTexture(posB.Translation, new Vector3(0,0,0), new Vector2(0,0))
+                    };
+                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+
                 }
+
+               // GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, skelModel.Buffers[0], 0, 1);
             }
 
-            base.Draw(time);
+
+                base.Draw(time);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Filetypes.ByteParsing;
+using System.Collections.Generic;
 
 namespace Filetypes.RigidModel
 {
@@ -11,6 +12,8 @@ namespace Filetypes.RigidModel
         public float Scale { get; set; }
         public uint LodLevel { get; set; }//??
         public uint Unknown3 { get; set; }
+
+        public List<LodModel> LodModels = new List<LodModel>();
 
         public static LodInformation Create(ByteChunk chunk)
         {

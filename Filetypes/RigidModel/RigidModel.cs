@@ -1,4 +1,5 @@
 ﻿using Filetypes.ByteParsing;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -11,10 +12,12 @@ namespace Filetypes.RigidModel
         public uint LodCount { get; set; }
         public string BaseSkeleton { get; set; }
         public List<LodInformation> LodInformations = new List<LodInformation>();
-        public List<LodModel> LodModels = new List<LodModel>();
+       
 
         static bool Validate(ByteChunk chunk, out string errorMessage)
         {
+            if (chunk.BytesLeft != 0)
+                throw new Exception("Data left!");
             errorMessage = "";
             return true;
         }
@@ -33,7 +36,8 @@ namespace Filetypes.RigidModel
                 model.LodInformations.Add(LodInformation.Create(chunk));
 
             for (int i = 0; i < model.LodCount; i++)
-                model.LodModels.Add(LodModel.Create(chunk));
+                for(int j = 0; j < model.LodInformations[i].GroupsCount; j++)
+                    model.LodInformations[i].LodModels.Add(LodModel.Create(chunk));
 
             Validate(chunk, out errorMessage);
 
