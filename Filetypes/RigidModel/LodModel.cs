@@ -183,26 +183,21 @@ namespace Filetypes.RigidModel
                         Z = subChucnk.ReadFloat16(),
                     };
 
+                    var ukn = subChucnk.ReadFloat16();
+                    var bone0 = subChucnk.ReadByte();
+                    var bone1 = subChucnk.ReadByte();
+                    var bone2 = subChucnk.ReadByte();
+                    var bone3 = subChucnk.ReadByte();
 
-                    var u0 = subChucnk.ReadFloat16();       // 4
-                    var u1 = subChucnk.ReadFloat16();       // 5
-                    var u2 = subChucnk.ReadFloat16();       // 6
-                    var u3 = subChucnk.ReadFloat16();       // 7
-                    var u4 = subChucnk.ReadFloat16();       // 8
 
-                    var b0 = subChucnk.ReadByte();
-                    var t0 = (b0 / 255.0f * 2.0f) - 1.0f;
-
-                    var b1 = subChucnk.ReadByte();
-                    var t1 = (b1 / 255.0f * 2.0f) - 1.0f;
-
-                    var b2 = subChucnk.ReadByte();
-                    var t2 = (b2 / 255.0f * 2.0f) - 1.0f;
-
-                    vertex.Normal_X = t0;
-                    vertex.Normal_Y = t1;
-                    vertex.Normal_Z = t2;
-
+                    var weight0 = subChucnk.ReadByte();
+                    var weight1 = subChucnk.ReadByte();
+                    var weight2 = subChucnk.ReadByte();
+                    var weight3 = subChucnk.ReadByte();
+        
+                    vertex.Normal_X = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
+                    vertex.Normal_Y = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
+                    vertex.Normal_Z = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
 
                     output[i] = vertex;
                 }
@@ -216,7 +211,13 @@ namespace Filetypes.RigidModel
     }
 
     public class Vertex
-    { 
+    {
+        public class BoneInfo
+        { 
+            public byte BoneIndex { get; set; }
+            public byte BoneWeight { get; set; }
+        }
+
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
@@ -224,5 +225,7 @@ namespace Filetypes.RigidModel
         public float Normal_X { get; set; }
         public float Normal_Y { get; set; }
         public float Normal_Z { get; set; }
+
+        public List<BoneInfo> BoneInfos { get; set; } = new List<BoneInfo>();
     }
 }

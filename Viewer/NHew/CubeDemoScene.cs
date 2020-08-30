@@ -14,6 +14,9 @@ using System.Windows;
 using System.Windows.Automation;
 using Viewer.NHew;
 
+
+//assimpnet
+
 namespace WpfTest.Scenes
 {
     /// <summary>
@@ -535,16 +538,16 @@ namespace WpfTest.Scenes
             //_basicEffect.Projection = _camera2.ProjectionMatrix;
             _basicEffect.View = _camera2.ViewMatrix;
 
-           //foreach (var mesh in _vertexBuffer)
-           //{
-           //    GraphicsDevice.SetVertexBuffer(mesh);
-           //
-           //    foreach (var pass in _basicEffect.CurrentTechnique.Passes)
-           //    {
-           //        pass.Apply();
-           //        GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, mesh.VertexCount);
-           //    }
-           //}
+           foreach (var mesh in _vertexBuffer)
+           {
+               GraphicsDevice.SetVertexBuffer(mesh);
+           
+               foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+               {
+                   pass.Apply();
+                   GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, mesh.VertexCount);
+               }
+           }
 
             foreach (var pass in _basicEffect.CurrentTechnique.Passes)
             {
