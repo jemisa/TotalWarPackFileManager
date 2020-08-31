@@ -121,6 +121,7 @@ namespace Filetypes.RigidModel
                     var u1 = subChucnk.ReadByte();          // 9
                     var boneWeight0 = subChucnk.ReadByte(); // 10
 
+                    vertex.BoneInfos.Add(new Vertex.BoneInfo() { BoneIndex = boneIndex,BoneWeight = boneWeight0 / 255.0f });
                     var u2 = subChucnk.ReadByte();          // 11
                     vertex.Normal_X = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //12
                     vertex.Normal_Y = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //13

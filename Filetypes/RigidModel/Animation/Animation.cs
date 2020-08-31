@@ -30,8 +30,8 @@ namespace Filetypes.RigidModel.Animation
             public List<short[]> Quaternion { get; set; } = new List<short[]>();
         }
 
-        public List<int>[] posIDArr = new List<int>[] { new List<int>(), new List<int>() };
-        public List<int>[] rotIDArr = new List<int>[] { new List<int>(), new List<int>() };
+        public List<int>[] TranslationMappingID = new List<int>[] { new List<int>(), new List<int>() };
+        public List<int>[] RotationMappingID = new List<int>[] { new List<int>(), new List<int>() };
         public List<Frame> Frames = new List<Frame>();
 
         public static Animation Create(ByteChunk chunk)
@@ -60,8 +60,8 @@ namespace Filetypes.RigidModel.Animation
                 boneParent.Add(chunk.ReadUInt32());
             }
 
-            ouput.posIDArr = new List<int>[] { new List<int>(), new List<int>() };
-            ouput.rotIDArr = new List<int>[] { new List<int>(), new List<int>() };
+            ouput.TranslationMappingID = new List<int>[] { new List<int>(), new List<int>() };
+            ouput.RotationMappingID = new List<int>[] { new List<int>(), new List<int>() };
 
             for (int i = 0; i < boneCount; i++)
             {
@@ -70,9 +70,9 @@ namespace Filetypes.RigidModel.Animation
                 var ukn = chunk.ReadShort();
 
                 if (boneFlag == 0x00)//: # for animated
-                    ouput.posIDArr[0].Add(i);
+                    ouput.TranslationMappingID[0].Add(i);
                 if (boneFlag == 0x27)//: # for static
-                    ouput.posIDArr[1].Add(i);
+                    ouput.TranslationMappingID[1].Add(i);
             }
 
             for (int i = 0; i < boneCount; i++)
@@ -82,9 +82,9 @@ namespace Filetypes.RigidModel.Animation
                 var ukn = chunk.ReadShort();
 
                 if (boneFlag == 0x00)//: # for animated
-                    ouput.rotIDArr[0].Add(i);
+                    ouput.RotationMappingID[0].Add(i);
                 if (boneFlag == 0x27)//: # for static
-                    ouput.rotIDArr[1].Add(i);
+                    ouput.RotationMappingID[1].Add(i);
             }
 
             // We dont care about this?

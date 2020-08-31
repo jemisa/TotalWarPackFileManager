@@ -25,17 +25,20 @@ namespace Viewer.GraphicModels
                 
                 var combinesTransformationMatrix = Matrix.Identity;
 
-               foreach (var boneActingOnVertex in vertex.BoneInfos)
-               {
-                   var boneTransform = currentFrame.BoneTransforms[boneActingOnVertex.BoneIndex];
-                   var weightedMatrix = boneTransform.Transform * boneActingOnVertex.BoneWeight;
-                   combinesTransformationMatrix += weightedMatrix;
-               }
-               //combinesTransformationMatrix.Translation = new Vector3(0,0,0);
-               //combinesTransformationMatrix.M44 = 1;
 
-                Vector3 inputVertexPos = new Vector3(vertex.X, vertex.Y, vertex.Z);
-                Vector3 animatedVertexPos = Vector3.Transform(inputVertexPos, combinesTransformationMatrix);
+              foreach (var boneActingOnVertex in vertex.BoneInfos)
+              {
+                  var boneTransform = currentFrame.BoneTransforms[boneActingOnVertex.BoneIndex];
+                   var weightedMatrix = boneTransform.Transform * boneActingOnVertex.BoneWeight;
+                  combinesTransformationMatrix += weightedMatrix;
+
+                    
+
+              }
+
+                //combinesTransformationMatrix = Matrix.CreateTranslation(0, -1, 0) * combinesTransformationMatrix;
+
+                  Vector3 animatedVertexPos = Vector3.Transform(new Vector3(vertex.X, vertex.Y, vertex.Z), combinesTransformationMatrix);
 
                 Vector3 normal = new Vector3(vertex.Normal_X, vertex.Normal_Y, vertex.Normal_Z);
                 vertices[index] = new VertexPositionNormalTexture(animatedVertexPos, normal, new Vector2(0.0f, 0.0f));
@@ -51,7 +54,7 @@ namespace Viewer.GraphicModels
 
         public void Create(GraphicsDevice device, RigidModel rigidModelData, AnimationInformation animationModel, int lodLevel, int frame)
         {
-            for (int i = 1; i < rigidModelData.LodInformations[lodLevel].LodModels.Count(); i++)
+            for (int i = 0 ; i < rigidModelData.LodInformations[lodLevel].LodModels.Count(); i++)
             {
                 Rmv2Model meshModel = new Rmv2Model();
                 meshModel.Create(device, rigidModelData, lodLevel, i, animationModel, frame);
