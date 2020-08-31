@@ -199,6 +199,27 @@ namespace Filetypes.RigidModel
                     vertex.Normal_Y = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
                     vertex.Normal_Z = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
 
+                    var x = 255.0f;
+                    vertex.BoneInfos.Add(new Vertex.BoneInfo()
+                    { 
+                        BoneIndex = bone0,
+                        BoneWeight = (float)weight0 / x
+                    });
+                    vertex.BoneInfos.Add(new Vertex.BoneInfo()
+                    {
+                        BoneIndex = bone1,
+                        BoneWeight = (float)weight1 / x
+                    });
+                    vertex.BoneInfos.Add(new Vertex.BoneInfo()
+                    {
+                        BoneIndex = bone2,
+                        BoneWeight = (float)weight2 / x
+                    });
+                    vertex.BoneInfos.Add(new Vertex.BoneInfo()
+                    {
+                        BoneIndex = bone3,
+                        BoneWeight = (float)weight3 / x
+                    });
                     output[i] = vertex;
                 }
             }
@@ -215,7 +236,12 @@ namespace Filetypes.RigidModel
         public class BoneInfo
         { 
             public byte BoneIndex { get; set; }
-            public byte BoneWeight { get; set; }
+            public float BoneWeight { get; set; }
+
+            public override string ToString()
+            {
+                return $"I:{ BoneIndex} - W:{BoneWeight}";
+            }
         }
 
         public float X { get; set; }

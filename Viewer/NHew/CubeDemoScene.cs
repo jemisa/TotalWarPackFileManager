@@ -85,25 +85,21 @@ namespace WpfTest.Scenes
 
             var anim = ByteChunk.FromFile(path + "hu1_rifle_celebrate_02.anim");
             var anim_ = Animation.Create(anim);
-            animModle = AnimationModel.Create(anim_, skelModel);
+            animationInfo = AnimationInformation.Create(anim_, skelModel);
 
 
             var modelChunk = ByteChunk.FromFile(path + models[0] + ".rigid_model_v2");
-            RigidModel rigidModel = RigidModel.Create(modelChunk, out var error);
-            _rmv2CompoundModel = new Rmv2CompoundModel();
-            _rmv2CompoundModel.Create(GraphicsDevice, rigidModel, 0);
+            _rTemp = RigidModel.Create(modelChunk, out var error);
 
-            _rmv2Compound = new MeshInstance()
-            {
-                Model = _rmv2CompoundModel,
-                World = Matrix.Identity
-            };
 
 
 
 
 
         }
+
+        RigidModel _rTemp;
+
 
         CubeModel _cubeModel;
         MeshInstance _cube0;
@@ -122,7 +118,6 @@ namespace WpfTest.Scenes
                 public int ParentIndex { get; set; }
             }
 
-            public List<VertexBuffer> Buffers = new List<VertexBuffer>();
             public List<BoneInfo> Bones = new List<BoneInfo>();
 
             public static SkeletonModel Create(Skeleton skeleton)
@@ -160,7 +155,7 @@ namespace WpfTest.Scenes
             }
         }
 
-        public class AnimationModel
+        public class AnimationInformation
         {
             public class AnimationKeyFrame
             { 
@@ -173,12 +168,12 @@ namespace WpfTest.Scenes
 
             public class AnimationFrame
             {
-                public List<AnimationKeyFrame> KeyFrames = new List<AnimationKeyFrame>();
+                public List<AnimationKeyFrame> BoneTransforms = new List<AnimationKeyFrame>();
             }
 
-            public static AnimationModel Create(Animation animation, SkeletonModel skeletonModel)
+            public static AnimationInformation Create(Animation animation, SkeletonModel skeletonModel)
             {
-                AnimationModel model = new AnimationModel();
+                AnimationInformation model = new AnimationInformation();
                 for (int frameIndex = 0; frameIndex < animation.Frames.Count(); frameIndex++)
                 {
                     var originalData = animation.Frames[frameIndex];
@@ -187,24 +182,25 @@ namespace WpfTest.Scenes
                     // Copy base pose
                     for (int i = 0; i < skeletonModel.Bones.Count(); i++)
                     {
-                        currentAnimationFrame.KeyFrames.Add(new AnimationKeyFrame()
+                        currentAnimationFrame.BoneTransforms.Add(new AnimationKeyFrame()
                         {
-                            Transform = skeletonModel.Bones[i].Position,
+                            Transform = (skeletonModel.Bones[i].Position),
                             BoneIndex = skeletonModel.Bones[i].Index,
                             ParentBoneIndex = skeletonModel.Bones[i].ParentIndex
                         });
                     }
 
-                    // Apply animation
+                    // Apply animation translation
                     for (int i = 0; i < originalData.Transforms.Count(); i++)
                     {
                         var index = animation.posIDArr[0][i];
                         var pos = originalData.Transforms[i];
-                        var temp = currentAnimationFrame.KeyFrames[index].Transform;
+                        var temp = currentAnimationFrame.BoneTransforms[index].Transform;
                         temp.Translation = new Vector3(pos.X, pos.Y, pos.Z);
-                        currentAnimationFrame.KeyFrames[index].Transform = temp;
+                        currentAnimationFrame.BoneTransforms[index].Transform = temp;
                     }
 
+                    // Apply animation rotation
                     for (int i = 0; i < originalData.Quaternion.Count(); i++)
                     {
                         var index = animation.rotIDArr[0][i];
@@ -216,18 +212,31 @@ namespace WpfTest.Scenes
                              originalData.Quaternion[i][3]);
                         q.Normalize();
 
-                        var translation = currentAnimationFrame.KeyFrames[index].Transform.Translation;
-                        currentAnimationFrame.KeyFrames[index].Transform = Matrix.CreateFromQuaternion(q) * Matrix.CreateTranslation(translation.X, translation.Y, translation.Z); ;
+                        var translation = currentAnimationFrame.BoneTransforms[index].Transform.Translation;
+                        currentAnimationFrame.BoneTransforms[index].Transform = Matrix.CreateFromQuaternion(q) * Matrix.CreateTranslation(translation);
                     }
 
-                    // Convert to worldspace
-                    for (int i = 0; i < currentAnimationFrame.KeyFrames.Count(); i++)
+               
+
+                    //Convert to worldspace
+                    for (int i = 0; i < currentAnimationFrame.BoneTransforms.Count(); i++)
                     {
-                        var parentindex = currentAnimationFrame.KeyFrames[i].ParentBoneIndex;
+                        var parentindex = currentAnimationFrame.BoneTransforms[i].ParentBoneIndex;
                         if (parentindex == -1)
                             continue;
-                        currentAnimationFrame.KeyFrames[i].Transform = currentAnimationFrame.KeyFrames[i].Transform * currentAnimationFrame.KeyFrames[parentindex].Transform;
+           
+                        currentAnimationFrame.BoneTransforms[i].Transform = currentAnimationFrame.BoneTransforms[i].Transform * currentAnimationFrame.BoneTransforms[parentindex].Transform;
                     }
+                    for (int i = 0; i < skeletonModel.Bones.Count(); i++)
+                    {
+                        var inv = Matrix.Invert(skeletonModel.Bones[i].Position);
+                        currentAnimationFrame.BoneTransforms[i].Transform = Matrix.Multiply(inv, currentAnimationFrame.BoneTransforms[i].Transform);
+                    }
+
+                    //
+                    for (int i = 0; i < skeletonModel.Bones.Count(); i++)
+                        currentAnimationFrame.BoneTransforms[i].Transform = Matrix.Multiply(skeletonModel.Bones[i].Position, currentAnimationFrame.BoneTransforms[i].Transform);
+
                     model.Animation.Add(currentAnimationFrame);
                 }
 
@@ -236,7 +245,7 @@ namespace WpfTest.Scenes
         }
 
         SkeletonModel skelModel;
-        AnimationModel animModle;
+        AnimationInformation animationInfo;
 
 
         
@@ -281,6 +290,21 @@ namespace WpfTest.Scenes
         int animIndex = 0;
         protected override void Draw(GameTime time)
         {
+            animIndex++;
+            if (animIndex >= animationInfo.Animation.Count)
+                animIndex = 0;
+
+            animIndex = 0;
+
+            _rmv2CompoundModel = new Rmv2CompoundModel();
+            _rmv2CompoundModel.Create(GraphicsDevice, _rTemp, animationInfo, 0, animIndex);
+            
+            _rmv2Compound = new MeshInstance()
+            {
+                Model = _rmv2CompoundModel,
+                World = Matrix.Identity
+            };
+
             //The projection depends on viewport dimensions (aspect ratio).
             // Because WPF controls can be resized at any time (user resizes window)
             // we need to refresh the values each draw call, otherwise cube will look distorted to user
@@ -292,35 +316,57 @@ namespace WpfTest.Scenes
      
             _basicEffect.View = _camera.ViewMatrix;
 
-            _cube0.Render(GraphicsDevice, _basicEffect);
+            //_cube0.Render(GraphicsDevice, _basicEffect);
             _rmv2Compound.Render(GraphicsDevice, _basicEffect);
             _basicEffect.World = Matrix.Identity;
            
             
             foreach (var pass in _basicEffect.CurrentTechnique.Passes)
             {
-                animIndex++;
-                if (animIndex >= animModle.Animation.Count)
-                    animIndex = 0;
                 pass.Apply();
-                for (int i = 0; i < animModle.Animation[animIndex].KeyFrames.Count; i++)
-                {
-                    if (animModle.Animation[animIndex].KeyFrames[i].ParentBoneIndex == -1)
-                        continue;
 
-                    var parentIndex = animModle.Animation[animIndex].KeyFrames[i].ParentBoneIndex;
-                    var posA = animModle.Animation[animIndex].KeyFrames[i].Transform;
-                    var posB = animModle.Animation[animIndex].KeyFrames[parentIndex].Transform;
 
-                    var vertices = new[]
-                    {
-                        new VertexPositionNormalTexture(posA.Translation, new Vector3(0,0,0), new Vector2(0,0)),
-                        new VertexPositionNormalTexture(posB.Translation, new Vector3(0,0,0), new Vector2(0,0))
-                    };
-                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
-                }
+               for (int i = 0; i < animationInfo.Animation[animIndex].BoneTransforms.Count; i++)
+               {
+                   if (animationInfo.Animation[animIndex].BoneTransforms[i].ParentBoneIndex == -1)
+                       continue;
+               
+                   var parentIndex = animationInfo.Animation[animIndex].BoneTransforms[i].ParentBoneIndex;
+                   var posA = animationInfo.Animation[animIndex].BoneTransforms[i].Transform;
+                   var posB = animationInfo.Animation[animIndex].BoneTransforms[parentIndex].Transform;
+               
+                   var vertices = new[]
+                   {
+                       new VertexPositionNormalTexture(posA.Translation, new Vector3(0,0,0), new Vector2(0,0)),
+                       new VertexPositionNormalTexture(posB.Translation, new Vector3(0,0,0), new Vector2(0,0))
+                   };
+                   GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+               }
+
+
+
+
+                // 
+                //for (int i = 0; i < skelModel.Bones.Count; i++)
+                //{
+                //    var parentIndex = skelModel.Bones[i].ParentIndex;
+                //    if (parentIndex == -1)
+                //        continue;
+                //
+                //    
+                //    var posA = skelModel.Bones[i].Position;
+                //    var posB = skelModel.Bones[parentIndex].Position;
+                //
+                //    var vertices = new[]
+                //    {
+                //        new VertexPositionNormalTexture(posA.Translation, new Vector3(0,0,0), new Vector2(0,0)),
+                //        new VertexPositionNormalTexture(posB.Translation, new Vector3(0,0,0), new Vector2(0,0))
+                //    };
+                //    GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+                //}
+
             }
-                        
+
 
             base.Draw(time);
         }
