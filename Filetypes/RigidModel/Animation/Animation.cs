@@ -12,9 +12,9 @@ namespace Filetypes.RigidModel.Animation
     {
         public class Frame
         {
-            public class Pos3d
+            public class Transform
             {
-                public Pos3d(float x, float y, float z)
+                public Transform(float x, float y, float z)
                 {
                     X = x;
                     Y = y;
@@ -26,8 +26,8 @@ namespace Filetypes.RigidModel.Animation
                 public float Z;
             }
 
-            public List<Pos3d> Positions { get; set; } = new List<Pos3d>();
-            public List<short[]> Quat { get; set; } = new List<short[]>();
+            public List<Transform> Transforms { get; set; } = new List<Transform>();
+            public List<short[]> Quaternion { get; set; } = new List<short[]>();
         }
 
         public List<int>[] posIDArr = new List<int>[] { new List<int>(), new List<int>() };
@@ -108,14 +108,14 @@ namespace Filetypes.RigidModel.Animation
                 var frame = new Frame();
                 for (int j = 0; j < animPosCount; j++)
                 {
-                    var pos = new Frame.Pos3d(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                    frame.Positions.Add(pos);
+                    var pos = new Frame.Transform(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
+                    frame.Transforms.Add(pos);
                 }
 
                 for (int j = 0; j < animRotCount; j++)
                 {
                     var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
-                    frame.Quat.Add(quat);
+                    frame.Quaternion.Add(quat);
                 }
 
                 ouput.Frames.Add(frame);

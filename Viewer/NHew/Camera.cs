@@ -234,5 +234,64 @@ namespace Viewer.NHew
             }
         }
         #endregion
+
+        public void Update(MouseState mouseState, KeyboardState keyboardState)
+        {
+
+            var moseSpeed = -0.5f;
+            var speed = 0.01f;
+
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (_mousePressedLastFrame == false)
+                {
+
+                    mouseX = mouseState.X;
+                    mouseY = mouseState.Y;
+                }
+                else
+                {
+                    
+                    var diffX = mouseX - mouseState.X;
+                    var diffY = mouseY - mouseState.Y;
+                    mouseX = mouseState.X;
+                    mouseY = mouseState.Y;
+                    Yaw += diffX * speed;
+                    Pitch += diffY * speed;
+                    
+                }
+                _mousePressedLastFrame = true;
+            }
+
+            if (mouseState.LeftButton == ButtonState.Released && _mousePressedLastFrame)
+            {
+                _mousePressedLastFrame = false;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.W))
+            {
+                Zoom += moseSpeed * 0.1f;
+            }
+
+
+            if (keyboardState.IsKeyDown(Keys.S))
+            {
+                Zoom -= moseSpeed * 0.1f;
+            }
+            if (keyboardState.IsKeyDown(Keys.Q))
+            {
+                MoveCameraUp(moseSpeed * 0.1f);
+            }
+
+            if (keyboardState.IsKeyDown(Keys.E))
+            {
+                MoveCameraUp(-moseSpeed * 0.1f);
+            }
+        }
+
+        bool _mousePressedLastFrame = false;
+
+        float mouseX;
+        float mouseY;
     }
 }

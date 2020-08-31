@@ -94,11 +94,6 @@ namespace Common
             Encoding.Unicode.GetBytes(value).CopyTo(array, 0);
             writer.Write(array);
         }
-  
-        /*
-         * Delegate for methods reading data from a reader.
-         */
-        public delegate T ItemReader<T>(BinaryReader reader);
     }
 }
 
