@@ -73,6 +73,7 @@
     <Compile Include="Esf\TypeCodes.cs" />
     <Compile Include="Esf\Underlying Types\Type26.cs" />
     <Compile Include="Esf\Util.cs" />
+    <Compile Include="JsonHelpers.cs" />
     <Compile Include="Loc\LocFile.cs" />
     <Compile Include="PackedFileEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="RigidModel\LodInformation.cs" />
     <Compile Include="RigidModel\LodModel.cs" />
     <Compile Include="RigidModel\Material.cs" />
+    <Compile Include="RigidModel\VariantMeshDefinition.cs" />
     <Compile Include="UnitVariant\UnitVariantFile.cs" />
     <Compile Include="UnitVariant\UnitVariantObject.cs" />
     <Compile Include="Groupformations\Groupformation.cs" />

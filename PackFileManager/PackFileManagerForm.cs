@@ -169,7 +169,22 @@ namespace PackFileManager
             _packTreeView.GetTreeView().PreviewKeyDown += packTreeView_PreviewKeyDown;
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
 
-            dBDecoderToolStripMenuItem_Click(null, null);
+            //dBDecoderToolStripMenuItem_Click(null, null);
+
+
+            var containerForm = new Form()
+            {
+                Width = 1600,
+                Height = 1000
+            };
+
+            var dbDecoder = new VariantMeshEditor.UserControl1();
+            //dbDecoder.Show();
+
+            //var dbDecoder = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);
+            var wpfWindow = WpfPackedFileEditorHost.Create(dbDecoder);
+            splitContainer1.Panel2.Controls.Add(wpfWindow);
+
         }
         
         #region Form Management

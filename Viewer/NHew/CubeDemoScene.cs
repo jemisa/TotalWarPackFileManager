@@ -76,8 +76,13 @@ namespace WpfTest.Scenes
             // Load scene
 
 
+
+
             var path = @"C:\Users\ole_k\Desktop\ModelDecoding\brt_paladin\";
             var models = new string[] { "brt_paladin_head_01","brt_paladin_head_04", "brt_paladin_torso_03", "brt_paladin_legs_01", "brt_paladin_torso_02" };
+
+
+            VariantMeshDefinition.Create(path + "VariantMeshDef.txt");
 
             var skeletonByteChunk = ByteChunk.FromFile(path + @"Skeleton\humanoid01.anim");
             var skel = Skeleton.Create(skeletonByteChunk, out string tt);

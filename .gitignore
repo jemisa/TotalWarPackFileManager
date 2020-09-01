@@ -77,3 +77,5 @@
 /Viewer/obj
 /ExternalProjects/MonoGame.Framework.WpfInterop/bin/Debug
 /ExternalProjects/MonoGame.Framework.WpfInterop/obj
+/VariantMeshEditor/obj/Debug
+/VariantMeshEditor/bin/Debug
