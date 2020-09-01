@@ -48,6 +48,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Util\VariantMeshLoader.cs" />
     <Compile Include="Views\Animation\AnimationControl.xaml.cs">
       <DependentUpon>AnimationControl.xaml</DependentUpon>
     </Compile>
