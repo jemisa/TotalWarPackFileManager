@@ -88,7 +88,7 @@ namespace WpfTest.Scenes
             animationInfo = AnimationInformation.Create(anim_, skelModel);
 
 
-            var modelChunk = ByteChunk.FromFile(path + models[4] + ".rigid_model_v2");
+            var modelChunk = ByteChunk.FromFile(path + models[3] + ".rigid_model_v2");
             _rTemp = RigidModel.Create(modelChunk, out var error);
 
 
@@ -214,7 +214,7 @@ namespace WpfTest.Scenes
                    
                        var mappingIdx = animation.RotationMappingID[0][i];
                        var translation = currentFrame.BoneTransforms[mappingIdx].Transform.Translation;
-                       currentFrame.BoneTransforms[mappingIdx].Transform = Matrix.CreateFromQuaternion(q) * Matrix.CreateTranslation(translation);
+                        currentFrame.BoneTransforms[mappingIdx].Transform = Matrix.CreateFromQuaternion(q) * Matrix.CreateTranslation(translation);
                    }
         
                     // Move into world space
