@@ -9,6 +9,7 @@ namespace Filetypes.RigidModel
     {
         public class VariantMeshReference
         {
+            [JsonProperty("@definition")]
             public string @definition { get; set; }
         }
 
@@ -52,6 +53,7 @@ namespace Filetypes.RigidModel
 
         public class VARIANTMESH
         {
+            [JsonConverter(typeof(SingleOrArrayConverter<SLOT>))]
             public List<SLOT> SLOT { get; set; }
         }
 
@@ -60,10 +62,8 @@ namespace Filetypes.RigidModel
             public VARIANTMESH VARIANT_MESH { get; set; }
         }
 
-        public static VariantMeshFile Create(string fileName)
+        public static VariantMeshFile Create(string fileContent)
         {
-            var fileContent = File.ReadAllText(fileName);
-
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(fileContent);
             string json = JsonConvert.SerializeXmlNode(doc, Newtonsoft.Json.Formatting.Indented);

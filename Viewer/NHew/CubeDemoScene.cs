@@ -63,7 +63,7 @@ namespace WpfTest.Scenes
 
         public void CreateScene()
         {
-
+            return; 
             _cubeModel = new CubeModel();
             _cubeModel.Create(GraphicsDevice);
 
@@ -292,6 +292,7 @@ namespace WpfTest.Scenes
         int animIndex = 0;
         protected override void Draw(GameTime time)
         {
+            return;
             animIndex++;
             if (animIndex >= animationInfo.Animation.Count)
                 animIndex = 0;

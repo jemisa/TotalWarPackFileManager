@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -46,11 +47,20 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Util\VariantMeshLoader.cs" />
     <Compile Include="Views\Animation\AnimationControl.xaml.cs">
       <DependentUpon>AnimationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ImprovedTreeView\TreeViewDataModel.cs" />
+    <Compile Include="Views\ImprovedTreeView\VirtualToggleButton.cs" />
+    <Compile Include="Views\ImprovedTreeView\Window1.xaml.cs">
+      <DependentUpon>Window1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SceneContentView\SceneContentView.xaml.cs">
+      <DependentUpon>SceneContentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\VariantMesh\VariantModelInstance.xaml.cs">
       <DependentUpon>VariantModelInstance.xaml</DependentUpon>
@@ -62,6 +72,14 @@
       <DependentUpon>VariantMeshSlot.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\Animation\AnimationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ImprovedTreeView\Window1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SceneContentView\SceneContentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -110,6 +128,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Filetypes\Filetypes.csproj">
       <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
       <Name>Filetypes</Name>
@@ -118,6 +140,11 @@
       <Project>{ab737a44-ee52-4979-a385-b275a38457e9}</Project>
       <Name>Viewer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AdamsLair.TreeViewAdv">
+      <Version>1.7.7</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
