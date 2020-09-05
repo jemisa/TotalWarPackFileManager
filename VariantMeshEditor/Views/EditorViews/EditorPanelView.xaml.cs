@@ -13,21 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Viewer
+namespace VariantMeshEditor.Views.EditorViews
 {
     /// <summary>
-    /// Interaction logic for wpf.xaml
+    /// Interaction logic for EditorPanelView.xaml
     /// </summary>
-    public partial class wpf : UserControl
+    public partial class EditorPanelView : UserControl
     {
-
-        IntPtr _handle;
-        public wpf(IntPtr handle)
+        public EditorPanelView()
         {
-            _handle = handle;
-
             InitializeComponent();
-            tempName.Handle = _handle;
         }
     }
 }

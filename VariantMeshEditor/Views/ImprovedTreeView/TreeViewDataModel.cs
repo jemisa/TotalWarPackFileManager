@@ -9,59 +9,21 @@ namespace TreeViewWithCheckBoxes
 
         bool? _isChecked = false;
         TreeViewDataModel _parent;
+        public object Tag { get; set; }
+
+        public TreeViewDataModel Parent { get { return _parent; } }
 
         #endregion // Data
 
-        #region CreateFoos
 
-        public static List<TreeViewDataModel> CreateFoos()
-        {
-            TreeViewDataModel root = new TreeViewDataModel("Weapons")
-            {
-                IsInitiallySelected = true,
-                Children =
-                {
-                    new TreeViewDataModel("Blades")
-                    {
-                        Children =
-                        {
-                            new TreeViewDataModel("Dagger"),
-                            new TreeViewDataModel("Machete"),
-                            new TreeViewDataModel("Sword"),
-                        }
-                    },
-                    new TreeViewDataModel("Vehicles")
-                    {
-                        Children =
-                        {
-                            new TreeViewDataModel("Apache Helicopter"),
-                            new TreeViewDataModel("Submarine"),
-                            new TreeViewDataModel("Tank"),                            
-                        }
-                    },
-                    new TreeViewDataModel("Guns")
-                    {
-                        Children =
-                        {
-                            new TreeViewDataModel("AK 47"),
-                            new TreeViewDataModel("Beretta"),
-                            new TreeViewDataModel("Uzi"),
-                        }
-                    },
-                }
-            };
 
-            root.Initialize();
-            return new List<TreeViewDataModel> { root };
-        }
-
-        TreeViewDataModel(string name)
+        public TreeViewDataModel(string name)
         {
             this.Name = name;
             this.Children = new List<TreeViewDataModel>();
         }
 
-        void Initialize()
+        public void Initialize()
         {
             foreach (TreeViewDataModel child in this.Children)
             {
@@ -69,8 +31,6 @@ namespace TreeViewWithCheckBoxes
                 child.Initialize();
             }
         }
-
-        #endregion // CreateFoos
 
         #region Properties
 
@@ -94,6 +54,8 @@ namespace TreeViewWithCheckBoxes
             get { return _isChecked; }
             set { this.SetIsChecked(value); }
         }
+
+        public System.Windows.Visibility Vis { get; set; } = System.Windows.Visibility.Visible;
 
         void SetIsChecked(bool? value)
         {

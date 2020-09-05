@@ -4,10 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VariantMeshEditor" 
-             xmlns:viewer="clr-namespace:Viewer;assembly=Viewer" 
              xmlns:nhew="clr-namespace:Viewer.NHew;assembly=Viewer" 
              xmlns:scenecontentview="clr-namespace:VariantMeshEditor.Views.SceneContentView"
-             xmlns:treeviewwithcheckboxes="clr-namespace:TreeViewWithCheckBoxes"
+             xmlns:treeviewwithcheckboxes="clr-namespace:TreeViewWithCheckBoxes" xmlns:scene="clr-namespace:Viewer.Scene;assembly=Viewer" xmlns:editorviews="clr-namespace:VariantMeshEditor.Views.EditorViews"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -17,18 +16,15 @@
             <ColumnDefinition Width="0.25*" />
         </Grid.ColumnDefinitions>
 
-        <nhew:UserControl1></nhew:UserControl1>
         
-        <TextBlock FontSize="55" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Left side</TextBlock>
-        <GridSplitter Grid.Column="1" Width="5" Background="Black" HorizontalAlignment="Stretch" />
-        
-        
-        <Grid Grid.Column="3">
-            <ScrollViewer IsTabStop="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <StackPanel>
-                    <treeviewwithcheckboxes:Window1 x:Name="MyTree"></treeviewwithcheckboxes:Window1>
-                </StackPanel>
-            </ScrollViewer>
-        </Grid>
+        <scene:SceneView Grid.Column="0" Grid.RowSpan="3" x:Name="RenderView" ></scene:SceneView>
+
+
+        <GridSplitter Grid.Column="1" Grid.RowSpan="3" Background="Gray"  HorizontalAlignment="Stretch" />
+
+        <editorviews:EditorPanelView  Grid.Column="2" x:Name="EditorPanel"></editorviews:EditorPanelView>
+
+
+
     </Grid>
 </UserControl>

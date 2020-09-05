@@ -7,32 +7,65 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
 using static Filetypes.RigidModel.VariantMeshDefinition;
 
 namespace VariantMeshEditor.Util
 {
+    public enum FileSceneElementEnum
+    { 
+        Root,
+        Transform,
+        Animation,
+        VariantMesh,
+        Slot,
+        RigidModel,
+        WsModel
+        
+    }
 
-
-    public class FileSceneElement
+    public abstract class FileSceneElement
     {
+        public FileSceneElement Parent { get; set; }
         public List<FileSceneElement> Children { get; set; } = new List<FileSceneElement>();
+        public abstract FileSceneElementEnum Type { get; }
         public string FileName { get; set; }
-
-        public override string ToString()
+        public string FullPath { get; set; }
+        public string DisplayName { get; set; }
+        public FileSceneElement(FileSceneElement parent, string fileName, string fullPath, string displayName)
         {
-            return "Root";
+            FileName = fileName;
+            FullPath = fullPath;
+            DisplayName = displayName;
+            Parent = parent;
         }
+
+        public override string ToString() => DisplayName;
 
     }
 
+    public class RootElement : FileSceneElement
+    {
+        public RootElement() : base(null, "", "", "Root") { }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.Root;
+    }
 
+    public class TransformElement : FileSceneElement
+    {
+        public TransformElement(FileSceneElement parent) : base(parent, "", "", "Transform") { }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.Transform;
+    }
+
+    public class AnimationElement : FileSceneElement
+    {
+        public AnimationElement(FileSceneElement parent) : base(parent, "", "", "Animation") { }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.Animation;
+    }
 
     public class VariantMeshElement : FileSceneElement
     {
-        public override string ToString()
-        {
-            return $"VariantMesh - {FileName}";
-        }
+        public VariantMeshElement(FileSceneElement parent, string fullPath) : base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, "VariantMesh") { }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.VariantMesh;
     }
 
 
@@ -41,28 +74,34 @@ namespace VariantMeshEditor.Util
         public string SlotName { get; set; }
         public string AttachmentPoint { get; set; }
 
-        public override string ToString()
+        public SlotElement(FileSceneElement parent, string slotName, string attachmentPoint) : base(parent, "","", "") 
         {
-            return $"Slot - {SlotName} - {AttachmentPoint}";
+            SlotName = slotName;
+            AttachmentPoint = attachmentPoint;
+            DisplayName = $"Slot -{SlotName} - {AttachmentPoint}";
         }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.Slot;
     }
 
     public class RigidModelElement : FileSceneElement
     {
         public RigidModel Model { get; set; }
 
-        public override string ToString()
+        public RigidModelElement(FileSceneElement parent, RigidModel model, string fullPath) : base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, "") 
         {
-            return $"RigidModel - {FileName}";
+            Model = model;
+            DisplayName = $"RigidModel - {FileName}";
         }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.RigidModel;
     }
 
     public class WsModelElement : FileSceneElement
     {
-        public override string ToString()
+        public WsModelElement(FileSceneElement parent, string fullPath) : base(parent,Path.GetFileNameWithoutExtension(fullPath), fullPath, "")
         {
-            return $"WsModel - {FileName}";
+            DisplayName = $"WsModel - {FileName}";
         }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.WsModel;
     }
 
 
@@ -76,7 +115,7 @@ namespace VariantMeshEditor.Util
         public FileSceneElement Load(string filePath, FileSceneElement parent = null)
         {
             if(parent == null)
-                parent = new FileSceneElement();
+                parent = new RootElement();
 
             var file = FindFile(filePath);
             switch (file.FileExtention)
@@ -90,7 +129,7 @@ namespace VariantMeshEditor.Util
                     break;
 
                 case "wsmodel":
-                    LoadVariantMesh(file, parent);
+                    LoadWsModel(file, parent);
                     break;
             }
 
@@ -99,9 +138,11 @@ namespace VariantMeshEditor.Util
 
         void LoadVariantMesh(PackedFile file, FileSceneElement parent)
         {
-            var variantMeshElement = new VariantMeshElement();
-            variantMeshElement.FileName = file.FullPath;
+            var variantMeshElement = new VariantMeshElement(parent,file.Name);
             parent.Children.Add(variantMeshElement);
+
+            variantMeshElement.Children.Add(new AnimationElement(variantMeshElement));
+            variantMeshElement.Children.Add(new TransformElement(variantMeshElement));
 
             var content = file.Data;
             var fileContent = Encoding.Default.GetString(content);
@@ -109,9 +150,7 @@ namespace VariantMeshEditor.Util
 
             foreach (var slot in meshFile.VARIANT_MESH.SLOT)
             {
-                var slotElement = new SlotElement();
-                slotElement.AttachmentPoint = slot.AttachPoint;
-                slotElement.SlotName = slot.Name;
+                var slotElement = new SlotElement(variantMeshElement, slot.Name, slot.AttachPoint);
                 variantMeshElement.Children.Add(slotElement);
 
                 foreach (var mesh in slot.VariantMeshes)
@@ -125,22 +164,16 @@ namespace VariantMeshEditor.Util
         void LoadRigidMesh(PackedFile file, FileSceneElement parent)
         {
             ByteChunk chunk = new ByteChunk(file.Data);
-            var model = RigidModel.Create(chunk, out string errorMessage);
-            
-            
-
-            var rigidModelElement = new RigidModelElement();
-            rigidModelElement.Model = model;
-            rigidModelElement.FileName = file.FullPath;
-            parent.Children.Add(rigidModelElement);
+            var model3d = RigidModel.Create(chunk, out string errorMessage);
+            var model = new RigidModelElement(parent,model3d, file.FullPath);
+            parent.Children.Add(model);
         }
 
 
         void LoadWsModel(PackedFile file, FileSceneElement parent)
         {
-            var wsModelElement = new WsModelElement();
-            wsModelElement.FileName = file.FullPath;
-            parent.Children.Add(wsModelElement);
+            var model = new WsModelElement(parent,file.FullPath);
+            parent.Children.Add(model);
         }
 
         PackedFile FindFile(string filename)
@@ -148,7 +181,6 @@ namespace VariantMeshEditor.Util
             filename = filename.ToLower();
             filename = filename.Replace(@"/", @"\");
 
-            var p = Path.GetFullPath(filename);
             foreach (var directory in _loadedContent)
             {
                 foreach (var file in directory)

@@ -1,16 +1,12 @@
-﻿<UserControl x:Class="Viewer.wpf"
+﻿<UserControl x:Class="VariantMeshEditor.Views.EditorViews.AnimationEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Viewer" xmlns:monoGameControls="clr-namespace:MonoGame.WpfCore.MonoGameControls" xmlns:local1="clr-namespace:MonoGame.WpfCore"
-                mc:Ignorable="d" 
+             xmlns:local="clr-namespace:VariantMeshEditor.Views.EditorViews"
+             mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
-
-
     <Grid>
-        
-        <monoGameControls:MonoGameContentControl x:Name="tempName" Margin="253,42,236,98" />
+            
     </Grid>
 </UserControl>

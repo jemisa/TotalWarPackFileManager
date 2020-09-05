@@ -9,11 +9,6 @@ namespace TreeViewWithCheckBoxes
         public Window1()
         {
             InitializeComponent();
-
-           // TreeViewDataModel root = this.tree.Items[0] as TreeViewDataModel;
-
-           
-
             this.tree.Focus();
         }
     }

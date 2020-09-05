@@ -50,9 +50,17 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\SceneController.cs" />
+    <Compile Include="Controls\SceneTreeViewController.cs" />
     <Compile Include="Util\VariantMeshLoader.cs" />
     <Compile Include="Views\Animation\AnimationControl.xaml.cs">
       <DependentUpon>AnimationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditorViews\AnimationEditorView.xaml.cs">
+      <DependentUpon>AnimationEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditorViews\EditorPanelView.xaml.cs">
+      <DependentUpon>EditorPanelView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ImprovedTreeView\TreeViewDataModel.cs" />
     <Compile Include="Views\ImprovedTreeView\VirtualToggleButton.cs" />
@@ -62,16 +70,15 @@
     <Compile Include="Views\SceneContentView\SceneContentView.xaml.cs">
       <DependentUpon>SceneContentView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\VariantMesh\VariantModelInstance.xaml.cs">
-      <DependentUpon>VariantModelInstance.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\VariantMesh\VariantMeshControl.xaml.cs">
-      <DependentUpon>VariantMeshControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\VariantMesh\VariantMeshSlot.xaml.cs">
-      <DependentUpon>VariantMeshSlot.xaml</DependentUpon>
-    </Compile>
     <Page Include="Views\Animation\AnimationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\AnimationEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\EditorPanelView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -83,10 +90,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\VariantMesh\VariantModelInstance.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UserControl1.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -95,14 +98,6 @@
       <DependentUpon>UserControl1.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\VariantMesh\VariantMeshControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\VariantMesh\VariantMeshSlot.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -132,6 +127,10 @@
       <Project>{6D23F5FB-04D4-4D7E-BDFF-FCA718309298}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ExternalProjects\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj">
+      <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
+      <Name>MonoGame.Framework.WpfInterop</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Filetypes\Filetypes.csproj">
       <Project>{2419C2AF-48A3-40D2-980B-36AB2D81DC74}</Project>
       <Name>Filetypes</Name>
@@ -140,11 +139,6 @@
       <Project>{ab737a44-ee52-4979-a385-b275a38457e9}</Project>
       <Name>Viewer</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="AdamsLair.TreeViewAdv">
-      <Version>1.7.7</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

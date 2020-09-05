@@ -22,7 +22,7 @@ namespace MonoGame.WpfCore.MonoGameControls
         void SizeChanged(object sender, SizeChangedEventArgs args);
     }
 
-    public class MonoGameViewModel : ViewModel, IMonoGameViewModel
+    public class MonoGameViewModel : IMonoGameViewModel
     {
         public MonoGameViewModel()
         {

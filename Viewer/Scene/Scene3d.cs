@@ -26,7 +26,7 @@ namespace WpfTest.Scenes
     /// Note that this is just an example implementation of <see cref="WpfGame"/>.
     /// Based on: http://msdn.microsoft.com/en-us/library/bb203926(v=xnagamestudio.40).aspx
     /// </summary>
-    public class CubeDemoScene : WpfGame
+    public class Scene3d : WpfGame
     {
         private BasicEffect _basicEffect;
         private WpfKeyboard _keyboard;
@@ -36,6 +36,11 @@ namespace WpfTest.Scenes
         private bool _disposed;
 
         ArcBallCamera _camera;
+        public List<MeshInstance> MyModels = new List<MeshInstance>();
+
+        public delegate List<MeshInstance> LoadSceneCallback(GraphicsDevice device);
+        public LoadSceneCallback LoadScene { get; set; }
+
         protected override void Initialize()
         {
 
@@ -57,13 +62,14 @@ namespace WpfTest.Scenes
 
             RefreshProjection();
             CreateScene();
+            if (LoadScene != null)
+                MyModels = LoadScene(GraphicsDevice);
 
             base.Initialize();
         }
 
         public void CreateScene()
         {
-            return; 
             _cubeModel = new CubeModel();
             _cubeModel.Create(GraphicsDevice);
 
@@ -76,7 +82,7 @@ namespace WpfTest.Scenes
             // Load scene
 
 
-
+            return;
 
             var path = @"C:\Users\ole_k\Desktop\ModelDecoding\brt_paladin\";
             var models = new string[] { "brt_paladin_head_01","brt_paladin_head_04", "brt_paladin_torso_03", "brt_paladin_legs_01", "brt_paladin_torso_02" };
@@ -97,7 +103,7 @@ namespace WpfTest.Scenes
             _rTemp = RigidModel.Create(modelChunk, out var error);
 
 
-
+            
 
 
 
@@ -292,21 +298,21 @@ namespace WpfTest.Scenes
         int animIndex = 0;
         protected override void Draw(GameTime time)
         {
-            return;
-            animIndex++;
-            if (animIndex >= animationInfo.Animation.Count)
-                animIndex = 0;
+        
+           //animIndex++;
+           //if (animIndex >= animationInfo.Animation.Count)
+           //    animIndex = 0;
 
             //animIndex = 0;
 
-            _rmv2CompoundModel = new Rmv2CompoundModel();
+            /*_rmv2CompoundModel = new Rmv2CompoundModel();
             _rmv2CompoundModel.Create(GraphicsDevice, _rTemp, animationInfo, 0, animIndex);
             
             _rmv2Compound = new MeshInstance()
             {
                 Model = _rmv2CompoundModel,
                 World = Matrix.Identity
-            };
+            };*/
 
             //The projection depends on viewport dimensions (aspect ratio).
             // Because WPF controls can be resized at any time (user resizes window)
@@ -319,36 +325,39 @@ namespace WpfTest.Scenes
      
             _basicEffect.View = _camera.ViewMatrix;
 
-            //_cube0.Render(GraphicsDevice, _basicEffect);
-            _rmv2Compound.Render(GraphicsDevice, _basicEffect);
-            _basicEffect.World = Matrix.Identity;
-           
-            
-            foreach (var pass in _basicEffect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
+            _cube0.Render(GraphicsDevice, _basicEffect);
+            foreach(var item in MyModels)
+                item.Render(GraphicsDevice, _basicEffect);
 
-               for (int i = 0; i < skelModel.Bones.Count; i++)
-               {
-                   var parentIndex = skelModel.Bones[i].ParentIndex;
-                   if (parentIndex == -1)
-                       continue;
-               
-                   var posA = Vector3.Transform(skelModel.Bones[i].WorldPosition.Translation,
-                       animationInfo.Animation[animIndex].BoneTransforms[i].Transform);
+            //_rmv2Compound.Render(GraphicsDevice, _basicEffect);
+            //_basicEffect.World = Matrix.Identity;
+            //
 
-                   var posB = Vector3.Transform(skelModel.Bones[parentIndex].WorldPosition.Translation,
-                       animationInfo.Animation[animIndex].BoneTransforms[parentIndex].Transform);
-               
-                   var vertices = new[]
-                   {
-                       new VertexPositionNormalTexture(posA, new Vector3(0,0,0), new Vector2(0,0)),
-                       new VertexPositionNormalTexture(posB, new Vector3(0,0,0), new Vector2(0,0))
-                   };
-                   GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
-               }
-
-            }
+            // foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+            // {
+            //     pass.Apply();
+            //
+            //    for (int i = 0; i < skelModel.Bones.Count; i++)
+            //    {
+            //        var parentIndex = skelModel.Bones[i].ParentIndex;
+            //        if (parentIndex == -1)
+            //            continue;
+            //    
+            //        var posA = Vector3.Transform(skelModel.Bones[i].WorldPosition.Translation,
+            //            animationInfo.Animation[animIndex].BoneTransforms[i].Transform);
+            //
+            //        var posB = Vector3.Transform(skelModel.Bones[parentIndex].WorldPosition.Translation,
+            //            animationInfo.Animation[animIndex].BoneTransforms[parentIndex].Transform);
+            //    
+            //        var vertices = new[]
+            //        {
+            //            new VertexPositionNormalTexture(posA, new Vector3(0,0,0), new Vector2(0,0)),
+            //            new VertexPositionNormalTexture(posB, new Vector3(0,0,0), new Vector2(0,0))
+            //        };
+            //        GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+            //    }
+            //
+            // }
 
 
             base.Draw(time);

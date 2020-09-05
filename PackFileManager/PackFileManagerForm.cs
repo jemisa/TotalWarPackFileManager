@@ -1475,7 +1475,7 @@ namespace PackFileManager
                 Height = 1000
             };
 
-            var dbDecoder = new Viewer.NHew.UserControl1();
+            var dbDecoder = new Viewer.Scene.SceneView();
             //dbDecoder.Show();
             
             //var dbDecoder = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);

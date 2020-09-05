@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Viewer.GraphicModels
 {
-    class MeshModel : IDisposable
+    public class MeshModel : IDisposable
     {
         VertexDeclaration _vertexDeclaration;
         VertexBuffer _vertexBuffer;

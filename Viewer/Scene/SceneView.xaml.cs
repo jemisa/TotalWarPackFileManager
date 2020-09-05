@@ -12,17 +12,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfTest.Scenes;
 
-namespace Viewer.NHew
+namespace Viewer.Scene
 {
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
-    public partial class UserControl1 : UserControl
+    public partial class SceneView : UserControl
     {
-        public UserControl1()
+        public SceneView()
         {
             InitializeComponent();
         }
+
+        public Scene3d Scene { get { return Scene2; } }
     }
 }

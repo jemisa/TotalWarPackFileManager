@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 
 namespace Common {
+
     /*
      * Class sorting the packs in a directory in the order they are loaded.
      */
@@ -188,6 +189,30 @@ namespace Common {
                 }
             }
             return result;
+        }
+    }
+
+    public static class PackFileLoadHelper
+    {
+        public static List<PackFile> LoadCaPackFilesForGame(Game game)
+        {
+            var output = new List<PackFile>();
+            PackLoadSequence allFiles = new PackLoadSequence
+            {
+                IncludePacksContaining = delegate (string s) { return true; }
+            };
+
+            List<string> packPaths = allFiles.GetPacksLoadedFrom(game.GameDirectory);
+            packPaths.Reverse();
+
+            PackFileCodec codec = new PackFileCodec();
+            foreach (string path in packPaths)
+            {
+                PackFile pack = codec.Open(path);
+                output.Add(pack);
+            }
+
+            return output;
         }
     }
 }
