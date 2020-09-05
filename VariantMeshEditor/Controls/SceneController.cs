@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Util;
+using VariantMeshEditor.Views.EditorViews;
 using Viewer.GraphicModels;
 using Game = Common.Game;
 
@@ -17,13 +20,14 @@ namespace VariantMeshEditor.Controls
     {
         SceneTreeViewController _treeViewController;
         List<PackFile> _caPackFiles;
-
+        Panel _toolPanel;
         Dictionary<string, MeshInstance> _models = new Dictionary<string, MeshInstance>();
 
-        public SceneController(SceneTreeViewController treeViewController)
+        public SceneController(SceneTreeViewController treeViewController, Panel toolPanel)
         {
             _treeViewController = treeViewController;
             _caPackFiles = PackFileLoadHelper.LoadCaPackFilesForGame(Game.TWH2);
+            _toolPanel = toolPanel;
 
             _treeViewController.SceneElementSelectedEvent += _treeViewController_SceneElementSelectedEvent;
             _treeViewController.VisabilityChangedEvent += _treeViewController_VisabilityChangedEvnt;
@@ -31,13 +35,26 @@ namespace VariantMeshEditor.Controls
 
         private void _treeViewController_SceneElementSelectedEvent(FileSceneElement element)
         {
-       
+            _toolPanel.Children.Clear();
+            if (element.Type == FileSceneElementEnum.Skeleton)
+            {
+                SkeletonEditorView view = new SkeletonEditorView();
+                _toolPanel.Children.Add(view);
+                SkeletonController controller = new SkeletonController(view, (element as SkeletonElement));
+            }
+            else if (element.Type == FileSceneElementEnum.Animation)
+            {
+                AnimationEditorView view = new AnimationEditorView();
+                _toolPanel.Children.Add(view);
+                AnimationController controller = new AnimationController(view, (element as AnimationElement));
+            }
         }
 
         private void _treeViewController_VisabilityChangedEvnt(FileSceneElement element, bool isVisible)
         {
             if (element.Type == FileSceneElementEnum.RigidModel ||
-                element.Type == FileSceneElementEnum.WsModel)
+                element.Type == FileSceneElementEnum.WsModel ||
+                element.Type == FileSceneElementEnum.Skeleton)
             {
                 _models[element.FullPath].Visible = isVisible;
             }
@@ -80,6 +97,21 @@ namespace VariantMeshEditor.Controls
                         Visible = shouldBeVisible
                     };
 
+                    out_created_models.Add(item.FullPath, instance);
+                }
+
+                if (item.Type == FileSceneElementEnum.Skeleton)
+                {
+
+                    SkeletonModel skeletonModel = new SkeletonModel();
+                    skeletonModel.Create((item as SkeletonElement).Skeleton);
+
+                    MeshInstance instance = new MeshInstance()
+                    {
+                        Model = skeletonModel,
+                        World = Matrix.Identity,
+                        Visible = shouldBeVisible
+                    };
                     out_created_models.Add(item.FullPath, instance);
                 }
 

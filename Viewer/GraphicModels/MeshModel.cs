@@ -8,7 +8,15 @@ using System.Threading.Tasks;
 
 namespace Viewer.GraphicModels
 {
-    public class MeshModel : IDisposable
+    public interface IRenderableContent : IDisposable
+    {
+        void Render(GraphicsDevice device, Effect effect);
+    }
+
+   
+
+
+    public class MeshModel : IRenderableContent
     {
         VertexDeclaration _vertexDeclaration;
         VertexBuffer _vertexBuffer;

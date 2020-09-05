@@ -1,6 +1,7 @@
 ﻿using Common;
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
+using Filetypes.RigidModel.Animation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +18,9 @@ namespace VariantMeshEditor.Util
         Root,
         Transform,
         Animation,
+        Skeleton,
         VariantMesh,
+        Slots,
         Slot,
         RigidModel,
         WsModel
@@ -62,12 +65,24 @@ namespace VariantMeshEditor.Util
         public override FileSceneElementEnum Type => FileSceneElementEnum.Animation;
     }
 
+    public class SkeletonElement : FileSceneElement
+    {
+        public Skeleton Skeleton { get; set; }
+        public SkeletonElement(FileSceneElement parent) : base(parent, "", "", "Skeleton") { }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.Skeleton;
+    }
+
     public class VariantMeshElement : FileSceneElement
     {
         public VariantMeshElement(FileSceneElement parent, string fullPath) : base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, "VariantMesh") { }
         public override FileSceneElementEnum Type => FileSceneElementEnum.VariantMesh;
     }
 
+    public class SlotsElement : FileSceneElement
+    {
+        public SlotsElement(FileSceneElement parent) : base(parent, "", "", "Slots") { }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.Slots;
+    }
 
     public class SlotElement : FileSceneElement
     {
@@ -141,8 +156,13 @@ namespace VariantMeshEditor.Util
             var variantMeshElement = new VariantMeshElement(parent,file.Name);
             parent.Children.Add(variantMeshElement);
 
-            variantMeshElement.Children.Add(new AnimationElement(variantMeshElement));
             variantMeshElement.Children.Add(new TransformElement(variantMeshElement));
+            variantMeshElement.Children.Add(new AnimationElement(variantMeshElement));
+            var skeletonElement = new SkeletonElement(variantMeshElement);
+            variantMeshElement.Children.Add(skeletonElement);
+
+            var slotsElement = new SlotsElement(variantMeshElement);
+            variantMeshElement.Children.Add(slotsElement);
 
             var content = file.Data;
             var fileContent = Encoding.Default.GetString(content);
@@ -150,14 +170,33 @@ namespace VariantMeshEditor.Util
 
             foreach (var slot in meshFile.VARIANT_MESH.SLOT)
             {
-                var slotElement = new SlotElement(variantMeshElement, slot.Name, slot.AttachPoint);
-                variantMeshElement.Children.Add(slotElement);
+                var slotElement = new SlotElement(slotsElement, slot.Name, slot.AttachPoint);
+                slotsElement.Children.Add(slotElement);
 
                 foreach (var mesh in slot.VariantMeshes)
                     Load(mesh.Name, slotElement);
 
                 foreach (var meshReference in slot.VariantMeshReferences)
                     Load(meshReference.definition, slotElement);
+            }
+
+            // Load the animation
+            var rigidModels = new List<RigidModelElement>();
+            GetAllOfType<RigidModelElement>(parent, ref rigidModels);
+            var skeletons = rigidModels
+                .Where(x=>!string.IsNullOrEmpty(x.Model.BaseSkeleton))
+                .Select(x => x.Model.BaseSkeleton)
+                .Distinct();
+
+            if (skeletons.Count() > 1)
+                throw new Exception("More the one skeleton for a veriant mesh");
+            if (skeletons.Count() == 1)
+            {
+                LoadSkeleton(skeletons.First(), skeletonElement);
+            }
+            else
+            {
+                variantMeshElement.Children.Remove(skeletonElement);
             }
         }
 
@@ -169,6 +208,14 @@ namespace VariantMeshEditor.Util
             parent.Children.Add(model);
         }
 
+        void LoadSkeleton(string skeletonName, SkeletonElement skeletonElement)
+        {
+            string animationFolder = "animations\\skeletons\\";
+            var skeletonFilePath = animationFolder + skeletonName + ".anim";
+            var file = FindFile(skeletonFilePath);
+            if(file != null)
+                skeletonElement.Skeleton = Skeleton.Create( new ByteChunk(file.Data), out string errorMessage);
+        }
 
         void LoadWsModel(PackedFile file, FileSceneElement parent)
         {
@@ -190,6 +237,20 @@ namespace VariantMeshEditor.Util
                 }
             }
             return null;
+        }
+
+        void GetAllOfType<T>(FileSceneElement variantMeshParent, ref List<T> out_items) where T : FileSceneElement
+        {
+            if (variantMeshParent as T != null)
+                out_items.Add(variantMeshParent as T);
+
+            foreach (var child in variantMeshParent.Children)
+            {
+                if (variantMeshParent as T != null)
+                    out_items.Add(variantMeshParent as T);
+
+                GetAllOfType<T>(child, ref out_items);
+            }
         }
     }
 }

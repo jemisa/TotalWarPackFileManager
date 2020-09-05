@@ -29,7 +29,7 @@ namespace Filetypes.RigidModel
                 FileType = chunk.ReadFixedLength(4),
                 MeshCount = chunk.ReadUInt32(),
                 LodCount = chunk.ReadUInt32(),
-                BaseSkeleton = chunk.ReadFixedLength(128)
+                BaseSkeleton = Util.SanatizeFixedString(chunk.ReadFixedLength(128))
             };
 
             for (int i = 0; i < model.LodCount; i++)

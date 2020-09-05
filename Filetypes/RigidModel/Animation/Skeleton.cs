@@ -98,7 +98,7 @@ namespace Filetypes.RigidModel.Animation
 
 		public override string ToString()
         {
-			return $"{Position_X}, {Position_Y}, {Position_Z}";
+			return $"{Name} {Id}->{ParentId} : {Position_X}, {Position_Y}, {Position_Z}";
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Viewer.GraphicModels
     public class MeshInstance
     {
         public Matrix World { get; set; } = Matrix.Identity;
-        public MeshModel Model { get; set; }
+        public IRenderableContent Model { get; set; }
         public bool Visible { get; set; } = true;
         public void Render(GraphicsDevice device, BasicEffect effect)
         {

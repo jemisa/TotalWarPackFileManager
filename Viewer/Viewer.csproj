@@ -46,9 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GraphicModels\CubeModel.cs" />
+    <Compile Include="GraphicModels\LineModel.cs" />
     <Compile Include="GraphicModels\MeshInstance.cs" />
     <Compile Include="GraphicModels\MeshModel.cs" />
     <Compile Include="GraphicModels\Rmv2Model.cs" />
+    <Compile Include="GraphicModels\SkeletonModel.cs" />
     <Compile Include="MonoGameControlls\MonoGameContentControl.cs" />
     <Compile Include="MonoGameControlls\MonoGameGraphicsDeviceService.cs" />
     <Compile Include="MonoGameControlls\MonoGameServiceProvider.cs" />

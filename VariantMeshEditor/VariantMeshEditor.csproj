@@ -50,6 +50,8 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\EditorControllers\AnimationController.cs" />
+    <Compile Include="Controls\EditorControllers\SkeletonController.cs" />
     <Compile Include="Controls\SceneController.cs" />
     <Compile Include="Controls\SceneTreeViewController.cs" />
     <Compile Include="Util\VariantMeshLoader.cs" />
@@ -61,6 +63,9 @@
     </Compile>
     <Compile Include="Views\EditorViews\EditorPanelView.xaml.cs">
       <DependentUpon>EditorPanelView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditorViews\SkeletonEditorView.xaml.cs">
+      <DependentUpon>SkeletonEditorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ImprovedTreeView\TreeViewDataModel.cs" />
     <Compile Include="Views\ImprovedTreeView\VirtualToggleButton.cs" />
@@ -79,6 +84,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditorViews\EditorPanelView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\SkeletonEditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

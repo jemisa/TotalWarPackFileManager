@@ -47,6 +47,8 @@ namespace VariantMeshEditor.Controls
                 node.Vis = Visibility.Hidden;
             if (scene as AnimationElement != null)
                 node.Vis = Visibility.Hidden;
+            if (scene as SkeletonElement != null)
+                node.IsChecked = false;
 
             bool areAllChildrenModels = scene.Children.Where(x => (x as RigidModelElement) != null).Count() == scene.Children.Count();
             bool firstItem = true;
@@ -67,7 +69,8 @@ namespace VariantMeshEditor.Controls
 
         private void _viewModel_SelectedItemChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<object> e)
         {
-            //SceneElementSelectedEvent?.Invoke((sender as TreeViewDataModel).Tag as FileSceneElement);
+            TreeViewDataModel selectedItem = e.NewValue as TreeViewDataModel;
+            SceneElementSelectedEvent?.Invoke(selectedItem.Tag as FileSceneElement);
         }
 
         bool _updatingCheckedStatus = false;
@@ -80,9 +83,14 @@ namespace VariantMeshEditor.Controls
             {
                 var treeItem = sender as TreeViewDataModel;
                 var fileSceneElement = treeItem.Tag as FileSceneElement;
+
+                if (fileSceneElement.Type == FileSceneElementEnum.Skeleton)
+                {
+                    VisabilityChangedEvent?.Invoke(treeItem.Tag as FileSceneElement, treeItem.IsChecked.Value);
+                }
+
                 if (treeItem.IsChecked.Value)
                 {
-                   
                     if (fileSceneElement.Type == FileSceneElementEnum.RigidModel ||
                         fileSceneElement.Type == FileSceneElementEnum.WsModel)
                     {
