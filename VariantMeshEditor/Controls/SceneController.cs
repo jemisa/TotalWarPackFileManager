@@ -21,7 +21,7 @@ namespace VariantMeshEditor.Controls
         SceneTreeViewController _treeViewController;
         List<PackFile> _caPackFiles;
         Panel _toolPanel;
-        Dictionary<string, MeshInstance> _models = new Dictionary<string, MeshInstance>();
+        Dictionary<FileSceneElement, MeshInstance> _models = new Dictionary<FileSceneElement, MeshInstance>();
 
         public SceneController(SceneTreeViewController treeViewController, Panel toolPanel)
         {
@@ -40,13 +40,14 @@ namespace VariantMeshEditor.Controls
             {
                 SkeletonEditorView view = new SkeletonEditorView();
                 _toolPanel.Children.Add(view);
-                SkeletonController controller = new SkeletonController(view, (element as SkeletonElement));
+                SkeletonController controller = new SkeletonController(view, _caPackFiles, (element as SkeletonElement));
             }
             else if (element.Type == FileSceneElementEnum.Animation)
             {
+                var skeleton = _treeViewController.GetAllOfTypeInSameVariantMesh<SkeletonElement>(element);
                 AnimationEditorView view = new AnimationEditorView();
                 _toolPanel.Children.Add(view);
-                AnimationController controller = new AnimationController(view, (element as AnimationElement));
+                AnimationController controller = new AnimationController(view, (element as AnimationElement), skeleton.First());
             }
         }
 
@@ -56,7 +57,7 @@ namespace VariantMeshEditor.Controls
                 element.Type == FileSceneElementEnum.WsModel ||
                 element.Type == FileSceneElementEnum.Skeleton)
             {
-                _models[element.FullPath].Visible = isVisible;
+                _models[element].Visible = isVisible;
             }
         }
 
@@ -76,7 +77,7 @@ namespace VariantMeshEditor.Controls
             return graphiScene;
         }
 
-        void Create(FileSceneElement scene, bool shouldBeVisible, GraphicsDevice device, ref Dictionary<string, MeshInstance> out_created_models)
+        void Create(FileSceneElement scene, bool shouldBeVisible, GraphicsDevice device, ref Dictionary<FileSceneElement, MeshInstance> out_created_models)
         {
             bool areAllChildrenModels = scene.Children.Where(x =>x.Type == FileSceneElementEnum.RigidModel).Count() == scene.Children.Count();
             bool firstItem = true;
@@ -97,22 +98,13 @@ namespace VariantMeshEditor.Controls
                         Visible = shouldBeVisible
                     };
 
-                    out_created_models.Add(item.FullPath, instance);
+                    out_created_models.Add(item, instance);
                 }
 
                 if (item.Type == FileSceneElementEnum.Skeleton)
                 {
-
-                    SkeletonModel skeletonModel = new SkeletonModel();
-                    skeletonModel.Create((item as SkeletonElement).Skeleton);
-
-                    MeshInstance instance = new MeshInstance()
-                    {
-                        Model = skeletonModel,
-                        World = Matrix.Identity,
-                        Visible = shouldBeVisible
-                    };
-                    out_created_models.Add(item.FullPath, instance);
+                    var skeleteonElement = item as SkeletonElement;
+                    out_created_models.Add(item, skeleteonElement.MeshInstance);
                 }
 
 

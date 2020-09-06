@@ -1,4 +1,5 @@
-﻿using Filetypes.RigidModel.Animation;
+﻿using Common;
+using Filetypes.RigidModel.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,16 +14,31 @@ namespace VariantMeshEditor.Controls.EditorControllers
     class SkeletonController
     {
         SkeletonEditorView _viewModel;
-        Skeleton _skeleton;
-        public SkeletonController(SkeletonEditorView viewModel, SkeletonElement skeletonElement)
+        List<PackFile>  _caPackFiles;
+
+        SkeletonElement _skeletonElement;
+        public SkeletonController(SkeletonEditorView viewModel, List<PackFile> caPackFiles, SkeletonElement skeletonElement)
         {
             _viewModel = viewModel;
-            _skeleton = skeletonElement.Skeleton;
+            _skeletonElement = skeletonElement;
+            _caPackFiles = caPackFiles;
+            var allSkeletons = GetAllSkeltons();
+            foreach(var skeleton in allSkeletons)
+                _viewModel.SkeltonTypeComboBox.Items.Add(skeleton);
 
-            _viewModel.SkeletonName.Content = "Name : " + _skeleton.Name;
-            _viewModel.BoneCount.Content = "Bone Count : " + _skeleton.Bones.Count;
+            var i = _viewModel.SkeltonTypeComboBox.Items.IndexOf(skeletonElement.Skeleton.Name + ".anim");
+            _viewModel.SkeltonTypeComboBox.SelectedIndex = i;
+
+            _viewModel.SkeltonTypeComboBox.SelectionChanged += SkeltonTypeComboBox_SelectionChanged;
+            CreateBoneOverview();
+        }
+
+        void CreateBoneOverview()
+        {
+            _viewModel.SkeletonBonesView.Items.Clear();
+            _viewModel.BoneCount.Content = "Bone Count : " + _skeletonElement.Skeleton.Bones.Count;
             var index = 0;
-            foreach (var bone in _skeleton.Bones)
+            foreach (var bone in _skeletonElement.Skeleton.Bones)
             {
                 index++;
                 if (bone.ParentId == -1)
@@ -31,13 +47,21 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 }
                 else
                 {
-                    var parentBone = _skeleton.Bones[bone.ParentId];
+                    var parentBone = _skeletonElement.Skeleton.Bones[bone.ParentId];
                     var treeParent = GetParent(_viewModel.SkeletonBonesView.Items, parentBone);
 
                     if (treeParent != null)
                         treeParent.Items.Add(CreateNode(bone));
                 }
             }
+        }
+
+        private void SkeltonTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string skeletonName = _viewModel.SkeltonTypeComboBox.SelectedItem as string;
+
+            _skeletonElement.Create(_caPackFiles, skeletonName);
+            CreateBoneOverview();
         }
 
         TreeViewItem CreateNode(BoneInfo bone)
@@ -65,7 +89,12 @@ namespace VariantMeshEditor.Controls.EditorControllers
             return null;
         }
 
-      
+        List<string> GetAllSkeltons()
+        {
+
+            var possibleSkeletons = PackFileLoadHelper.GetAllFilesWithExtentionInDirectory(_caPackFiles, @"animations\skeletons");
+            return possibleSkeletons.Where(x => x.FileExtention == "anim").Select(x => x.Name).ToList();
+        }
 
 
     }

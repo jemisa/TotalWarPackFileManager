@@ -14,7 +14,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
     {
         AnimationEditorView _viewModel;
 
-        public AnimationController(AnimationEditorView viewModel, AnimationElement animationElement)
+        public AnimationController(AnimationEditorView viewModel, AnimationElement animationElement, SkeletonElement skeletonElement)
         {
             _viewModel = viewModel;
         }

@@ -214,6 +214,46 @@ namespace Common {
 
             return output;
         }
+
+        public static PackedFile FindFile(List<PackFile> loadedPackFiles, string filename)
+        {
+            filename = filename.ToLower();
+            filename = filename.Replace(@"/", @"\");
+
+            foreach (var directory in loadedPackFiles)
+            {
+                foreach (var file in directory)
+                {
+                    if (file.FullPath == filename)
+                        return file;
+                }
+            }
+            return null;
+        }
+
+        public static List<PackedFile> GetAllFilesWithExtentionInDirectory(List<PackFile> loadedPackFiles, string sourceDirectory)
+        {
+            var output = new List<PackedFile>();
+            sourceDirectory = sourceDirectory.ToLower();
+            sourceDirectory = sourceDirectory.Replace(@"/", @"\");
+
+            foreach (var packedFile in loadedPackFiles)
+            {
+                foreach (var file in packedFile.Files)
+                {
+                    var idx = file.FullPath.IndexOf(sourceDirectory);
+                    if (idx == 0)
+                        output.Add(file);
+                }
+
+               /* if (directory.Filepath == sourceDirectory)
+                {
+                    foreach (var file in directory)
+                        output.Add(file);
+                }*/
+            }
+            return output;
+        }
     }
 }
 
