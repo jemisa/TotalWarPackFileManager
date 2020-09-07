@@ -4,9 +4,9 @@ using System.Windows.Input;
 
 namespace TreeViewWithCheckBoxes
 {
-    public partial class Window1 : UserControl
+    public partial class ImprovedTreeViewWindow : UserControl
     {
-        public Window1()
+        public ImprovedTreeViewWindow()
         {
             InitializeComponent();
             this.tree.Focus();
