@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TreeViewWithCheckBoxes;
 using VariantMeshEditor.Util;
+using VariantMeshEditor.ViewModels;
 
 namespace VariantMeshEditor.Controls
 {
@@ -62,28 +63,23 @@ namespace VariantMeshEditor.Controls
 
         public void Populate(FileSceneElement rootItem)
         {
-            var node = CreateNode(rootItem, true);
-            node.Initialize();
-            _viewModel.DataContext = new ObservableCollection<TreeViewDataModel>() { node }; ;
+            SetInitialVisability(rootItem, true);
+            _viewModel.DataContext = new ObservableCollection<TreeViewDataModel>() { rootItem }; ;
         }
 
-        public TreeViewDataModel CreateNode(FileSceneElement scene, bool shouldBeSelected, TreeViewDataModel parent = null)
+        public void SetInitialVisability(FileSceneElement scene, bool shouldBeSelected, TreeViewDataModel parent = null)
         {
-            TreeViewDataModel node = new TreeViewDataModel(scene.ToString())
-            {
-                IsChecked = shouldBeSelected,
-                Tag = scene,
-            };
 
-            scene.TreeNode = node;
-            node.PropertyChanged += Node_PropertyChanged;
+            scene.IsChecked = shouldBeSelected;
+
+            scene.PropertyChanged += Node_PropertyChanged;
 
             if (scene as TransformElement != null)
-                node.Vis = Visibility.Hidden;
+                scene.Vis = Visibility.Hidden;
             if (scene as AnimationElement != null)
-                node.Vis = Visibility.Hidden;
+                scene.Vis = Visibility.Hidden;
             if (scene as SkeletonElement != null)
-                node.IsChecked = false;
+                scene.IsChecked = false;
 
             bool areAllChildrenModels = scene.Children.Where(x => (x as RigidModelElement) != null).Count() == scene.Children.Count();
             bool firstItem = true;
@@ -93,19 +89,14 @@ namespace VariantMeshEditor.Controls
                     shouldBeSelected = false;
 
                 firstItem = false;
-                CreateNode(item, shouldBeSelected, node);
+                SetInitialVisability(item, shouldBeSelected, null);
             }
-
-            if (parent != null)
-                parent.Children.Add(node);
-
-            return node;
         }
 
         private void _viewModel_SelectedItemChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<object> e)
         {
             TreeViewDataModel selectedItem = e.NewValue as TreeViewDataModel;
-            SceneElementSelectedEvent?.Invoke(selectedItem.Tag as FileSceneElement);
+            SceneElementSelectedEvent?.Invoke(selectedItem as FileSceneElement);
         }
 
         bool _updatingCheckedStatus = false;
@@ -116,30 +107,29 @@ namespace VariantMeshEditor.Controls
             _updatingCheckedStatus = true;
             if (e.PropertyName == "IsChecked")
             {
-                var treeItem = sender as TreeViewDataModel;
-                var fileSceneElement = treeItem.Tag as FileSceneElement;
+                var fileSceneElement = sender as FileSceneElement;
 
                 if (fileSceneElement.Type == FileSceneElementEnum.Skeleton)
                 {
-                    VisabilityChangedEvent?.Invoke(treeItem.Tag as FileSceneElement, treeItem.IsChecked.Value);
+                    VisabilityChangedEvent?.Invoke(fileSceneElement as FileSceneElement, fileSceneElement.IsChecked);
                 }
 
-                if (treeItem.IsChecked.Value)
+                if (fileSceneElement.IsChecked)
                 {
                     if (fileSceneElement.Type == FileSceneElementEnum.RigidModel ||
                         fileSceneElement.Type == FileSceneElementEnum.WsModel)
                     {
-                        var parentChildren = treeItem.Parent.Children;
+                        var parentChildren = fileSceneElement.Parent.Children;
                         foreach (var child in parentChildren)
                         {
                             child.IsChecked = false;
-                            VisabilityChangedEvent?.Invoke(child.Tag as FileSceneElement, child.IsChecked.Value);
+                            VisabilityChangedEvent?.Invoke(child as FileSceneElement, child.IsChecked);
                         }
-                        treeItem.IsChecked = true;
+                        fileSceneElement.IsChecked = true;
 
-                        VisabilityChangedEvent?.Invoke(treeItem.Tag as FileSceneElement, treeItem.IsChecked.Value);
+                        VisabilityChangedEvent?.Invoke(fileSceneElement as FileSceneElement, fileSceneElement.IsChecked);
 
-                        var parent = treeItem.Parent;
+                        var parent = fileSceneElement.Parent;
                         while (parent != null)
                         {
                             parent.IsChecked = true;
@@ -148,7 +138,7 @@ namespace VariantMeshEditor.Controls
                     }
                     else
                     {
-                        SetChildrenVisability(treeItem, true);
+                        SetChildrenVisability(fileSceneElement, true);
                     }
                 }
                 else
@@ -156,11 +146,11 @@ namespace VariantMeshEditor.Controls
                     if (fileSceneElement.Type == FileSceneElementEnum.RigidModel ||
                         fileSceneElement.Type == FileSceneElementEnum.WsModel)
                     {
-                        VisabilityChangedEvent?.Invoke(treeItem.Tag as FileSceneElement, treeItem.IsChecked.Value);
+                        VisabilityChangedEvent?.Invoke(fileSceneElement as FileSceneElement, fileSceneElement.IsChecked);
                     }
                     else
                     {
-                        SetChildrenVisability(treeItem, false);
+                        SetChildrenVisability(fileSceneElement, false);
                     }
                 }
             }
@@ -168,18 +158,18 @@ namespace VariantMeshEditor.Controls
             _updatingCheckedStatus = false;
         }
 
-        void SetChildrenVisability(TreeViewDataModel root, bool isVisible)
+        void SetChildrenVisability(FileSceneElement root, bool isVisible)
         {
             foreach (var treeItem in root.Children)
             {
-                var fileSceneElement = treeItem.Tag as FileSceneElement;
+                var fileSceneElement = treeItem as FileSceneElement;
                 if (fileSceneElement.Type == FileSceneElementEnum.RigidModel ||
                         fileSceneElement.Type == FileSceneElementEnum.WsModel)
                 {
                     if (isVisible)
-                        VisabilityChangedEvent?.Invoke(treeItem.Tag as FileSceneElement, treeItem.IsChecked.Value);
+                        VisabilityChangedEvent?.Invoke(treeItem as FileSceneElement, treeItem.IsChecked);
                     else
-                        VisabilityChangedEvent?.Invoke(treeItem.Tag as FileSceneElement, false);
+                        VisabilityChangedEvent?.Invoke(treeItem as FileSceneElement, false);
                 }
 
                 if (fileSceneElement.Type == FileSceneElementEnum.Slot && treeItem.IsChecked == false)

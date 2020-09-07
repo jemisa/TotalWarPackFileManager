@@ -40,10 +40,7 @@ namespace VariantMeshEditor
             InitializeComponent();
 
             _treeViewController = new SceneTreeViewController(EditorPanel.TreeView.tree);
-            _sceneController = new SceneController(_treeViewController, EditorPanel.ToolPanel);
-
-            RenderView.Scene.LoadScene = _sceneController.LoadScene;
-
+            _sceneController = new SceneController(_treeViewController, RenderView.Scene, EditorPanel.ToolPanel);
         }
     }
 }

@@ -56,6 +56,9 @@
     <Compile Include="Controls\SceneController.cs" />
     <Compile Include="Controls\SceneTreeViewController.cs" />
     <Compile Include="Util\VariantMeshLoader.cs" />
+    <Compile Include="ViewModels\FileSceneElement.cs" />
+    <Compile Include="ViewModels\RigidModelElement.cs" />
+    <Compile Include="ViewModels\SkeletonElement.cs" />
     <Compile Include="Views\Animation\AnimationControl.xaml.cs">
       <DependentUpon>AnimationControl.xaml</DependentUpon>
     </Compile>
@@ -164,5 +167,6 @@
       <Name>Viewer</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

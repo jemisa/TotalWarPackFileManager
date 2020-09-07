@@ -36,9 +36,9 @@ namespace WpfTest.Scenes
         private bool _disposed;
 
         ArcBallCamera _camera;
-        public List<MeshInstance> MyModels = new List<MeshInstance>();
+        public List<MeshInstance> DrawBuffer = new List<MeshInstance>();
 
-        public delegate List<MeshInstance> LoadSceneCallback(GraphicsDevice device);
+        public delegate void LoadSceneCallback(GraphicsDevice device);
         public LoadSceneCallback LoadScene { get; set; }
 
         protected override void Initialize()
@@ -62,11 +62,11 @@ namespace WpfTest.Scenes
 
             RefreshProjection();
             CreateScene();
-            if (LoadScene != null)
-                MyModels = LoadScene(GraphicsDevice);
+
 
             base.Initialize();
         }
+
 
         public void CreateScene()
         {
@@ -79,7 +79,7 @@ namespace WpfTest.Scenes
                 World = Matrix.Identity * Matrix.CreateScale(0.05f)
             };
 
-            // Load scene
+            LoadScene?.Invoke(GraphicsDevice);
 
 
             return;
@@ -87,7 +87,7 @@ namespace WpfTest.Scenes
             var path = @"C:\Users\ole_k\Desktop\ModelDecoding\brt_paladin\";
             var models = new string[] { "brt_paladin_head_01","brt_paladin_head_04", "brt_paladin_torso_03", "brt_paladin_legs_01", "brt_paladin_torso_02" };
 
-
+            /*
             VariantMeshDefinition.Create(path + "VariantMeshDef.txt");
 
             var skeletonByteChunk = ByteChunk.FromFile(path + @"Skeleton\humanoid01.anim");
@@ -100,7 +100,7 @@ namespace WpfTest.Scenes
 
 
             var modelChunk = ByteChunk.FromFile(path + models[3] + ".rigid_model_v2");
-            _rTemp = RigidModel.Create(modelChunk, out var error);
+            _rTemp = RigidModel.Create(modelChunk, out var error);*/
 
 
             
@@ -109,67 +109,15 @@ namespace WpfTest.Scenes
 
         }
 
-        RigidModel _rTemp;
+  
 
 
         CubeModel _cubeModel;
         MeshInstance _cube0;
 
-        Rmv2CompoundModel _rmv2CompoundModel;
-        MeshInstance _rmv2Compound;
 
 
-        public class SkeletonModel
-        {
-            public class BoneInfo
-            {
-                public Matrix Position { get; set; }
-                public Matrix WorldPosition { get; set; }
-                public Matrix Inv { get; set; }
-                public int Index { get; set; }
-                public int ParentIndex { get; set; }
-                public string Name { get; set; }
-            }
 
-            public List<BoneInfo> Bones = new List<BoneInfo>();
-
-            public static SkeletonModel Create(Skeleton skeleton)
-            {
-                SkeletonModel model = new SkeletonModel();
-                for (int i = 0; i < skeleton.Bones.Count(); i++)
-                {
-                    var x = new Microsoft.Xna.Framework.Quaternion(
-                        skeleton.Bones[i].Rotation_X,
-                        skeleton.Bones[i].Rotation_Y,
-                        skeleton.Bones[i].Rotation_Z,
-                        skeleton.Bones[i].Rotation_W);
-                    x.Normalize();
-
-                    var pos = Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(skeleton.Bones[i].Position_X, skeleton.Bones[i].Position_Y, skeleton.Bones[i].Position_Z);
-                    var info = new BoneInfo()
-                    {
-                        Index = skeleton.Bones[i].Id,
-                        ParentIndex = skeleton.Bones[i].ParentId,
-                        Position = pos,
-                        WorldPosition = pos,
-                        Inv = Matrix.Invert(pos),
-                        Name = skeleton.Bones[i].Name
-                    };
-                    model.Bones.Add(info);
-                }
-
-
-                for (int i = 0; i < model.Bones.Count(); i++)
-                {
-                    var parentIndex = model.Bones[i].ParentIndex;
-                    if (parentIndex == -1)
-                        continue;
-                    model.Bones[i].WorldPosition = model.Bones[i].WorldPosition * model.Bones[parentIndex].WorldPosition;
-                }
-
-                return model;
-            }
-        }
 
         public class AnimationInformation
         {
@@ -326,7 +274,7 @@ namespace WpfTest.Scenes
             _basicEffect.View = _camera.ViewMatrix;
 
             _cube0.Render(GraphicsDevice, _basicEffect);
-            foreach(var item in MyModels)
+            foreach(var item in DrawBuffer)
                 item.Render(GraphicsDevice, _basicEffect);
 
             //_rmv2Compound.Render(GraphicsDevice, _basicEffect);

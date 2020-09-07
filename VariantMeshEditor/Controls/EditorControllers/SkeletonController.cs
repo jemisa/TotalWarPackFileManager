@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using VariantMeshEditor.Util;
+using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 
 namespace VariantMeshEditor.Controls.EditorControllers

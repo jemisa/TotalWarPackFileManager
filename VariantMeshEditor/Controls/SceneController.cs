@@ -10,8 +10,10 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Util;
+using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 using Viewer.GraphicModels;
+using WpfTest.Scenes;
 using Game = Common.Game;
 
 namespace VariantMeshEditor.Controls
@@ -21,16 +23,21 @@ namespace VariantMeshEditor.Controls
         SceneTreeViewController _treeViewController;
         List<PackFile> _caPackFiles;
         Panel _toolPanel;
+        Scene3d _scene3d;
         Dictionary<FileSceneElement, MeshInstance> _models = new Dictionary<FileSceneElement, MeshInstance>();
 
-        public SceneController(SceneTreeViewController treeViewController, Panel toolPanel)
+        public SceneController(SceneTreeViewController treeViewController, Scene3d scene3d, Panel toolPanel)
         {
             _treeViewController = treeViewController;
-            _caPackFiles = PackFileLoadHelper.LoadCaPackFilesForGame(Game.TWH2);
+            _scene3d = scene3d;
             _toolPanel = toolPanel;
+
+            _caPackFiles = PackFileLoadHelper.LoadCaPackFilesForGame(Game.TWH2);
+           
 
             _treeViewController.SceneElementSelectedEvent += _treeViewController_SceneElementSelectedEvent;
             _treeViewController.VisabilityChangedEvent += _treeViewController_VisabilityChangedEvnt;
+            _scene3d.LoadScene += LoadScene;
         }
 
         private void _treeViewController_SceneElementSelectedEvent(FileSceneElement element)
@@ -56,7 +63,7 @@ namespace VariantMeshEditor.Controls
             {
                 SlotEditorView view = new SlotEditorView();
                 _toolPanel.Children.Add(view);
-                SlotController controller = new SlotController(view, _treeViewController, (element as SlotElement));
+                SlotController controller = new SlotController(view, (element as SlotElement));
             }
         }
 
@@ -66,60 +73,48 @@ namespace VariantMeshEditor.Controls
                 element.Type == FileSceneElementEnum.WsModel ||
                 element.Type == FileSceneElementEnum.Skeleton)
             {
-                _models[element].Visible = isVisible;
+                if(_models.ContainsKey(element))
+                    _models[element].Visible = isVisible;
             }
         }
 
-        public List<MeshInstance> LoadScene(GraphicsDevice device)
+        public void LoadScene(GraphicsDevice device)
         {
-            List<MeshInstance> graphiScene = new List<MeshInstance>();
-
             SceneLoader sceneLoader = new SceneLoader(_caPackFiles);
             var scene = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
-
-            Create(scene, true, device, ref _models);
-            foreach (var item in _models)
-                graphiScene.Add(item.Value);
-
+            
             _treeViewController.Populate(scene);
-
-            return graphiScene;
+            CreateMeshes(scene, device, ref _models);
+            _scene3d.DrawBuffer = _models.Select(x=>x.Value).ToList();
         }
 
-        void Create(FileSceneElement scene, bool shouldBeVisible, GraphicsDevice device, ref Dictionary<FileSceneElement, MeshInstance> out_created_models)
+        void CreateMeshes(FileSceneElement scene, GraphicsDevice device, ref Dictionary<FileSceneElement, MeshInstance> out_created_models)
         {
-            bool areAllChildrenModels = scene.Children.Where(x =>x.Type == FileSceneElementEnum.RigidModel).Count() == scene.Children.Count();
-            bool firstItem = true;
-            foreach (var item in scene.Children)
-            {
-                if (areAllChildrenModels && !firstItem)
-                    shouldBeVisible = false;
+             foreach (var item in scene.Children)
+             {
+                 if(item.Type == FileSceneElementEnum.RigidModel)
+                 { 
+                     Rmv2CompoundModel model3d = new Rmv2CompoundModel();
+                     model3d.Create(device, (item as RigidModelElement).Model, null, 0, 0);
 
-                if(item.Type == FileSceneElementEnum.RigidModel)
-                { 
-                    Rmv2CompoundModel model3d = new Rmv2CompoundModel();
-                    model3d.Create(device, (item as RigidModelElement).Model, null, 0, 0);
+                     MeshInstance instance = new MeshInstance()
+                     {
+                         Model = model3d,
+                         World = Matrix.Identity,
+                         Visible = item.Vis == System.Windows.Visibility.Visible && item.IsChecked == true
+                     };
 
-                    MeshInstance instance = new MeshInstance()
-                    {
-                        Model = model3d,
-                        World = Matrix.Identity,
-                        Visible = shouldBeVisible
-                    };
+                     out_created_models.Add(item, instance);
+                 }
 
-                    out_created_models.Add(item, instance);
-                }
+                 if (item .Type == FileSceneElementEnum.Skeleton)
+                 {
+                     var skeleteonElement = item as SkeletonElement;
+                     out_created_models.Add(item, skeleteonElement.MeshInstance);
+                 }
 
-                if (item.Type == FileSceneElementEnum.Skeleton)
-                {
-                    var skeleteonElement = item as SkeletonElement;
-                    out_created_models.Add(item, skeleteonElement.MeshInstance);
-                }
-
-
-                firstItem = false;
-                Create(item, shouldBeVisible, device, ref out_created_models);
-            }
+                 CreateMeshes(item, device, ref out_created_models);
+             }
         }
     }
 }

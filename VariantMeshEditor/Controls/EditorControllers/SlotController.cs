@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VariantMeshEditor.Util;
+using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 using VariantMeshEditor.Views.EditorViews.Util;
 
@@ -13,12 +14,11 @@ namespace VariantMeshEditor.Controls.EditorControllers
     {
         SlotElement _slotElement;
         SlotEditorView _viewModel;
-        SceneTreeViewController _sceneTreeView = null;
-        public SlotController(SlotEditorView viewModel, SceneTreeViewController sceneTree, SlotElement slot)
+
+        public SlotController(SlotEditorView viewModel, SlotElement slot)
         {
             _viewModel = viewModel;
             _slotElement = slot;
-            _sceneTreeView = sceneTree;
             CreateUi();
         }
 
@@ -57,7 +57,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
         {
             VariantMeshElement newSlot = new VariantMeshElement(_slotElement, "New");
             _slotElement.Children.Add(newSlot);
-            _sceneTreeView.CreateNode(newSlot, false, _slotElement.TreeNode);
+            //_sceneTreeView.CreateNode(newSlot, false, _slotElement);
             CreateMeshList();
         }
 

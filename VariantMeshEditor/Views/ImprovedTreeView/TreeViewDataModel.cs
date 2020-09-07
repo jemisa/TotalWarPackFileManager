@@ -4,42 +4,22 @@ using System.ComponentModel;
 
 namespace TreeViewWithCheckBoxes
 {
-    public class TreeViewDataModel : INotifyPropertyChanged
+    public abstract class TreeViewDataModel : INotifyPropertyChanged
     {
-        #region Data
-
-        bool? _isChecked = false;
-        TreeViewDataModel _parent;
-        public object Tag { get; set; }
-
-        public TreeViewDataModel Parent { get { return _parent; } }
-
-        #endregion // Data
-
-
+        bool _isChecked = false;
 
         public TreeViewDataModel(string name)
         {
-            this.Name = name;
-            this.Children = new ObservableCollection<TreeViewDataModel>();
-        }
-
-        public void Initialize()
-        {
-            foreach (TreeViewDataModel child in this.Children)
-            {
-                child._parent = this;
-                child.Initialize();
-            }
+            this.DisplayName = name;
         }
 
         #region Properties
 
-        public ObservableCollection<TreeViewDataModel> Children { get; private set; }
+        
 
         public bool IsInitiallySelected { get; private set; }
 
-        public string Name { get; private set; }
+        public string DisplayName { get; protected set; }
 
         #region IsChecked
 
@@ -50,7 +30,7 @@ namespace TreeViewWithCheckBoxes
         /// will set all children to the same check state, and setting it 
         /// to any value will cause the parent to verify its check state.
         /// </summary>
-        public bool? IsChecked
+        public bool IsChecked
         {
             get { return _isChecked; }
             set { this.SetIsChecked(value); }
@@ -58,7 +38,7 @@ namespace TreeViewWithCheckBoxes
 
         public System.Windows.Visibility Vis { get; set; } = System.Windows.Visibility.Visible;
 
-        void SetIsChecked(bool? value)
+        void SetIsChecked(bool value)
         {
             if (value == _isChecked)
                 return;
@@ -77,8 +57,7 @@ namespace TreeViewWithCheckBoxes
 
         void OnPropertyChanged(string prop)
         {
-            if (this.PropertyChanged != null)
-                this.PropertyChanged(this, new PropertyChangedEventArgs(prop));
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
