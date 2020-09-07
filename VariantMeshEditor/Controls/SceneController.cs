@@ -34,7 +34,6 @@ namespace VariantMeshEditor.Controls
 
             _caPackFiles = PackFileLoadHelper.LoadCaPackFilesForGame(Game.TWH2);
            
-
             _treeViewController.SceneElementSelectedEvent += _treeViewController_SceneElementSelectedEvent;
             _treeViewController.VisabilityChangedEvent += _treeViewController_VisabilityChangedEvnt;
             _scene3d.LoadScene += LoadScene;
@@ -81,39 +80,25 @@ namespace VariantMeshEditor.Controls
         public void LoadScene(GraphicsDevice device)
         {
             SceneLoader sceneLoader = new SceneLoader(_caPackFiles);
-            var scene = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
+            var scene = sceneLoader.Load(device, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
             
             _treeViewController.Populate(scene);
-            CreateMeshes(scene, device, ref _models);
+            CreateMeshDictionary(scene, device, ref _models);
             _scene3d.DrawBuffer = _models.Select(x=>x.Value).ToList();
         }
 
-        void CreateMeshes(FileSceneElement scene, GraphicsDevice device, ref Dictionary<FileSceneElement, MeshInstance> out_created_models)
+        void CreateMeshDictionary(FileSceneElement scene, GraphicsDevice device, ref Dictionary<FileSceneElement, MeshInstance> out_created_models)
         {
              foreach (var item in scene.Children)
              {
-                 if(item.Type == FileSceneElementEnum.RigidModel)
-                 { 
-                     Rmv2CompoundModel model3d = new Rmv2CompoundModel();
-                     model3d.Create(device, (item as RigidModelElement).Model, null, 0, 0);
+                var typedItem = item as RenderableFileSceneElement;
+                if (typedItem != null)
+                {
+                    typedItem.MeshInstance.Visible = item.Vis == System.Windows.Visibility.Visible && item.IsChecked == true;
+                    out_created_models.Add(item, typedItem.MeshInstance);
+                }
 
-                     MeshInstance instance = new MeshInstance()
-                     {
-                         Model = model3d,
-                         World = Matrix.Identity,
-                         Visible = item.Vis == System.Windows.Visibility.Visible && item.IsChecked == true
-                     };
-
-                     out_created_models.Add(item, instance);
-                 }
-
-                 if (item .Type == FileSceneElementEnum.Skeleton)
-                 {
-                     var skeleteonElement = item as SkeletonElement;
-                     out_created_models.Add(item, skeleteonElement.MeshInstance);
-                 }
-
-                 CreateMeshes(item, device, ref out_created_models);
+                CreateMeshDictionary(item, device, ref out_created_models);
              }
         }
     }

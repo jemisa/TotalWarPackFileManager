@@ -3,6 +3,7 @@ using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
 using Filetypes.RigidModel.Animation;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +28,7 @@ namespace VariantMeshEditor.Util
             _loadedContent = loadedContent;
         }
         List<PackFile> _loadedContent;
-        public FileSceneElement Load(string filePath, FileSceneElement parent = null)
+        public FileSceneElement Load(GraphicsDevice device, string filePath, FileSceneElement parent = null)
         {
             if(parent == null)
                 parent = new RootElement();
@@ -36,11 +37,11 @@ namespace VariantMeshEditor.Util
             switch (file.FileExtention)
             {
                 case "variantmeshdefinition":
-                    LoadVariantMesh(file, parent);
+                    LoadVariantMesh(device, file, parent);
                     break;
 
                 case "rigid_model_v2":
-                    LoadRigidMesh(file, parent);
+                    LoadRigidMesh(device, file, parent);
                     break;
 
                 case "wsmodel":
@@ -51,7 +52,7 @@ namespace VariantMeshEditor.Util
             return parent;
         }
 
-        void LoadVariantMesh(PackedFile file, FileSceneElement parent)
+        void LoadVariantMesh(GraphicsDevice device, PackedFile file, FileSceneElement parent)
         {
             var variantMeshElement = new VariantMeshElement(parent,file.Name);
             parent.Children.Add(variantMeshElement);
@@ -74,10 +75,10 @@ namespace VariantMeshEditor.Util
                 slotsElement.Children.Add(slotElement);
 
                 foreach (var mesh in slot.VariantMeshes)
-                    Load(mesh.Name, slotElement);
+                    Load(device, mesh.Name, slotElement);
 
                 foreach (var meshReference in slot.VariantMeshReferences)
-                    Load(meshReference.definition, slotElement);
+                    Load(device, meshReference.definition, slotElement);
             }
 
             // Load the animation
@@ -96,11 +97,12 @@ namespace VariantMeshEditor.Util
                 variantMeshElement.Children.Remove(skeletonElement);
         }
 
-        void LoadRigidMesh(PackedFile file, FileSceneElement parent)
+        void LoadRigidMesh(GraphicsDevice device, PackedFile file, FileSceneElement parent)
         {
             ByteChunk chunk = new ByteChunk(file.Data);
             var model3d = RigidModel.Create(chunk, out string errorMessage);
             var model = new RigidModelElement(parent, model3d, file.FullPath);
+            model.Create(device);
             parent.Children.Add(model);
         }
 
