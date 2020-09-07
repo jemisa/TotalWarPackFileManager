@@ -8,10 +8,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <Label>Skeleton:</Label>
-                <ComboBox x:Name="SkeltonTypeComboBox"></ComboBox>
-            </StackPanel>
+            <Label DockPanel.Dock="Top" x:Name="SkeletonName">Skeleton:"SkellyBoi"</Label>
             <Label DockPanel.Dock="Top" x:Name="BoneCount">BoneCount:"123"</Label>
             <TreeView DockPanel.Dock="Top" x:Name="SkeletonBonesView"></TreeView>
         </DockPanel>

@@ -40,14 +40,23 @@ namespace VariantMeshEditor.Controls
             {
                 SkeletonEditorView view = new SkeletonEditorView();
                 _toolPanel.Children.Add(view);
-                SkeletonController controller = new SkeletonController(view, _caPackFiles, (element as SkeletonElement));
+                SkeletonController controller = new SkeletonController(view, (element as SkeletonElement));
             }
             else if (element.Type == FileSceneElementEnum.Animation)
             {
                 var skeleton = _treeViewController.GetAllOfTypeInSameVariantMesh<SkeletonElement>(element);
-                AnimationEditorView view = new AnimationEditorView();
+                if (skeleton.Count == 1)
+                { 
+                    AnimationEditorView view = new AnimationEditorView();
+                    _toolPanel.Children.Add(view);
+                    AnimationController controller = new AnimationController(view, (element as AnimationElement), skeleton.First());
+                }
+            }
+            else if (element.Type == FileSceneElementEnum.Slot)
+            {
+                SlotEditorView view = new SlotEditorView();
                 _toolPanel.Children.Add(view);
-                AnimationController controller = new AnimationController(view, (element as AnimationElement), skeleton.First());
+                SlotController controller = new SlotController(view, _treeViewController, (element as SlotElement));
             }
         }
 

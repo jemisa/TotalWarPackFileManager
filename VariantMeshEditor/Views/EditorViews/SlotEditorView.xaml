@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="VariantMeshEditor.Views.EditorViews.SlotEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VariantMeshEditor.Views.EditorViews" xmlns:util="clr-namespace:VariantMeshEditor.Views.EditorViews.Util"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <TextBlock x:Name="SlotName" TextWrapping="Wrap" Text="Slot Name:" VerticalAlignment="Center"/>
+
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Left" TextWrapping="Wrap" Text="Attachment point:" VerticalAlignment="Center"/>
+            <ComboBox x:Name="AttachmentPointComboBox" DockPanel.Dock="Right"></ComboBox>
+        </DockPanel>
+
+        <StackPanel x:Name="MeshStackPanel">
+
+        </StackPanel>
+        
+        <Button x:Name="AddButton">Add new mesh</Button>
+        
+    </StackPanel>
+</UserControl>

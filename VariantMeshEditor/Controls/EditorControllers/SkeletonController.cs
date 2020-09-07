@@ -14,22 +14,14 @@ namespace VariantMeshEditor.Controls.EditorControllers
     class SkeletonController
     {
         SkeletonEditorView _viewModel;
-        List<PackFile>  _caPackFiles;
-
         SkeletonElement _skeletonElement;
-        public SkeletonController(SkeletonEditorView viewModel, List<PackFile> caPackFiles, SkeletonElement skeletonElement)
+
+        public SkeletonController(SkeletonEditorView viewModel, SkeletonElement skeletonElement)
         {
             _viewModel = viewModel;
             _skeletonElement = skeletonElement;
-            _caPackFiles = caPackFiles;
-            var allSkeletons = GetAllSkeltons();
-            foreach(var skeleton in allSkeletons)
-                _viewModel.SkeltonTypeComboBox.Items.Add(skeleton);
 
-            var i = _viewModel.SkeltonTypeComboBox.Items.IndexOf(skeletonElement.Skeleton.Name + ".anim");
-            _viewModel.SkeltonTypeComboBox.SelectedIndex = i;
-
-            _viewModel.SkeltonTypeComboBox.SelectionChanged += SkeltonTypeComboBox_SelectionChanged;
+            _viewModel.SkeletonName.Content = "Skeleton Name: " + skeletonElement.DisplayName;
             CreateBoneOverview();
         }
 
@@ -56,14 +48,6 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
         }
 
-        private void SkeltonTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            string skeletonName = _viewModel.SkeltonTypeComboBox.SelectedItem as string;
-
-            _skeletonElement.Create(_caPackFiles, skeletonName);
-            CreateBoneOverview();
-        }
-
         TreeViewItem CreateNode(BoneInfo bone)
         {
             TreeViewItem item = new TreeViewItem
@@ -87,13 +71,6 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     return result;
             }
             return null;
-        }
-
-        List<string> GetAllSkeltons()
-        {
-
-            var possibleSkeletons = PackFileLoadHelper.GetAllFilesWithExtentionInDirectory(_caPackFiles, @"animations\skeletons");
-            return possibleSkeletons.Where(x => x.FileExtention == "anim").Select(x => x.Name).ToList();
         }
 
 

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using TreeViewWithCheckBoxes;
 using Viewer.GraphicModels;
 using static Filetypes.RigidModel.VariantMeshDefinition;
 
@@ -31,6 +32,7 @@ namespace VariantMeshEditor.Util
 
     public abstract class FileSceneElement
     {
+        public TreeViewDataModel TreeNode { get; set; }
         public FileSceneElement Parent { get; set; }
         public List<FileSceneElement> Children { get; set; } = new List<FileSceneElement>();
         public abstract FileSceneElementEnum Type { get; }
@@ -118,7 +120,10 @@ namespace VariantMeshEditor.Util
 
     public class VariantMeshElement : FileSceneElement
     {
-        public VariantMeshElement(FileSceneElement parent, string fullPath) : base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, "VariantMesh") { }
+        public VariantMeshElement(FileSceneElement parent, string fullPath) : base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, "VariantMesh")
+        {
+            DisplayName = "VariantMesh - " + FileName; 
+        }
         public override FileSceneElementEnum Type => FileSceneElementEnum.VariantMesh;
     }
 

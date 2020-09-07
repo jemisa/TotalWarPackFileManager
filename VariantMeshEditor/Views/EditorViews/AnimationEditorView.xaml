@@ -33,13 +33,7 @@
             <Border Width="3" BorderBrush="LightGray"  ></Border>
         </StackPanel>
 
-        <DockPanel DockPanel.Dock="Top">
-            <Label DockPanel.Dock="Left">Animation:</Label>
-            <Button DockPanel.Dock="Right" Content="Browse" Width="70" />
-            <Border BorderBrush="{x:Null}" >
-                <TextBlock x:Name="CurrentAnimation"  TextWrapping="Wrap" Text="folder\folder\anim\walk.anim" VerticalAlignment="Center"/>
-            </Border>
-        </DockPanel>
+     
 
         <DockPanel DockPanel.Dock="Top" >
             <Label DockPanel.Dock="Left">Filter:</Label>

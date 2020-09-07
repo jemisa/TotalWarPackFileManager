@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Controls\EditorControllers\AnimationController.cs" />
     <Compile Include="Controls\EditorControllers\SkeletonController.cs" />
+    <Compile Include="Controls\EditorControllers\SlotController.cs" />
     <Compile Include="Controls\SceneController.cs" />
     <Compile Include="Controls\SceneTreeViewController.cs" />
     <Compile Include="Util\VariantMeshLoader.cs" />
@@ -66,6 +67,12 @@
     </Compile>
     <Compile Include="Views\EditorViews\SkeletonEditorView.xaml.cs">
       <DependentUpon>SkeletonEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditorViews\SlotEditorView.xaml.cs">
+      <DependentUpon>SlotEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditorViews\Util\BrowsableItemView.xaml.cs">
+      <DependentUpon>BrowsableItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ImprovedTreeView\TreeViewDataModel.cs" />
     <Compile Include="Views\ImprovedTreeView\VirtualToggleButton.cs" />
@@ -88,6 +95,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditorViews\SkeletonEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\SlotEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\Util\BrowsableItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

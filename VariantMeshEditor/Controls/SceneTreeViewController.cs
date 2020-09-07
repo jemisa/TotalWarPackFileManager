@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Reflection.Emit;
@@ -61,12 +62,12 @@ namespace VariantMeshEditor.Controls
 
         public void Populate(FileSceneElement rootItem)
         {
-            var node = Create(rootItem, true);
+            var node = CreateNode(rootItem, true);
             node.Initialize();
-            _viewModel.DataContext = new List<TreeViewDataModel>() { node }; ;
+            _viewModel.DataContext = new ObservableCollection<TreeViewDataModel>() { node }; ;
         }
 
-        TreeViewDataModel Create(FileSceneElement scene, bool shouldBeSelected, TreeViewDataModel parent = null)
+        public TreeViewDataModel CreateNode(FileSceneElement scene, bool shouldBeSelected, TreeViewDataModel parent = null)
         {
             TreeViewDataModel node = new TreeViewDataModel(scene.ToString())
             {
@@ -74,6 +75,7 @@ namespace VariantMeshEditor.Controls
                 Tag = scene,
             };
 
+            scene.TreeNode = node;
             node.PropertyChanged += Node_PropertyChanged;
 
             if (scene as TransformElement != null)
@@ -91,7 +93,7 @@ namespace VariantMeshEditor.Controls
                     shouldBeSelected = false;
 
                 firstItem = false;
-                Create(item, shouldBeSelected, node);
+                CreateNode(item, shouldBeSelected, node);
             }
 
             if (parent != null)

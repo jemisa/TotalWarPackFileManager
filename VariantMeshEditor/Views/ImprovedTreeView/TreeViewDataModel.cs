@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace TreeViewWithCheckBoxes
@@ -20,7 +21,7 @@ namespace TreeViewWithCheckBoxes
         public TreeViewDataModel(string name)
         {
             this.Name = name;
-            this.Children = new List<TreeViewDataModel>();
+            this.Children = new ObservableCollection<TreeViewDataModel>();
         }
 
         public void Initialize()
@@ -34,7 +35,7 @@ namespace TreeViewWithCheckBoxes
 
         #region Properties
 
-        public List<TreeViewDataModel> Children { get; private set; }
+        public ObservableCollection<TreeViewDataModel> Children { get; private set; }
 
         public bool IsInitiallySelected { get; private set; }
 
