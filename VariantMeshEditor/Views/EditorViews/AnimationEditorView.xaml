@@ -11,7 +11,7 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center">
             <Label>Frame</Label>
             <Border BorderBrush="{x:Null}" >
-                <TextBlock x:Name="CurretFrameText"  TextWrapping="Wrap" Text="12" VerticalAlignment="Center"/>
+                <TextBlock x:Name="CurretFrameText"  TextWrapping="NoWrap" Text="12" VerticalAlignment="Center"/>
             </Border>
             <Label>/300</Label>
         </StackPanel>
@@ -23,11 +23,15 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <Label>Animation skeleton:</Label>
+            <Label Width="120">Animation skeleton</Label>
+            <Label>:</Label>
             <Border BorderBrush="{x:Null}" >
-                <TextBlock x:Name="CurrentSkeletonName"  TextWrapping="Wrap" Text="SkellyBoi" VerticalAlignment="Center"/>
+                <TextBlock x:Name="CurrentSkeletonName"  TextWrapping="NoWrap" Text="SkellyBoi" VerticalAlignment="Center"/>
             </Border>
         </StackPanel>
+
+
+
 
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" >
             <Border Width="3" BorderBrush="LightGray"  ></Border>
@@ -35,13 +39,23 @@
 
      
 
+
+
+        <DockPanel DockPanel.Dock="Top" >
+            <Label Width="120">Current Animation</Label>
+            <Label>:</Label>
+            <Button DockPanel.Dock="Right" Width="70" >Browse</Button>
+            <Border BorderBrush="{x:Null}" >
+                <TextBox x:Name="CurrentAnimation"  TextWrapping="NoWrap" Text="AnimationName.anim" VerticalAlignment="Center"/>
+            </Border>
+        </DockPanel>
+
         <DockPanel DockPanel.Dock="Top" >
             <Label DockPanel.Dock="Left">Filter:</Label>
             <Button DockPanel.Dock="Right" Width="70" >Clear</Button>
             <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="FilterText"  TextWrapping="Wrap" Text="FilterText" VerticalAlignment="Center"/>
+                <TextBox x:Name="FilterText"  TextWrapping="NoWrap" Text="FilterText" VerticalAlignment="Center"/>
             </Border>
-            
         </DockPanel>
 
         <ListView x:Name="AnimationList"></ListView>
