@@ -19,13 +19,17 @@ namespace Viewer.GraphicModels
 
     public class MeshModel : IRenderableContent
     {
-        VertexDeclaration _vertexDeclaration;
-        VertexBuffer _vertexBuffer;
-        AnimationPlayer _animationPlayer;
+        public VertexDeclaration _vertexDeclaration;
+        public VertexBuffer _vertexBuffer;
+        public AnimationPlayer _animationPlayer;
+        public IndexBuffer _indexBuffer;
 
-        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, VertexPositionNormalTexture[] vertexMesh)
+        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, VertexPositionNormalTexture[] vertexMesh, ushort[] indices)
         {
             _animationPlayer = animationPlayer;
+
+            _indexBuffer = new IndexBuffer(device, typeof(short), indices.Length, BufferUsage.WriteOnly);
+            _indexBuffer.SetData(indices);
 
             _vertexDeclaration = new VertexDeclaration(
                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
@@ -39,12 +43,12 @@ namespace Viewer.GraphicModels
 
         public virtual void Render(GraphicsDevice device, Effect effect)
         {
+            device.Indices = _indexBuffer;
             device.SetVertexBuffer(_vertexBuffer);
-
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                device.DrawPrimitives(PrimitiveType.TriangleList, 0, _vertexBuffer.VertexCount);
+                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _indexBuffer.IndexCount);
             }
         }
 

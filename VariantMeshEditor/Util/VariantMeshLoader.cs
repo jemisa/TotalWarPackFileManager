@@ -32,7 +32,7 @@ namespace VariantMeshEditor.Util
             _loadedContent = loadedContent;
         }
 
-        public FileSceneElement Load(GraphicsDevice device, string filePath, FileSceneElement parent = null)
+        public FileSceneElement Load(AnimationElement animationElement, GraphicsDevice device, string filePath, FileSceneElement parent = null)
         {
             if(parent == null)
                 parent = new RootElement();
@@ -45,7 +45,7 @@ namespace VariantMeshEditor.Util
                     break;
 
                 case "rigid_model_v2":
-                    LoadRigidMesh(device, file, parent);
+                    LoadRigidMesh(animationElement, device, file, parent);
                     break;
 
                 case "wsmodel":
@@ -80,10 +80,10 @@ namespace VariantMeshEditor.Util
                 slotsElement.Children.Add(slotElement);
 
                 foreach (var mesh in slot.VariantMeshes)
-                    Load(device, mesh.Name, slotElement);
+                    Load(animationElement, device, mesh.Name, slotElement);
 
                 foreach (var meshReference in slot.VariantMeshReferences)
-                    Load(device, meshReference.definition, slotElement);
+                    Load(animationElement, device, meshReference.definition, slotElement);
             }
 
             // Load the animation
@@ -106,17 +106,12 @@ namespace VariantMeshEditor.Util
             }
         }
 
-        void LoadRigidMesh(GraphicsDevice device, PackedFile file, FileSceneElement parent)
+        void LoadRigidMesh(AnimationElement animationElement, GraphicsDevice device, PackedFile file, FileSceneElement parent)
         {
             ByteChunk chunk = new ByteChunk(file.Data);
             var model3d = RigidModel.Create(chunk, out string errorMessage);
             var model = new RigidModelElement(parent, model3d, file.FullPath);
-
-            AnimationPlayer animationControl = null;
-            var animationElement = FileSceneElement.FindParentOfType<AnimationElement>(parent);
-            if (animationElement != null)
-                animationControl = animationElement.AnimationPlayer;
-            model.Create(animationControl, device);
+            model.Create(animationElement.AnimationPlayer, device);
             parent.Children.Add(model);
         }
 

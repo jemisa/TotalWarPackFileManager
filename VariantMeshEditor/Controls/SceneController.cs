@@ -54,7 +54,7 @@ namespace VariantMeshEditor.Controls
         public void LoadScene(GraphicsDevice device)
         {
             SceneLoader sceneLoader = new SceneLoader(_loadedContent);
-            var scene = sceneLoader.Load(device, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
+            var scene = sceneLoader.Load(null, device, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
             
             _treeViewController.Populate(scene);
             RegisterAnimations(scene);

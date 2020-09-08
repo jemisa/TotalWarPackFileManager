@@ -13,7 +13,7 @@ namespace Viewer.GraphicModels
         public void Create(GraphicsDevice device)
         {
             var mesh = CreateBuffer();
-            this.Create(null, device, mesh);
+            this.Create(null, device, mesh, new ushort[] { 1,2,3});
         }
 
         VertexPositionNormalTexture[] CreateBuffer()
