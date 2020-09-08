@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.Animation
 {
-    public class Animation
+    public class AnimationFile
     {
         public class Frame
         {
@@ -33,20 +33,27 @@ namespace Filetypes.RigidModel.Animation
         public List<int>[] TranslationMappingID = new List<int>[] { new List<int>(), new List<int>() };
         public List<int>[] RotationMappingID = new List<int>[] { new List<int>(), new List<int>() };
         public List<Frame> Frames = new List<Frame>();
+        public string SkeletonName { get; set; }
+        public uint AnimationType { get; set; }
 
-        public static Animation Create(ByteChunk chunk)
+        public uint Unknown0;
+        public short Unknown1;
+        public short Unknown2;
+        public uint Unknown3;
+
+        public static AnimationFile Create(ByteChunk chunk)
         {
-            var ouput = new Animation();
+            var ouput = new AnimationFile();
             chunk.Reset();
-            var type = chunk.ReadUInt32();
-            var unk0 = chunk.ReadUInt32();
-            var unk1 = chunk.ReadShort();
-            var unk2 = chunk.ReadShort();
+            ouput.AnimationType = chunk.ReadUInt32();
+            ouput.Unknown0 = chunk.ReadUInt32();
+            ouput.Unknown1 = chunk.ReadShort();
+            ouput.Unknown2 = chunk.ReadShort();
             var nameSize= chunk.ReadShort();
-            var skeletonName = chunk.ReadFixedLength(nameSize);
-            var ukn3 = chunk.ReadUInt32();
+            ouput.SkeletonName = chunk.ReadFixedLength(nameSize);
+            ouput.Unknown3 = chunk.ReadUInt32();
 
-            if(type == 7)
+            if(ouput.AnimationType == 7)
                 chunk.ReadUInt32();
 
             var boneCount = chunk.ReadUInt32();
@@ -88,7 +95,7 @@ namespace Filetypes.RigidModel.Animation
             }
 
             // We dont care about this?
-            if (type == 7)
+            if (ouput.AnimationType == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
                 var staticRotCount = chunk.ReadUInt32();

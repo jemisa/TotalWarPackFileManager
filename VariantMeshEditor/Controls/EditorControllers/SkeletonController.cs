@@ -29,9 +29,9 @@ namespace VariantMeshEditor.Controls.EditorControllers
         void CreateBoneOverview()
         {
             _viewModel.SkeletonBonesView.Items.Clear();
-            _viewModel.BoneCount.Content = "Bone Count : " + _skeletonElement.Skeleton.Bones.Count;
+            _viewModel.BoneCount.Content = "Bone Count : " + _skeletonElement.SkeletonFile.Bones.Count;
             var index = 0;
-            foreach (var bone in _skeletonElement.Skeleton.Bones)
+            foreach (var bone in _skeletonElement.SkeletonFile.Bones)
             {
                 index++;
                 if (bone.ParentId == -1)
@@ -40,7 +40,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 }
                 else
                 {
-                    var parentBone = _skeletonElement.Skeleton.Bones[bone.ParentId];
+                    var parentBone = _skeletonElement.SkeletonFile.Bones[bone.ParentId];
                     var treeParent = GetParent(_viewModel.SkeletonBonesView.Items, parentBone);
 
                     if (treeParent != null)

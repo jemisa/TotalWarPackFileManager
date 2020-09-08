@@ -21,7 +21,7 @@ namespace VariantMeshEditor.Controls
     class SceneController
     {
         SceneTreeViewController _treeViewController;
-        List<PackFile> _caPackFiles;
+        List<PackFile> _loadedContent;
         Panel _toolPanel;
         Scene3d _scene3d;
         Dictionary<FileSceneElement, MeshInstance> _models = new Dictionary<FileSceneElement, MeshInstance>();
@@ -32,39 +32,13 @@ namespace VariantMeshEditor.Controls
             _scene3d = scene3d;
             _toolPanel = toolPanel;
 
-            _caPackFiles = PackFileLoadHelper.LoadCaPackFilesForGame(Game.TWH2);
+            _loadedContent = PackFileLoadHelper.LoadCaPackFilesForGame(Game.TWH2);
            
-            _treeViewController.SceneElementSelectedEvent += _treeViewController_SceneElementSelectedEvent;
+            _treeViewController.SceneElementSelectedEvent += CreateEditor;
             _treeViewController.VisabilityChangedEvent += _treeViewController_VisabilityChangedEvnt;
             _scene3d.LoadScene += LoadScene;
         }
 
-        private void _treeViewController_SceneElementSelectedEvent(FileSceneElement element)
-        {
-            _toolPanel.Children.Clear();
-            if (element.Type == FileSceneElementEnum.Skeleton)
-            {
-                SkeletonEditorView view = new SkeletonEditorView();
-                _toolPanel.Children.Add(view);
-                SkeletonController controller = new SkeletonController(view, (element as SkeletonElement));
-            }
-            else if (element.Type == FileSceneElementEnum.Animation)
-            {
-                var skeleton = _treeViewController.GetAllOfTypeInSameVariantMesh<SkeletonElement>(element);
-                if (skeleton.Count == 1)
-                { 
-                    AnimationEditorView view = new AnimationEditorView();
-                    _toolPanel.Children.Add(view);
-                    AnimationController controller = new AnimationController(view, (element as AnimationElement), skeleton.First());
-                }
-            }
-            else if (element.Type == FileSceneElementEnum.Slot)
-            {
-                SlotEditorView view = new SlotEditorView();
-                _toolPanel.Children.Add(view);
-                SlotController controller = new SlotController(view, (element as SlotElement));
-            }
-        }
 
         private void _treeViewController_VisabilityChangedEvnt(FileSceneElement element, bool isVisible)
         {
@@ -79,10 +53,11 @@ namespace VariantMeshEditor.Controls
 
         public void LoadScene(GraphicsDevice device)
         {
-            SceneLoader sceneLoader = new SceneLoader(_caPackFiles);
+            SceneLoader sceneLoader = new SceneLoader(_loadedContent);
             var scene = sceneLoader.Load(device, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
             
             _treeViewController.Populate(scene);
+            RegisterAnimations(scene);
             CreateMeshDictionary(scene, device, ref _models);
             _scene3d.DrawBuffer = _models.Select(x=>x.Value).ToList();
         }
@@ -100,6 +75,60 @@ namespace VariantMeshEditor.Controls
 
                 CreateMeshDictionary(item, device, ref out_created_models);
              }
+        }
+
+        void RegisterAnimations(FileSceneElement scene)
+        {
+            if (scene as AnimationElement != null)
+                _scene3d.AnimationPlayers.Add((scene as AnimationElement).AnimationPlayer);
+
+            foreach (var item in scene.Children)
+                RegisterAnimations(item);
+        }
+
+        void CreateEditor(FileSceneElement element)
+        {
+            _toolPanel.Children.Clear();
+            switch (element.Type)
+            {
+                case FileSceneElementEnum.Skeleton:
+                    CreateSkeletonEditor(element as SkeletonElement);
+                    break;
+
+                case FileSceneElementEnum.Animation:
+                    CreateAnimationEditor(element as AnimationElement);
+                    break;
+
+                case FileSceneElementEnum.Slot:
+                    CreateSlotEditor(element as SlotElement);
+                    break;
+
+            }
+        }
+
+        void CreateSkeletonEditor(SkeletonElement element)
+        {
+            SkeletonEditorView view = new SkeletonEditorView();
+            _toolPanel.Children.Add(view);
+            SkeletonController controller = new SkeletonController(view, element);
+        }
+
+        void CreateAnimationEditor(AnimationElement element)
+        {
+            var skeleton = _treeViewController.GetAllOfTypeInSameVariantMesh<SkeletonElement>(element);
+            if (skeleton.Count == 1)
+            {
+                AnimationEditorView view = new AnimationEditorView();
+                _toolPanel.Children.Add(view);
+                AnimationController controller = new AnimationController(view, _loadedContent, element, skeleton.First());
+            }
+        }
+
+        void CreateSlotEditor(SlotElement element)
+        {
+            SlotEditorView view = new SlotEditorView();
+            _toolPanel.Children.Add(view);
+            SlotController controller = new SlotController(view, element);
         }
     }
 }

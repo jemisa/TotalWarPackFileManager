@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:VariantMeshEditor.Views.EditorViews"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
@@ -13,13 +12,14 @@
             <Border BorderBrush="{x:Null}" >
                 <TextBlock x:Name="CurretFrameText"  TextWrapping="NoWrap" Text="12" VerticalAlignment="Center"/>
             </Border>
-            <Label>/300</Label>
+            <Label x:Name="NoFramesLabel">/ 300</Label>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center">
             <Button FontSize="20">⏮︎</Button>
             <Button FontSize="20">⏯︎</Button>
             <Button FontSize="20">⏭︎</Button>
+            <ComboBox x:Name="AnimationSpeedComboBox"></ComboBox>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -30,23 +30,40 @@
             </Border>
         </StackPanel>
 
-
-
-
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" >
             <Border Width="3" BorderBrush="LightGray"  ></Border>
         </StackPanel>
 
-     
-
-
-
         <DockPanel DockPanel.Dock="Top" >
-            <Label Width="120">Current Animation</Label>
+            <Label Width="120">Animation</Label>
             <Label>:</Label>
             <Button DockPanel.Dock="Right" Width="70" >Browse</Button>
             <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="CurrentAnimation"  TextWrapping="NoWrap" Text="AnimationName.anim" VerticalAlignment="Center"/>
+                <TextBox x:Name="CurrentAnimation" IsReadOnly="true"  TextWrapping="NoWrap" Text="AnimationName.anim" VerticalAlignment="Center"/>
+            </Border>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Top" >
+            <Label Width="120">Animation Skeleton</Label>
+            <Label>:</Label>
+            <Border BorderBrush="{x:Null}" >
+                <TextBox x:Name="AnimationSkeleton" IsReadOnly="true" TextWrapping="NoWrap" Text="SkellyBoi" VerticalAlignment="Center" Margin="0,0,70,0"/>
+            </Border>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Top" >
+            <Label Width="120">Animation Type</Label>
+            <Label>:</Label>
+            <Border BorderBrush="{x:Null}" >
+                <TextBox x:Name="AnimationType" IsReadOnly="true" TextWrapping="NoWrap" Text="SkellyBoi" VerticalAlignment="Center"  Margin="0,0,70,0"/>
+            </Border>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Top" >
+            <Label Width="120">Debug</Label>
+            <Label>:</Label>
+            <Border BorderBrush="{x:Null}" >
+                <TextBox x:Name="DebugData" IsReadOnly="true" TextWrapping="NoWrap" Text="[]" VerticalAlignment="Center"  Margin="0,0,70,0"/>
             </Border>
         </DockPanel>
 

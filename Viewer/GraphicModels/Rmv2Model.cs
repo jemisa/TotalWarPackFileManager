@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Viewer.Animation;
 using static WpfTest.Scenes.Scene3d;
 
 namespace Viewer.GraphicModels
 {
     public class Rmv2Model : MeshModel
     {
-        public void Create(GraphicsDevice device, RigidModel rigidModelData, int lodLevel, int model, AnimationInformation animationData, int frame = 30)
+        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, int lodLevel, int model, Animation.AnimationClip animationData, int frame = 30)
         {
             var lodModel = rigidModelData.LodInformations[lodLevel].LodModels[model];
             var vertices = new VertexPositionNormalTexture[lodModel.IndicesBuffer.Length];
@@ -35,7 +36,7 @@ namespace Viewer.GraphicModels
                     float w3 = vertex.BoneInfos[2].BoneWeight;
                     float w4 = vertex.BoneInfos[3].BoneWeight;
                 
-                    var currentFrame = animationData.Animation[frame];
+                    var currentFrame = animationData.KeyFrameCollection[frame];
                     Matrix m1 = currentFrame.BoneTransforms[b0].Transform;
                     Matrix m2 = currentFrame.BoneTransforms[b1].Transform;
                     Matrix m3 = currentFrame.BoneTransforms[b2].Transform;
@@ -63,7 +64,7 @@ namespace Viewer.GraphicModels
                 vertices[index] = new VertexPositionNormalTexture(animatedVertexPos, normal, new Vector2(0.0f, 0.0f));
             }
 
-            Create(device, vertices);
+            Create(animationPlayer, device, vertices);
         }
     }
 
@@ -71,12 +72,12 @@ namespace Viewer.GraphicModels
     {
         List<MeshModel> _models = new List<MeshModel>();
 
-        public void Create(GraphicsDevice device, RigidModel rigidModelData, AnimationInformation animationModel, int lodLevel, int frame)
+        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, Animation.AnimationClip animationModel, int lodLevel, int frame)
         {
             for (int i = 0 ; i < rigidModelData.LodInformations[lodLevel].LodModels.Count(); i++)
             {
                 Rmv2Model meshModel = new Rmv2Model();
-                meshModel.Create(device, rigidModelData, lodLevel, i, animationModel, frame);
+                meshModel.Create(animationPlayer, device, rigidModelData, lodLevel, i, animationModel, frame);
                 _models.Add(meshModel);
             }
         }

@@ -56,6 +56,7 @@
     <Compile Include="Controls\SceneController.cs" />
     <Compile Include="Controls\SceneTreeViewController.cs" />
     <Compile Include="Util\VariantMeshLoader.cs" />
+    <Compile Include="ViewModels\AnimationElement.cs" />
     <Compile Include="ViewModels\FileSceneElement.cs" />
     <Compile Include="ViewModels\RigidModelElement.cs" />
     <Compile Include="ViewModels\SkeletonElement.cs" />

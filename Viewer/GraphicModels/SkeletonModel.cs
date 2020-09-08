@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Viewer.Animation;
+using static Viewer.Animation.AnimationClip;
 
 namespace Viewer.GraphicModels
 {
@@ -22,9 +24,12 @@ namespace Viewer.GraphicModels
         }
 
         public List<BoneInfo> Bones = new List<BoneInfo>();
+        AnimationPlayer _animationPlayer;
 
-        public void Create(Skeleton skeleton)
+        public void Create(AnimationPlayer animationPlayer, SkeletonFile skeleton)
         {
+            _animationPlayer = animationPlayer;
+
             for (int i = 0; i < skeleton.Bones.Count(); i++)
             {
                 var x = new Microsoft.Xna.Framework.Quaternion(
@@ -55,7 +60,6 @@ namespace Viewer.GraphicModels
                 Bones[i].WorldPosition = Bones[i].WorldPosition * Bones[parentIndex].WorldPosition;
             }
 
-
             List<(Vector3, Vector3)> boneTransformList = new List<(Vector3, Vector3)>();
             foreach (var bone in Bones)
             {
@@ -67,7 +71,44 @@ namespace Viewer.GraphicModels
                 boneTransformList.Add((bone.WorldPosition.Translation, parentBone.WorldPosition.Translation));
             }
 
-            CreateLineList(boneTransformList);
+            //CreateLineList(boneTransformList);
+        }
+
+        public override void Render(GraphicsDevice device, Effect effect)
+        {
+            AnimationFrame frame = _animationPlayer.GetCurrentFrame();
+
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                for (int i = 0; i < Bones.Count(); i++)
+                {
+                    var parentIndex = Bones[i].ParentIndex;
+                    if (parentIndex == -1)
+                        continue;
+
+                    var bonePos = Bones[i].WorldPosition;
+                    var parentBonePos = Bones[parentIndex].WorldPosition;
+
+                    if (frame != null)
+                    {
+                        var currentBoneAnimationoffset = frame.BoneTransforms[i].Transform;
+                        var parentBoneAnimationoffset = frame.BoneTransforms[parentIndex].Transform;
+
+                        bonePos = Matrix.Multiply(bonePos, currentBoneAnimationoffset);
+                        parentBonePos = Matrix.Multiply(parentBonePos, parentBoneAnimationoffset);
+                    }
+
+                    var vertices = new[]
+                    {
+                        new VertexPositionNormalTexture(bonePos.Translation, new Vector3(0,0,0), new Vector2(0,0)),
+                        new VertexPositionNormalTexture(parentBonePos.Translation, new Vector3(0,0,0), new Vector2(0,0))
+                    };
+
+                    device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+                }
+            }
         }
 
     }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Viewer.Animation;
 
 namespace Viewer.GraphicModels
 {
@@ -20,9 +21,12 @@ namespace Viewer.GraphicModels
     {
         VertexDeclaration _vertexDeclaration;
         VertexBuffer _vertexBuffer;
+        AnimationPlayer _animationPlayer;
 
-        public void Create(GraphicsDevice device, VertexPositionNormalTexture[] vertexMesh)
+        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, VertexPositionNormalTexture[] vertexMesh)
         {
+            _animationPlayer = animationPlayer;
+
             _vertexDeclaration = new VertexDeclaration(
                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
                new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),

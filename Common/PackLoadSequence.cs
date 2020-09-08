@@ -231,7 +231,7 @@ namespace Common {
             return null;
         }
 
-        public static List<PackedFile> GetAllFilesWithExtentionInDirectory(List<PackFile> loadedPackFiles, string sourceDirectory)
+        public static List<PackedFile> GetAllFilesInDirectory(List<PackFile> loadedPackFiles, string sourceDirectory)
         {
             var output = new List<PackedFile>();
             sourceDirectory = sourceDirectory.ToLower();
@@ -245,12 +245,6 @@ namespace Common {
                     if (idx == 0)
                         output.Add(file);
                 }
-
-               /* if (directory.Filepath == sourceDirectory)
-                {
-                    foreach (var file in directory)
-                        output.Add(file);
-                }*/
             }
             return output;
         }

@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using System.Windows.Navigation;
 using TreeViewWithCheckBoxes;
 using VariantMeshEditor.ViewModels;
+using VariantMeshEditor.Views.Animation;
+using Viewer.Animation;
 using Viewer.GraphicModels;
 using static Filetypes.RigidModel.VariantMeshDefinition;
 
@@ -23,11 +25,13 @@ namespace VariantMeshEditor.Util
 
     class SceneLoader
     {
+        List<PackFile> _loadedContent;
+
         public SceneLoader(List<PackFile> loadedContent)
         {
             _loadedContent = loadedContent;
         }
-        List<PackFile> _loadedContent;
+
         public FileSceneElement Load(GraphicsDevice device, string filePath, FileSceneElement parent = null)
         {
             if(parent == null)
@@ -58,7 +62,8 @@ namespace VariantMeshEditor.Util
             parent.Children.Add(variantMeshElement);
 
             variantMeshElement.Children.Add(new TransformElement(variantMeshElement));
-            variantMeshElement.Children.Add(new AnimationElement(variantMeshElement));
+            var animationElement = new AnimationElement(variantMeshElement);
+            variantMeshElement.Children.Add(animationElement);
             var skeletonElement = new SkeletonElement(variantMeshElement, "");
             variantMeshElement.Children.Add(skeletonElement);
 
@@ -92,9 +97,13 @@ namespace VariantMeshEditor.Util
             if (skeletons.Count() > 1)
                 throw new Exception("More the one skeleton for a veriant mesh");
             if (skeletons.Count() == 1)
-                skeletonElement.Create(_loadedContent, skeletons.First() + ".anim");
+            {
+                skeletonElement.Create(animationElement.AnimationPlayer, _loadedContent, skeletons.First() + ".anim");
+            }
             else
+            {
                 variantMeshElement.Children.Remove(skeletonElement);
+            }
         }
 
         void LoadRigidMesh(GraphicsDevice device, PackedFile file, FileSceneElement parent)
@@ -102,7 +111,12 @@ namespace VariantMeshEditor.Util
             ByteChunk chunk = new ByteChunk(file.Data);
             var model3d = RigidModel.Create(chunk, out string errorMessage);
             var model = new RigidModelElement(parent, model3d, file.FullPath);
-            model.Create(device);
+
+            AnimationPlayer animationControl = null;
+            var animationElement = FileSceneElement.FindParentOfType<AnimationElement>(parent);
+            if (animationElement != null)
+                animationControl = animationElement.AnimationPlayer;
+            model.Create(animationControl, device);
             parent.Children.Add(model);
         }
 
@@ -123,7 +137,7 @@ namespace VariantMeshEditor.Util
                 if (variantMeshParent as T != null)
                     out_items.Add(variantMeshParent as T);
 
-                GetAllOfType<T>(child, ref out_items);
+                GetAllOfType(child, ref out_items);
             }
         }
     }

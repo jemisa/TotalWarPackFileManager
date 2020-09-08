@@ -45,6 +45,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation\AnimationClip.cs" />
+    <Compile Include="Animation\AnimationPlayer.cs" />
     <Compile Include="GraphicModels\CubeModel.cs" />
     <Compile Include="GraphicModels\LineModel.cs" />
     <Compile Include="GraphicModels\MeshInstance.cs" />
@@ -87,5 +89,6 @@
       <Name>Filetypes</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

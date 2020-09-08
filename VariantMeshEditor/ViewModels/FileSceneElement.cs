@@ -47,6 +47,17 @@ namespace VariantMeshEditor.ViewModels
         }
 
         public override string ToString() => DisplayName;
+
+        public static T FindParentOfType<T>(FileSceneElement element) where T: FileSceneElement
+        {
+            if(element == null)
+                return null;
+
+            if (element as T != null)
+                return element as T;
+
+            return FindParentOfType<T>(element.Parent);
+        }
     }
 
     public abstract class RenderableFileSceneElement : FileSceneElement
@@ -69,13 +80,6 @@ namespace VariantMeshEditor.ViewModels
         public override FileSceneElementEnum Type => FileSceneElementEnum.Transform;
     }
 
-    public class AnimationElement : FileSceneElement
-    {
-        public AnimationElement(FileSceneElement parent) : base(parent, "", "", "Animation") { }
-        public override FileSceneElementEnum Type => FileSceneElementEnum.Animation;
-    }
-
-    
 
     public class VariantMeshElement : FileSceneElement
     {

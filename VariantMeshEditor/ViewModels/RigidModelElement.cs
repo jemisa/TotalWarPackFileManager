@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Viewer.Animation;
 using Viewer.GraphicModels;
 
 namespace VariantMeshEditor.ViewModels
@@ -22,10 +23,10 @@ namespace VariantMeshEditor.ViewModels
         }
 
 
-        public void Create(GraphicsDevice device)
+        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device)
         {
             Rmv2CompoundModel model3d = new Rmv2CompoundModel();
-            model3d.Create(device, Model, null, 0, 0);
+            model3d.Create(animationPlayer, device, Model, null, 0, 0);
 
             MeshInstance = new MeshInstance()
             {

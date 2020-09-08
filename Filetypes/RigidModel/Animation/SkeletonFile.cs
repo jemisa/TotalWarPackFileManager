@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Filetypes.RigidModel.Animation
 {
-    public class Skeleton
+    public class SkeletonFile
     {
 		public string Name { get; set; }
 		public List<BoneInfo> Bones = new List<BoneInfo>();
 
-		public static Skeleton Create(ByteChunk chunk, out string errorMessage)
+		public static SkeletonFile Create(ByteChunk chunk, out string errorMessage)
         {
-			var skeleton = new Skeleton();
+			var skeleton = new SkeletonFile();
 
 			errorMessage = "";
 			chunk.Reset();
