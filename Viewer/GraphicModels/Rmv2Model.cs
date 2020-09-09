@@ -19,15 +19,18 @@ namespace Viewer.GraphicModels
         public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, int lodLevel, int model, Animation.AnimationClip animationData, int frame = 30)
         {
             _animationPlayer = animationPlayer;
-            var lodModel = rigidModelData.LodInformations[lodLevel].LodModels[model];
-            
-            _model = lodModel;
-
+            _model = rigidModelData.LodInformations[lodLevel].LodModels[model];
             _bufferArray = new VertexPositionNormalTexture[_model.VertexArray.Length];
-            Create(animationPlayer, device, _bufferArray, lodModel.IndicesBuffer);
+            Create(animationPlayer, device, _bufferArray, _model.IndicesBuffer);
         }
        
         public override void Render(GraphicsDevice device, Effect effect)
+        {
+            UpdateVertexBuffer();
+            base.Render(device, effect);
+        }
+
+        private void UpdateVertexBuffer()
         {
             for (int index = 0; index < _model.VertexArray.Length; index++)
             {
@@ -65,22 +68,25 @@ namespace Viewer.GraphicModels
                     transformSum.M43 = (m1.M43 * w1) + (m2.M43 * w2) + (m3.M43 * w3) + (m4.M43 * w4);
                 }
 
-                Vector3 animatedVertexPos = new Vector3();
-                animatedVertexPos.X = vertex.X * transformSum.M11 + vertex.Y * transformSum.M21 + vertex.Z * transformSum.M31 + transformSum.M41;
-                animatedVertexPos.Y = vertex.X * transformSum.M12 + vertex.Y * transformSum.M22 + vertex.Z * transformSum.M32 + transformSum.M42;
-                animatedVertexPos.Z = vertex.X * transformSum.M13 + vertex.Y * transformSum.M23 + vertex.Z * transformSum.M33 + transformSum.M43;
+                Vector3 animatedVertexPos = new Vector3
+                {
+                    X = vertex.X * transformSum.M11 + vertex.Y * transformSum.M21 + vertex.Z * transformSum.M31 + transformSum.M41,
+                    Y = vertex.X * transformSum.M12 + vertex.Y * transformSum.M22 + vertex.Z * transformSum.M32 + transformSum.M42,
+                    Z = vertex.X * transformSum.M13 + vertex.Y * transformSum.M23 + vertex.Z * transformSum.M33 + transformSum.M43
+                };
 
-                Vector3 animatedNormal = new Vector3();
-                animatedNormal.X = vertex.Normal_X * transformSum.M11 + vertex.Normal_Y * transformSum.M21 + vertex.Normal_Z * transformSum.M31 + transformSum.M41;
-                animatedNormal.Y = vertex.Normal_X * transformSum.M12 + vertex.Normal_Y * transformSum.M22 + vertex.Normal_Z * transformSum.M32 + transformSum.M42;
-                animatedNormal.Z = vertex.Normal_X * transformSum.M13 + vertex.Normal_Y * transformSum.M23 + vertex.Normal_Z * transformSum.M33 + transformSum.M43;
+                Vector3 animatedNormal = new Vector3
+                {
+                    X = vertex.Normal_X * transformSum.M11 + vertex.Normal_Y * transformSum.M21 + vertex.Normal_Z * transformSum.M31 + transformSum.M41,
+                    Y = vertex.Normal_X * transformSum.M12 + vertex.Normal_Y * transformSum.M22 + vertex.Normal_Z * transformSum.M32 + transformSum.M42,
+                    Z = vertex.Normal_X * transformSum.M13 + vertex.Normal_Y * transformSum.M23 + vertex.Normal_Z * transformSum.M33 + transformSum.M43
+                };
                 animatedNormal.Normalize();
                 _bufferArray[index] = new VertexPositionNormalTexture(animatedVertexPos, animatedNormal, new Vector2(0.0f, 0.0f));
             }
 
 
             _vertexBuffer.SetData(_bufferArray);
-            base.Render(device, effect);
         }
     }
 

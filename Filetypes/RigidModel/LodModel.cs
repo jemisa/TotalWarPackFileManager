@@ -23,6 +23,11 @@ namespace Filetypes.RigidModel
         public uint materialCount { get; set; }
         public List<Material> Materials { get; set; } = new List<Material>();
 
+
+        public byte[] Unknown0;
+        public byte[] Unknown1;
+        public byte[] Unknown2_possibleBlendFlag;
+
         public Vertex[] VertexArray;
         public ushort[] IndicesBuffer;
 
@@ -37,7 +42,7 @@ namespace Filetypes.RigidModel
             var groupType = chunk.ReadUInt32();
             lodModel.GroupType = (GroupTypeEnum)groupType;
 
-            var uknown0 = chunk.ReadUInt32();
+            lodModel.Unknown0 = chunk.ReadBytes(4);
 
             var VertOffset = chunk.ReadUInt32() + offset;
             lodModel.vertexCount = chunk.ReadUInt32();
@@ -47,24 +52,24 @@ namespace Filetypes.RigidModel
             // BoundingBox
             lodModel.BoundingBox = BoundingBox.Create(chunk);
 
-            lodModel.materiaType = chunk.ReadFixedLength(30);
+            lodModel.materiaType = Util.SanatizeFixedString(chunk.ReadFixedLength(30));
             lodModel.vertexType = chunk.ReadUInt32();
-            lodModel.modelName = chunk.ReadFixedLength(32);
-            lodModel.textureDirectory = chunk.ReadFixedLength(256);
+            lodModel.modelName = Util.SanatizeFixedString(chunk.ReadFixedLength(32));
+            lodModel.textureDirectory = Util.SanatizeFixedString(chunk.ReadFixedLength(256));
 
-            var uknown1 = chunk.ReadBytes(258); // Contains some transformations
+            var unknownChunk0 = chunk.ReadBytes(258); // Contains some transformations
+            
             var pivX = chunk.ReadSingle();
             var pivY = chunk.ReadSingle();
             var pivZ = chunk.ReadSingle();
+            var pivW = chunk.ReadSingle();
 
-
-            var unknown2 = chunk.ReadBytes(152); // Contains some transformations?
-
+            var unknownChunk1 = chunk.ReadBytes(148); // Contains some transformations?
 
             lodModel.BoneCount = chunk.ReadUInt32();
             lodModel.materialCount = chunk.ReadUInt32();
 
-            var uknown3 = chunk.ReadBytes(140);
+            var unknownChunk3 = chunk.ReadBytes(140);
 
             for (int i = 0; i < lodModel.BoneCount; i++)
                 lodModel.Bones.Add(Bone.Create(chunk));
@@ -72,7 +77,8 @@ namespace Filetypes.RigidModel
             for (int i = 0; i < lodModel.materialCount; i++)
                 lodModel.Materials.Add(Material.Create(chunk));
 
-            var uknown4 = chunk.ReadBytes(8);
+            lodModel.Unknown1 = chunk.ReadBytes(4);
+            lodModel.Unknown2_possibleBlendFlag = chunk.ReadBytes(4);
             // last 4 = ?
             /*
              typedef enum DDS_ALPHA_MODE

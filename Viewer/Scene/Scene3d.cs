@@ -2,8 +2,10 @@
 using Filetypes.RigidModel;
 using Filetypes.RigidModel.Animation;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.Content.Pipeline.Builder;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using SharpDX.MediaFoundation;
@@ -48,7 +50,7 @@ namespace WpfTest.Scenes
 
         protected override void Initialize()
         {
-
+            //ContentManager
             _disposed = false;
             new WpfGraphicsDeviceService(this);
             //Components.Add(new FpsComponent(this));
@@ -75,7 +77,13 @@ namespace WpfTest.Scenes
 
         public void CreateScene()
         {
-            _cubeModel = new CubeModel();
+           //var Services = new MonoGameServiceProvider();
+           //Services.AddService(GraphicsDeviceService);
+           var Content = new ContentManager(Services) { RootDirectory = "Content" };
+            var x = Content.Load<Texture2D>("monogame-logo");
+          //  var d  = new PipelineManager("", "", "");
+          //  d.FindDefaultProcessor()
+              _cubeModel = new CubeModel();
             _cubeModel.Create(GraphicsDevice);
 
             _cube0 = new MeshInstance()

@@ -36,10 +36,11 @@ namespace Filetypes.RigidModel.Animation
         public string SkeletonName { get; set; }
         public uint AnimationType { get; set; }
 
-        public uint Unknown0;
-        public short Unknown1;
-        public short Unknown2;
-        public uint Unknown3;
+        public uint Unknown0 { get; set; }
+        public short Unknown1 { get; set; }
+        public short Unknown2 { get; set; }
+        public uint Unknown3 { get; set; }
+        public uint Unknown4 { get; set; }
 
         public static AnimationFile Create(ByteChunk chunk)
         {
@@ -54,7 +55,7 @@ namespace Filetypes.RigidModel.Animation
             ouput.Unknown3 = chunk.ReadUInt32();
 
             if(ouput.AnimationType == 7)
-                chunk.ReadUInt32();
+                ouput.Unknown4 = chunk.ReadUInt32();
 
             var boneCount = chunk.ReadUInt32();
 

@@ -29,7 +29,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
         void CreateBoneOverview()
         {
             _viewModel.SkeletonBonesView.Items.Clear();
-            _viewModel.BoneCount.Content = "Bone Count : " + _skeletonElement.SkeletonFile.Bones.Count;
+            _viewModel.BoneCount.Content = "Bone Count : " + _skeletonElement.SkeletonFile.Bones.Count();
             var index = 0;
             foreach (var bone in _skeletonElement.SkeletonFile.Bones)
             {

@@ -14,8 +14,6 @@ namespace Viewer.GraphicModels
         void Render(GraphicsDevice device, Effect effect);
     }
 
-   
-
 
     public class MeshModel : IRenderableContent
     {

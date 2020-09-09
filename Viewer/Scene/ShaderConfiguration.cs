@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -20,8 +21,9 @@ namespace Viewer.NHew
             basicEffect.SpecularPower = 5.0f;
             basicEffect.Alpha = 1.0f;
 
+            basicEffect.EnableDefaultLighting();
 
-            basicEffect.LightingEnabled = true;
+           /* basicEffect.LightingEnabled = true;
             if (basicEffect.LightingEnabled)
             {
                 basicEffect.DirectionalLight0.Enabled = true; // enable each light individually
@@ -51,7 +53,7 @@ namespace Viewer.NHew
                     basicEffect.DirectionalLight2.Direction = Vector3.Normalize(new Vector3(0, 0, -1));
                     basicEffect.DirectionalLight2.SpecularColor = Vector3.One;
                 }
-            }
+            }*/
 
             return basicEffect;
         }

@@ -2,6 +2,7 @@
 {
     public enum GroupTypeEnum
     {
+        Unknown,
         Actor = 82,
         Banner = 26,
         Bow = 64,

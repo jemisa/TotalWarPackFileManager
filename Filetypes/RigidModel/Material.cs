@@ -11,7 +11,7 @@ namespace Filetypes.RigidModel
             return new Material()
             {
                 Type = chunk.ReadInt32(),
-                Name = chunk.ReadFixedLength(256),
+                Name = Util.SanatizeFixedString(chunk.ReadFixedLength(256)),
             };
         }
 

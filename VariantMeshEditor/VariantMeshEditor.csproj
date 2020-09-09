@@ -69,6 +69,9 @@
     <Compile Include="Views\EditorViews\EditorPanelView.xaml.cs">
       <DependentUpon>EditorPanelView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EditorViews\RigidModelEditorView.xaml.cs">
+      <DependentUpon>RigidModelEditorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditorViews\SkeletonEditorView.xaml.cs">
       <DependentUpon>SkeletonEditorView.xaml</DependentUpon>
     </Compile>
@@ -92,6 +95,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditorViews\EditorPanelView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\RigidModelEditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
