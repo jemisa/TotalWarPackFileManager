@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Profile>Reach</Profile>
+  <Platform>Windows</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/SkyBox.dds</File>
+    <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/TestShader.fx</File>
+    <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/ColorMap.jpg</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

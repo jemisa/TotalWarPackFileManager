@@ -14,5 +14,7 @@
                 <TextBox x:Name="PathTextBox"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center"/>
             </Border>
         </DockPanel>
+        
+        
     </StackPanel>
 </UserControl>

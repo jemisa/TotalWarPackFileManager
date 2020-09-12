@@ -13,11 +13,11 @@ namespace Viewer.GraphicModels
         public Matrix World { get; set; } = Matrix.Identity;
         public IRenderableContent Model { get; set; }
         public bool Visible { get; set; } = true;
-        public void Render(GraphicsDevice device, BasicEffect effect)
+        public void Render(GraphicsDevice device, Effect effect)
         {
             if (Visible)
             {
-                effect.World = World;
+                //effect.World = World;
                 Model.Render(device, effect);
             }
         }

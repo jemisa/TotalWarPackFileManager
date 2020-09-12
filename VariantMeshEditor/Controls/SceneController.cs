@@ -103,6 +103,10 @@ namespace VariantMeshEditor.Controls
                     CreateSlotEditor(element as SlotElement);
                     break;
 
+                case FileSceneElementEnum.RigidModel:
+                    CreateRigidModelEditor(element as RigidModelElement);
+                    break;
+
             }
         }
 
@@ -129,6 +133,13 @@ namespace VariantMeshEditor.Controls
             SlotEditorView view = new SlotEditorView();
             _toolPanel.Children.Add(view);
             SlotController controller = new SlotController(view, element);
+        }
+
+        void CreateRigidModelEditor(RigidModelElement element)
+        {
+            RigidModelEditorView view = new RigidModelEditorView();
+            _toolPanel.Children.Add(view);
+            //SlotController controller = new SlotController(view, element);
         }
     }
 }

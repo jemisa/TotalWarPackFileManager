@@ -1,0 +1,4 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/ColorMap.jpg","C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/bin/Windows/ColorMap.xnb","TextureProcessor","Texture2DContent",190508,1048661,0.1453721
+"C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/SkyBox.dds","C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/bin/Windows/SkyBox.xnb","TextureProcessor","TextureCubeContent",6291584,6291559,0.3181224
+"C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/TestShader.fx","C:/Users/ole_k/source/repos/TotalWarPackFileManager/MonoContentPipeline/Content/bin/Windows/TestShader.xnb","EffectProcessor","CompiledEffectContent",1345,1995,0.3318324

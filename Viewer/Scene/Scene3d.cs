@@ -73,16 +73,18 @@ namespace WpfTest.Scenes
 
             base.Initialize();
         }
-
+        Effect _shader;
+        Texture2D _texture;
 
         public void CreateScene()
         {
            //var Services = new MonoGameServiceProvider();
            //Services.AddService(GraphicsDeviceService);
-           var Content = new ContentManager(Services) { RootDirectory = "Content" };
-            var x = Content.Load<Texture2D>("monogame-logo");
-          //  var d  = new PipelineManager("", "", "");
-          //  d.FindDefaultProcessor()
+           var Content = new ContentManager(Services) { RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\MonoContentPipeline\Content\bin\Windows" };
+            _shader = Content.Load<Effect>("TestShader");
+            _texture = Content.Load<Texture2D>("ColorMap");
+              //  var d  = new PipelineManager("", "", "");
+              //  d.FindDefaultProcessor()
               _cubeModel = new CubeModel();
             _cubeModel.Create(GraphicsDevice);
 
@@ -145,10 +147,53 @@ namespace WpfTest.Scenes
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
      
             _basicEffect.View = _camera.ViewMatrix;
+      
 
-            _cube0.Render(GraphicsDevice, _basicEffect);
-            foreach(var item in DrawBuffer)
-                item.Render(GraphicsDevice, _basicEffect);
+            _shader.CurrentTechnique = _shader.Techniques["Diffuse"];
+      
+
+
+            foreach (var pass in _shader.CurrentTechnique.Passes)
+            {
+
+                pass.Apply();
+                foreach (var item in DrawBuffer)
+                {
+                    /*Matrix worldInverse = Matrix.Invert(Matrix.Identity);
+                    Vector4 vLightDirection = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+                    Vector4 vecEye = new Vector4(x, y, zHeight, 0);
+                    Vector4 vColorDiffuse = new Vector4(0.8f, 0.0f, 0.0f, 1.0f);
+                    Vector4 vColorSpecular = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+                    Vector4 vColorAmbient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);*/
+
+
+                    Vector4 vecEye = new Vector4(_camera.ViewMatrix.Translation, 0);
+                    Vector4 vColorDiffuse = new Vector4(0.8f, 0.0f, 0.0f, 1.0f);
+                    Vector4 vColorSpecular = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+                    Vector4 vColorAmbient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
+
+                    // .. and pass it into our shader.
+                    // To access a parameter defined in our shader file ( Shader.fx ), use effectObject.Parameters["variableName"]
+                    var worldMatrix = Matrix.Identity;
+                    Matrix worldInverse = Matrix.Invert(worldMatrix);
+                    Vector4 vLightDirection = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+                    _shader.Parameters["World"].SetValue(worldMatrix);
+                    _shader.Parameters["View"].SetValue(_camera.ViewMatrix);
+                    _shader.Parameters["Projection"].SetValue(_projectionMatrix);
+                    _shader.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
+
+                    /*
+                     float4x4 World;
+float4x4 View;
+float4x4 Projection;
+                     */
+
+                    item.Render(GraphicsDevice, _shader);
+                }
+            }
+
+            //_cube0.Render(GraphicsDevice, _shader);
+        
 
             base.Draw(time);
         }
