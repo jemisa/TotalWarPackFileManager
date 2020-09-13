@@ -1,10 +1,14 @@
 ﻿using Common;
 using Filetypes.Codecs;
 using Filetypes.RigidModel;
+using Pfim;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
@@ -94,13 +98,37 @@ namespace VariantMeshEditor.Controls.EditorControllers
             var path = pathContainer.Text;
             var file = PackFileLoadHelper.FindFile(_loadedContent, path);
 
+
+
+
+            //var data = file.Data;
+
+
+            
+          //var img =  SixLabors.ImageSharp.Image.Load(data);
+          // var format = SixLabors.ImageSharp.Image.DetectFormat(data);
             using (MemoryStream stream = new MemoryStream(file.Data))
             {
-                using (var bitMap = BitmapCodec.Instance.Decode(stream))
-                { 
-                
-                
+                var image = Pfim.Pfim.FromStream(stream);
+
+                var handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
+                try
+                {
+                    var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
+                    var bitmap = new Bitmap(image.Width, image.Height, image.Stride, PixelFormat.Format24bppRgb, data);
+                    bitmap.Save(@"c:\temp\myImage.png", System.Drawing.Imaging.ImageFormat.Png);
                 }
+                finally
+                {
+                    handle.Free();
+                }
+
+                /*ss
+                                using (var bitMap = BitmapCodec.Instance.Decode(stream))
+                                { 
+
+
+                                }*/
             }
         }
 

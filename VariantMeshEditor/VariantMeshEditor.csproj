@@ -193,6 +193,12 @@
     <PackageReference Include="MvvmLightLibs">
       <Version>5.4.1.1</Version>
     </PackageReference>
+    <PackageReference Include="Pfim">
+      <Version>0.9.1</Version>
+    </PackageReference>
+    <PackageReference Include="SixLabors.ImageSharp">
+      <Version>1.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
