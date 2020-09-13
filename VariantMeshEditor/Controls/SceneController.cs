@@ -139,7 +139,7 @@ namespace VariantMeshEditor.Controls
         {
             RigidModelEditorView view = new RigidModelEditorView();
             _toolPanel.Children.Add(view);
-            //SlotController controller = new SlotController(view, element);
+            var controller = new RigidModelController(view, element, _loadedContent);
         }
     }
 }

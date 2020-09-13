@@ -51,10 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\EditorControllers\AnimationController.cs" />
+    <Compile Include="Controls\EditorControllers\RigidModelController.cs" />
     <Compile Include="Controls\EditorControllers\SkeletonController.cs" />
     <Compile Include="Controls\EditorControllers\SlotController.cs" />
     <Compile Include="Controls\SceneController.cs" />
     <Compile Include="Controls\SceneTreeViewController.cs" />
+    <Compile Include="Util\NotifyPropertyChangedImpl.cs" />
     <Compile Include="Util\VariantMeshLoader.cs" />
     <Compile Include="ViewModels\AnimationElement.cs" />
     <Compile Include="ViewModels\FileSceneElement.cs" />
@@ -84,7 +86,7 @@
     <Compile Include="Views\EditorViews\Util\BrowsableItemView.xaml.cs">
       <DependentUpon>BrowsableItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EditorViews\Util\CustomControl1.cs" />
+    <Compile Include="Views\EditorViews\Util\CollapsableButtonControl.cs" />
     <Compile Include="Views\EditorViews\Util\RigidModelMeshEditor.xaml.cs">
       <DependentUpon>RigidModelMeshEditor.xaml</DependentUpon>
     </Compile>

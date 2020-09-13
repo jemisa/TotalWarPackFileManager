@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using VariantMeshEditor.Util;
 
 namespace VariantMeshEditor.Views.EditorViews.Util
 {
@@ -53,38 +54,36 @@ namespace VariantMeshEditor.Views.EditorViews.Util
         public ICommand MyCommand { get; set; }
         double _ContentHight;
         public double ContentHight { get { return _ContentHight; } set { _ContentHight = value; NotifyPropertyChanged(); } }
+        
+        string _buttonSymbol = "🡆";
+        public string ButtonSymbol { get { return _buttonSymbol; } set { _buttonSymbol = value; NotifyPropertyChanged(); } }
+
+        string _buttonText;
+        public string ButtonText { get { return _buttonText; } set { _buttonText = value; NotifyPropertyChanged(); } }
     }
 
     
-    public class NotifyPropertyChangedImpl : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
 
-    public class CustomControl1 : UserControl
+    public class CollapsableButtonControl : UserControl
     {
+        public static DependencyProperty MyBane;
+
         ViwModel _viewModel;
-        static CustomControl1()
+        static CollapsableButtonControl()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1),
-           new FrameworkPropertyMetadata(typeof(CustomControl1)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CollapsableButtonControl),
+           new FrameworkPropertyMetadata(typeof(CollapsableButtonControl)));
         }
 
-        public CustomControl1()
+        public CollapsableButtonControl(string headerName)
         {
             _viewModel = new ViwModel()
             {
-                MyCommand = new RelayCommand(OnClick)// ; new MyClickCommand(this)
+                MyCommand = new RelayCommand(OnClick),
+                ButtonText = headerName,
             };
 
-            //  InitializeComponent();
             DataContext = _viewModel;
         }
 
@@ -92,9 +91,15 @@ namespace VariantMeshEditor.Views.EditorViews.Util
         public void OnClick()
         {
             if (flag)
+            {
+                _viewModel.ButtonSymbol = "🡇";
                 _viewModel.ContentHight = Double.NaN;
+            }
             else
+            {
+                _viewModel.ButtonSymbol = "🡆";
                 _viewModel.ContentHight = 0;
+            }
             flag = !flag;
         }
 

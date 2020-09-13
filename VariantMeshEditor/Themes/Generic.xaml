@@ -4,10 +4,10 @@
     xmlns:util="clr-namespace:VariantMeshEditor.Views.EditorViews.Util">
 
 
-    <Style TargetType="{x:Type util:CustomControl1}">
+    <Style TargetType="{x:Type util:CollapsableButtonControl}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type util:CustomControl1}">
+                <ControlTemplate TargetType="{x:Type util:CollapsableButtonControl}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
@@ -18,9 +18,7 @@
                             
                                     <Button.Template>
                                         <ControlTemplate TargetType="{x:Type Button}">
-                                            <Border Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                            <Border Background="{TemplateBinding Background}"  BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                                 <ContentPresenter />
                                             </Border>
                                         </ControlTemplate>
@@ -32,12 +30,8 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0"
-                                       VerticalAlignment="Center"
-                                       Text="Left" />
-                                        <TextBlock Grid.Column="1"
-                                       VerticalAlignment="Center"
-                                       Text="{DynamicResource  Header}" />
+                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Path=ButtonSymbol, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding Path=ButtonText, UpdateSourceTrigger=PropertyChanged}" />
                                     </Grid>
                                 </Button>
 

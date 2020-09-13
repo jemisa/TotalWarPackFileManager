@@ -2,15 +2,26 @@
 
 namespace Filetypes.RigidModel
 {
+
+    public enum TexureType
+    {
+        Diffuse = 0,
+        Normal = 1,
+        Alpha = 3,
+        Specular = 11,
+        Gloss = 12,
+    }
+
     public class Material
     {
         public string Name { get; set; }
-        public int Type { get; set; }
+        public TexureType Type { get { return (TexureType)TypeRaw; } }
+        public int TypeRaw { get; set; }
         public static Material Create(ByteChunk chunk)
         {
             return new Material()
             {
-                Type = chunk.ReadInt32(),
+                TypeRaw = chunk.ReadInt32(),
                 Name = Util.SanatizeFixedString(chunk.ReadFixedLength(256)),
             };
         }

@@ -6,8 +6,12 @@
              xmlns:local="clr-namespace:VariantMeshEditor.Views.EditorViews" xmlns:util="clr-namespace:VariantMeshEditor.Views.EditorViews.Util" xmlns:System="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" x:Name="Lods"></StackPanel>
-      
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+            <StackPanel DockPanel.Dock="Top" x:Name="LodStackPanel"></StackPanel>
+        </ScrollViewer>
+
     </DockPanel>
 </UserControl>

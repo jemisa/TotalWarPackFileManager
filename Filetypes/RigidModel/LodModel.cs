@@ -5,6 +5,10 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Filetypes.RigidModel
 {
+
+
+
+
     public class LodModel
     {
         public GroupTypeEnum GroupType { get; set; }

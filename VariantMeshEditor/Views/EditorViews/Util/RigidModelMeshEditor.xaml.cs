@@ -18,9 +18,9 @@ namespace VariantMeshEditor.Views.EditorViews.Util
     /// <summary>
     /// Interaction logic for RigidModelMeshEditor.xaml
     /// </summary>
-    public partial class RigidModelMeshEditor : UserControl
+    public partial class RigidModelMeshEditorView : UserControl
     {
-        public RigidModelMeshEditor()
+        public RigidModelMeshEditorView()
         {
             InitializeComponent();
         }

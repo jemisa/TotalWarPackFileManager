@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews.Util;
 
 namespace VariantMeshEditor.Views.EditorViews
@@ -24,9 +25,9 @@ namespace VariantMeshEditor.Views.EditorViews
         public RigidModelEditorView()
         {
             InitializeComponent();
-
+            /*return;
             {
-                var item = new CustomControl1();
+                var item = new CollapsableButtonControl();
                 item.Resources.Add("Header", "My Lod - 1");
 
                 var stackpanel = new StackPanel();
@@ -38,12 +39,12 @@ namespace VariantMeshEditor.Views.EditorViews
                 stackpanel.Children.Add(CreateMesh("Group 0 - Mesh 2"));
                 stackpanel.Children.Add(CreateMesh("Group 1 - Mesh 0"));
 
-                Lods.Children.Add(item);
+                LodStackPanel.Children.Add(item);
             }
-
+            return;
 
             {
-                var item1 = new CustomControl1();
+                var item1 = new CollapsableButtonControl();
                 item1.Resources.Add("Header", "My Lod - 2");
 
                 var stackpanel1 = new StackPanel();
@@ -55,13 +56,14 @@ namespace VariantMeshEditor.Views.EditorViews
                 stackpanel1.Children.Add(CreateMesh("Group 0 - Mesh 2"));
                 stackpanel1.Children.Add(CreateMesh("Group 1 - Mesh 0"));
 
-                Lods.Children.Add(item1);
-            }
+                LodStackPanel.Children.Add(item1);
+            }*/
         }
 
-        RigidModelMeshEditor CreateMesh(string name)
+
+        RigidModelMeshEditorView CreateMesh(string name)
         {
-            var item = new RigidModelMeshEditor();
+            var item = new RigidModelMeshEditorView();
             item.Resources.Add("Header", name);
             return item;
         }
