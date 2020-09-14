@@ -92,5 +92,9 @@
       <Name>Filetypes</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Content\MonoContentPipelineContent.mgcb" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -78,11 +78,16 @@ namespace WpfTest.Scenes
 
         public void CreateScene()
         {
-           //var Services = new MonoGameServiceProvider();
-           //Services.AddService(GraphicsDeviceService);
-           var Content = new ContentManager(Services) { RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\MonoContentPipeline\Content\bin\Windows" };
-            _shader = Content.Load<Effect>("TestShader");
-            _texture = Content.Load<Texture2D>("ColorMap");
+            //var Services = new MonoGameServiceProvider();
+            //Services.AddService(GraphicsDeviceService);
+
+            //var Content = new ContentManager(Services) { RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\MonoContentPipeline\bin\Windows\AnyCPU\Debug\Content" };
+            var Content = new ContentManager(Services) 
+            { 
+                RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\bin\Windows"
+            };
+            _shader = Content.Load<Effect>("Shaders\\TestShader");
+           // _texture = Content.Load<Texture2D>("ColorMap");
               //  var d  = new PipelineManager("", "", "");
               //  d.FindDefaultProcessor()
               _cubeModel = new CubeModel();
