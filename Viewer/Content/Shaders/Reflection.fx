@@ -19,9 +19,9 @@ Texture SkyboxTexture;
 samplerCUBE SkyboxSampler = sampler_state 
 { 
    texture = <SkyboxTexture>; 
-   magfilter = LINEAR; 
-   minfilter = LINEAR; 
-   mipfilter = LINEAR; 
+   magfilter = Linear;
+   minfilter = Linear;
+   mipfilter = Linear;
    AddressU = Mirror; 
    AddressV = Mirror; 
 };
@@ -35,6 +35,7 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
     float4 Position : SV_POSITION;  // POSITION0 or this: no change
+    float3 Normal : NORMAL0;
     float3 Reflection : TEXCOORD0;
 };
  
@@ -49,15 +50,25 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     float4 VertexPosition = mul(input.Position, World);
     float3 ViewDirection = CameraPosition - VertexPosition;
  
-    float3 Normal = normalize(mul(input.Normal, WorldInverseTranspose));
-    output.Reflection = reflect(-normalize(ViewDirection), normalize(Normal));
+    output.Normal = normalize(mul(input.Normal, WorldInverseTranspose));
+    output.Reflection = reflect(-normalize(ViewDirection), normalize(output.Normal));
  
     return output;
 }
  
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR
-{
-    return TintColor * texCUBE(SkyboxSampler, normalize(input.Reflection));
+{ 
+    float4 sam = float4(normalize(input.Normal), 6);
+float f = 1;
+   // float4 colour =  TintColor * texCUBElod(SkyboxSampler, normalize(input.Reflection), f,f);
+float4 colour = TintColor * texCUBElod(SkyboxSampler, sam);// *float4(1, 0, 0, 1);
+   // SkyboxTexture.
+    
+    //
+    //float4 colour = SkyboxTexture.Sample(SkyboxSampler, float3(normalize(input.Reflection)));
+//float4 colour = TintColor * texCUBE(SkyboxSampler, normalize(input.Reflection));
+    colour.w = 1;
+    return colour;
 }
  
 technique Reflection
@@ -65,6 +76,6 @@ technique Reflection
     pass Pass1
     {
         VertexShader = compile VS_SHADERMODEL VertexShaderFunction();
-        PixelShader = compile PS_SHADERMODEL PixelShaderFunction();
+        PixelShader = compile ps_4_0 PixelShaderFunction();
     }
 }

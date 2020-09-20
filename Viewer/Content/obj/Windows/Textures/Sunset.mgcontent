@@ -3,7 +3,7 @@
   <SourceFile>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Textures/Sunset.dds</SourceFile>
   <SourceTime>2020-09-14T10:09:46.2743578+02:00</SourceTime>
   <DestFile>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/bin/Windows/Textures/Sunset.xnb</DestFile>
-  <DestTime>2020-09-14T10:11:34.6921187+02:00</DestTime>
+  <DestTime>2020-09-14T23:06:23.8061472+02:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-08-10T16:17:54+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
@@ -18,11 +18,11 @@
   </Parameters>
   <Parameters>
     <Key>GenerateMipmaps</Key>
-    <Value>False</Value>
+    <Value>True</Value>
   </Parameters>
   <Parameters>
     <Key>PremultiplyAlpha</Key>
-    <Value>True</Value>
+    <Value>False</Value>
   </Parameters>
   <Parameters>
     <Key>ResizeToPowerOfTwo</Key>

@@ -53,6 +53,7 @@
     <Compile Include="GraphicModels\MeshModel.cs" />
     <Compile Include="GraphicModels\Rmv2Model.cs" />
     <Compile Include="GraphicModels\SkeletonModel.cs" />
+    <Compile Include="GraphicModels\SkyBox.cs" />
     <Compile Include="MonoGameControlls\MonoGameContentControl.cs" />
     <Compile Include="MonoGameControlls\MonoGameGraphicsDeviceService.cs" />
     <Compile Include="MonoGameControlls\MonoGameServiceProvider.cs" />
@@ -66,6 +67,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ImageProcessor">
+      <Version>2.9.1</Version>
+    </PackageReference>
     <PackageReference Include="MonoGame.Framework.Content.Pipeline.Portable">
       <Version>3.7.1.189</Version>
     </PackageReference>
@@ -74,6 +78,9 @@
     </PackageReference>
     <PackageReference Include="SharpDX">
       <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="StackBlur">
+      <Version>1.1.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

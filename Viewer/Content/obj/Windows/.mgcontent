@@ -4,7 +4,6 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/TestShader.fx</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/DebugModels/cube.FBX</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/DebugModels/Helicopter.fbx</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/DebugModels/Helicopter_a.fbx</File>
@@ -17,6 +16,7 @@
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/Skybox.fx</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/SkyboxShader.fx</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/Specular.fx</File>
+    <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/TestShader.fx</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/Textured.fx</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/Transparency.fx</File>
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Textures/ColorMap.jpg</File>
@@ -26,6 +26,25 @@
     <File>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Textures/Sunset.dds</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>
