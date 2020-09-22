@@ -129,16 +129,18 @@ namespace Filetypes.RigidModel
                     var u0 = subChucnk.ReadByte();          // 7      
                     var boneIndex = subChucnk.ReadByte();   // 8
                     var u1 = subChucnk.ReadByte();          // 9
-                    var boneWeight0 = subChucnk.ReadByte(); // 10
 
+                    var boneWeight0 = subChucnk.ReadByte(); // 10
                     vertex.BoneInfos.Add(new Vertex.BoneInfo() { BoneIndex = boneIndex,BoneWeight = boneWeight0 / 255.0f });
+
                     var u2 = subChucnk.ReadByte();          // 11
                     vertex.Normal_X = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //12
                     vertex.Normal_Y = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //13
                     vertex.Normal_Z = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //14
-                    var u3 = subChucnk.ReadByte();          // 11
-                    var uv0 = subChucnk.ReadFloat16();      // 16
-                    var u4 = subChucnk.ReadBytes(10);       // 18
+                    var u3 = subChucnk.ReadByte();          // 15
+                    vertex.Uv0 = subChucnk.ReadFloat16();      // 16
+                    vertex.Uv1 = subChucnk.ReadFloat16();      // 18
+                    var u4 = subChucnk.ReadBytes(8);       // 20
 
                     output[i] = vertex;
                 }
@@ -151,25 +153,25 @@ namespace Filetypes.RigidModel
                     var subChucnk = new ByteChunk(bytes);
                     var vertex = new Vertex()
                     {
-                        X = subChucnk.ReadFloat16(),
-                        Y = subChucnk.ReadFloat16(),
-                        Z = subChucnk.ReadFloat16(),
+                        X = subChucnk.ReadFloat16(),    //0
+                        Y = subChucnk.ReadFloat16(),    //2
+                        Z = subChucnk.ReadFloat16(),    //4
                     };
 
 
-                    var u0 = subChucnk.ReadFloat16();       // 4
-                    var u1 = subChucnk.ReadFloat16();       // 5
-                    var u2 = subChucnk.ReadFloat16();       // 6
-                    var u3 = subChucnk.ReadFloat16();       // 7
-                    var u4 = subChucnk.ReadFloat16();       // 8
+                    var u0 = subChucnk.ReadFloat16();       // 6
+                    vertex.Uv0 = subChucnk.ReadFloat16();       // 8        uv0
+                    vertex.Uv1 = subChucnk.ReadFloat16();       // 10
+                    var u3 = subChucnk.ReadFloat16();       // 12
+                    var u4 = subChucnk.ReadFloat16();       // 14
 
-                    var b0 = subChucnk.ReadByte();
+                    var b0 = subChucnk.ReadByte();          //15
                     var t0 = (b0 / 255.0f * 2.0f) - 1.0f;
 
-                    var b1 = subChucnk.ReadByte();
+                    var b1 = subChucnk.ReadByte();          //16
                     var t1 = (b1 / 255.0f * 2.0f) - 1.0f;
 
-                    var b2 = subChucnk.ReadByte();
+                    var b2 = subChucnk.ReadByte();          //17
                     var t2 = (b2 / 255.0f * 2.0f) - 1.0f;
 
                     vertex.Normal_X = t0;
@@ -189,26 +191,26 @@ namespace Filetypes.RigidModel
                     var subChucnk = new ByteChunk(bytes);
                     var vertex = new Vertex()
                     {
-                        X = subChucnk.ReadFloat16(),
-                        Y = subChucnk.ReadFloat16(),
-                        Z = subChucnk.ReadFloat16(),
+                        X = subChucnk.ReadFloat16(),    //0
+                        Y = subChucnk.ReadFloat16(),    //2
+                        Z = subChucnk.ReadFloat16(),    //4
                     };
 
-                    var ukn = subChucnk.ReadFloat16();
-                    var bone0 = subChucnk.ReadByte();
-                    var bone1 = subChucnk.ReadByte();
-                    var bone2 = subChucnk.ReadByte();
-                    var bone3 = subChucnk.ReadByte();
+                    var ukn = subChucnk.ReadFloat16();  //6
+                    var bone0 = subChucnk.ReadByte();   //8
+                    var bone1 = subChucnk.ReadByte();   //9
+                    var bone2 = subChucnk.ReadByte();   //10
+                    var bone3 = subChucnk.ReadByte();   //11
 
 
-                    var weight0 = subChucnk.ReadByte();
-                    var weight1 = subChucnk.ReadByte();
-                    var weight2 = subChucnk.ReadByte();
-                    var weight3 = subChucnk.ReadByte();
+                    var weight0 = subChucnk.ReadByte(); //12
+                    var weight1 = subChucnk.ReadByte(); //13
+                    var weight2 = subChucnk.ReadByte(); //14
+                    var weight3 = subChucnk.ReadByte(); //15
         
-                    vertex.Normal_X = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
-                    vertex.Normal_Y = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
-                    vertex.Normal_Z = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;
+                    vertex.Normal_X = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //16
+                    vertex.Normal_Y = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //17
+                    vertex.Normal_Z = (subChucnk.ReadByte() / 255.0f * 2.0f) - 1.0f;    //18
 
                     var x = 255.0f;
                     vertex.BoneInfos.Add(new Vertex.BoneInfo()
@@ -231,6 +233,10 @@ namespace Filetypes.RigidModel
                         BoneIndex = bone3,
                         BoneWeight = (float)weight3 / x
                     });
+
+                    var ukn1 = subChucnk.ReadByte();  //6// 19
+                    vertex.Uv0 = subChucnk.ReadFloat16();      // 20
+                    vertex.Uv1 = subChucnk.ReadFloat16();      // 22
                     output[i] = vertex;
                 }
             }
@@ -262,6 +268,9 @@ namespace Filetypes.RigidModel
         public float Normal_X { get; set; }
         public float Normal_Y { get; set; }
         public float Normal_Z { get; set; }
+
+        public float Uv0 { get; set; }
+        public float Uv1 { get; set; }
 
         public List<BoneInfo> BoneInfos { get; set; } = new List<BoneInfo>();
     }

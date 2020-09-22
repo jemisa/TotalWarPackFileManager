@@ -82,7 +82,7 @@ namespace Viewer.GraphicModels
                     Z = vertex.Normal_X * transformSum.M13 + vertex.Normal_Y * transformSum.M23 + vertex.Normal_Z * transformSum.M33 + transformSum.M43
                 };
                 animatedNormal.Normalize();
-                _bufferArray[index] = new VertexPositionNormalTexture(animatedVertexPos, animatedNormal, new Vector2(0.0f, 0.0f));
+                _bufferArray[index] = new VertexPositionNormalTexture(animatedVertexPos, animatedNormal, new Vector2(vertex.Uv0, vertex.Uv1));
             }
 
 

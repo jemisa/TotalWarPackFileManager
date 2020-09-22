@@ -3,7 +3,7 @@ float4x4 View;
 float4x4 Projection;
 
 float4 AmbientColor = float4(1, 1, 1, 1);
-float AmbientIntensity = 0.1;
+float AmbientIntensity = 0.4;
 
 float4x4 WorldInverseTranspose;
 
@@ -21,6 +21,7 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
     float4 Position : SV_POSITION;
+    float2 TextureCoordinate: TEXCOORD0;
     float4 Color : COLOR0;
 };
 
@@ -34,14 +35,15 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
     float3 normal = mul(input.Normal, WorldInverseTranspose);
     float lightIntensity = dot(normal.xyz, DiffuseLightDirection);
-    output.Color = saturate(DiffuseColor * DiffuseIntensity * lightIntensity) * float4(1,0,1,1);
+    output.Color = saturate(DiffuseColor * DiffuseIntensity * lightIntensity);
 	output.Color.w = 1;
+    output.TextureCoordinate = input.TextureCoordinate;
     return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : SV_TARGET0
 {
-    return saturate(input.Color + AmbientColor * AmbientIntensity);
+    return saturate(input.Color + AmbientColor * AmbientIntensity) * float4(input.TextureCoordinate.x, input.TextureCoordinate.y,0,1);
 }
 
 technique Diffuse

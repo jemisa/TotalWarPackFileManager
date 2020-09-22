@@ -608,12 +608,12 @@ namespace WpfTest.Scenes
         TextureCube textureCube;
         public void CreateScene()
         {
-            CubemapGeneratorHelper cubemapGeneratorHelper = new CubemapGeneratorHelper();
-            cubemapGeneratorHelper.Create(@"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\Textures\CubeMaps\GamleStan", GraphicsDevice);
-            //textureCube = cubemapGeneratorHelper.CreateCubemapTexture("Blur", 28);
-            //cubemapGeneratorHelper.CreateCubemapTexture("Unprocessed", 0);
-            cubemapGeneratorHelper.SuperIm();
-            textureCube = cubemapGeneratorHelper.SimpleCubeMap();
+            //CubemapGeneratorHelper cubemapGeneratorHelper = new CubemapGeneratorHelper();
+            //cubemapGeneratorHelper.Create(@"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\Textures\CubeMaps\GamleStan", GraphicsDevice);
+            ////textureCube = cubemapGeneratorHelper.CreateCubemapTexture("Blur", 28);
+            ////cubemapGeneratorHelper.CreateCubemapTexture("Unprocessed", 0);
+            //cubemapGeneratorHelper.SuperIm();
+            //textureCube = cubemapGeneratorHelper.SimpleCubeMap();
           
 
             //var Content = new ContentManager(Services) { RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\MonoContentPipeline\bin\Windows\AnyCPU\Debug\Content" };
@@ -705,39 +705,42 @@ namespace WpfTest.Scenes
             RefreshProjection();
 
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
-     
-     
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
             _basicEffect.View = _camera.ViewMatrix;
 
 
 
             /**/
             float distance = 20;
+
+
             var angle = 0.002f;
             var cameraPosition = distance * new Vector3((float)Math.Sin(angle), 0, (float)Math.Cos(angle));
             var view = Matrix.CreateLookAt(cameraPosition, new Vector3(0, 0, 0), Vector3.UnitY);
-            RasterizerState originalRasterizerState = GraphicsDevice.RasterizerState;
-            RasterizerState rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.None;
-            GraphicsDevice.RasterizerState = rasterizerState;
+           //RasterizerState originalRasterizerState = GraphicsDevice.RasterizerState;
+           //RasterizerState rasterizerState = new RasterizerState();
+           //rasterizerState.CullMode = CullMode.None;
+           //GraphicsDevice.RasterizerState = rasterizerState;
 
             //skybox.Draw(_camera.ViewMatrix, _projectionMatrix, _camera.Position);
 
-            GraphicsDevice.RasterizerState = originalRasterizerState;
+       //     GraphicsDevice.RasterizerState = originalRasterizerState;
 
-            DrawModelWithEffect(_reflectShader, _camera.Position, _cube, Matrix.Identity, _camera.ViewMatrix, _projectionMatrix);
+            //DrawModelWithEffect(_reflectShader, _camera.Position, _cube, Matrix.Identity, _camera.ViewMatrix, _projectionMatrix);
 
             /*GraphicsDevice.RasterizerState.CullMode = CullMode.CullClockwiseFace;
             skybox.Draw(_camera.ViewMatrix, _projectionMatrix, _camera.Position);
             GraphicsDevice.RasterizerState.CullMode = CullMode.CullCounterClockwiseFace;*/
 
-            return;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
+        //
+        //    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+        //    GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+        //
             _shader.CurrentTechnique = _shader.Techniques["Diffuse"];
       
-
+            
 
             foreach (var pass in _shader.CurrentTechnique.Passes)
             {
