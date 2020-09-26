@@ -12,7 +12,7 @@ namespace Viewer.GraphicModels
 {
     public interface IRenderableContent : IDisposable
     {
-        void Render(GraphicsDevice device, Effect effect, EffectPass effectPass);
+        void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass);
     }
 
 
@@ -37,14 +37,15 @@ namespace Viewer.GraphicModels
             _vertexBuffer.SetData(vertexMesh);
         }
 
-        public virtual void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
+        public virtual void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
         {
             device.Indices = _indexBuffer;
             device.SetVertexBuffer(_vertexBuffer);
             //foreach (var pass in effect.CurrentTechnique.Passes)
             //{
 
-
+            effect.Parameters["World"].SetValue(world);
+            effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
             //  pass.Apply();
 
             effectPass.Apply();

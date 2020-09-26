@@ -247,15 +247,6 @@ namespace Filetypes.RigidModel
 
             return output;
         }
-
-        public void ResolveTextures(List<PackFile> loadedContent)
-        {
-            foreach (var material in Materials)
-            {
-                material.File = PackFileLoadHelper.FindFile(loadedContent, material.Name);
-            }
-            
-        }
     }
 
     public class Vertex

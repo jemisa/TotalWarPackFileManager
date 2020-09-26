@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Viewer.Animation;
+using Viewer.Scene;
 using static WpfTest.Scenes.Scene3d;
 
 namespace Viewer.GraphicModels
@@ -20,101 +21,31 @@ namespace Viewer.GraphicModels
     {
         LodModel _model;
         VertexPositionNormalTexture[] _bufferArray;
-        Dictionary<TexureType, (Texture2D, Material )> _textures = new Dictionary<TexureType, (Texture2D, Material)>();
+        Dictionary<TexureType, Texture2D> _textures = new Dictionary<TexureType, Texture2D>();
 
-        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, int lodLevel, int model, Animation.AnimationClip animationData, int frame = 30)
+        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, int lodLevel, int model)
         {
             _animationPlayer = animationPlayer;
             _model = rigidModelData.LodInformations[lodLevel].LodModels[model];
             _bufferArray = new VertexPositionNormalTexture[_model.VertexArray.Length];
             Create(animationPlayer, device, _bufferArray, _model.IndicesBuffer);
+        }
 
+        public void ResolveTextures(TextureLibary textureLibary, GraphicsDevice device)
+        {
             foreach (var material in _model.Materials)
-            {
-                _textures[material.Type] = (LoadTexture(material, device), material);
-            }
+                _textures[material.Type] = textureLibary.LoadTexture(material.Name, device);
         }
 
-        Texture2D LoadTexture(Material material, GraphicsDevice device)
-        {
-            if (material.File != null)
-            {
-                var tex =  LoadTextureAsTexture2d(material, device);
-
-                if(tex != null)
-                {
-                    var filename = Path.GetFileNameWithoutExtension(material.Name);
-                    SaveTexture2d($@"c:\temp\TextureLoading\{filename}_tex2d.png", tex);
-                }
-                return tex;
-            }
-            return null;
-        }
-
-        Texture2D CreateTexture2dFromBitmap(Bitmap bitmap, GraphicsDevice device)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                bitmap.Save(memoryStream, ImageFormat.Png);
-                Texture2D tex = Texture2D.FromStream(device, memoryStream);
-                return tex;
-            }
-        }
-
-        void SaveTexture2d(string path, Texture2D texture)
-        {
-            return;
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                texture.SaveAsPng(stream, texture.Width, texture.Height);
-            }
-        }
-
-
-        Texture2D LoadTextureAsTexture2d(Material material, GraphicsDevice device)
-        {
-            var content = material.File.Data;
-            using (MemoryStream stream = new MemoryStream(content))
-            {
-                var image = Pfim.Dds.Create(stream, new Pfim.PfimConfig(32768, Pfim.TargetFormat.Native, false ));
-         
-                if (image as Pfim.Dxt1Dds != null)
-                {
-                    var t = image as Pfim.Dxt1Dds;
-                    /*var handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
-                    try
-                    {
-                        var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-                        var bitmap = new Bitmap(image.Width, image.Height, image.Stride, PixelFormat.Format24bppRgb, data);
-                        return CreateTexture2dFromBitmap(bitmap, device);
-                    }
-                    finally
-                    {
-                        handle.Free();
-                    }*/
-
-                    var texture = new Texture2D(device, image.Width, image.Height, false, SurfaceFormat.Dxt1);
-                    texture.SetData(image.Data, 0, (int)image.Header.PitchOrLinearSize);
-                    return texture;
-                }
-                else if (image.Format == Pfim.ImageFormat.Rgba32)
-                {
-                    /*var texture = new Texture2D(device, image.Width, image.Height, false, SurfaceFormat.Dxt1);
-                    texture.SetData(image.Data, 0, image.DataLen);
-                    return texture;*/
-                }
-            }
-            return null;
-        }
-
-        public override void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
+        public override void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
         {
             UpdateVertexBuffer();
 
-            var item = _textures[TexureType.Diffuse];
-            effect.Parameters["ModelTexture"].SetValue(item.Item1);
+            //var item = _textures[TexureType.Specular];
+            //if(item != null)
+            //    effect.Parameters["ModelTexture"].SetValue(item);
 
-            base.Render(device, effect, effectPass);
+            base.Render(world, device, effect, effectPass);
         }
 
         private void UpdateVertexBuffer()
@@ -124,7 +55,7 @@ namespace Viewer.GraphicModels
                 var vertex = _model.VertexArray[index];
 
                 var transformSum = Matrix.Identity;
-                var animationData = _animationPlayer.GetCurrentFrame();
+                var animationData = _animationPlayer?.GetCurrentFrame();
                 if (animationData != null && vertex.BoneInfos.Count != 0)
                 {
                     int b0 = vertex.BoneInfos[0].BoneIndex;
@@ -174,27 +105,6 @@ namespace Viewer.GraphicModels
 
 
             _vertexBuffer.SetData(_bufferArray);
-        }
-    }
-
-    public class Rmv2CompoundModel : MeshModel
-    {
-        List<MeshModel> _models = new List<MeshModel>();
-
-        public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, Animation.AnimationClip animationModel, int lodLevel, int frame)
-        {
-            for (int i = 0 ; i < rigidModelData.LodInformations[lodLevel].LodModels.Count(); i++)
-            {
-                Rmv2Model meshModel = new Rmv2Model();
-                meshModel.Create(animationPlayer, device, rigidModelData, lodLevel, i, animationModel, frame);
-                _models.Add(meshModel);
-            }
-        }
-
-        public override void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
-        {
-            foreach (var model in _models)
-                model.Render(device, effect, effectPass);
         }
     }
 }

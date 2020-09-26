@@ -27,14 +27,13 @@ namespace Viewer.GraphicModels
         }
 
 
-        public virtual void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
+        public virtual void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
         {
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                foreach (var line in _originalVertecies)
-                    device.DrawUserPrimitives(PrimitiveType.LineList, line, 0, 1);
-            }
+            effect.Parameters["World"].SetValue(world);
+            effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
+            effectPass.Apply();
+            foreach (var line in _originalVertecies)
+                device.DrawUserPrimitives(PrimitiveType.LineList, line, 0, 1);
         }
 
         public void Dispose()

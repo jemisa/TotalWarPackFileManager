@@ -12,7 +12,7 @@ using VariantMeshEditor.Views.EditorViews;
 
 namespace VariantMeshEditor.Controls.EditorControllers
 {
-    class SkeletonController
+    public class SkeletonController
     {
         SkeletonEditorView _viewModel;
         SkeletonElement _skeletonElement;

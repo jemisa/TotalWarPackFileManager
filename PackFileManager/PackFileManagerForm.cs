@@ -178,7 +178,7 @@ namespace PackFileManager
                 Height = 1000
             };
 
-            var dbDecoder = new VariantMeshEditor.UserControl1();
+            var dbDecoder = new VariantMeshEditor.VariantMeshEditorControl();
             //dbDecoder.Show();
 
             //var dbDecoder = new DbSchemaDecoder.DbSchemaDecoder(GameManager.Instance.CurrentGame);

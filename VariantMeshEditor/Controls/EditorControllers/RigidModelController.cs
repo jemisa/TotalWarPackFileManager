@@ -1,29 +1,24 @@
 ﻿using Common;
-using Filetypes.Codecs;
 using Filetypes.RigidModel;
-using Pfim;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Channels;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 using VariantMeshEditor.Views.EditorViews.Util;
+using Viewer.GraphicModels;
 
 namespace VariantMeshEditor.Controls.EditorControllers
 {
-    class RigidModelController
+    public class RigidModelController
     {
         RigidModelEditorView _view;
         RigidModelElement _element;
         List<PackFile> _loadedContent;
+
+        Dictionary<RigidModelMeshEditorView, MeshInstance> _modelEditors = new Dictionary<RigidModelMeshEditorView, MeshInstance>();
+         
         public RigidModelController(RigidModelEditorView view, RigidModelElement element, List<PackFile> loadedContent )
         {
             _view = view;
@@ -33,26 +28,53 @@ namespace VariantMeshEditor.Controls.EditorControllers
             PopulateUi(_view, _element);
         }
 
+        public void AssignModel(MeshInstance meshInstance, int lodIndex, int modelIndex)
+        {
+            var item = _modelEditors.Where(x => x.Key.ModelIndex == modelIndex && x.Key.LodIndex == lodIndex).First();
+            _modelEditors[item.Key] = meshInstance;
+        }
+
+        public void SetVisible(int lodIndex, bool state)
+        {
+            foreach (var item in _modelEditors)
+            {
+                var editor = item.Key;
+                var model = item.Value;
+                if (editor.LodIndex == lodIndex)
+                    model.Visible = state;
+                else
+                    model.Visible = false;
+            }
+        }
+
         private void PopulateUi(RigidModelEditorView view, RigidModelElement element)
         {
             bool firstSub = true;
             bool first = true;
+            int currentLodIndex = 0;
             foreach (var lod in element.Model.LodInformations)
             {
-                var item = new CollapsableButtonControl($"Lod - {lod.LodLevel}");
+                var lodContent = new CollapsableButtonControl($"Lod - {lod.LodLevel}");
 
-                var stackpanel = new StackPanel();
-                item.Content = stackpanel;
+                var lodStackPanel = new StackPanel();
+                lodContent.Content = lodStackPanel;
 
+                var currentModelIndex = 0;
                 foreach (var mesh in lod.LodModels)
                 {
-                    var sub = new CollapsableButtonControl($"{mesh.modelName}");
-                    var substackpanel = new StackPanel();
-                    sub.Content = substackpanel;
+                    var meshContnet = new CollapsableButtonControl($"{mesh.modelName}");
+                    var meshStackPanel = new StackPanel();
+                    meshContnet.Content = meshStackPanel;
 
-                    var meshView = new RigidModelMeshEditorView();
+                    var meshView = new RigidModelMeshEditorView
+                    {
+                        ModelIndex = currentModelIndex,
+                        LodIndex = currentLodIndex
+                    };
+                    _modelEditors.Add(meshView, null);
+
                     meshView.ModelType.Text = mesh.GroupType.ToString();
-                    meshView.VisibleCheckBox.Click += VisibleCheckBox_Click;
+                    meshView.VisibleCheckBox.Click += (sender, arg) => VisibleCheckBox_Click(meshView);
                     meshView.VertexType.Text = mesh.vertexType.ToString();
                     meshView.VertexCount.Text = mesh.vertexCount.ToString();
                     meshView.FaceCount.Text = mesh.faceCount.ToString();
@@ -66,6 +88,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     meshView.AlphaPath.Text = GetTexuterName(mesh, TexureType.Alpha);
                     meshView.AlphaView.Click += (sender, file) => DisplayTexture(TexureType.Alpha, meshView.AlphaPath);
 
+
                     meshView.NormalPath.Text = GetTexuterName(mesh, TexureType.Normal);
                     meshView.NormalView.Click += (sender, file) => DisplayTexture(TexureType.Normal, meshView.NormalPath);
 
@@ -78,63 +101,34 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     AddUnknownTexture(meshView, mesh);
                     AddUnknowData(meshView, mesh);
 
-                    substackpanel.Children.Add(meshView);
-                    stackpanel.Children.Add(sub);
+                    meshStackPanel.Children.Add(meshView);
+                    lodStackPanel.Children.Add(meshContnet);
 
                     if (firstSub)
-                        sub.OnClick();
+                        meshContnet.OnClick();
                     firstSub = false;
+
+                    currentModelIndex++;
                 }
-                
-                view.LodStackPanel.Children.Add(item);
+
+                currentLodIndex++;
+
+
+                view.LodStackPanel.Children.Add(lodContent);
                 if(first)
-                    item.OnClick();
+                    lodContent.OnClick();
                 first = false;
             }
         }
 
-        private void VisibleCheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void VisibleCheckBox_Click(RigidModelMeshEditorView editorView)
         {
-            throw new NotImplementedException();
+            var model = _modelEditors[editorView];
+            model.Visible = editorView.VisibleCheckBox.IsChecked == true;
         }
 
         void DisplayTexture(TexureType type, TextBox pathContainer )
         {
-            var path = pathContainer.Text;
-            var file = PackFileLoadHelper.FindFile(_loadedContent, path);
-
-
-
-
-            //var data = file.Data;
-
-
-            
-          //var img =  SixLabors.ImageSharp.Image.Load(data);
-          // var format = SixLabors.ImageSharp.Image.DetectFormat(data);
-            using (MemoryStream stream = new MemoryStream(file.Data))
-            {
-                var image = Pfim.Pfim.FromStream(stream);
-
-                var handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
-                try
-                {
-                    var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-                    var bitmap = new Bitmap(image.Width, image.Height, image.Stride, PixelFormat.Format24bppRgb, data);
-                    bitmap.Save(@"c:\temp\myImage.png", System.Drawing.Imaging.ImageFormat.Png);
-                }
-                finally
-                {
-                    handle.Free();
-                }
-
-                /*ss
-                                using (var bitMap = BitmapCodec.Instance.Decode(stream))
-                                { 
-
-
-                                }*/
-            }
         }
 
         void AddUnknownTexture(RigidModelMeshEditorView view, LodModel model)
@@ -166,16 +160,6 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
 
             return "";
-        }
-
-        void CreateLod()
-        { }
-
-        RigidModelMeshEditorView CreateMesh(LodModel model)
-        {
-            var item = new RigidModelMeshEditorView();
-            item.Resources.Add("Header", model.modelName + " ");
-            return item;
         }
     }
 }

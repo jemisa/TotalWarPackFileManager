@@ -36,7 +36,16 @@ namespace TreeViewWithCheckBoxes
             set { this.SetIsChecked(value); }
         }
 
-        public System.Windows.Visibility Vis { get; set; } = System.Windows.Visibility.Visible;
+        System.Windows.Visibility _vis = System.Windows.Visibility.Visible;
+        public System.Windows.Visibility Vis 
+        { 
+            get { return _vis; }
+            set
+            {
+                _vis = value;
+                OnPropertyChanged("Vis");
+            } 
+        } 
 
         void SetIsChecked(bool value)
         {

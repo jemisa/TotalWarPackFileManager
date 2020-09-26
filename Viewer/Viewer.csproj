@@ -48,23 +48,22 @@
     <Compile Include="Animation\AnimationClip.cs" />
     <Compile Include="Animation\AnimationPlayer.cs" />
     <Compile Include="GraphicModels\CubeModel.cs" />
+    <Compile Include="GraphicModels\LineBox.cs" />
     <Compile Include="GraphicModels\LineModel.cs" />
     <Compile Include="GraphicModels\MeshInstance.cs" />
     <Compile Include="GraphicModels\MeshModel.cs" />
     <Compile Include="GraphicModels\Rmv2Model.cs" />
     <Compile Include="GraphicModels\SkeletonModel.cs" />
     <Compile Include="GraphicModels\SkyBox.cs" />
-    <Compile Include="MonoGameControlls\MonoGameContentControl.cs" />
-    <Compile Include="MonoGameControlls\MonoGameGraphicsDeviceService.cs" />
-    <Compile Include="MonoGameControlls\MonoGameServiceProvider.cs" />
-    <Compile Include="MonoGameControlls\MonoGameViewModel.cs" />
     <Compile Include="Scene\Camera.cs" />
+    <Compile Include="Scene\CubemapGeneratorHelper.cs" />
     <Compile Include="Scene\Scene3d.cs" />
     <Compile Include="Scene\ShaderConfiguration.cs" />
     <Compile Include="Scene\SceneView.xaml.cs">
       <DependentUpon>SceneView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scene\TextureLibary.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ImageProcessor">

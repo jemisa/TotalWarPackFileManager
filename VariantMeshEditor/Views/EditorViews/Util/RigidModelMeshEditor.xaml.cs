@@ -20,6 +20,9 @@ namespace VariantMeshEditor.Views.EditorViews.Util
     /// </summary>
     public partial class RigidModelMeshEditorView : UserControl
     {
+        public int LodIndex { get; set; }
+        public int ModelIndex { get; set;
+        }
         public RigidModelMeshEditorView()
         {
             InitializeComponent();

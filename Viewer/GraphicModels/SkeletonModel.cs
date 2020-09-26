@@ -11,7 +11,9 @@ using static Viewer.Animation.AnimationClip;
 
 namespace Viewer.GraphicModels
 {
-    public class SkeletonModel : LineModel
+
+
+    public class SkeletonModel : IRenderableContent
     {
         public class BoneInfo
         {
@@ -26,10 +28,13 @@ namespace Viewer.GraphicModels
         public List<BoneInfo> Bones = new List<BoneInfo>();
         AnimationPlayer _animationPlayer;
 
+        LineBox _lineBox = new LineBox();
+
         public void Create(AnimationPlayer animationPlayer, SkeletonFile skeleton)
         {
+            _lineBox.Create();
             _animationPlayer = animationPlayer;
-
+           
             for (int i = 0; i < skeleton.Bones.Count(); i++)
             {
                 var x = new Microsoft.Xna.Framework.Quaternion(
@@ -59,58 +64,54 @@ namespace Viewer.GraphicModels
                     continue;
                 Bones[i].WorldPosition = Bones[i].WorldPosition * Bones[parentIndex].WorldPosition;
             }
+        }
 
-            List<(Vector3, Vector3)> boneTransformList = new List<(Vector3, Vector3)>();
-            foreach (var bone in Bones)
+        public void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
+        {
+            AnimationFrame frame = _animationPlayer.GetCurrentFrame();
+             
+            for (int i = 0; i < Bones.Count(); i++)
             {
-                var parentIndex = bone.ParentIndex;
+                var parentIndex = Bones[i].ParentIndex;
                 if (parentIndex == -1)
                     continue;
 
-                var parentBone = Bones[parentIndex];
-                boneTransformList.Add((bone.WorldPosition.Translation, parentBone.WorldPosition.Translation));
-            }
+                var bonePos = Bones[i].WorldPosition;
+                var parentBonePos = Bones[parentIndex].WorldPosition;
 
-            //CreateLineList(boneTransformList);
-        }
-
-        public override void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
-        {
-            AnimationFrame frame = _animationPlayer.GetCurrentFrame();
-
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                for (int i = 0; i < Bones.Count(); i++)
+                if (frame != null)
                 {
-                    var parentIndex = Bones[i].ParentIndex;
-                    if (parentIndex == -1)
-                        continue;
+                    var currentBoneAnimationoffset = frame.BoneTransforms[i].Transform;
+                    var parentBoneAnimationoffset = frame.BoneTransforms[parentIndex].Transform;
 
-                    var bonePos = Bones[i].WorldPosition;
-                    var parentBonePos = Bones[parentIndex].WorldPosition;
-
-                    if (frame != null)
-                    {
-                        var currentBoneAnimationoffset = frame.BoneTransforms[i].Transform;
-                        var parentBoneAnimationoffset = frame.BoneTransforms[parentIndex].Transform;
-
-                        bonePos = Matrix.Multiply(bonePos, currentBoneAnimationoffset);
-                        parentBonePos = Matrix.Multiply(parentBonePos, parentBoneAnimationoffset);
-                    }
-
-                    var vertices = new[]
-                    {
-                        new VertexPositionNormalTexture(bonePos.Translation, new Vector3(0,0,0), new Vector2(0,0)),
-                        new VertexPositionNormalTexture(parentBonePos.Translation, new Vector3(0,0,0), new Vector2(0,0))
-                    };
-
-                    effectPass.Apply();
-                    device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+                    bonePos = Matrix.Multiply(bonePos, currentBoneAnimationoffset);
+                    parentBonePos = Matrix.Multiply(parentBonePos, parentBoneAnimationoffset);
                 }
+
+                var vertices = new[]
+                {
+                    new VertexPositionNormalTexture(bonePos.Translation, new Vector3(0,0,0), new Vector2(0,0)),
+                    new VertexPositionNormalTexture(parentBonePos.Translation, new Vector3(0,0,0), new Vector2(0,0))
+                };
+
+                MeshInstance instance = new MeshInstance()
+                {
+                    Model = _lineBox,
+                };
+                instance.Render(Matrix.CreateScale(0.05f) * bonePos, device, effect, effectPass);
+
+
+                effect.Parameters["World"].SetValue(world);
+                effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
+                effectPass.Apply();
+                device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+                
             }
         }
 
+        public void Dispose()
+        {
+        
+        }
     }
 }

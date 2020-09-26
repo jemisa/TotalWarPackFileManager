@@ -29,18 +29,20 @@ namespace VariantMeshEditor
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
-    public partial class UserControl1 : UserControl
+    public partial class VariantMeshEditorControl : UserControl
     {
 
         SceneTreeViewController _treeViewController;
-        SceneController _sceneController;
 
-        public UserControl1()
+        EditorMainController _mainController;
+        public VariantMeshEditorControl()
         {
             InitializeComponent();
 
             _treeViewController = new SceneTreeViewController(EditorPanel.TreeView.tree);
-            _sceneController = new SceneController(_treeViewController, RenderView.Scene, EditorPanel.ToolPanel);
+            _mainController = new EditorMainController(_treeViewController, RenderView.Scene, EditorPanel.ToolPanel);
+            _mainController.LoadModel("");
+
         }
     }
 }

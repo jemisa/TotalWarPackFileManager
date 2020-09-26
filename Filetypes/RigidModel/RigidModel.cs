@@ -45,17 +45,5 @@ namespace Filetypes.RigidModel
             return model;
         }
 
-        public void ResolveTextures(List<PackFile> loadedContent)
-        {
-
-            foreach (var lodLevel in LodInformations)
-            {
-                foreach (var model in lodLevel.LodModels)
-                {
-                    model.ResolveTextures(loadedContent);
-                }
-            }
-        }
-
     }
 }

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VariantMeshEditor.Controls.EditorControllers;
 using Viewer.Animation;
 using Viewer.GraphicModels;
 
@@ -15,6 +16,8 @@ namespace VariantMeshEditor.ViewModels
 {
     public class SkeletonElement : RenderableFileSceneElement
     {
+
+        public SkeletonController Controller { get; set; }
         public SkeletonFile SkeletonFile { get; set; }
         public SkeletonModel SkeletonModel { get; set; }
         public SkeletonElement(FileSceneElement parent, string fullPath) : base(parent, fullPath, "Skeleton")
@@ -24,7 +27,7 @@ namespace VariantMeshEditor.ViewModels
         public override FileSceneElementEnum Type => FileSceneElementEnum.Skeleton;
 
 
-        public void Create(AnimationPlayer animationPlayer, List<PackFile> loadedContent, string skeletonName)
+        public MeshInstance Create(AnimationPlayer animationPlayer, List<PackFile> loadedContent, string skeletonName)
         {
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + skeletonName;
@@ -36,17 +39,18 @@ namespace VariantMeshEditor.ViewModels
                 FileName = Path.GetFileNameWithoutExtension(skeletonFilePath);
             }
 
-            Refresh3dModel(animationPlayer);
+            return Refresh3dModel(animationPlayer);
         }
 
-        void Refresh3dModel(AnimationPlayer animationPlayer)
+        MeshInstance Refresh3dModel(AnimationPlayer animationPlayer)
         {
             SkeletonModel = new SkeletonModel();
             SkeletonModel.Create(animationPlayer, SkeletonFile);
             MeshInstance.Model = SkeletonModel;
+            return MeshInstance;
         }
 
-        void Create3dModel()
+        MeshInstance Create3dModel()
         {
             MeshInstance = new MeshInstance()
             {
@@ -54,6 +58,7 @@ namespace VariantMeshEditor.ViewModels
                 World = Matrix.Identity,
                 Visible = true
             };
+            return MeshInstance;
         }
     }
 }

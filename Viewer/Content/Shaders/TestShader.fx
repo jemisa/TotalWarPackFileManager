@@ -52,12 +52,12 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : SV_TARGET0
 {
-     float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
-     if(textureColor.a == 0)
-            clip(-1);
+    // float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
+    //if(textureColor.a == 0)
+    //       clip(-1);
     //textureColor.a = 0.5f;
-    return textureColor;
-    //return saturate(input.Color + AmbientColor * AmbientIntensity) * float4(input.TextureCoordinate.x, input.TextureCoordinate.y,0,1);
+    //return textureColor;
+     return saturate(input.Color);// + AmbientColor * AmbientIntensity) * float4(input.TextureCoordinate.x, input.TextureCoordinate.y,0,1);
 }
 
 technique Diffuse

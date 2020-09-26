@@ -63,27 +63,24 @@ namespace VariantMeshEditor.Controls
 
         public void Populate(FileSceneElement rootItem)
         {
-            SetInitialVisability(rootItem, true);
             _viewModel.DataContext = new ObservableCollection<TreeViewDataModel>() { rootItem }; ;
         }
 
-        public void SetInitialVisability(FileSceneElement scene, bool shouldBeSelected, TreeViewDataModel parent = null)
+        public void SetInitialVisability(FileSceneElement element, bool shouldBeSelected, TreeViewDataModel parent = null)
         {
+            element.PropertyChanged += Node_PropertyChanged;
+            element.IsChecked = shouldBeSelected;
 
-            scene.IsChecked = shouldBeSelected;
+            if (element as TransformElement != null)
+                element.Vis = Visibility.Hidden;
+            if (element as AnimationElement != null)
+                element.Vis = Visibility.Hidden;
+            if (element as SkeletonElement != null)
+                element.IsChecked = false;
 
-            scene.PropertyChanged += Node_PropertyChanged;
-
-            if (scene as TransformElement != null)
-                scene.Vis = Visibility.Hidden;
-            if (scene as AnimationElement != null)
-                scene.Vis = Visibility.Hidden;
-            if (scene as SkeletonElement != null)
-                scene.IsChecked = false;
-
-            bool areAllChildrenModels = scene.Children.Where(x => (x as RigidModelElement) != null).Count() == scene.Children.Count();
+            bool areAllChildrenModels = element.Children.Where(x => (x as RigidModelElement) != null).Count() == element.Children.Count();
             bool firstItem = true;
-            foreach (var item in scene.Children)
+            foreach (var item in element.Children)
             {
                 if (areAllChildrenModels && !firstItem)
                     shouldBeSelected = false;

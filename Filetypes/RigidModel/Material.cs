@@ -15,7 +15,6 @@ namespace Filetypes.RigidModel
 
     public class Material
     {
-        public PackedFile File { get; set; } = null;
         public string Name { get; set; }
         public TexureType Type { get { return (TexureType)TypeRaw; } }
         public int TypeRaw { get; set; }

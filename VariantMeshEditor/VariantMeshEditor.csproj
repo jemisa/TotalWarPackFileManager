@@ -54,7 +54,7 @@
     <Compile Include="Controls\EditorControllers\RigidModelController.cs" />
     <Compile Include="Controls\EditorControllers\SkeletonController.cs" />
     <Compile Include="Controls\EditorControllers\SlotController.cs" />
-    <Compile Include="Controls\SceneController.cs" />
+    <Compile Include="Controls\EditorMainController.cs" />
     <Compile Include="Controls\SceneTreeViewController.cs" />
     <Compile Include="Util\NotifyPropertyChangedImpl.cs" />
     <Compile Include="Util\VariantMeshLoader.cs" />
@@ -139,12 +139,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControl1.xaml">
+    <Page Include="VariantMeshEditorControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
+    <Compile Include="VariantMeshEditorControl.xaml.cs">
+      <DependentUpon>VariantMeshEditorControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using TreeViewWithCheckBoxes;
 using Viewer.GraphicModels;
 
@@ -36,6 +37,7 @@ namespace VariantMeshEditor.ViewModels
         public abstract FileSceneElementEnum Type { get; }
         public string FileName { get; set; }
         public string FullPath { get; set; }
+        public UserControl Editor { get; set; }
 
         public FileSceneElement(FileSceneElement parent, string fileName, string fullPath, string displayName)
             : base(displayName)
