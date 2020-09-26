@@ -86,6 +86,8 @@ namespace VariantMeshEditor.Util
                     Load(animationElement, device, meshReference.definition, slotElement);
             }
 
+            
+
             // Load the animation
             var rigidModels = new List<RigidModelElement>();
             GetAllOfType<RigidModelElement>(parent, ref rigidModels);
@@ -110,6 +112,7 @@ namespace VariantMeshEditor.Util
         {
             ByteChunk chunk = new ByteChunk(file.Data);
             var model3d = RigidModel.Create(chunk, out string errorMessage);
+            model3d.ResolveTextures(_loadedContent);
             var model = new RigidModelElement(parent, model3d, file.FullPath);
             model.Create(animationElement.AnimationPlayer, device);
             parent.Children.Add(model);

@@ -17,6 +17,15 @@
             </Border>
         </StackPanel>
 
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Visible</Label>
+            <Label>:</Label>
+            <CheckBox x:Name="VisibleCheckBox" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+
+        </StackPanel>
+
+
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Width="100">Vertex Type</Label>
             <Label>:</Label>

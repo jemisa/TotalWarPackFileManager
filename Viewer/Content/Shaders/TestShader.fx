@@ -11,6 +11,15 @@ float3 DiffuseLightDirection = float3(1, 0, 0);
 float4 DiffuseColor = float4(1, 1, 1, 1);
 float DiffuseIntensity = 1.0;
 
+texture ModelTexture;
+sampler2D textureSampler = sampler_state {
+    Texture = (ModelTexture);
+    MinFilter = Linear;
+    MagFilter = Linear;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
 struct VertexShaderInput
 {
     float3 Position : SV_POSITION;    
@@ -43,13 +52,19 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : SV_TARGET0
 {
-    return saturate(input.Color + AmbientColor * AmbientIntensity) * float4(input.TextureCoordinate.x, input.TextureCoordinate.y,0,1);
+     float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
+     if(textureColor.a == 0)
+            clip(-1);
+    //textureColor.a = 0.5f;
+    return textureColor;
+    //return saturate(input.Color + AmbientColor * AmbientIntensity) * float4(input.TextureCoordinate.x, input.TextureCoordinate.y,0,1);
 }
 
 technique Diffuse
 {
     pass Pass1
     {
+        //AlphaBlendEnable = TRUE;
         VertexShader = compile vs_4_0 VertexShaderFunction();
         PixelShader = compile ps_4_0 PixelShaderFunction();
     }

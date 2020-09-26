@@ -44,16 +44,15 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 var stackpanel = new StackPanel();
                 item.Content = stackpanel;
 
-                
                 foreach (var mesh in lod.LodModels)
                 {
-
                     var sub = new CollapsableButtonControl($"{mesh.modelName}");
                     var substackpanel = new StackPanel();
                     sub.Content = substackpanel;
 
                     var meshView = new RigidModelMeshEditorView();
                     meshView.ModelType.Text = mesh.GroupType.ToString();
+                    meshView.VisibleCheckBox.Click += VisibleCheckBox_Click;
                     meshView.VertexType.Text = mesh.vertexType.ToString();
                     meshView.VertexCount.Text = mesh.vertexCount.ToString();
                     meshView.FaceCount.Text = mesh.faceCount.ToString();
@@ -77,6 +76,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     meshView.SpecularView.Click += (sender, file) => DisplayTexture(TexureType.Specular, meshView.SpecularPath);
 
                     AddUnknownTexture(meshView, mesh);
+                    AddUnknowData(meshView, mesh);
 
                     substackpanel.Children.Add(meshView);
                     stackpanel.Children.Add(sub);
@@ -91,6 +91,11 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     item.OnClick();
                 first = false;
             }
+        }
+
+        private void VisibleCheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         void DisplayTexture(TexureType type, TextBox pathContainer )
@@ -145,7 +150,11 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     view.DebugInfo.Text += $"Unknown Texture Type: {item.TypeRaw} - {item.Name}"; 
                 }
             }
-          
+        }
+
+        void AddUnknowData(RigidModelMeshEditorView view, LodModel model)
+        { 
+        
         }
 
         string GetTexuterName(LodModel model, TexureType type)

@@ -74,7 +74,7 @@ namespace Viewer.GraphicModels
             //CreateLineList(boneTransformList);
         }
 
-        public override void Render(GraphicsDevice device, Effect effect)
+        public override void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
         {
             AnimationFrame frame = _animationPlayer.GetCurrentFrame();
 
@@ -106,6 +106,7 @@ namespace Viewer.GraphicModels
                         new VertexPositionNormalTexture(parentBonePos.Translation, new Vector3(0,0,0), new Vector2(0,0))
                     };
 
+                    effectPass.Apply();
                     device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
                 }
             }

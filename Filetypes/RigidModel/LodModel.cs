@@ -1,4 +1,5 @@
-﻿using Filetypes.ByteParsing;
+﻿using Common;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -234,7 +235,7 @@ namespace Filetypes.RigidModel
                         BoneWeight = (float)weight3 / x
                     });
 
-                    var ukn1 = subChucnk.ReadByte();  //6// 19
+                    var ukn1 = subChucnk.ReadByte();           // 19
                     vertex.Uv0 = subChucnk.ReadFloat16();      // 20
                     vertex.Uv1 = subChucnk.ReadFloat16();      // 22
                     output[i] = vertex;
@@ -245,6 +246,15 @@ namespace Filetypes.RigidModel
 
 
             return output;
+        }
+
+        public void ResolveTextures(List<PackFile> loadedContent)
+        {
+            foreach (var material in Materials)
+            {
+                material.File = PackFileLoadHelper.FindFile(loadedContent, material.Name);
+            }
+            
         }
     }
 

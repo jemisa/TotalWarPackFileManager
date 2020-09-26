@@ -258,7 +258,14 @@ namespace MonoGame.Framework.WpfInterop
                     var presentationParameters = new PresentationParameters
                     {
                         // Do not associate graphics device with window.
-                        DeviceWindowHandle = IntPtr.Zero
+                        DeviceWindowHandle = IntPtr.Zero,
+                        DepthStencilFormat = DepthFormat.Depth24,
+
+
+
+
+
+
                     };
                     var gd = CreateSharedGraphicsDevice(presentationParameters);
                     if (UseASingleSharedGraphicsDevice)
@@ -268,6 +275,19 @@ namespace MonoGame.Framework.WpfInterop
                 }
             }
         }
+
+        /*
+                     _parameters = new PresentationParameters
+            {
+                BackBufferWidth = Math.Max(width, 1),
+                BackBufferHeight = Math.Max(height, 1),
+                BackBufferFormat = SurfaceFormat.Color,
+                DepthStencilFormat = DepthFormat.Depth24,
+                DeviceWindowHandle = windowHandle,
+                PresentationInterval = Microsoft.Xna.Framework.Graphics.PresentInterval.Immediate,
+                IsFullScreen = false
+            };
+         */
 
         private static GraphicsDevice CreateSharedGraphicsDevice(PresentationParameters presentationParameters)
         {

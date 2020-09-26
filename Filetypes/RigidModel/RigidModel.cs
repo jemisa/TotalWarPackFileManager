@@ -1,4 +1,5 @@
-﻿using Filetypes.ByteParsing;
+﻿using Common;
+using Filetypes.ByteParsing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,6 +43,18 @@ namespace Filetypes.RigidModel
             Validate(chunk, out errorMessage);
 
             return model;
+        }
+
+        public void ResolveTextures(List<PackFile> loadedContent)
+        {
+
+            foreach (var lodLevel in LodInformations)
+            {
+                foreach (var model in lodLevel.LodModels)
+                {
+                    model.ResolveTextures(loadedContent);
+                }
+            }
         }
 
     }

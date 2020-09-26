@@ -744,8 +744,9 @@ namespace WpfTest.Scenes
 
             foreach (var pass in _shader.CurrentTechnique.Passes)
             {
+                
 
-                pass.Apply();
+               
                 foreach (var item in DrawBuffer)
                 {
                     /*Matrix worldInverse = Matrix.Invert(Matrix.Identity);
@@ -776,8 +777,10 @@ namespace WpfTest.Scenes
 float4x4 View;
 float4x4 Projection;
                      */
-
-                    item.Render(GraphicsDevice, _shader);
+                  
+                      
+                        item.Render(GraphicsDevice, _shader, pass);
+                    
                 }
             }
 

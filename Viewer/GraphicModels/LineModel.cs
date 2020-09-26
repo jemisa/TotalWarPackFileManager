@@ -27,7 +27,7 @@ namespace Viewer.GraphicModels
         }
 
 
-        public virtual void Render(GraphicsDevice device, Effect effect)
+        public virtual void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
         {
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
@@ -41,5 +41,6 @@ namespace Viewer.GraphicModels
         {
 
         }
+
     }
 }

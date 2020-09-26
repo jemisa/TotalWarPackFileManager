@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Viewer.GraphicModels
 {
     public interface IRenderableContent : IDisposable
     {
-        void Render(GraphicsDevice device, Effect effect);
+        void Render(GraphicsDevice device, Effect effect, EffectPass effectPass);
     }
 
 
@@ -36,7 +37,7 @@ namespace Viewer.GraphicModels
             _vertexBuffer.SetData(vertexMesh);
         }
 
-        public virtual void Render(GraphicsDevice device, Effect effect)
+        public virtual void Render(GraphicsDevice device, Effect effect, EffectPass effectPass)
         {
             device.Indices = _indexBuffer;
             device.SetVertexBuffer(_vertexBuffer);
@@ -44,7 +45,9 @@ namespace Viewer.GraphicModels
             //{
 
 
-              //  pass.Apply();
+            //  pass.Apply();
+
+            effectPass.Apply();
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _indexBuffer.IndexCount);
             //}
         }
@@ -54,5 +57,6 @@ namespace Viewer.GraphicModels
             if(_vertexDeclaration != null)
                 _vertexDeclaration.Dispose();
         }
+
     }
 }
