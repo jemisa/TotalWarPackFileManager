@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/TestShader.fx</SourceFile>
-  <SourceTime>2020-09-26T22:59:42.5749401+02:00</SourceTime>
-  <DestFile>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/bin/Windows/Shaders/TestShader.xnb</DestFile>
-  <DestTime>2020-09-27T17:56:12.0144709+02:00</DestTime>
+  <SourceFile>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/Shaders/LineShader.fx</SourceFile>
+  <SourceTime>2020-09-27T18:54:41.7199199+02:00</SourceTime>
+  <DestFile>C:/Users/ole_k/source/repos/TotalWarPackFileManager/Viewer/Content/bin/Windows/Shaders/LineShader.xnb</DestFile>
+  <DestTime>2020-09-27T18:57:54.8041774+02:00</DestTime>
   <Importer>EffectImporter</Importer>
   <ImporterTime>2020-08-10T16:17:54+02:00</ImporterTime>
   <Processor>EffectProcessor</Processor>

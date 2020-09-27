@@ -109,6 +109,44 @@ namespace Viewer.GraphicModels
             }
         }
 
+        public void Update()
+        {
+            AnimationFrame frame = _animationPlayer.GetCurrentFrame();
+
+            for (int i = 0; i < Bones.Count(); i++)
+            {
+                var parentIndex = Bones[i].ParentIndex;
+                if (parentIndex == -1)
+                    continue;
+
+                var bonePos = Bones[i].WorldPosition;
+                var parentBonePos = Bones[parentIndex].WorldPosition;
+
+                if (frame != null)
+                {
+                    var currentBoneAnimationoffset = frame.BoneTransforms[i].Transform;
+                    var parentBoneAnimationoffset = frame.BoneTransforms[parentIndex].Transform;
+
+                    bonePos = Matrix.Multiply(bonePos, currentBoneAnimationoffset);
+                    parentBonePos = Matrix.Multiply(parentBonePos, parentBoneAnimationoffset);
+                }
+
+                var   = new[]
+                {
+                    new VertexPosition(bonePos.Translation),
+                    new VertexPosition(parentBonePos.Translation)
+                };
+            }
+
+        }
+
+        public void Render()
+        {
+            Update();
+
+            ///
+        }
+
         public void Dispose()
         {
         

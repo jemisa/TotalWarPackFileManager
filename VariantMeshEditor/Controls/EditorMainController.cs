@@ -25,7 +25,7 @@ namespace VariantMeshEditor.Controls
         SceneTreeViewController _treeViewController;
         Scene3d _scene3d;
         Panel _editorPanel;
-        TextureLibary _textureLibary;
+        ResourceLibary _resourceLibary;
         List<PackFile> _temp_loadedContent;
 
         public EditorMainController(SceneTreeViewController treeViewController, Scene3d scene3d, Panel editorPanel)
@@ -35,7 +35,7 @@ namespace VariantMeshEditor.Controls
             _editorPanel = editorPanel;
 
             _temp_loadedContent = PackFileLoadHelper.LoadCaPackFilesForGame(Game.TWH2);
-            _textureLibary = new TextureLibary(_temp_loadedContent);
+            _resourceLibary = new ResourceLibary(_temp_loadedContent);
 
 
             _treeViewController.SceneElementSelectedEvent += _treeViewController_SceneElementSelectedEvent;
@@ -84,6 +84,7 @@ namespace VariantMeshEditor.Controls
 
         void Create3dWorld(GraphicsDevice device)
         {
+            _scene3d.SetResourceLibary(_resourceLibary);
             Create3dModels(device, _rootElement);
             RegisterAnimations(_rootElement);
             _treeViewController.SetInitialVisability(_rootElement, true);
@@ -98,25 +99,24 @@ namespace VariantMeshEditor.Controls
 
                 for (int lodIndex = 0; lodIndex < rigidModelData.LodInformations.Count; lodIndex++)
                 {
-                    rigidModelElement.MeshInstances.Add(new List<MeshInstance>());
+                    rigidModelElement.MeshInstances.Add(new List<MeshRenderItem>());
 
                     for (int modelIndex = 0; modelIndex < rigidModelData.LodInformations[lodIndex].LodModels.Count(); modelIndex++)
                     {
                         Rmv2Model meshModel = new Rmv2Model();
                         meshModel.Create(null, device, rigidModelData, lodIndex, modelIndex);
-                        MeshInstance instance = new MeshInstance()
-                        {
-                            Model = meshModel,
-                            Visible = lodIndex == 0
-                        };
 
-                        rigidModelElement.MeshInstances[lodIndex].Add(instance);
-                        controller.AssignModel(instance, lodIndex, modelIndex);
-                        _scene3d.DrawBuffer.Add(instance);
+                        MeshRenderItem meshRenderItem = new MeshRenderItem(meshModel, _resourceLibary.GetEffect(ShaderTypes.Mesh));
+                        meshRenderItem.Visible = lodIndex == 0;
+
+
+                        rigidModelElement.MeshInstances[lodIndex].Add(meshRenderItem);
+                        controller.AssignModel(meshRenderItem, lodIndex, modelIndex);
+                        _scene3d.DrawBuffer.Add(meshRenderItem);
 
                         // Resolve the textures
-                        meshModel.ResolveTextures(_textureLibary, device);
-
+                        //controller.resolveTexture();
+                        meshModel.ResolveTextures(_resourceLibary, device);
                     }
                 }
             }

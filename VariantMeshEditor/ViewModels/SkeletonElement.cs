@@ -22,7 +22,7 @@ namespace VariantMeshEditor.ViewModels
         public SkeletonModel SkeletonModel { get; set; }
         public SkeletonElement(FileSceneElement parent, string fullPath) : base(parent, fullPath, "Skeleton")
         {
-            Create3dModel();
+           
         }
         public override FileSceneElementEnum Type => FileSceneElementEnum.Skeleton;
 
@@ -39,26 +39,13 @@ namespace VariantMeshEditor.ViewModels
                 FileName = Path.GetFileNameWithoutExtension(skeletonFilePath);
             }
 
-            return Refresh3dModel(animationPlayer);
-        }
-
-        MeshInstance Refresh3dModel(AnimationPlayer animationPlayer)
-        {
             SkeletonModel = new SkeletonModel();
             SkeletonModel.Create(animationPlayer, SkeletonFile);
             MeshInstance.Model = SkeletonModel;
             return MeshInstance;
         }
 
-        MeshInstance Create3dModel()
-        {
-            MeshInstance = new MeshInstance()
-            {
-                Model = null,
-                World = Matrix.Identity,
-                Visible = true
-            };
-            return MeshInstance;
-        }
+
+        
     }
 }

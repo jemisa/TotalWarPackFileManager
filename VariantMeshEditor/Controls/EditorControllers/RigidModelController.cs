@@ -8,6 +8,7 @@ using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 using VariantMeshEditor.Views.EditorViews.Util;
 using Viewer.GraphicModels;
+using WpfTest.Scenes;
 
 namespace VariantMeshEditor.Controls.EditorControllers
 {
@@ -17,7 +18,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
         RigidModelElement _element;
         List<PackFile> _loadedContent;
 
-        Dictionary<RigidModelMeshEditorView, MeshInstance> _modelEditors = new Dictionary<RigidModelMeshEditorView, MeshInstance>();
+        Dictionary<RigidModelMeshEditorView, MeshRenderItem> _modelEditors = new Dictionary<RigidModelMeshEditorView, MeshRenderItem>();
          
         public RigidModelController(RigidModelEditorView view, RigidModelElement element, List<PackFile> loadedContent )
         {
@@ -28,7 +29,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             PopulateUi(_view, _element);
         }
 
-        public void AssignModel(MeshInstance meshInstance, int lodIndex, int modelIndex)
+        public void AssignModel(MeshRenderItem meshInstance, int lodIndex, int modelIndex)
         {
             var item = _modelEditors.Where(x => x.Key.ModelIndex == modelIndex && x.Key.LodIndex == lodIndex).First();
             _modelEditors[item.Key] = meshInstance;

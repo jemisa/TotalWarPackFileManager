@@ -1,5 +1,6 @@
 ﻿using Common;
 using Filetypes.RigidModel;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -11,14 +12,22 @@ using System.Threading.Tasks;
 
 namespace Viewer.Scene
 {
-    public class TextureLibary
+    public enum ShaderTypes
+    { 
+        Line,
+        Mesh,
+    }
+
+    public class ResourceLibary
     {
         Dictionary<string, Texture2D> _textureMap = new Dictionary<string, Texture2D>();
+        Dictionary<ShaderTypes, Effect> _shaders = new Dictionary<ShaderTypes, Effect>();
+
         List<PackFile> _loadedContent;
+        public ContentManager XnaContentManager { get; set; }
 
 
-
-        public TextureLibary(List<PackFile> loadedContent)
+        public ResourceLibary(List<PackFile> loadedContent)
         {
             _loadedContent = loadedContent;
         }
@@ -69,6 +78,22 @@ namespace Viewer.Scene
                     throw new Exception("Unknow texture format: " + image.ToString());
                 }
             }
+        }
+
+        public Effect LoadEffect(string fileName, ShaderTypes type)
+        {
+            if (_shaders.ContainsKey(type))
+                return _shaders[type];
+            var effect = XnaContentManager.Load<Effect>(fileName);
+            _shaders[type] = effect;
+            return effect;
+        }
+
+        public Effect GetEffect(ShaderTypes type)
+        {
+            if (_shaders.ContainsKey(type))
+                return _shaders[type];
+            return null; 
         }
 
 

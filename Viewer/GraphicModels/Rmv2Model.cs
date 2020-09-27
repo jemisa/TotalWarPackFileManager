@@ -31,7 +31,7 @@ namespace Viewer.GraphicModels
             Create(animationPlayer, device, _bufferArray, _model.IndicesBuffer);
         }
 
-        public void ResolveTextures(TextureLibary textureLibary, GraphicsDevice device)
+        public void ResolveTextures(ResourceLibary textureLibary, GraphicsDevice device)
         {
             foreach (var material in _model.Materials)
                 _textures[material.Type] = textureLibary.LoadTexture(material.Name, device);

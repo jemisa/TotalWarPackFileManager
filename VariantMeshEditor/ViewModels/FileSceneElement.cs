@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using TreeViewWithCheckBoxes;
 using Viewer.GraphicModels;
+using WpfTest.Scenes;
 
 namespace VariantMeshEditor.ViewModels
 {
@@ -56,7 +57,7 @@ namespace VariantMeshEditor.ViewModels
         public RenderableFileSceneElement(FileSceneElement parent, string fullPath, string displayName) :
             base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, displayName)
         { }
-        public MeshInstance MeshInstance { get; set; }
+        public RenderItem MeshInstance { get; set; }
     }
 
     public class RootElement : FileSceneElement

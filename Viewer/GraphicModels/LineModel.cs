@@ -1,45 +1,32 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Viewer.Animation;
 
 namespace Viewer.GraphicModels
 {
     public class LineModel : IRenderableContent
     {
-        List<VertexPositionNormalTexture[]> _originalVertecies { get; set; } = new List<VertexPositionNormalTexture[]>();
+        VertexPosition[] _originalVertecies;
 
         public void CreateLineList(List<(Vector3, Vector3)> lines)
         {
-            foreach (var line in lines)
+            _originalVertecies = new VertexPosition[lines.Count * 2];
+            for (int i = 0; i < lines.Count; i++)
             {
-                var vertices = new[]
-                {
-                    new VertexPositionNormalTexture(line.Item1, new Vector3(0,0,0), new Vector2(0,0)),
-                    new VertexPositionNormalTexture(line.Item2, new Vector3(0,0,0), new Vector2(0,0))
-                };
-                _originalVertecies.Add(vertices);
+                _originalVertecies[i * 2] = new VertexPosition(lines[i].Item1);
+                _originalVertecies[i * 2+1] = new VertexPosition(lines[i].Item2);
             }
         }
 
-
         public virtual void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
         {
-            effect.Parameters["World"].SetValue(world);
-            effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
-            effectPass.Apply();
-            foreach (var line in _originalVertecies)
-                device.DrawUserPrimitives(PrimitiveType.LineList, line, 0, 1);
+            device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies, 0, _originalVertecies.Count() / 2);
         }
 
         public void Dispose()
         {
 
         }
-
     }
 }

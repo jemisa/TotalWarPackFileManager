@@ -34,7 +34,7 @@ namespace WpfTest.Scenes
         private bool _disposed;
 
         ArcBallCamera _camera;
-        public List<MeshInstance> DrawBuffer = new List<MeshInstance>();
+        public List<RenderItem> DrawBuffer = new List<RenderItem>();
         public List<AnimationPlayer> AnimationPlayers = new List<AnimationPlayer>();
 
         public delegate void LoadSceneCallback(GraphicsDevice device);
@@ -43,10 +43,14 @@ namespace WpfTest.Scenes
         CubeModel _cubeModel;
         MeshInstance _cube0;
 
+
+        ResourceLibary _resourceLibary;
+
         protected override void Initialize()
         {
             //ContentManager
             _disposed = false;
+            
             new WpfGraphicsDeviceService(this);
             //Components.Add(new FpsComponent(this));
             //Components.Add(new TimingComponent(this));
@@ -68,18 +72,29 @@ namespace WpfTest.Scenes
             base.Initialize();
         }
 
+        public void SetResourceLibary(ResourceLibary resourceLibary)
+        {
+            _resourceLibary = resourceLibary;
+            _resourceLibary.XnaContentManager = new ContentManager(Services)
+            {
+                RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\bin\Windows"
+            };
+            _resourceLibary.LoadEffect("Shaders\\TestShader", ShaderTypes.Mesh);
+            _resourceLibary.LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
+
+        }
 
 
 
 
-
-        Effect _shader;
-        Texture2D _texture;
-        Skybox skybox;
-        Model _cube;
-        TextureCube _skyBoxTexture;
-        Effect _reflectShader;
-        TextureCube textureCube;
+        //Effect _shader;
+        //Effect _lineShader;
+        //Texture2D _texture;
+        //Skybox skybox;
+        //Model _cube;
+        //TextureCube _skyBoxTexture;
+        //Effect _reflectShader;
+        //TextureCube textureCube;
         public void CreateScene()
         {
             //CubemapGeneratorHelper cubemapGeneratorHelper = new CubemapGeneratorHelper();
@@ -91,26 +106,27 @@ namespace WpfTest.Scenes
           
 
             //var Content = new ContentManager(Services) { RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\MonoContentPipeline\bin\Windows\AnyCPU\Debug\Content" };
-            var Content = new ContentManager(Services) 
-            { 
-                RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\bin\Windows"
-            };
-            _shader = Content.Load<Effect>("Shaders\\TestShader");
-            _reflectShader = Content.Load<Effect>("Shaders\\Reflection");
-            _cube = Content.Load<Model>("DebugModels/UntexturedSphere");
-            _skyBoxTexture = Content.Load<TextureCube>("Textures//Sunset");
-            // _texture = Content.Load<Texture2D>("ColorMap");
-            //  var d  = new PipelineManager("", "", "");
-            //  d.FindDefaultProcessor()
-            _cubeModel = new CubeModel();
-            _cubeModel.Create(GraphicsDevice);
-            skybox = new Skybox("Textures/Sunset", Content);
-            _cube0 = new MeshInstance()
-            {
-                Model = _cubeModel,
-                World = Matrix.Identity * Matrix.CreateScale(0.05f)
-            };
-            //DrawBuffer.Add(_cube0);
+            //var Content = new ContentManager(Services) 
+            //{ 
+            //    RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\bin\Windows"
+            //};
+            //_shader = Content.Load<Effect>("Shaders\\TestShader");
+            //_lineShader = Content.Load<Effect>("Shaders\\LineShader");
+            //_reflectShader = Content.Load<Effect>("Shaders\\Reflection");
+            //_cube = Content.Load<Model>("DebugModels/UntexturedSphere");
+            //_skyBoxTexture = Content.Load<TextureCube>("Textures//Sunset");
+            //// _texture = Content.Load<Texture2D>("ColorMap");
+            ////  var d  = new PipelineManager("", "", "");
+            ////  d.FindDefaultProcessor()
+            //_cubeModel = new CubeModel();
+            //_cubeModel.Create(GraphicsDevice);
+            //skybox = new Skybox("Textures/Sunset", Content);
+            //_cube0 = new MeshInstance()
+            //{
+            //    Model = _cubeModel,
+            //    World = Matrix.Identity * Matrix.CreateScale(0.05f)
+            //};
+            ////DrawBuffer.Add(_cube0);
 
             LoadScene?.Invoke(GraphicsDevice);
         }
@@ -195,24 +211,23 @@ namespace WpfTest.Scenes
         //    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
         //    GraphicsDevice.RasterizerState = RasterizerState.CullNone;
         //
-            _shader.CurrentTechnique = _shader.Techniques["Diffuse"];
+            //_shader.CurrentTechnique = _shader.Techniques["Diffuse"];
 
-            LineBox tempBox = new LineBox();
-            tempBox.Create();
 
-            foreach (var pass in _shader.CurrentTechnique.Passes)
+
+            /*foreach (var pass in _shader.CurrentTechnique.Passes)
             {
                 
 
                
                 foreach (var item in DrawBuffer)
                 {
-                    /*Matrix worldInverse = Matrix.Invert(Matrix.Identity);
-                    Vector4 vLightDirection = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-                    Vector4 vecEye = new Vector4(x, y, zHeight, 0);
-                    Vector4 vColorDiffuse = new Vector4(0.8f, 0.0f, 0.0f, 1.0f);
-                    Vector4 vColorSpecular = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
-                    Vector4 vColorAmbient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);*/
+                    //Matrix worldInverse = Matrix.Invert(Matrix.Identity);
+                    //Vector4 vLightDirection = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+                    //Vector4 vecEye = new Vector4(x, y, zHeight, 0);
+                    //Vector4 vColorDiffuse = new Vector4(0.8f, 0.0f, 0.0f, 1.0f);
+                    //Vector4 vColorSpecular = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+                    //Vector4 vColorAmbient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
 
 
                     Vector4 vecEye = new Vector4(_camera.ViewMatrix.Translation, 0);
@@ -235,16 +250,111 @@ namespace WpfTest.Scenes
                     item.Render(item.World, GraphicsDevice, _shader, pass);
                     
                 }
+            }*/
+
+            CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
+            {
+                Projection = _projectionMatrix,
+                View = _camera.ViewMatrix
+            };
+
+
+            LineBox tempBox = new LineBox();
+            tempBox.Create();
+            var renderItem = new LineRenderItem(tempBox, _resourceLibary.GetEffect(ShaderTypes.Line));
+            renderItem.Colour = new Vector3(0, 1, 0);
+            renderItem.Draw(GraphicsDevice, commonShaderParameters);
+
+
+            foreach (var item in DrawBuffer)
+            {
+                item.Draw(GraphicsDevice, commonShaderParameters);
             }
 
-            //_cube0.Render(GraphicsDevice, _shader);
-        
+            /*foreach (var pass in _lineShader.CurrentTechnique.Passes)
+            {
+                _lineShader.Parameters["View"].SetValue(_camera.ViewMatrix);
+                _lineShader.Parameters["Projection"].SetValue(_projectionMatrix);
+                _lineShader.Parameters["World"].SetValue(Matrix.Identity);
+                _lineShader.Parameters["Color"].SetValue(new Vector3(1, 0, 0));
+                pass.Apply();
+
+                tempBox.Render(Matrix.Identity, GraphicsDevice, _lineShader, null);
+            }*/
 
             base.Draw(time);
         }
+    }
 
+    public class CommonShaderParameters
+    {
+        public Matrix View { get; set; }
+        public Matrix Projection { get; set; }
+    }
 
+    public class RenderItem : IDisposable
+    {
+        protected IRenderableContent _model;
+        protected Effect _shader;
+
+        public Matrix World { get; set; } = Matrix.Identity;
+        public bool Visible { get; set; } = true;
+        public RenderItem(IRenderableContent model, Effect shader)
+        {
+            _model = model;
+            _shader = shader;
+        }
+
+        public void Dispose()
+        {
+            _model.Dispose();
+            _shader.Dispose();
+        }
+
+        public void Draw(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
+        {
+            if (!Visible)
+                return;
+
+            foreach (var pass in _shader.CurrentTechnique.Passes)
+            {
+                _shader.Parameters["View"].SetValue(commonShaderParameters.View);
+                _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+                _shader.Parameters["World"].SetValue(World);
+                _shader.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(World)));
+
+                ApplyCustomShaderParams();
+                pass.Apply();
+
+                _model.Render(Matrix.Identity, device, _shader, null);
+            }
+        }
+
+        public virtual void ApplyCustomShaderParams()
+        { 
         
+        }
+    }
 
+    public class LineRenderItem : RenderItem
+    {
+        public Vector3 Colour { get; set; } = new Vector3(0, 0, 0);
+
+        public LineRenderItem(LineModel model, Effect shader) :base(model, shader){ }
+
+        public override void ApplyCustomShaderParams()
+        {
+            _shader.Parameters["Color"].SetValue(Colour);
+        }
+    }
+
+    public class MeshRenderItem : RenderItem
+    {
+        public MeshRenderItem(MeshModel model, Effect shader) : base(model, shader) { }
+
+        public override void ApplyCustomShaderParams()
+        {
+           
+        }
     }
 }

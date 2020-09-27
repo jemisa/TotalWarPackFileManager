@@ -44,11 +44,11 @@ namespace Viewer.GraphicModels
             //foreach (var pass in effect.CurrentTechnique.Passes)
             //{
 
-            effect.Parameters["World"].SetValue(world);
-            effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
+            //effect.Parameters["World"].SetValue(world);
+            //effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
             //  pass.Apply();
 
-            effectPass.Apply();
+           // effectPass.Apply();
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _indexBuffer.IndexCount);
             //}
         }

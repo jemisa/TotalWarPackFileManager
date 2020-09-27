@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using VariantMeshEditor.Controls.EditorControllers;
 using Viewer.Animation;
 using Viewer.GraphicModels;
+using WpfTest.Scenes;
 
 namespace VariantMeshEditor.ViewModels
 {
@@ -17,7 +18,7 @@ namespace VariantMeshEditor.ViewModels
         public RigidModel Model { get; set; }
         public RigidModelController Controller { get; set; }
 
-        public List<List<MeshInstance>> MeshInstances { get; set; } = new List<List<MeshInstance>>();
+        public List<List<MeshRenderItem>> MeshInstances { get; set; } = new List<List<MeshRenderItem>>();
 
         public RigidModelElement(FileSceneElement parent, RigidModel model, string fullPath) : base(parent, fullPath, "")
         {
