@@ -67,6 +67,8 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     var meshStackPanel = new StackPanel();
                     meshContnet.Content = meshStackPanel;
 
+                    // Create the model
+
                     var meshView = new RigidModelMeshEditorView
                     {
                         ModelIndex = currentModelIndex,

@@ -130,7 +130,7 @@ namespace Viewer.GraphicModels
             }
         }
 
-        public override void Draw(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
+        public override void Draw(GraphicsDevice device, Matrix world, CommonShaderParameters commonShaderParameters)
         {
             if (!Visible)
                 return;

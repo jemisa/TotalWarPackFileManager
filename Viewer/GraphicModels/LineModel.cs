@@ -8,7 +8,7 @@ namespace Viewer.GraphicModels
     public class LineModel : IRenderableContent
     {
         VertexPosition[] _originalVertecies;
-
+        public Vector3 Pivot { get; set; } = Vector3.Zero;
         public void CreateLineList(List<(Vector3, Vector3)> lines)
         {
             _originalVertecies = new VertexPosition[lines.Count * 2];

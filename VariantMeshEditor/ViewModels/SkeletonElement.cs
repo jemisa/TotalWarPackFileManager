@@ -2,6 +2,7 @@
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel.Animation;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VariantMeshEditor.Controls.EditorControllers;
+using VariantMeshEditor.Views.EditorViews;
 using Viewer.Animation;
 using Viewer.GraphicModels;
 using Viewer.Scene;
@@ -43,6 +45,23 @@ namespace VariantMeshEditor.ViewModels
 
             SkeletonModel = new SkeletonModel(resourceLibary.GetEffect(ShaderTypes.Line));
             SkeletonModel.Create(animationPlayer, SkeletonFile);
+        }
+
+        protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
+        {
+            SkeletonEditorView view = new SkeletonEditorView();
+            SkeletonController controller = new SkeletonController(view, this);
+            Editor = view;
+        }
+
+        protected override void UpdateNode(GameTime time)
+        {
+            SkeletonModel.Update(time);
+        }
+
+        protected override void DrawNode(GraphicsDevice device, Matrix parentTransform, CommonShaderParameters commonShaderParameters)
+        {
+            SkeletonModel.Draw(device, parentTransform, commonShaderParameters);
         }
     }
 }

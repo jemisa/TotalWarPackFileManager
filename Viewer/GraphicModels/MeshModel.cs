@@ -13,6 +13,7 @@ namespace Viewer.GraphicModels
     public interface IRenderableContent : IDisposable
     {
         void Render(GraphicsDevice device);
+        Vector3 Pivot { get; set; }
     }
 
 
@@ -22,7 +23,8 @@ namespace Viewer.GraphicModels
         public VertexBuffer _vertexBuffer;
         public AnimationPlayer _animationPlayer;
         public IndexBuffer _indexBuffer;
-
+        public Vector3 Pivot { get; set; } = Vector3.Zero;
+ 
         public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, VertexPositionNormalTexture[] vertexMesh, ushort[] indices)
         {
             _animationPlayer = animationPlayer;

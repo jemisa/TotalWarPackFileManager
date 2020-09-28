@@ -3,6 +3,7 @@ using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
 using Filetypes.RigidModel.Animation;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using TreeViewWithCheckBoxes;
 using Viewer.GraphicModels;
+using Viewer.Scene;
 using WpfTest.Scenes;
 
 namespace VariantMeshEditor.ViewModels
@@ -30,7 +32,10 @@ namespace VariantMeshEditor.ViewModels
         WsModel
     }
 
-    public abstract class FileSceneElement : TreeViewDataModel
+
+
+
+    public abstract class FileSceneElement : TreeViewDataModel, ISceneGraphNode
     {
         public FileSceneElement Parent { get; protected set; }
         public ObservableCollection<FileSceneElement> Children { get; private set; } = new ObservableCollection<FileSceneElement>();
@@ -50,6 +55,46 @@ namespace VariantMeshEditor.ViewModels
         }
 
         public override string ToString() => DisplayName;
+
+
+
+        public void CreateContent(Scene3d virtualWorld, ResourceLibary resourceLibary)
+        {
+            CreateEditor(virtualWorld, resourceLibary);
+            foreach (var child in Children)
+            {
+                child.CreateContent(virtualWorld, resourceLibary);
+            }
+        }
+
+        protected virtual void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
+        { }
+
+
+        public Matrix WorldTransform { get; set; } = Matrix.Identity;
+
+        public void Render(GraphicsDevice device, Matrix parentTransform, CommonShaderParameters commonShaderParameters)
+        {
+            DrawNode(device, parentTransform, commonShaderParameters);
+            var newWorld = parentTransform * WorldTransform;
+            foreach (var child in Children)
+            {
+                child.Render(device, newWorld, commonShaderParameters);
+            }
+        }
+
+        virtual public void Update(GameTime time)
+        {
+            UpdateNode(time);
+            foreach (var child in Children)
+                child.Update(time);
+        }
+
+        virtual protected void UpdateNode(GameTime time)
+        { }
+
+        virtual protected void DrawNode(GraphicsDevice device, Matrix parentTransform, CommonShaderParameters commonShaderParameters)
+        {}
     }
 
     public abstract class RenderableFileSceneElement : FileSceneElement
@@ -80,28 +125,6 @@ namespace VariantMeshEditor.ViewModels
         }
         public override FileSceneElementEnum Type => FileSceneElementEnum.VariantMesh;
     }
-
-    public class SlotsElement : FileSceneElement
-    {
-        public SlotsElement(FileSceneElement parent) : base(parent, "", "", "Slots") { }
-        public override FileSceneElementEnum Type => FileSceneElementEnum.Slots;
-    }
-
-    public class SlotElement : FileSceneElement
-    {
-        public string SlotName { get; set; }
-        public string AttachmentPoint { get; set; }
-
-        public SlotElement(FileSceneElement parent, string slotName, string attachmentPoint) : base(parent, "", "", "")
-        {
-            SlotName = slotName;
-            AttachmentPoint = attachmentPoint;
-            DisplayName = $"Slot -{SlotName} - {AttachmentPoint}";
-        }
-        public override FileSceneElementEnum Type => FileSceneElementEnum.Slot;
-    }
-
-    
 
     public class WsModelElement : FileSceneElement
     {

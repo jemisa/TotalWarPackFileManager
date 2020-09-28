@@ -61,7 +61,9 @@
     <Compile Include="ViewModels\AnimationElement.cs" />
     <Compile Include="ViewModels\FileSceneElement.cs" />
     <Compile Include="ViewModels\RigidModelElement.cs" />
+    <Compile Include="ViewModels\SceneElementHelper.cs" />
     <Compile Include="ViewModels\SkeletonElement.cs" />
+    <Compile Include="ViewModels\SlotsElement.cs" />
     <Compile Include="Views\Animation\AnimationControl.xaml.cs">
       <DependentUpon>AnimationControl.xaml</DependentUpon>
     </Compile>

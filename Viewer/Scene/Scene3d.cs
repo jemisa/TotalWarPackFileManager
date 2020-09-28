@@ -36,16 +36,15 @@ namespace WpfTest.Scenes
 
         ArcBallCamera _camera;
         public List<RenderItem> DrawBuffer = new List<RenderItem>();
-        public List<AnimationPlayer> AnimationPlayers = new List<AnimationPlayer>();
 
         public delegate void LoadSceneCallback(GraphicsDevice device);
         public LoadSceneCallback LoadScene { get; set; }
 
         CubeModel _cubeModel;
-      
+        public ISceneGraphNode _rootNode;
 
 
-        ResourceLibary _resourceLibary;
+          ResourceLibary _resourceLibary;
 
         protected override void Initialize()
         {
@@ -167,9 +166,6 @@ namespace WpfTest.Scenes
 
             _camera.Update(mouseState, keyboardState);
 
-            foreach (var player in AnimationPlayers)
-                player.Update(gameTime);
-
             base.Update(gameTime);
         }
 
@@ -221,11 +217,17 @@ namespace WpfTest.Scenes
                 View = _camera.ViewMatrix
             };
 
-            foreach (var item in DrawBuffer)
-                item.Update(time);
+            /*foreach (var item in DrawBuffer)
+                item.Update(time);*/
 
-            foreach (var item in DrawBuffer)
-                item.Draw(GraphicsDevice, commonShaderParameters);
+            /*foreach (var item in DrawBuffer)
+                item.Draw(GraphicsDevice, Matrix.Identity, commonShaderParameters);*/
+
+            if (_rootNode != null)
+            {
+                _rootNode.Update(time);
+                _rootNode.Render(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+            }
 
             base.Draw(time);
         }
@@ -243,7 +245,6 @@ namespace WpfTest.Scenes
         protected IRenderableContent _model;
         protected Effect _shader;
         public bool Visible { get; set; } = true;
-        public Matrix World { get; set; } = Matrix.Identity;
 
         public RenderItem(IRenderableContent model, Effect shader)
         {
@@ -251,14 +252,14 @@ namespace WpfTest.Scenes
             _shader = shader;
         }
 
-        public virtual void Draw(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
+        public virtual void Draw(GraphicsDevice device, Matrix world, CommonShaderParameters commonShaderParameters)
         {
             if (!Visible)
                 return;
 
             foreach (var pass in _shader.CurrentTechnique.Passes)
             {
-                ApplyCommonShaderParameters(commonShaderParameters, World);
+                ApplyCommonShaderParameters(commonShaderParameters, world);
                 ApplyCustomShaderParams();
                 pass.Apply();
                 _model.Render(device);
@@ -269,6 +270,9 @@ namespace WpfTest.Scenes
         {
             _shader.Parameters["View"].SetValue(commonShaderParameters.View);
             _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+
+            if(_model != null)
+                world = Matrix.CreateTranslation(_model.Pivot) * world;
             _shader.Parameters["World"].SetValue(world);
             _shader.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
         }
@@ -297,7 +301,6 @@ namespace WpfTest.Scenes
 
     public class MeshRenderItem : RenderItem
     {
-        public AttachmentResolver AttachmentResolver { get; set; }
         public MeshRenderItem(MeshModel model, Effect shader) : base(model, shader) 
         {
         
@@ -305,8 +308,7 @@ namespace WpfTest.Scenes
 
         public override void ApplyCustomShaderParams()
         {
-            if (AttachmentResolver != null)
-                _shader.Parameters["World"].SetValue(AttachmentResolver.GetWorldMatrix());
+
         }
 
         public override void Update(GameTime time)
@@ -327,7 +329,16 @@ namespace WpfTest.Scenes
 
         public Matrix GetWorldMatrix()
         {
-            return /*Matrix.CreateTranslation(0.5f, 0, 0) * */_skeleton.GetAnimatedBone(_boneIndex);
+            if(_boneIndex != -1)
+                return _skeleton.GetAnimatedBone(_boneIndex);
+            return Matrix.Identity;
         }
+    }
+
+    public interface ISceneGraphNode
+    {
+        Matrix WorldTransform { get; set; }
+        void Render(GraphicsDevice device, Matrix parentTransform, CommonShaderParameters commonShaderParameters);
+        void Update(GameTime time);
     }
 }

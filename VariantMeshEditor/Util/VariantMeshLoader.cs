@@ -26,12 +26,10 @@ namespace VariantMeshEditor.Util
 
     class SceneLoader
     {
-        List<PackFile> _loadedContent;
         ResourceLibary _resourceLibary;
 
-        public SceneLoader(List<PackFile> loadedContent, ResourceLibary resourceLibary)
+        public SceneLoader( ResourceLibary resourceLibary)
         {
-            _loadedContent = loadedContent;
             _resourceLibary = resourceLibary;
         }
 
@@ -40,7 +38,7 @@ namespace VariantMeshEditor.Util
             if(parent == null)
                 parent = new RootElement();
 
-            var file = PackFileLoadHelper.FindFile(_loadedContent, filePath);
+            var file = PackFileLoadHelper.FindFile(_resourceLibary.PackfileContent, filePath);
             switch (file.FileExtention)
             {
                 case "variantmeshdefinition":
@@ -101,7 +99,7 @@ namespace VariantMeshEditor.Util
                 throw new Exception("More the one skeleton for a veriant mesh");
             if (skeletons.Count() == 1)
             {
-                skeletonElement.Create(animationElement.AnimationPlayer, _loadedContent, _resourceLibary, skeletons.First() + ".anim");
+                skeletonElement.Create(animationElement.AnimationPlayer, _resourceLibary.PackfileContent, _resourceLibary, skeletons.First() + ".anim");
             }
             else
             {

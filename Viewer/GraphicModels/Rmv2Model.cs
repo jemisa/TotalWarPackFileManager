@@ -28,6 +28,8 @@ namespace Viewer.GraphicModels
             _animationPlayer = animationPlayer;
             _model = rigidModelData.LodInformations[lodLevel].LodModels[model];
             _bufferArray = new VertexPositionNormalTexture[_model.VertexArray.Length];
+            Pivot = new Vector3(_model.Pivot[0], _model.Pivot[1], _model.Pivot[2]);
+
             Create(animationPlayer, device, _bufferArray, _model.IndicesBuffer);
         }
 

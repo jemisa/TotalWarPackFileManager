@@ -96,6 +96,6 @@ namespace Viewer.Scene
             return null; 
         }
 
-
+        public List<PackFile> PackfileContent { get { return _loadedContent; } }
     }
 }
