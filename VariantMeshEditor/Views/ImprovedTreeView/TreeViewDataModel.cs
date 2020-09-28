@@ -19,7 +19,16 @@ namespace TreeViewWithCheckBoxes
 
         public bool IsInitiallySelected { get; private set; }
 
-        public string DisplayName { get; protected set; }
+        string _displayName = "";
+        public string DisplayName
+        {
+            get { return _displayName; }
+            set
+            {
+                _displayName = value;
+                OnPropertyChanged("DisplayName");
+            }
+        }
 
         #region IsChecked
 

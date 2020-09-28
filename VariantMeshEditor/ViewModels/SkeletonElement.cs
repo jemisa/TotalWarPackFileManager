@@ -18,13 +18,13 @@ using WpfTest.Scenes;
 
 namespace VariantMeshEditor.ViewModels
 {
-    public class SkeletonElement : RenderableFileSceneElement
+    public class SkeletonElement : FileSceneElement
     {
 
         public SkeletonController Controller { get; set; }
         public SkeletonFile SkeletonFile { get; set; }
         public SkeletonModel SkeletonModel { get; set; }
-        public SkeletonElement(FileSceneElement parent, string fullPath) : base(parent, fullPath, "Skeleton")
+        public SkeletonElement(FileSceneElement parent, string fullPath) : base(parent, "", fullPath, "Skeleton")
         {
            
         }

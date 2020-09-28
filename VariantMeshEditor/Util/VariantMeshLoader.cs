@@ -62,7 +62,6 @@ namespace VariantMeshEditor.Util
             var variantMeshElement = new VariantMeshElement(parent,file.Name);
             parent.Children.Add(variantMeshElement);
 
-            variantMeshElement.Children.Add(new TransformElement(variantMeshElement));
             var animationElement = new AnimationElement(variantMeshElement);
             variantMeshElement.Children.Add(animationElement);
             var skeletonElement = new SkeletonElement(variantMeshElement, "");
@@ -103,6 +102,7 @@ namespace VariantMeshEditor.Util
             }
             else
             {
+                variantMeshElement.Children.Remove(animationElement);
                 variantMeshElement.Children.Remove(skeletonElement);
             }
         }

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Controls\EditorControllers\AnimationController.cs" />
     <Compile Include="Controls\EditorControllers\RigidModelController.cs" />
+    <Compile Include="Controls\EditorControllers\RootController.cs" />
     <Compile Include="Controls\EditorControllers\SkeletonController.cs" />
     <Compile Include="Controls\EditorControllers\SlotController.cs" />
     <Compile Include="Controls\EditorMainController.cs" />
@@ -75,6 +76,9 @@
     </Compile>
     <Compile Include="Views\EditorViews\RigidModelEditorView.xaml.cs">
       <DependentUpon>RigidModelEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditorViews\RootEditorView.xaml.cs">
+      <DependentUpon>RootEditorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EditorViews\SkeletonEditorView.xaml.cs">
       <DependentUpon>SkeletonEditorView.xaml</DependentUpon>
@@ -114,6 +118,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditorViews\RigidModelEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\RootEditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

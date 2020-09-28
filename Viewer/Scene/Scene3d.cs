@@ -41,10 +41,10 @@ namespace WpfTest.Scenes
         public LoadSceneCallback LoadScene { get; set; }
 
         CubeModel _cubeModel;
-        public ISceneGraphNode _rootNode;
+        public ISceneGraphNode SceneGraphRootNode { get; set; }
 
 
-          ResourceLibary _resourceLibary;
+        ResourceLibary _resourceLibary;
 
         protected override void Initialize()
         {
@@ -178,17 +178,10 @@ namespace WpfTest.Scenes
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            _basicEffect.View = _camera.ViewMatrix;
-
 
 
             /**/
-            float distance = 20;
 
-
-            var angle = 0.002f;
-            var cameraPosition = distance * new Vector3((float)Math.Sin(angle), 0, (float)Math.Cos(angle));
-            var view = Matrix.CreateLookAt(cameraPosition, new Vector3(0, 0, 0), Vector3.UnitY);
            //RasterizerState originalRasterizerState = GraphicsDevice.RasterizerState;
            //RasterizerState rasterizerState = new RasterizerState();
            //rasterizerState.CullMode = CullMode.None;
@@ -223,10 +216,10 @@ namespace WpfTest.Scenes
             /*foreach (var item in DrawBuffer)
                 item.Draw(GraphicsDevice, Matrix.Identity, commonShaderParameters);*/
 
-            if (_rootNode != null)
+            if (SceneGraphRootNode != null)
             {
-                _rootNode.Update(time);
-                _rootNode.Render(GraphicsDevice, Matrix.Identity, commonShaderParameters);
+                SceneGraphRootNode.Update(time);
+                SceneGraphRootNode.Render(GraphicsDevice, Matrix.Identity, commonShaderParameters);
             }
 
             base.Draw(time);

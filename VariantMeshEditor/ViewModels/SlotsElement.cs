@@ -26,31 +26,44 @@ namespace VariantMeshEditor.ViewModels
         {
             SlotName = slotName;
             AttachmentPoint = attachmentPoint;
-            DisplayName = $"Slot -{SlotName} - {AttachmentPoint}";
+
+            SetDisplayName(AttachmentPoint);
         }
         public override FileSceneElementEnum Type => FileSceneElementEnum.Slot;
 
         AttachmentResolver _attachmentResolver;
+        SlotController _controller;
+        SkeletonElement _skeleton;
+        void SetDisplayName(string attachmentPointName)
+        {
+            DisplayName = $"Slot -{SlotName} - {attachmentPointName}";
+        }
 
         protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
         {
+            _skeleton = SceneElementHelper.GetAllOfTypeInSameVariantMesh<SkeletonElement>(this).FirstOrDefault();
             SlotEditorView view = new SlotEditorView();
-            SlotController controller = new SlotController(view, this);
+            _controller = new SlotController(view, this, _skeleton);
             Editor = view;
 
-            var skeleton = SceneElementHelper.GetAllOfTypeInSameVariantMesh<SkeletonElement>(this);
             if (!string.IsNullOrWhiteSpace(AttachmentPoint))
             {
-                _attachmentResolver = new AttachmentResolver(AttachmentPoint, skeleton.First().SkeletonModel);
+                _attachmentResolver = new AttachmentResolver(AttachmentPoint, _skeleton?.SkeletonModel);
             }
         }
 
         protected override void UpdateNode(GameTime time)
         {
-            if (_attachmentResolver != null)
-                WorldTransform = _attachmentResolver.GetWorldMatrix();
+            if (_controller.AttachmentBoneIndex != -1)
+            {
+                WorldTransform = _skeleton.SkeletonModel.GetAnimatedBone(_controller.AttachmentBoneIndex);
+                SetDisplayName(_skeleton.SkeletonModel.Bones[_controller.AttachmentBoneIndex].Name);
+            }
             else
+            {
                 WorldTransform = Matrix.Identity;
+                SetDisplayName("");
+            }
         }
     }
 }

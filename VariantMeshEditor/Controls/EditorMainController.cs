@@ -77,16 +77,9 @@ namespace VariantMeshEditor.Controls
 
             SceneLoader sceneLoader = new SceneLoader(_resourceLibary);
             _rootElement = sceneLoader.Load(null, null, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
-
-            
-            
-
             _rootElement.CreateContent(_scene3d, _resourceLibary);
 
-            //Create3dModels(device, _rootElement);
-            //ResovleAttachment(_rootElement);
-            //RegisterAnimations(_rootElement);
-            _scene3d._rootNode = _rootElement;
+            _scene3d.SceneGraphRootNode = _rootElement;
             _treeViewController.Populate(_rootElement);
             _treeViewController.SetInitialVisability(_rootElement, true);
         }

@@ -71,8 +71,6 @@ namespace VariantMeshEditor.Controls
             element.PropertyChanged += Node_PropertyChanged;
             element.IsChecked = shouldBeSelected;
 
-            if (element as TransformElement != null)
-                element.Vis = Visibility.Hidden;
             if (element as AnimationElement != null)
                 element.Vis = Visibility.Hidden;
             if (element as SkeletonElement != null)

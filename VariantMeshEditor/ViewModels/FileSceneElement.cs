@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using TreeViewWithCheckBoxes;
+using VariantMeshEditor.Controls.EditorControllers;
+using VariantMeshEditor.Views.EditorViews;
 using Viewer.GraphicModels;
 using Viewer.Scene;
 using WpfTest.Scenes;
@@ -97,24 +99,23 @@ namespace VariantMeshEditor.ViewModels
         {}
     }
 
-    public abstract class RenderableFileSceneElement : FileSceneElement
-    {
-        public RenderableFileSceneElement(FileSceneElement parent, string fullPath, string displayName) :
-            base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, displayName)
-        { }
-    }
 
     public class RootElement : FileSceneElement
     {
         public RootElement() : base(null, "", "", "Root") { }
         public override FileSceneElementEnum Type => FileSceneElementEnum.Root;
+
+
+        protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
+        {
+         
+            RootEditorView view = new RootEditorView();
+            RootController controller = new RootController(view, this);
+            Editor = view;
+            
+        }
     }
 
-    public class TransformElement : FileSceneElement
-    {
-        public TransformElement(FileSceneElement parent) : base(parent, "", "", "Transform") { }
-        public override FileSceneElementEnum Type => FileSceneElementEnum.Transform;
-    }
 
 
     public class VariantMeshElement : FileSceneElement

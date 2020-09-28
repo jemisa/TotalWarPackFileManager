@@ -204,15 +204,18 @@ namespace Common {
 
             List<string> packPaths = allFiles.GetPacksLoadedFrom(game.GameDirectory);
             packPaths.Reverse();
-
+            PackFile file = new PackFile("All Packs");
             PackFileCodec codec = new PackFileCodec();
             foreach (string path in packPaths)
             {
                 PackFile pack = codec.Open(path);
-                output.Add(pack);
+                pack.Files.ForEach(f =>
+                {
+                    file.Add(f, true);
+                    f.IsAdded = false;
+                });
             }
-
-            return output;
+            return new List<PackFile>() { file};
         }
 
         public static PackedFile FindFile(List<PackFile> loadedPackFiles, string filename)
