@@ -1,25 +1,45 @@
 ﻿using Filetypes.RigidModel.Animation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Viewer.Animation;
+using WpfTest.Scenes;
 using static Viewer.Animation.AnimationClip;
 
 namespace Viewer.GraphicModels
 {
 
 
-    public class SkeletonModel : IRenderableContent
+    public class SkeletonEntity
+    {
+        public void Update()
+        { 
+            // Updete skeleton
+            // Update boxes
+        }
+
+        public void Render()
+        { 
+            // Draw skeleton
+            // Draw boxes
+        }
+    
+    
+    }
+
+
+    public class SkeletonModel : RenderItem
     {
         public class BoneInfo
         {
             public Matrix Position { get; set; }
             public Matrix WorldPosition { get; set; }
-            public Matrix Inv { get; set; }
+            public Matrix AnimatedPosition { get; set; }
             public int Index { get; set; }
             public int ParentIndex { get; set; }
             public string Name { get; set; }
@@ -29,6 +49,26 @@ namespace Viewer.GraphicModels
         AnimationPlayer _animationPlayer;
 
         LineBox _lineBox = new LineBox();
+
+        public SkeletonModel(Effect shader) : base(null, shader)
+        {
+        }
+
+        public int GetBoneIndex(string name)
+        {
+            for (int i = 0; i < Bones.Count(); i++)
+            {
+                if (Bones[i].Name == name)
+                    return i;
+            }
+
+            return -1;
+        }
+
+        public Matrix GetAnimatedBone(int index)
+        {
+            return Bones[index].AnimatedPosition;
+        }
 
         public void Create(AnimationPlayer animationPlayer, SkeletonFile skeleton)
         {
@@ -51,7 +91,6 @@ namespace Viewer.GraphicModels
                     ParentIndex = skeleton.Bones[i].ParentId,
                     Position = pos,
                     WorldPosition = pos,
-                    Inv = Matrix.Invert(pos),
                     Name = skeleton.Bones[i].Name
                 };
                 Bones.Add(info);
@@ -63,93 +102,72 @@ namespace Viewer.GraphicModels
                 if (parentIndex == -1)
                     continue;
                 Bones[i].WorldPosition = Bones[i].WorldPosition * Bones[parentIndex].WorldPosition;
+                Bones[i].AnimatedPosition = Bones[i].WorldPosition;
             }
         }
 
-        public void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
+        public override void Update(GameTime time)
         {
             AnimationFrame frame = _animationPlayer.GetCurrentFrame();
-             
+
             for (int i = 0; i < Bones.Count(); i++)
             {
                 var parentIndex = Bones[i].ParentIndex;
                 if (parentIndex == -1)
                     continue;
 
-                var bonePos = Bones[i].WorldPosition;
-                var parentBonePos = Bones[parentIndex].WorldPosition;
-
                 if (frame != null)
                 {
+                    var bonePos = Bones[i].WorldPosition;
+                    var parentBonePos = Bones[parentIndex].WorldPosition;
+
                     var currentBoneAnimationoffset = frame.BoneTransforms[i].Transform;
                     var parentBoneAnimationoffset = frame.BoneTransforms[parentIndex].Transform;
 
-                    bonePos = Matrix.Multiply(bonePos, currentBoneAnimationoffset);
-                    parentBonePos = Matrix.Multiply(parentBonePos, parentBoneAnimationoffset);
+                    Bones[i].AnimatedPosition = Matrix.Multiply(bonePos, currentBoneAnimationoffset);
+                    Bones[parentIndex].AnimatedPosition = Matrix.Multiply(parentBonePos, parentBoneAnimationoffset);
                 }
+            }
+        }
+
+        public override void Draw(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
+        {
+            if (!Visible)
+                return;
+
+            for (int i = 0; i < Bones.Count(); i++)
+            {
+                var parentIndex = Bones[i].ParentIndex;
+                if (parentIndex == -1)
+                    continue;
 
                 var vertices = new[]
                 {
-                    new VertexPositionNormalTexture(bonePos.Translation, new Vector3(0,0,0), new Vector2(0,0)),
-                    new VertexPositionNormalTexture(parentBonePos.Translation, new Vector3(0,0,0), new Vector2(0,0))
+                    new VertexPosition(Bones[i].AnimatedPosition.Translation),
+                    new VertexPosition(Bones[parentIndex].AnimatedPosition.Translation)
                 };
 
-                MeshInstance instance = new MeshInstance()
+                foreach (var pass in _shader.CurrentTechnique.Passes)
                 {
-                    Model = _lineBox,
-                };
-                instance.Render(Matrix.CreateScale(0.05f) * bonePos, device, effect, effectPass);
-
-
-                effect.Parameters["World"].SetValue(world);
-                effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
-                effectPass.Apply();
-                device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
-                
-            }
-        }
-
-        public void Update()
-        {
-            AnimationFrame frame = _animationPlayer.GetCurrentFrame();
-
-            for (int i = 0; i < Bones.Count(); i++)
-            {
-                var parentIndex = Bones[i].ParentIndex;
-                if (parentIndex == -1)
-                    continue;
-
-                var bonePos = Bones[i].WorldPosition;
-                var parentBonePos = Bones[parentIndex].WorldPosition;
-
-                if (frame != null)
-                {
-                    var currentBoneAnimationoffset = frame.BoneTransforms[i].Transform;
-                    var parentBoneAnimationoffset = frame.BoneTransforms[parentIndex].Transform;
-
-                    bonePos = Matrix.Multiply(bonePos, currentBoneAnimationoffset);
-                    parentBonePos = Matrix.Multiply(parentBonePos, parentBoneAnimationoffset);
+                    ApplyCommonShaderParameters(commonShaderParameters, Matrix.Identity);
+                    _shader.Parameters["Color"].SetValue(new Vector3(0,0,0));
+                    pass.Apply();
+                    device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
                 }
 
-                var   = new[]
-                {
-                    new VertexPosition(bonePos.Translation),
-                    new VertexPosition(parentBonePos.Translation)
-                };
+                DrawCube(device, commonShaderParameters, Matrix.CreateScale(0.05f) * Bones[i].AnimatedPosition);
             }
-
         }
 
-        public void Render()
+        void DrawCube(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix world)
         {
-            Update();
-
-            ///
-        }
-
-        public void Dispose()
-        {
-        
+            foreach (var pass in _shader.CurrentTechnique.Passes)
+            {
+                ApplyCommonShaderParameters(commonShaderParameters, world);
+                _shader.Parameters["Color"].SetValue(new Vector3(.25f, 1, .25f));
+                pass.Apply();
+                _lineBox.Render(device);
+            }
         }
     }
 }

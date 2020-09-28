@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using VariantMeshEditor.Controls.EditorControllers;
 using Viewer.Animation;
 using Viewer.GraphicModels;
+using Viewer.Scene;
+using WpfTest.Scenes;
 
 namespace VariantMeshEditor.ViewModels
 {
@@ -27,7 +29,7 @@ namespace VariantMeshEditor.ViewModels
         public override FileSceneElementEnum Type => FileSceneElementEnum.Skeleton;
 
 
-        public MeshInstance Create(AnimationPlayer animationPlayer, List<PackFile> loadedContent, string skeletonName)
+        public void Create(AnimationPlayer animationPlayer, List<PackFile> loadedContent, ResourceLibary resourceLibary, string skeletonName)
         {
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + skeletonName;
@@ -39,13 +41,8 @@ namespace VariantMeshEditor.ViewModels
                 FileName = Path.GetFileNameWithoutExtension(skeletonFilePath);
             }
 
-            SkeletonModel = new SkeletonModel();
+            SkeletonModel = new SkeletonModel(resourceLibary.GetEffect(ShaderTypes.Line));
             SkeletonModel.Create(animationPlayer, SkeletonFile);
-            MeshInstance.Model = SkeletonModel;
-            return MeshInstance;
         }
-
-
-        
     }
 }

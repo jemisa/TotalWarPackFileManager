@@ -1,9 +1,12 @@
 ﻿using Common;
+using Filetypes.ByteParsing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.MediaFoundation;
+using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +33,29 @@ namespace VariantMeshEditor.Controls
 
         public EditorMainController(SceneTreeViewController treeViewController, Scene3d scene3d, Panel editorPanel)
         {
+
+
+            byte[] data = File.ReadAllBytes(@"C:\Users\ole_k\Desktop\ModelDecoding\brt_paladin\Skeleton\hu1_sws_stand_01.anm.meta");
+            var chunk = new ByteChunk(data);
+
+            var header = chunk.ReadBytes(10);
+            var label = chunk.ReadFixedLength(10);
+            //var dataContent = chunk.ReadBytes(28);
+            var removed = chunk.ReadBytes(17);
+            var f0 = chunk.ReadSingle();
+            var f1 = chunk.ReadSingle();
+            var f2 = chunk.ReadSingle();
+            var f3 = chunk.ReadSingle();
+
+            var label2 = chunk.ReadFixedLength(10);
+
+
+
+
+
+
+
+
             _treeViewController = treeViewController;
             _scene3d = scene3d;
             _editorPanel = editorPanel;
@@ -45,12 +71,7 @@ namespace VariantMeshEditor.Controls
 
         public void LoadModel(string path)
         {
-            SceneLoader sceneLoader = new SceneLoader(_temp_loadedContent);
-            _rootElement = sceneLoader.Load(null, null, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
 
-            _treeViewController.Populate(_rootElement);
-
-            CreateEditors(_rootElement);
         }
 
         private void _treeViewController_VisabilityChangedEvent(FileSceneElement element, bool isVisible)
@@ -85,9 +106,66 @@ namespace VariantMeshEditor.Controls
         void Create3dWorld(GraphicsDevice device)
         {
             _scene3d.SetResourceLibary(_resourceLibary);
+
+            SceneLoader sceneLoader = new SceneLoader(_temp_loadedContent, _resourceLibary);
+            _rootElement = sceneLoader.Load(null, null, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
+
+            
+            _treeViewController.Populate(_rootElement);
+
+            CreateEditors(_rootElement);
+
             Create3dModels(device, _rootElement);
+            ResovleAttachment(_rootElement);
             RegisterAnimations(_rootElement);
             _treeViewController.SetInitialVisability(_rootElement, true);
+        }
+
+        public void ResovleAttachment(FileSceneElement element)
+        {
+
+            if (element is SlotElement rigidModelElement)
+            {
+
+                var skeleton = _treeViewController.GetAllOfTypeInSameVariantMesh<SkeletonElement>(element);
+
+                if (!string.IsNullOrWhiteSpace(rigidModelElement.AttachmentPoint))
+                {
+                    var models = new List<RigidModelElement>();
+                    GetAllChildrenOfType<RigidModelElement>(element, models);
+
+                    foreach (var model in models)
+                    {
+                        foreach (var mesh in model.MeshInstances)
+                        {
+                            foreach (var childmesh in mesh)
+                            {
+                                childmesh.AttachmentResolver = new AttachmentResolver(rigidModelElement.AttachmentPoint, skeleton.First().SkeletonModel);
+                            }
+                        }
+
+                    }
+
+                }
+            }
+
+            foreach (var child in element.Children)
+            {
+                ResovleAttachment(child);
+            }
+        }
+
+        void GetAllChildrenOfType<T>(FileSceneElement element, List<T> output) where T : FileSceneElement
+        {
+            if (element as T != null)
+            {
+                output.Add(element as T);
+            }
+
+            foreach (var child in element.Children)
+            {
+                GetAllChildrenOfType(child, output);
+            }
         }
 
         void Create3dModels(GraphicsDevice device, FileSceneElement element)
@@ -103,12 +181,13 @@ namespace VariantMeshEditor.Controls
 
                     for (int modelIndex = 0; modelIndex < rigidModelData.LodInformations[lodIndex].LodModels.Count(); modelIndex++)
                     {
+                        var animation = _treeViewController.GetAllOfTypeInSameVariantMesh<AnimationElement>(element);
+
                         Rmv2Model meshModel = new Rmv2Model();
-                        meshModel.Create(null, device, rigidModelData, lodIndex, modelIndex);
+                        meshModel.Create(animation.First().AnimationPlayer, device, rigidModelData, lodIndex, modelIndex);
 
                         MeshRenderItem meshRenderItem = new MeshRenderItem(meshModel, _resourceLibary.GetEffect(ShaderTypes.Mesh));
                         meshRenderItem.Visible = lodIndex == 0;
-
 
                         rigidModelElement.MeshInstances[lodIndex].Add(meshRenderItem);
                         controller.AssignModel(meshRenderItem, lodIndex, modelIndex);
@@ -123,7 +202,7 @@ namespace VariantMeshEditor.Controls
 
             if (element is SkeletonElement skeletonElement)
             {
-                _scene3d.DrawBuffer.Add(skeletonElement.MeshInstance);
+                _scene3d.DrawBuffer.Add(skeletonElement.SkeletonModel);
             }
 
             foreach (var child in element.Children)

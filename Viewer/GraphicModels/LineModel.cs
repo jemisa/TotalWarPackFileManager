@@ -19,7 +19,7 @@ namespace Viewer.GraphicModels
             }
         }
 
-        public virtual void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
+        public virtual void Render( GraphicsDevice device)
         {
             device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies, 0, _originalVertecies.Count() / 2);
         }

@@ -57,7 +57,6 @@ namespace VariantMeshEditor.ViewModels
         public RenderableFileSceneElement(FileSceneElement parent, string fullPath, string displayName) :
             base(parent, Path.GetFileNameWithoutExtension(fullPath), fullPath, displayName)
         { }
-        public RenderItem MeshInstance { get; set; }
     }
 
     public class RootElement : FileSceneElement

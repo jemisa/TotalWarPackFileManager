@@ -76,6 +76,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
                     meshView.ModelType.Text = mesh.GroupType.ToString();
                     meshView.VisibleCheckBox.Click += (sender, arg) => VisibleCheckBox_Click(meshView);
+                    meshView.PivotText.Text = $"{mesh.Pivot[0]},{mesh.Pivot[1]},{mesh.Pivot[2]},{mesh.Pivot[3]}";
                     meshView.VertexType.Text = mesh.vertexType.ToString();
                     meshView.VertexCount.Text = mesh.vertexCount.ToString();
                     meshView.FaceCount.Text = mesh.faceCount.ToString();

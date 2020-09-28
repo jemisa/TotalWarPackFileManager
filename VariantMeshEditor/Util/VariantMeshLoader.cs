@@ -17,6 +17,7 @@ using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.Animation;
 using Viewer.Animation;
 using Viewer.GraphicModels;
+using Viewer.Scene;
 using static Filetypes.RigidModel.VariantMeshDefinition;
 
 namespace VariantMeshEditor.Util
@@ -26,10 +27,12 @@ namespace VariantMeshEditor.Util
     class SceneLoader
     {
         List<PackFile> _loadedContent;
+        ResourceLibary _resourceLibary;
 
-        public SceneLoader(List<PackFile> loadedContent)
+        public SceneLoader(List<PackFile> loadedContent, ResourceLibary resourceLibary)
         {
             _loadedContent = loadedContent;
+            _resourceLibary = resourceLibary;
         }
 
         public FileSceneElement Load(AnimationElement animationElement, GraphicsDevice device, string filePath, FileSceneElement parent = null)
@@ -98,7 +101,7 @@ namespace VariantMeshEditor.Util
                 throw new Exception("More the one skeleton for a veriant mesh");
             if (skeletons.Count() == 1)
             {
-                skeletonElement.Create(animationElement.AnimationPlayer, _loadedContent, skeletons.First() + ".anim");
+                skeletonElement.Create(animationElement.AnimationPlayer, _loadedContent, _resourceLibary, skeletons.First() + ".anim");
             }
             else
             {

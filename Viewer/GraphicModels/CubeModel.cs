@@ -91,7 +91,6 @@ namespace Viewer.GraphicModels
 
 
             return cubeVertices;
-  
         }
     }
 }

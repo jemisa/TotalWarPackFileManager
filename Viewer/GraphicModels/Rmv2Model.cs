@@ -37,15 +37,10 @@ namespace Viewer.GraphicModels
                 _textures[material.Type] = textureLibary.LoadTexture(material.Name, device);
         }
 
-        public override void Render(Matrix world, GraphicsDevice device, Effect effect, EffectPass effectPass)
+        public override void Render(GraphicsDevice device)
         {
             UpdateVertexBuffer();
-
-            //var item = _textures[TexureType.Specular];
-            //if(item != null)
-            //    effect.Parameters["ModelTexture"].SetValue(item);
-
-            base.Render(world, device, effect, effectPass);
+            base.Render(device);
         }
 
         private void UpdateVertexBuffer()

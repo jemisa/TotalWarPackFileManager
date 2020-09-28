@@ -27,7 +27,7 @@ namespace Filetypes.RigidModel
 
         public uint materialCount { get; set; }
         public List<Material> Materials { get; set; } = new List<Material>();
-
+        public float[] Pivot { get; set; } = new float[4];
 
         public byte[] Unknown0;
         public byte[] Unknown1;
@@ -64,10 +64,10 @@ namespace Filetypes.RigidModel
 
             var unknownChunk0 = chunk.ReadBytes(258); // Contains some transformations
             
-            var pivX = chunk.ReadSingle();
-            var pivY = chunk.ReadSingle();
-            var pivZ = chunk.ReadSingle();
-            var pivW = chunk.ReadSingle();
+            lodModel.Pivot[0] = chunk.ReadSingle();
+            lodModel.Pivot[1] = chunk.ReadSingle();
+            lodModel.Pivot[2] = chunk.ReadSingle();
+            lodModel.Pivot[3] = chunk.ReadSingle();
 
             var unknownChunk1 = chunk.ReadBytes(148); // Contains some transformations?
 

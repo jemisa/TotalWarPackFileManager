@@ -22,7 +22,14 @@
             <Label Width="100">Visible</Label>
             <Label>:</Label>
             <CheckBox x:Name="VisibleCheckBox" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+        </StackPanel>
 
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Pivot</Label>
+            <Label>:</Label>
+            <Border BorderBrush="{x:Null}" >
+                <TextBlock x:Name="PivotText" TextWrapping="NoWrap" Text="0,0,0,0" VerticalAlignment="Center"/>
+            </Border>
         </StackPanel>
 
 

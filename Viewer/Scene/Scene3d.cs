@@ -6,6 +6,7 @@ using MonoGame.Framework.WpfInterop.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using Viewer.Animation;
 using Viewer.GraphicModels;
 using Viewer.NHew;
@@ -41,7 +42,7 @@ namespace WpfTest.Scenes
         public LoadSceneCallback LoadScene { get; set; }
 
         CubeModel _cubeModel;
-        MeshInstance _cube0;
+      
 
 
         ResourceLibary _resourceLibary;
@@ -214,73 +215,17 @@ namespace WpfTest.Scenes
             //_shader.CurrentTechnique = _shader.Techniques["Diffuse"];
 
 
-
-            /*foreach (var pass in _shader.CurrentTechnique.Passes)
-            {
-                
-
-               
-                foreach (var item in DrawBuffer)
-                {
-                    //Matrix worldInverse = Matrix.Invert(Matrix.Identity);
-                    //Vector4 vLightDirection = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-                    //Vector4 vecEye = new Vector4(x, y, zHeight, 0);
-                    //Vector4 vColorDiffuse = new Vector4(0.8f, 0.0f, 0.0f, 1.0f);
-                    //Vector4 vColorSpecular = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
-                    //Vector4 vColorAmbient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
-
-
-                    Vector4 vecEye = new Vector4(_camera.ViewMatrix.Translation, 0);
-                    Vector4 vColorDiffuse = new Vector4(0.8f, 0.0f, 0.0f, 1.0f);
-                    Vector4 vColorSpecular = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
-                    Vector4 vColorAmbient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
-
-                    // .. and pass it into our shader.
-                    // To access a parameter defined in our shader file ( Shader.fx ), use effectObject.Parameters["variableName"]
-                    var worldMatrix = Matrix.Identity;
-                    Matrix worldInverse = Matrix.Invert(worldMatrix);
-                    Vector4 vLightDirection = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
-                    
-                    _shader.Parameters["View"].SetValue(_camera.ViewMatrix);
-                    _shader.Parameters["Projection"].SetValue(_projectionMatrix);
-
-            
-
-
-                    item.Render(item.World, GraphicsDevice, _shader, pass);
-                    
-                }
-            }*/
-
             CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
             {
                 Projection = _projectionMatrix,
                 View = _camera.ViewMatrix
             };
 
-
-            LineBox tempBox = new LineBox();
-            tempBox.Create();
-            var renderItem = new LineRenderItem(tempBox, _resourceLibary.GetEffect(ShaderTypes.Line));
-            renderItem.Colour = new Vector3(0, 1, 0);
-            renderItem.Draw(GraphicsDevice, commonShaderParameters);
-
+            foreach (var item in DrawBuffer)
+                item.Update(time);
 
             foreach (var item in DrawBuffer)
-            {
                 item.Draw(GraphicsDevice, commonShaderParameters);
-            }
-
-            /*foreach (var pass in _lineShader.CurrentTechnique.Passes)
-            {
-                _lineShader.Parameters["View"].SetValue(_camera.ViewMatrix);
-                _lineShader.Parameters["Projection"].SetValue(_projectionMatrix);
-                _lineShader.Parameters["World"].SetValue(Matrix.Identity);
-                _lineShader.Parameters["Color"].SetValue(new Vector3(1, 0, 0));
-                pass.Apply();
-
-                tempBox.Render(Matrix.Identity, GraphicsDevice, _lineShader, null);
-            }*/
 
             base.Draw(time);
         }
@@ -292,48 +237,49 @@ namespace WpfTest.Scenes
         public Matrix Projection { get; set; }
     }
 
-    public class RenderItem : IDisposable
+
+    public class RenderItem 
     {
         protected IRenderableContent _model;
         protected Effect _shader;
-
-        public Matrix World { get; set; } = Matrix.Identity;
         public bool Visible { get; set; } = true;
+        public Matrix World { get; set; } = Matrix.Identity;
+
         public RenderItem(IRenderableContent model, Effect shader)
         {
             _model = model;
             _shader = shader;
         }
 
-        public void Dispose()
-        {
-            _model.Dispose();
-            _shader.Dispose();
-        }
-
-        public void Draw(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
+        public virtual void Draw(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
         {
             if (!Visible)
                 return;
 
             foreach (var pass in _shader.CurrentTechnique.Passes)
             {
-                _shader.Parameters["View"].SetValue(commonShaderParameters.View);
-                _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-                _shader.Parameters["World"].SetValue(World);
-                _shader.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(World)));
-
+                ApplyCommonShaderParameters(commonShaderParameters, World);
                 ApplyCustomShaderParams();
                 pass.Apply();
-
-                _model.Render(Matrix.Identity, device, _shader, null);
+                _model.Render(device);
             }
+        }
+
+        protected void ApplyCommonShaderParameters(CommonShaderParameters commonShaderParameters, Matrix world)
+        {
+            _shader.Parameters["View"].SetValue(commonShaderParameters.View);
+            _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+            _shader.Parameters["World"].SetValue(world);
+            _shader.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
         }
 
         public virtual void ApplyCustomShaderParams()
         { 
         
         }
+
+        public virtual void Update(GameTime time)
+        { }
     }
 
     public class LineRenderItem : RenderItem
@@ -348,13 +294,40 @@ namespace WpfTest.Scenes
         }
     }
 
+
     public class MeshRenderItem : RenderItem
     {
-        public MeshRenderItem(MeshModel model, Effect shader) : base(model, shader) { }
+        public AttachmentResolver AttachmentResolver { get; set; }
+        public MeshRenderItem(MeshModel model, Effect shader) : base(model, shader) 
+        {
+        
+        }
 
         public override void ApplyCustomShaderParams()
         {
-           
+            if (AttachmentResolver != null)
+                _shader.Parameters["World"].SetValue(AttachmentResolver.GetWorldMatrix());
+        }
+
+        public override void Update(GameTime time)
+        {
+            base.Update(time);
+        }
+    }
+
+    public class AttachmentResolver
+    {
+        int _boneIndex = -1;
+        SkeletonModel _skeleton;
+        public AttachmentResolver(string name, SkeletonModel skeleton)
+        {
+            _skeleton = skeleton;
+            _boneIndex = _skeleton.GetBoneIndex(name);
+        }
+
+        public Matrix GetWorldMatrix()
+        {
+            return /*Matrix.CreateTranslation(0.5f, 0, 0) * */_skeleton.GetAnimatedBone(_boneIndex);
         }
     }
 }

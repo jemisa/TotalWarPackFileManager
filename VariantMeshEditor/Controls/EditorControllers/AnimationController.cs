@@ -80,7 +80,10 @@ namespace VariantMeshEditor.Controls.EditorControllers
             var animations = files.Where(x => x.FileExtention == "anim").ToList();
 
             foreach (var file in animations)
-                _viewModel.AnimationList.Items.Add(new AnimationListItem() { File = file});
+            {
+                if(file.Name.Contains("hu1_sws_stand_01"))
+                _viewModel.AnimationList.Items.Add(new AnimationListItem() { File = file });
+            }
         }
 
         class AnimationListItem
