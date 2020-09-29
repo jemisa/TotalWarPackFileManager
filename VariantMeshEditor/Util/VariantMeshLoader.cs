@@ -1,31 +1,17 @@
 ﻿using Common;
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
-using Filetypes.RigidModel.Animation;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Navigation;
 using System.Xml;
-using TreeViewWithCheckBoxes;
 using VariantMeshEditor.ViewModels;
-using VariantMeshEditor.Views.Animation;
-using Viewer.Animation;
-using Viewer.GraphicModels;
 using Viewer.Scene;
 using static Filetypes.RigidModel.VariantMeshDefinition;
 
 namespace VariantMeshEditor.Util
 {
-    
-
     class SceneLoader
     {
         ResourceLibary _resourceLibary;
@@ -114,7 +100,6 @@ namespace VariantMeshEditor.Util
             parent.Children.Add(model);
         }
 
-
         void LoadWsModel(PackedFile file, FileSceneElement parent)
         {
             var model = new WsModelElement(parent,file.FullPath);
@@ -130,8 +115,6 @@ namespace VariantMeshEditor.Util
             {
                 var file2 = PackFileLoadHelper.FindFile(_resourceLibary.PackfileContent, node.InnerText);
                 LoadRigidMesh(file2, model);
-
-
             }
         }
 
