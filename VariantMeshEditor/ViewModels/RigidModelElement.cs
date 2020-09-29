@@ -35,7 +35,7 @@ namespace VariantMeshEditor.ViewModels
         {
             RigidModelEditorView view = new RigidModelEditorView();
 
-            var controller = new RigidModelController(view, this, resourceLibary.PackfileContent);
+            var controller = new RigidModelController(view, this);
             Editor = view;
             Controller = controller;
 

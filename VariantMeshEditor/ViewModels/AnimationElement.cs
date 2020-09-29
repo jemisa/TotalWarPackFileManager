@@ -20,20 +20,24 @@ namespace VariantMeshEditor.ViewModels
         public AnimationElement(FileSceneElement parent) : base(parent, "", "", "Animation") { }
         public override FileSceneElementEnum Type => FileSceneElementEnum.Animation;
 
+        AnimationController _controller;
+
         protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
         {
             var skeleton = SceneElementHelper.GetAllOfTypeInSameVariantMesh<SkeletonElement>(this);
             if (skeleton.Count == 1)
             {
-                AnimationEditorView view = new AnimationEditorView();
-                AnimationController controller = new AnimationController(view, resourceLibary.PackfileContent, this, skeleton.First());
+                var view = new AnimationEditorView();
                 Editor = view;
+                _controller = new AnimationController(view, resourceLibary, this, skeleton.First());
             }
         }
 
         protected override void UpdateNode(GameTime time)
         {
             AnimationPlayer.Update(time);
+            DisplayName = "Animation - " + _controller.GetCurrentAnimationName();
+            _controller.Update();
         }
     }
 }

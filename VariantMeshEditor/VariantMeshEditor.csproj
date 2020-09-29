@@ -86,9 +86,6 @@
     <Compile Include="Views\EditorViews\SlotEditorView.xaml.cs">
       <DependentUpon>SlotEditorView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EditorViews\UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\EditorViews\Util\BrowsableItemView.xaml.cs">
       <DependentUpon>BrowsableItemView.xaml</DependentUpon>
     </Compile>
@@ -130,10 +127,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditorViews\SlotEditorView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\EditorViews\UserControl1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -41,7 +41,7 @@ namespace VariantMeshEditor.Util
             switch (file.FileExtention)
             {
                 case "variantmeshdefinition":
-                    LoadVariantMesh(file, parent);
+                     LoadVariantMesh(file, parent);
                     break;
 
                 case "rigid_model_v2":

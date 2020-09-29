@@ -16,15 +16,13 @@ namespace VariantMeshEditor.Controls.EditorControllers
     {
         RigidModelEditorView _view;
         RigidModelElement _element;
-        List<PackFile> _loadedContent;
 
         Dictionary<RigidModelMeshEditorView, MeshRenderItem> _modelEditors = new Dictionary<RigidModelMeshEditorView, MeshRenderItem>();
          
-        public RigidModelController(RigidModelEditorView view, RigidModelElement element, List<PackFile> loadedContent )
+        public RigidModelController(RigidModelEditorView view, RigidModelElement element)
         {
             _view = view;
             _element = element;
-            _loadedContent = loadedContent;
 
             PopulateUi(_view, _element);
         }
@@ -33,19 +31,6 @@ namespace VariantMeshEditor.Controls.EditorControllers
         {
             var item = _modelEditors.Where(x => x.Key.ModelIndex == modelIndex && x.Key.LodIndex == lodIndex).First();
             _modelEditors[item.Key] = meshInstance;
-        }
-
-        public void SetVisible(int lodIndex, bool state)
-        {
-            foreach (var item in _modelEditors)
-            {
-                var editor = item.Key;
-                var model = item.Value;
-                if (editor.LodIndex == lodIndex)
-                    model.Visible = state;
-                else
-                    model.Visible = false;
-            }
         }
 
         private void PopulateUi(RigidModelEditorView view, RigidModelElement element)

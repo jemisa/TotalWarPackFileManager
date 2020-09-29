@@ -39,13 +39,15 @@ namespace VariantMeshEditor.ViewModels
 
     public abstract class FileSceneElement : TreeViewDataModel, ISceneGraphNode
     {
-        public FileSceneElement Parent { get; protected set; }
+        public FileSceneElement Parent { get; set; }
         public ObservableCollection<FileSceneElement> Children { get; private set; } = new ObservableCollection<FileSceneElement>();
 
         public abstract FileSceneElementEnum Type { get; }
         public string FileName { get; set; }
         public string FullPath { get; set; }
         public UserControl Editor { get; set; }
+
+        public bool Visible { get; set; } = true;
 
         public FileSceneElement(FileSceneElement parent, string fileName, string fullPath, string displayName)
             : base(displayName)
@@ -77,10 +79,13 @@ namespace VariantMeshEditor.ViewModels
 
         public void Render(GraphicsDevice device, Matrix parentTransform, CommonShaderParameters commonShaderParameters)
         {
+            if (Visible == false)
+                return;
             DrawNode(device, parentTransform, commonShaderParameters);
             var newWorld = parentTransform * WorldTransform;
             foreach (var child in Children)
             {
+                
                 child.Render(device, newWorld, commonShaderParameters);
             }
         }

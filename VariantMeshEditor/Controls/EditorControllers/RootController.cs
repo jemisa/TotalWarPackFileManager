@@ -61,18 +61,18 @@ namespace VariantMeshEditor.Controls.EditorControllers
             {
                 var res = loadedPackFileBrowser.ShowDialog();
             }
-            return;
+      
             //def_armoured_cold_one.variantmeshdefinition
             //brt_pegasus.variantmeshdefinition
             SceneLoader sceneLoader = new SceneLoader(_resourceLibary);
             var element = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_pegasus.variantmeshdefinition", new RootElement());
-            element.Children[element.Children.Count - 1].CreateContent(_virtualWorld, _resourceLibary);
-            _rootElement.Children.Add(element);
+            element.CreateContent(_virtualWorld, _resourceLibary);
 
-           //VariantMeshElement newSlot = new VariantMeshElement(_rootElement, "New");
-           //_referenceElements.Add(newSlot);
-           //_rootElement.Children.Add(newSlot);
-            //_sceneTreeView.CreateNode(newSlot, false, _slotElement);
+            var mesh = element.Children.First();
+            mesh.Parent = null;
+            SceneElementHelper.SetInitialVisability(mesh, true); ;
+            _rootElement.Children.Add(mesh);
+
             CreateMeshList();
         }
 

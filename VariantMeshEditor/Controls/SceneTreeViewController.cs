@@ -22,10 +22,35 @@ namespace VariantMeshEditor.Controls
         public event VisabilityChangedEvntHandler VisabilityChangedEvent;
 
         TreeView _viewModel;
+        ObservableCollection<TreeViewDataModel> _dataContext = new ObservableCollection<TreeViewDataModel>();
+
+
         public SceneTreeViewController(TreeView viewModel)
         {
             _viewModel = viewModel;
             _viewModel.SelectedItemChanged += _viewModel_SelectedItemChanged;
+            _viewModel.DataContext = _dataContext;
+
+            _dataContext.CollectionChanged += _dataContext_CollectionChanged;
+        }
+
+        private void _dataContext_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (FileSceneElement item in e.NewItems)
+                {
+                    AddCallbacks(item);
+                }
+            }
+        }
+
+        void AddCallbacks(FileSceneElement item)
+        {
+            item.Children.CollectionChanged += _dataContext_CollectionChanged;
+            item.PropertyChanged += Node_PropertyChanged;
+            foreach (var child in item.Children)
+                AddCallbacks(child);
         }
 
         public List<T> GetAllOfTypeInSameVariantMesh<T>(FileSceneElement knownNode) where T : FileSceneElement
@@ -61,31 +86,9 @@ namespace VariantMeshEditor.Controls
         }
 
 
-        public void Populate(FileSceneElement rootItem)
+        public void SetRootItem(FileSceneElement rootItem)
         {
-            _viewModel.DataContext = new ObservableCollection<TreeViewDataModel>() { rootItem }; ;
-        }
-
-        public void SetInitialVisability(FileSceneElement element, bool shouldBeSelected, TreeViewDataModel parent = null)
-        {
-            element.PropertyChanged += Node_PropertyChanged;
-            element.IsChecked = shouldBeSelected;
-
-            if (element as AnimationElement != null)
-                element.Vis = Visibility.Hidden;
-            if (element as SkeletonElement != null)
-                element.IsChecked = false;
-
-            bool areAllChildrenModels = element.Children.Where(x => (x as RigidModelElement) != null).Count() == element.Children.Count();
-            bool firstItem = true;
-            foreach (var item in element.Children)
-            {
-                if (areAllChildrenModels && !firstItem)
-                    shouldBeSelected = false;
-
-                firstItem = false;
-                SetInitialVisability(item, shouldBeSelected, null);
-            }
+            _dataContext.Add(rootItem);
         }
 
         private void _viewModel_SelectedItemChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<object> e)

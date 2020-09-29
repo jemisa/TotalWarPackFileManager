@@ -16,9 +16,9 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center">
-            <Button FontSize="20">⏮︎</Button>
-            <Button FontSize="20">⏯︎</Button>
-            <Button FontSize="20">⏭︎</Button>
+            <Button x:Name="PrivFrameButton" FontSize="20" >⏮︎</Button>
+            <Button x:Name="PlayPauseButton" FontSize="20">⏯︎</Button>
+            <Button x:Name="NextFrameButton" FontSize="20">⏭︎</Button>
             <ComboBox x:Name="AnimationSpeedComboBox"></ComboBox>
         </StackPanel>
 
@@ -69,12 +69,23 @@
 
         <DockPanel DockPanel.Dock="Top" >
             <Label DockPanel.Dock="Left">Filter:</Label>
-            <Button DockPanel.Dock="Right" Width="70" >Clear</Button>
+            <Button x:Name="ClearFilterButton" DockPanel.Dock="Right" Width="70" >Clear</Button>
             <Border BorderBrush="{x:Null}" >
                 <TextBox x:Name="FilterText"  TextWrapping="NoWrap" Text="FilterText" VerticalAlignment="Center"/>
             </Border>
         </DockPanel>
 
+        <DockPanel DockPanel.Dock="Bottom" >
+            <Label DockPanel.Dock="Left">Error:</Label>
+            <Border BorderBrush="{x:Null}" >
+                <TextBox x:Name="ErrorText"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center"/>
+            </Border>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Bottom">
+            <Button x:Name="FindAllValidAnimations" Margin="10,0,10,0">Find all animations for current skeleton</Button>
+        </DockPanel>
+        
         <ListView x:Name="AnimationList"></ListView>
     </DockPanel>
 </UserControl>

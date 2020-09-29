@@ -29,6 +29,7 @@ namespace VariantMeshEditor.Controls
         Scene3d _scene3d;
         Panel _editorPanel;
         ResourceLibary _resourceLibary;
+        string _modelToLoad;
 
         public EditorMainController(SceneTreeViewController treeViewController, Scene3d scene3d, Panel editorPanel)
         {
@@ -46,20 +47,12 @@ namespace VariantMeshEditor.Controls
 
         public void LoadModel(string path)
         {
-
+            _modelToLoad = path;
         }
 
         private void _treeViewController_VisabilityChangedEvent(FileSceneElement element, bool isVisible)
         {
-            if (element is RigidModelElement rigidModelElement)
-            {
-                rigidModelElement.Controller.SetVisible(0, isVisible);
-            }
-
-            if (element is SkeletonElement skeletonElement)
-            {
-                //skeletonElement.Controller.SetVisible(0, isVisible);
-            }
+            element.Visible = isVisible;
         }
 
         private void _treeViewController_SceneElementSelectedEvent(FileSceneElement element)
@@ -69,22 +62,18 @@ namespace VariantMeshEditor.Controls
                 _editorPanel.Children.Add(element.Editor);
         }
 
-
-
         void Create3dWorld(GraphicsDevice device)
         {
             _scene3d.SetResourceLibary(_resourceLibary);
 
             SceneLoader sceneLoader = new SceneLoader(_resourceLibary);
-            _rootElement = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition", new RootElement());
+            _rootElement = sceneLoader.Load(_modelToLoad, new RootElement());
             _rootElement.CreateContent(_scene3d, _resourceLibary);
 
             _scene3d.SceneGraphRootNode = _rootElement;
-            _treeViewController.Populate(_rootElement);
-            _treeViewController.SetInitialVisability(_rootElement, true);
+            _treeViewController.SetRootItem(_rootElement);
+            SceneElementHelper.SetInitialVisability(_rootElement, true);
         }
-
-
     }
 
 }

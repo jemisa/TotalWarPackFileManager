@@ -42,6 +42,17 @@ namespace Filetypes.RigidModel.Animation
         public uint Unknown3 { get; set; }
         public uint Unknown4 { get; set; }
 
+        public static string GetAnimationSkeletonName(ByteChunk chunk)
+        {
+            var animationType = chunk.ReadUInt32();
+            var unknown0 = chunk.ReadUInt32();
+            var unknown1 = chunk.ReadShort();
+            var unknown2 = chunk.ReadShort();
+            var nameSize = chunk.ReadShort();
+            var skeletonName = chunk.ReadFixedLength(nameSize);
+            return skeletonName;
+        }
+
         public static AnimationFile Create(ByteChunk chunk)
         {
             var ouput = new AnimationFile();

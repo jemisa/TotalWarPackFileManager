@@ -41,7 +41,7 @@ namespace VariantMeshEditor
 
             _treeViewController = new SceneTreeViewController(EditorPanel.TreeView.tree);
             _mainController = new EditorMainController(_treeViewController, RenderView.Scene, EditorPanel.ToolPanel);
-            _mainController.LoadModel("");
+            _mainController.LoadModel("variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
 
         }
     }

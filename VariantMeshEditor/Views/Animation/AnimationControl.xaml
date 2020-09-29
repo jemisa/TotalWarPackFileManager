@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:VariantMeshEditor.Views.Animation"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel x:Name="VariantMeshStackPanel">
@@ -15,7 +14,6 @@
             </Grid.ColumnDefinitions>
 
             <DockPanel Grid.Column="1" x:Name="VariantMeshContainer" LastChildFill="False">
-
                 <DockPanel DockPanel.Dock="Top">
                     <Label>SkeletonName:</Label>
                 </DockPanel>
@@ -25,20 +23,23 @@
                     <ComboBox ></ComboBox>
                 </DockPanel>
 
-
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center">
-                    <Label>Frame</Label>
-                    <TextBox>12</TextBox>
-                    <Label>/300</Label>
+                    <Label>Frame:</Label>
+                    <Border BorderBrush="{x:Null}" >
+                        <TextBox x:Name="CurrentFrameTextBox" IsReadOnly="true" TextWrapping="NoWrap" Text="12" VerticalAlignment="Center" />
+                    </Border>
+                    <Label>/</Label>
+                    <Label x:Name="MaxFramesLabel">30</Label>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center">
+                    <Button x:Name="NextFrameButton" FontSize="20">⏮︎</Button>
+                    <Button x:Name="PlayPauseButton" FontSize="20">⏯︎</Button>
+                    <Button x:Name="LastFrameButton" FontSize="20">⏭︎</Button>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center">
-                    <Button FontSize="20">⏮︎</Button>
-                    <Button FontSize="20">⏯︎</Button>
-                    <Button FontSize="20">⏭︎</Button>
-                </StackPanel>
-
-                <!-- Added in code-->
+                <StackPanel></StackPanel>
+                <!-- animation list Added in code-->
             </DockPanel>
         </Grid>
     </StackPanel>
