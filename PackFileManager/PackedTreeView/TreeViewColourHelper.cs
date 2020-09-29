@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace PackFileManager.PackedTreeView
 {
-    class TreeViewColourHelper
+    class TreeViewColourHelper : ITreeViewColourHelper
     {
-        public static void SetColourBasedOnValidation(Collection<Node> nodes)
+        public void SetColourBasedOnValidation(Collection<Node> nodes)
         {
             foreach (var node in nodes)
             {

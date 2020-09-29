@@ -84,7 +84,10 @@ namespace Viewer.GraphicModels
                     skeleton.Bones[i].Rotation_W);
                 x.Normalize();
 
-                var pos = Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(skeleton.Bones[i].Position_X, skeleton.Bones[i].Position_Y, skeleton.Bones[i].Position_Z);
+                var scale = Matrix.CreateScale(1); 
+                if (i == 0)
+                    scale = Matrix.CreateScale(-1, 1, 1);
+                var pos = scale * Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(skeleton.Bones[i].Position_X, skeleton.Bones[i].Position_Y, skeleton.Bones[i].Position_Z);
                 var info = new BoneInfo()
                 {
                     Index = skeleton.Bones[i].Id,

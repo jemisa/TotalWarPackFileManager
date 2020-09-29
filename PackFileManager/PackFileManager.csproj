@@ -117,12 +117,6 @@
     <Compile Include="Editors\UnitVariantFileEditorControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PackedTreeView\PackedTreeView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="PackedTreeView\PackedTreeView.Designer.cs">
-      <DependentUpon>PackedTreeView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Mods.cs" />
     <Compile Include="PackBrowseDialog.cs">
       <SubType>Form</SubType>
@@ -130,9 +124,7 @@
     <Compile Include="PackBrowseDialog.Designer.cs">
       <DependentUpon>PackBrowseDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="PackedTreeView\TreeViewIconCreator.cs" />
     <Compile Include="PackedTreeView\TreeViewColourHelper.cs" />
-    <Compile Include="PackedTreeView\TreeViewModelCreator.cs" />
     <Compile Include="PackFileManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,9 +150,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\PackedEsfEditor.resx">
       <DependentUpon>PackedEsfEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PackedTreeView\PackedTreeView.resx">
-      <DependentUpon>PackedTreeView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PackBrowseDialog.resx">
       <DependentUpon>PackBrowseDialog.cs</DependentUpon>
@@ -197,9 +186,6 @@
     <Compile Include="Utilities.cs" />
     <Compile Include="DataGridViewAutoFilter\DataGridViewAutoFilterColumnHeaderCell.cs" />
     <Compile Include="DataGridViewAutoFilter\DataGridViewAutoFilterTextBoxColumn.cs" />
-    <Compile Include="DnD\DragDropHelper.cs" />
-    <Compile Include="DnD\DragFileInfo.cs" />
-    <Compile Include="DnD\FILEDESCRIPTOR.cs" />
     <Reference Include="ObjectListView">
       <HintPath>..\Files\ObjectListView.dll</HintPath>
     </Reference>

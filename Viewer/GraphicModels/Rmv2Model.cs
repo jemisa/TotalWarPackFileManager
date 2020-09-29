@@ -85,16 +85,19 @@ namespace Viewer.GraphicModels
 
                 Vector3 animatedVertexPos = new Vector3
                 {
-                    X = vertex.X * transformSum.M11 + vertex.Y * transformSum.M21 + vertex.Z * transformSum.M31 + transformSum.M41,
-                    Y = vertex.X * transformSum.M12 + vertex.Y * transformSum.M22 + vertex.Z * transformSum.M32 + transformSum.M42,
-                    Z = vertex.X * transformSum.M13 + vertex.Y * transformSum.M23 + vertex.Z * transformSum.M33 + transformSum.M43
+                    X = -vertex.X * transformSum.M11 + vertex.Y * transformSum.M21 + vertex.Z * transformSum.M31 + transformSum.M41,
+                    Y = -vertex.X * transformSum.M12 + vertex.Y * transformSum.M22 + vertex.Z * transformSum.M32 + transformSum.M42,
+                    Z = -vertex.X * transformSum.M13 + vertex.Y * transformSum.M23 + vertex.Z * transformSum.M33 + transformSum.M43
                 };
+
+                //animatedVertexPos = Vector3.Transform(animatedVertexPos, Matrix.CreateScale(-1, 1, 1));
+
 
                 Vector3 animatedNormal = new Vector3
                 {
-                    X = vertex.Normal_X * transformSum.M11 + vertex.Normal_Y * transformSum.M21 + vertex.Normal_Z * transformSum.M31 + transformSum.M41,
-                    Y = vertex.Normal_X * transformSum.M12 + vertex.Normal_Y * transformSum.M22 + vertex.Normal_Z * transformSum.M32 + transformSum.M42,
-                    Z = vertex.Normal_X * transformSum.M13 + vertex.Normal_Y * transformSum.M23 + vertex.Normal_Z * transformSum.M33 + transformSum.M43
+                    X = -vertex.Normal_X * transformSum.M11 + vertex.Normal_Y * transformSum.M21 + vertex.Normal_Z * transformSum.M31 + transformSum.M41,
+                    Y = -vertex.Normal_X * transformSum.M12 + vertex.Normal_Y * transformSum.M22 + vertex.Normal_Z * transformSum.M32 + transformSum.M42,
+                    Z = -vertex.Normal_X * transformSum.M13 + vertex.Normal_Y * transformSum.M23 + vertex.Normal_Z * transformSum.M33 + transformSum.M43
                 };
                 animatedNormal.Normalize();
                 _bufferArray[index] = new VertexPositionNormalTexture(animatedVertexPos, animatedNormal, new Vector2(vertex.Uv0, vertex.Uv1));

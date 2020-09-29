@@ -7,11 +7,13 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using System.Xml;
 using TreeViewWithCheckBoxes;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.Animation;
@@ -33,20 +35,17 @@ namespace VariantMeshEditor.Util
             _resourceLibary = resourceLibary;
         }
 
-        public FileSceneElement Load(AnimationElement animationElement, GraphicsDevice device, string filePath, FileSceneElement parent = null)
+        public FileSceneElement Load(string filePath, FileSceneElement parent)
         {
-            if(parent == null)
-                parent = new RootElement();
-
             var file = PackFileLoadHelper.FindFile(_resourceLibary.PackfileContent, filePath);
             switch (file.FileExtention)
             {
                 case "variantmeshdefinition":
-                    LoadVariantMesh(device, file, parent);
+                    LoadVariantMesh(file, parent);
                     break;
 
                 case "rigid_model_v2":
-                    LoadRigidMesh(animationElement, device, file, parent);
+                    LoadRigidMesh(file, parent);
                     break;
 
                 case "wsmodel":
@@ -57,7 +56,7 @@ namespace VariantMeshEditor.Util
             return parent;
         }
 
-        void LoadVariantMesh(GraphicsDevice device, PackedFile file, FileSceneElement parent)
+        void LoadVariantMesh(PackedFile file, FileSceneElement parent)
         {
             var variantMeshElement = new VariantMeshElement(parent,file.Name);
             parent.Children.Add(variantMeshElement);
@@ -80,10 +79,10 @@ namespace VariantMeshEditor.Util
                 slotsElement.Children.Add(slotElement);
 
                 foreach (var mesh in slot.VariantMeshes)
-                    Load(animationElement, device, mesh.Name, slotElement);
+                    Load(mesh.Name, slotElement);
 
                 foreach (var meshReference in slot.VariantMeshReferences)
-                    Load(animationElement, device, meshReference.definition, slotElement);
+                    Load(meshReference.definition, slotElement);
             }
 
             // Load the animation
@@ -107,13 +106,11 @@ namespace VariantMeshEditor.Util
             }
         }
 
-        void LoadRigidMesh(AnimationElement animationElement, GraphicsDevice device, PackedFile file, FileSceneElement parent)
+        void LoadRigidMesh(PackedFile file, FileSceneElement parent)
         {
             ByteChunk chunk = new ByteChunk(file.Data);
             var model3d = RigidModel.Create(chunk, out string errorMessage);
-            //model3d.ResolveTextures(_loadedContent);
             var model = new RigidModelElement(parent, model3d, file.FullPath);
-            //model.Create(animationElement.AnimationPlayer, device);
             parent.Children.Add(model);
         }
 
@@ -122,6 +119,20 @@ namespace VariantMeshEditor.Util
         {
             var model = new WsModelElement(parent,file.FullPath);
             parent.Children.Add(model);
+
+            var buffer = file.Data;
+            string s = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(s);
+
+            var nodes = doc.SelectNodes(@"/model/geometry");
+            foreach (XmlNode node in nodes)
+            {
+                var file2 = PackFileLoadHelper.FindFile(_resourceLibary.PackfileContent, node.InnerText);
+                LoadRigidMesh(file2, model);
+
+
+            }
         }
 
         void GetAllOfType<T>(FileSceneElement variantMeshParent, ref List<T> out_items) where T : FileSceneElement

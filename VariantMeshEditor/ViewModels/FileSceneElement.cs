@@ -110,7 +110,7 @@ namespace VariantMeshEditor.ViewModels
         {
          
             RootEditorView view = new RootEditorView();
-            RootController controller = new RootController(view, this);
+            RootController controller = new RootController(view, this, resourceLibary, virtualWorld);
             Editor = view;
             
         }

@@ -9,9 +9,6 @@ using CommonDialogs;
 using Aga.Controls.Tree.NodeControls;
 using System.Drawing;
 using System.Collections.ObjectModel;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Windows.Documents;
 using System.Collections.Generic;
 
 namespace PackFileManager.PackedTreeView
@@ -30,9 +27,9 @@ namespace PackFileManager.PackedTreeView
             }
         }
 
-        public PackFileManagerForm _parentRef;
         TreeModel _treeModel;
         TreeViewModelCreator _treeViewModelCreator;
+        public ITreeViewColourHelper TreeViewColourHelper { get; set; }
 
         public PackedTreeView()
         {
@@ -199,8 +196,16 @@ namespace PackFileManager.PackedTreeView
             var nodes = _treeViewModelCreator.Create(currentPackFile.Root, this);
             _treeModel.Nodes.Clear();
             _treeModel.Nodes.Add(nodes);
-            TreeViewColourHelper.SetColourBasedOnValidation(_treeModel.Nodes);
+            if(TreeViewColourHelper != null)
+                TreeViewColourHelper.SetColourBasedOnValidation(_treeModel.Nodes);
             treeViewAdv1.EndUpdate();
+
+            var extentions = currentPackFile.Files.Select(x => x.FileExtention).Distinct().ToList();
+            extentions.Sort();
+            foreach (var extention in extentions)
+            {
+                _extentionDropDown.Items.Add(extention);
+            }
         }
 
         
@@ -246,12 +251,6 @@ namespace PackFileManager.PackedTreeView
 
         public void ShowRenameSelectedNodeDialog()
         {
-            if (!_parentRef.CanWriteCurrentPack)
-            {
-                MessageBox.Show("Unable to edit current pack as it is read only");
-                return;
-            }
-
             PackEntry entry = GetSelectedNodeContent();
             if (entry == null)
             {
@@ -281,9 +280,89 @@ namespace PackFileManager.PackedTreeView
         {
             TreeNodeAdv viewNode = obj as TreeNodeAdv;
             Node n = viewNode != null ? viewNode.Tag as Node : obj as Node;
-            return n == null || n.Text.ToUpper().Contains(this._treeViewSearchBox.Text.ToUpper()) || n.Nodes.Any(filter);
+
+            var isNameMatch = false;
+            var isExtentionMatch = true;
+            if (n != null)
+            {
+                isNameMatch = HasChildrenValidName(n.Tag as PackEntry, this._treeViewSearchBox.Text.ToUpper());
+                isExtentionMatch = HasChildDirValidFiles(n.Tag as PackEntry);
+            }
+
+            return n == null || (isNameMatch && isExtentionMatch);
         }
 
+
+        bool HasChildrenValidName(PackEntry dir, string filterContent )
+        {
+            if (string.IsNullOrWhiteSpace(filterContent))
+                return true;
+
+            var packedDir = dir as VirtualDirectory;
+            if (packedDir != null)
+            {
+                foreach (var subDir in packedDir.Subdirectories)
+                {
+                    var res = HasChildrenValidName(subDir.Value, filterContent);
+                    if (res == true)
+                        return true;
+                }
+
+                foreach (var file in packedDir.Files)
+                {
+                    var res = HasChildrenValidName(file.Value, filterContent);
+                    if (res == true)
+                        return true;
+                }
+            }
+
+            var packfile = dir as PackedFile;
+            if (packfile != null)
+            {
+                var isNameMatch = dir.Name.ToUpper().Contains(filterContent);
+                if (isNameMatch)
+                    return true;
+            }
+
+            return false;
+        }
+
+        bool HasChildDirValidFiles(PackEntry dir)
+        {
+            var checkedItems = _extentionDropDown.CheckedItems;
+            if (checkedItems.Count == 0)
+                return true;
+
+            var packedDir = dir as VirtualDirectory;
+            if (packedDir != null)
+            {
+                foreach (var subDir in packedDir.Subdirectories)
+                {
+                    var res = HasChildDirValidFiles(subDir.Value);
+                    if (res == true)
+                        return true;
+                }
+
+                foreach (var file in packedDir.Files)
+                {
+                    var res = HasChildDirValidFiles(file.Value);
+                    if (res == true)
+                        return true;
+                }
+            }
+
+            var packfile = dir as PackedFile;
+            if(packfile != null)
+            { 
+                foreach (string checkedItem in checkedItems)
+                {
+                    if (packfile.FileExtention == checkedItem)
+                        return true;
+                }
+            }
+
+            return false;
+        }
 
         private void packTreeView_ItemDrag(object sender, ItemDragEventArgs e)
         {
@@ -312,6 +391,19 @@ namespace PackFileManager.PackedTreeView
 
         private void _treeViewSearchBox_TextChanged(object sender, EventArgs e)
         {
+            treeViewAdv1.UpdateNodeFilter();
+        }
+
+        private void OnExtentionFilterChanged(object sender, EventArgs e)
+        {
+            treeViewAdv1.UpdateNodeFilter();
+        }
+
+        private void OnClearFilterExtention(object sender, EventArgs e)
+        {
+            for (int i = 0; i < _extentionDropDown.Items.Count; i++)
+                _extentionDropDown.SetItemCheckState(i, CheckState.Unchecked);
+
             treeViewAdv1.UpdateNodeFilter();
         }
     }

@@ -18,7 +18,7 @@ namespace PackFileManager.PackedTreeView
         public string ToolTipText { get; set; }
     }
 
-    class TreeViewModelCreator
+    public class TreeViewModelCreator
     {
         TreeViewIconCreator _treeViewIconCreator;
         public TreeViewModelCreator()

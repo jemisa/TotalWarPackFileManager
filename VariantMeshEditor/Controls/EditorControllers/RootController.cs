@@ -1,11 +1,15 @@
-﻿using System;
+﻿using CommonDialogs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VariantMeshEditor.Util;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 using VariantMeshEditor.Views.EditorViews.Util;
+using Viewer.Scene;
+using WpfTest.Scenes;
 
 namespace VariantMeshEditor.Controls.EditorControllers
 {
@@ -13,13 +17,16 @@ namespace VariantMeshEditor.Controls.EditorControllers
     {
         RootElement _rootElement;
         RootEditorView _viewModel;
-
+        ResourceLibary _resourceLibary;
+        Scene3d _virtualWorld;
         List<VariantMeshElement> _referenceElements = new List<VariantMeshElement>();
 
-        public RootController(RootEditorView viewModel, RootElement rootElement)
+        public RootController(RootEditorView viewModel, RootElement rootElement, ResourceLibary resourceLibary, Scene3d virtualWorld)
         {
             _viewModel = viewModel;
             _rootElement = rootElement;
+            _resourceLibary = resourceLibary;
+            _virtualWorld = virtualWorld;
             CreateMeshList();
             _viewModel.AddButton.Click += AddButton_Click;
         }
@@ -49,9 +56,22 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
         private void AddButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            VariantMeshElement newSlot = new VariantMeshElement(_rootElement, "New");
-            _referenceElements.Add(newSlot);
-            _rootElement.Children.Add(newSlot);
+
+            using (LoadedPackFileBrowser loadedPackFileBrowser = new LoadedPackFileBrowser(_resourceLibary.PackfileContent.First()))
+            {
+                var res = loadedPackFileBrowser.ShowDialog();
+            }
+            return;
+            //def_armoured_cold_one.variantmeshdefinition
+            //brt_pegasus.variantmeshdefinition
+            SceneLoader sceneLoader = new SceneLoader(_resourceLibary);
+            var element = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_pegasus.variantmeshdefinition", new RootElement());
+            element.Children[element.Children.Count - 1].CreateContent(_virtualWorld, _resourceLibary);
+            _rootElement.Children.Add(element);
+
+           //VariantMeshElement newSlot = new VariantMeshElement(_rootElement, "New");
+           //_referenceElements.Add(newSlot);
+           //_rootElement.Children.Add(newSlot);
             //_sceneTreeView.CreateNode(newSlot, false, _slotElement);
             CreateMeshList();
         }

@@ -76,61 +76,13 @@ namespace VariantMeshEditor.Controls
             _scene3d.SetResourceLibary(_resourceLibary);
 
             SceneLoader sceneLoader = new SceneLoader(_resourceLibary);
-            _rootElement = sceneLoader.Load(null, null, "variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition");
+            _rootElement = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_paladin.variantmeshdefinition", new RootElement());
             _rootElement.CreateContent(_scene3d, _resourceLibary);
 
             _scene3d.SceneGraphRootNode = _rootElement;
             _treeViewController.Populate(_rootElement);
             _treeViewController.SetInitialVisability(_rootElement, true);
         }
-
-        /*public void ResovleAttachment(FileSceneElement element)
-        {
-
-            if (element is SlotElement rigidModelElement)
-            {
-
-                var skeleton = _treeViewController.GetAllOfTypeInSameVariantMesh<SkeletonElement>(element);
-
-                if (!string.IsNullOrWhiteSpace(rigidModelElement.AttachmentPoint))
-                {
-                    var models = new List<RigidModelElement>();
-                    GetAllChildrenOfType<RigidModelElement>(element, models);
-
-                    foreach (var model in models)
-                    {
-                        foreach (var mesh in model.MeshInstances)
-                        {
-                            foreach (var childmesh in mesh)
-                            {
-                                childmesh.AttachmentResolver = new AttachmentResolver(rigidModelElement.AttachmentPoint, skeleton.First().SkeletonModel);
-                            }
-                        }
-                    }
-                }
-            }
-
-            foreach (var child in element.Children)
-            {
-                ResovleAttachment(child);
-            }
-        }
-
-        void GetAllChildrenOfType<T>(FileSceneElement element, List<T> output) where T : FileSceneElement
-        {
-            if (element as T != null)
-            {
-                output.Add(element as T);
-            }
-
-            foreach (var child in element.Children)
-            {
-                GetAllChildrenOfType(child, output);
-            }
-        }*/
-
-       
-
 
 
     }

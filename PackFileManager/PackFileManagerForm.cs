@@ -164,7 +164,7 @@ namespace PackFileManager
             EnableMenuItems();
 
             RefreshTitle();
-            _packTreeView._parentRef = this;
+            //_packTreeView._parentRef = this;
             _packTreeView.GetTreeView().SelectionChanged += packTreeView_AfterSelect;
             _packTreeView.GetTreeView().PreviewKeyDown += packTreeView_PreviewKeyDown;
             _packTreeView.GetTreeView().ContextMenuStrip = packActionMenuStrip;
