@@ -22,6 +22,16 @@
             <ComboBox x:Name="AnimationSpeedComboBox"></ComboBox>
         </StackPanel>
 
+
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="120">Animate in place</Label>
+            <Label>:</Label>
+            <Border BorderBrush="{x:Null}" >
+                <CheckBox x:Name="AnimateInPlaceCheckBox" VerticalAlignment="Center"></CheckBox>    
+            </Border>
+        </StackPanel>
+
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Width="120">Animation skeleton</Label>
             <Label>:</Label>
@@ -67,12 +77,18 @@
             </Border>
         </DockPanel>
 
+      
+
         <DockPanel DockPanel.Dock="Top" >
             <Label DockPanel.Dock="Left">Filter:</Label>
             <Button x:Name="ClearFilterButton" DockPanel.Dock="Right" Width="70" >Clear</Button>
             <Border BorderBrush="{x:Null}" >
                 <TextBox x:Name="FilterText"  TextWrapping="NoWrap" Text="FilterText" VerticalAlignment="Center"/>
             </Border>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Top">
+            <Button x:Name="FindAllValidAnimations" Margin="70,0,70,0">Find all animations for current skeleton</Button>
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Bottom" >
@@ -82,9 +98,7 @@
             </Border>
         </DockPanel>
 
-        <DockPanel DockPanel.Dock="Bottom">
-            <Button x:Name="FindAllValidAnimations" Margin="10,0,10,0">Find all animations for current skeleton</Button>
-        </DockPanel>
+
         
         <ListView x:Name="AnimationList"></ListView>
     </DockPanel>

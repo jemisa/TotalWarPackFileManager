@@ -9,7 +9,7 @@ namespace Filetypes.RigidModel
         {
             return new Bone()
             {
-                Name = chunk.ReadFixedLength(84),
+                Name = Util.SanatizeFixedString(chunk.ReadFixedLength(84)),
             };
         }
 

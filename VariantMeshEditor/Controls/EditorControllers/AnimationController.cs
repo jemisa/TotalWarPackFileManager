@@ -41,6 +41,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             _viewModel.PlayPauseButton.Click += (sender, e) => OnPlayButtonPressed();
             _viewModel.NextFrameButton.Click += (sender, e) => NextFrame();
             _viewModel.PrivFrameButton.Click += (sender, e) => PrivFrame();
+            _viewModel.AnimateInPlaceCheckBox.Click += (sender, e) => OnAnimateInPlaceChanged();
 
             _viewModel.ClearFilterButton.Click += (sender, e) => FindAllAnimations();
             _viewModel.FilterText.TextChanged += (sender, e) => FilterConditionChanged();
@@ -117,6 +118,11 @@ namespace VariantMeshEditor.Controls.EditorControllers
         {
             _animationElement.AnimationPlayer.Pause();
             _animationElement.AnimationPlayer.CurrentFrame--;
+        }
+
+        void OnAnimateInPlaceChanged()
+        {
+            _animationElement.AnimationPlayer.AnimateInPlace(_viewModel.AnimateInPlaceCheckBox.IsChecked.Value);
         }
 
         void CreateAnimationSpeed()

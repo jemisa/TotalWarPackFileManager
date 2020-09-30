@@ -9,7 +9,7 @@ namespace Filetypes.RigidModel
     public class RigidModel
     {
         public string FileType { get; set; }
-        public uint MeshCount { get; set; }
+        public uint Version { get; set; }
         public uint LodCount { get; set; }
         public string BaseSkeleton { get; set; }
         public List<LodInformation> LodInformations = new List<LodInformation>();
@@ -28,7 +28,7 @@ namespace Filetypes.RigidModel
             RigidModel model = new RigidModel
             {
                 FileType = chunk.ReadFixedLength(4),
-                MeshCount = chunk.ReadUInt32(),
+                Version = chunk.ReadUInt32(),
                 LodCount = chunk.ReadUInt32(),
                 BaseSkeleton = Util.SanatizeFixedString(chunk.ReadFixedLength(128))
             };

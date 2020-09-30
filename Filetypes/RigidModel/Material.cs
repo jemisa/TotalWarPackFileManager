@@ -8,9 +8,16 @@ namespace Filetypes.RigidModel
     {
         Diffuse = 0,
         Normal = 1,
-        Alpha = 3,
+        Mask = 3,
+        Ambient_occlusion = 5,
+        Tiling_dirt_uv2 = 7,
+        Skin_mask = 10,
         Specular = 11,
         Gloss = 12,
+        Decal_dirtmap = 13,
+        Decal_dirtmask = 14,
+        Decal_mask = 15,
+        Diffuse_damage = 17
     }
 
     public class Material

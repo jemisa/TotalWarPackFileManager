@@ -11,6 +11,9 @@
             <Button x:Name="RemoveButton" DockPanel.Dock="Right" Width="70" >Remove</Button>
             <Button x:Name="BrowseButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
             <Border BorderBrush="{x:Null}" >
+                <CheckBox x:Name="CheckBox" Visibility="Collapsed" VerticalAlignment="Center"></CheckBox>
+            </Border>
+            <Border BorderBrush="{x:Null}" >
                 <TextBox x:Name="PathTextBox"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center"/>
             </Border>
         </DockPanel>

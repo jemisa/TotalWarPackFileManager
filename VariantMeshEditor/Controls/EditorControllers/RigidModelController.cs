@@ -48,7 +48,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 var currentModelIndex = 0;
                 foreach (var mesh in lod.LodModels)
                 {
-                    var meshContnet = new CollapsableButtonControl($"{mesh.modelName}");
+                    var meshContnet = new CollapsableButtonControl($"{mesh.ModelName}");
                     var meshStackPanel = new StackPanel();
                     meshContnet.Content = meshStackPanel;
 
@@ -64,18 +64,23 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     meshView.ModelType.Text = mesh.GroupType.ToString();
                     meshView.VisibleCheckBox.Click += (sender, arg) => VisibleCheckBox_Click(meshView);
                     meshView.PivotText.Text = $"{mesh.Pivot[0]},{mesh.Pivot[1]},{mesh.Pivot[2]},{mesh.Pivot[3]}";
-                    meshView.VertexType.Text = mesh.vertexType.ToString();
-                    meshView.VertexCount.Text = mesh.vertexCount.ToString();
-                    meshView.FaceCount.Text = mesh.faceCount.ToString();
-                    meshView.SkeltonName.Text = "";// mesh.
-                    meshView.MaterialName.Text = mesh.materiaType;
-                    meshView.TextureDirectory.Text = mesh.textureDirectory;
+                    meshView.VertexType.Text = mesh.VertexFormatValue.ToString();
+                    meshView.VertexCount.Text = mesh.VertexCount.ToString();
+                    meshView.FaceCount.Text = mesh.FaceCount.ToString();
+
+                    foreach (var bone in mesh.Bones)
+                    {
+                        meshView.BoneList.Items.Add(bone.Name);
+                    }
+
+                    meshView.MaterialName.Text = mesh.MateriaType;
+                    meshView.TextureDirectory.Text = mesh.TextureDirectory;
 
                     meshView.DiffusePath.Text = GetTexuterName(mesh, TexureType.Diffuse);
                     meshView.DiffuseView.Click += (sender, file) => DisplayTexture(TexureType.Diffuse, meshView.DiffusePath);
 
-                    meshView.AlphaPath.Text = GetTexuterName(mesh, TexureType.Alpha);
-                    meshView.AlphaView.Click += (sender, file) => DisplayTexture(TexureType.Alpha, meshView.AlphaPath);
+                    meshView.AlphaPath.Text = GetTexuterName(mesh, TexureType.Mask);
+                    meshView.AlphaView.Click += (sender, file) => DisplayTexture(TexureType.Mask, meshView.AlphaPath);
 
 
                     meshView.NormalPath.Text = GetTexuterName(mesh, TexureType.Normal);

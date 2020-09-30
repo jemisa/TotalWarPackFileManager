@@ -8,7 +8,6 @@
              d:DesignHeight="395.249" d:DesignWidth="1000">
     <DockPanel LastChildFill="False">
 
-
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Width="100">Model Type</Label>
             <Label>:</Label>
@@ -16,7 +15,6 @@
                 <TextBlock x:Name="ModelType" TextWrapping="NoWrap" Text="ModelType0" VerticalAlignment="Center"/>
             </Border>
         </StackPanel>
-
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Width="100">Visible</Label>
@@ -59,11 +57,15 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <Label Width="100">Skeleton Name</Label>
+            <Label Width="100">AnimationInfo</Label>
             <Label>:</Label>
-            <Border BorderBrush="{x:Null}" >
-                <TextBlock x:Name="SkeltonName" TextWrapping="NoWrap" Text="SkellyBoi" VerticalAlignment="Center"/>
-            </Border>
+            <Expander>
+                <StackPanel>
+                <Label>Bones:</Label>
+                <ListView x:Name="BoneList"></ListView>
+                </StackPanel>
+            </Expander>
+           
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -71,6 +73,15 @@
             <Label>:</Label>
             <Border BorderBrush="{x:Null}" >
                 <TextBlock x:Name="MaterialName" TextWrapping="NoWrap" Text="MaterialType0" VerticalAlignment="Center"/>
+            </Border>
+        </StackPanel>
+
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Alpha Mode</Label>
+            <Label>:</Label>
+            <Border BorderBrush="{x:Null}" >
+                <ComboBox x:Name="AlphaMode" VerticalAlignment="Center"/>
             </Border>
         </StackPanel>
 

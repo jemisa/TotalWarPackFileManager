@@ -13,7 +13,7 @@ namespace Viewer.Animation
     {
         AnimationClip _currentAnimation;
         int _currentFrame;
-
+        bool _animateInPlace = false;
 
         public int CurrentFrame
         {
@@ -77,6 +77,11 @@ namespace Viewer.Animation
             if (_currentAnimation != null)
                 return _currentAnimation.KeyFrameCollection.Count();
             return 0;
+        }
+
+        public void AnimateInPlace(bool state)
+        {
+            _currentAnimation.ReCreate(state);
         }
     }
 }
