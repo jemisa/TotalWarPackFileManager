@@ -1,20 +1,9 @@
 ﻿using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.XAudio2;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Viewer.Animation;
 using Viewer.Scene;
-using static WpfTest.Scenes.Scene3d;
 
 namespace Viewer.GraphicModels
 {
@@ -22,7 +11,7 @@ namespace Viewer.GraphicModels
     {
         LodModel _model;
         VertexPositionNormalTexture[] _bufferArray;
-        Dictionary<TexureType, Texture2D> _textures = new Dictionary<TexureType, Texture2D>();
+        
 
         public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, int lodLevel, int model)
         {
@@ -40,10 +29,12 @@ namespace Viewer.GraphicModels
             Create(animationPlayer, device, _bufferArray, _model.IndicesBuffer);
         }
 
-        public void ResolveTextures(ResourceLibary textureLibary, GraphicsDevice device)
+        public Dictionary<TexureType, Texture2D> ResolveTextures(ResourceLibary textureLibary, GraphicsDevice device)
         {
+            var textures = new Dictionary<TexureType, Texture2D>();
             foreach (var material in _model.Materials)
-                _textures[material.Type] = textureLibary.LoadTexture(material.Name, device);
+                textures[material.Type] = textureLibary.LoadTexture(material.Name, device);
+            return textures;
         }
 
         public override void Render(GraphicsDevice device)
@@ -61,7 +52,6 @@ namespace Viewer.GraphicModels
 
                 _bufferArray[index].Normal = ApplyAnimation(vertex.Normal, transformSum, true);
                 _bufferArray[index].Position = ApplyAnimation(vertex.Position, transformSum);
-                //_bufferArray[index].TextureCoordinate = new Vector2(vertex.Uv0, vertex.Uv1);
             }
 
             _vertexBuffer.SetData(_bufferArray);

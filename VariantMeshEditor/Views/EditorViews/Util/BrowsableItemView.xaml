@@ -7,15 +7,15 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
         <DockPanel DockPanel.Dock="Top" MaxHeight="50">
-            <Label x:Name="LabelName" DockPanel.Dock="Left">LabelName:</Label>
-            <Button x:Name="RemoveButton" DockPanel.Dock="Right" Width="70" >Remove</Button>
-            <Button x:Name="BrowseButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Border BorderBrush="{x:Null}" >
-                <CheckBox x:Name="CheckBox" Visibility="Collapsed" VerticalAlignment="Center"></CheckBox>
-            </Border>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="PathTextBox"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center"/>
-            </Border>
+            <Label x:Name="LabelName" DockPanel.Dock="Left">LabelName</Label>
+            <Label>:</Label>
+
+            <Button x:Name="RemoveButton" DockPanel.Dock="Right" Width="50" >Remove</Button>
+            <Button x:Name="BrowseButton" DockPanel.Dock="Right" Width="50" >Browse</Button>
+            <Button x:Name="PreviewButton" DockPanel.Dock="Right" Width="50" >Preview</Button>
+
+            <CheckBox x:Name="CheckBox" Visibility="Collapsed" VerticalAlignment="Center"></CheckBox>
+            <TextBox x:Name="PathTextBox"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center"/>
         </DockPanel>
         
         

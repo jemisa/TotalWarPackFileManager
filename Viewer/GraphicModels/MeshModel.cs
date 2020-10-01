@@ -28,13 +28,9 @@ namespace Viewer.GraphicModels
         public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, VertexPositionNormalTexture[] vertexMesh, ushort[] indices)
         {
             _animationPlayer = animationPlayer;
-
             _indexBuffer = new IndexBuffer(device, typeof(short), indices.Length, BufferUsage.WriteOnly);
             _indexBuffer.SetData(indices);
-
             _vertexDeclaration = VertexPositionNormalTexture.VertexDeclaration;
-
-
             _vertexBuffer = new VertexBuffer(device, _vertexDeclaration, vertexMesh.Length, BufferUsage.None);
             _vertexBuffer.SetData(vertexMesh);
         }

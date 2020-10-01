@@ -55,15 +55,14 @@ namespace VariantMeshEditor.ViewModels
                     Rmv2Model meshModel = new Rmv2Model();
                     meshModel.Create(animation?.AnimationPlayer, virtualWorld.GraphicsDevice, Model, lodIndex, modelIndex);
 
-                    MeshRenderItem meshRenderItem = new MeshRenderItem(meshModel, resourceLibary.GetEffect(ShaderTypes.Mesh));
-                    meshRenderItem.Visible = lodIndex == 0;
+                    TextureMeshRenderItem meshRenderItem = new TextureMeshRenderItem(meshModel, resourceLibary.GetEffect(ShaderTypes.Mesh))
+                    {
+                        Visible = lodIndex == 0,
+                        Textures = meshModel.ResolveTextures(resourceLibary, virtualWorld.GraphicsDevice)
+                    };
 
                     MeshInstances[lodIndex].Add(meshRenderItem);
                     Controller.AssignModel(meshRenderItem, lodIndex, modelIndex);
-
-                    // Resolve the textures
-                    //controller.resolveTexture();
-                    meshModel.ResolveTextures(resourceLibary, virtualWorld.GraphicsDevice);
                 }
             }
         }

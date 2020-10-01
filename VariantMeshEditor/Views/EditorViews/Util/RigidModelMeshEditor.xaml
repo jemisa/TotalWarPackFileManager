@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VariantMeshEditor.Views.EditorViews.Util" xmlns:System="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="395.249" d:DesignWidth="1000">
+             d:DesignHeight="449.249" d:DesignWidth="1000">
     <DockPanel LastChildFill="False">
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -20,6 +20,12 @@
             <Label Width="100">Visible</Label>
             <Label>:</Label>
             <CheckBox x:Name="VisibleCheckBox" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <Label Width="100">Render BBox</Label>
+            <Label>:</Label>
+            <CheckBox x:Name="RenderBoundingBox" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -85,66 +91,35 @@
             </Border>
         </StackPanel>
 
-        <DockPanel DockPanel.Dock="Top" >
-            <Label Width="100">Texture directory</Label>
-            <Label>:</Label>
-            <Button x:Name="TextureDirButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="TextureDirectory" IsReadOnly="true" TextWrapping="NoWrap" Text="/data/textures" VerticalAlignment="Center" Margin="0,0,75,0"/>
-            </Border>
+        <DockPanel DockPanel.Dock="Top" MaxHeight="50">
+            <local:BrowsableItemView x:Name="TextureDir"></local:BrowsableItemView>
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" MaxHeight="50">
-            <Label Width="100" DockPanel.Dock="Left">Diffuse</Label>
-            <Label>:</Label>
-            <Button x:Name="DiffuseButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Button x:Name="DiffuseView" DockPanel.Dock="Right" Width="70" >View</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="DiffusePath"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            </Border>
+            <local:BrowsableItemView x:Name="Diffuse"></local:BrowsableItemView>
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" MaxHeight="50">
-            <Label Width="100" DockPanel.Dock="Left">Specular</Label>
-            <Label>:</Label>
-            <Button x:Name="SpecularButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Button x:Name="SpecularView" DockPanel.Dock="Right" Width="70" >View</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="SpecularPath"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            </Border>
+            <local:BrowsableItemView x:Name="Specular"></local:BrowsableItemView>
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" MaxHeight="50">
-            <Label Width="100" DockPanel.Dock="Left">Normal</Label>
-            <Label>:</Label>
-            <Button x:Name="NormalButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Button x:Name="NormalView" DockPanel.Dock="Right" Width="70" >View</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="NormalPath"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            </Border>
+            <local:BrowsableItemView x:Name="Gloss"></local:BrowsableItemView>
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" MaxHeight="50">
-            <Label Width="100" DockPanel.Dock="Left">Gloss</Label>
-            <Label>:</Label>
-            <Button x:Name="GlossButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Button x:Name="GlossView" DockPanel.Dock="Right" Width="70" >View</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="GlossPath"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            </Border>
+            <local:BrowsableItemView x:Name="Normal"></local:BrowsableItemView>
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" MaxHeight="50">
-            <Label Width="100" DockPanel.Dock="Left">Alpha</Label>
-            <Label>:</Label>
-            <Button x:Name="AlphaButton" DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Button x:Name="AlphaView" DockPanel.Dock="Right" Width="70" >View</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="AlphaPath"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            </Border>
+            <local:BrowsableItemView x:Name="Mask"></local:BrowsableItemView>
         </DockPanel>
 
 
+
+
+
+  
 
         <Expander DockPanel.Dock="Top" Header="Debug Info" IsExpanded="False">
             <TextBox x:Name="DebugInfo"></TextBox>

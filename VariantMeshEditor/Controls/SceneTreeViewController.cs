@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using TreeViewWithCheckBoxes;
-using VariantMeshEditor.Util;
 using VariantMeshEditor.ViewModels;
 
 namespace VariantMeshEditor.Controls
@@ -30,8 +24,32 @@ namespace VariantMeshEditor.Controls
             _viewModel = viewModel;
             _viewModel.SelectedItemChanged += _viewModel_SelectedItemChanged;
             _viewModel.DataContext = _dataContext;
+            _viewModel.MouseDoubleClick += MyTreeView_PreviewMouseDoubleClick;
 
             _dataContext.CollectionChanged += _dataContext_CollectionChanged;
+        }
+
+        void MyTreeView_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var clickedItem = TryGetClickedItem(_viewModel, e);
+            if (clickedItem == null)
+                return;
+
+            var item = clickedItem.DataContext as FileSceneElement;
+            if (item != null)
+            {
+                item.IsChecked = !item.IsChecked;
+                e.Handled = true;
+            }
+        }
+
+        TreeViewItem TryGetClickedItem(TreeView treeView, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var hit = e.OriginalSource as DependencyObject;
+            while (hit != null && !(hit is TreeViewItem))
+                hit = VisualTreeHelper.GetParent(hit);
+
+            return hit as TreeViewItem;
         }
 
         private void _dataContext_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

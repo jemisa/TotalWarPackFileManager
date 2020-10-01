@@ -1,11 +1,14 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Filetypes.RigidModel;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
+using SharpDX.DXGI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Viewer.Animation;
 using Viewer.GraphicModels;
@@ -94,15 +97,15 @@ namespace WpfTest.Scenes
         //Model _cube;
         //TextureCube _skyBoxTexture;
         //Effect _reflectShader;
-        //TextureCube textureCube;
+        TextureCube textureCube;
         public void CreateScene()
         {
-            //CubemapGeneratorHelper cubemapGeneratorHelper = new CubemapGeneratorHelper();
-            //cubemapGeneratorHelper.Create(@"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\Textures\CubeMaps\GamleStan", GraphicsDevice);
+            CubemapGeneratorHelper cubemapGeneratorHelper = new CubemapGeneratorHelper();
+            cubemapGeneratorHelper.Create(@"C:\Users\ole_k\source\repos\TotalWarPackFileManager\Viewer\Content\Textures\CubeMaps\GamleStan", GraphicsDevice);
             ////textureCube = cubemapGeneratorHelper.CreateCubemapTexture("Blur", 28);
             ////cubemapGeneratorHelper.CreateCubemapTexture("Unprocessed", 0);
             //cubemapGeneratorHelper.SuperIm();
-            //textureCube = cubemapGeneratorHelper.SimpleCubeMap();
+            textureCube = cubemapGeneratorHelper.SimpleCubeMap();
           
 
             //var Content = new ContentManager(Services) { RootDirectory = @"C:\Users\ole_k\source\repos\TotalWarPackFileManager\MonoContentPipeline\bin\Windows\AnyCPU\Debug\Content" };
@@ -178,18 +181,16 @@ namespace WpfTest.Scenes
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-
-
             /**/
 
-           //RasterizerState originalRasterizerState = GraphicsDevice.RasterizerState;
-           //RasterizerState rasterizerState = new RasterizerState();
-           //rasterizerState.CullMode = CullMode.None;
-           //GraphicsDevice.RasterizerState = rasterizerState;
+            //RasterizerState originalRasterizerState = GraphicsDevice.RasterizerState;
+            //RasterizerState rasterizerState = new RasterizerState();
+            //rasterizerState.CullMode = CullMode.None;
+            //GraphicsDevice.RasterizerState = rasterizerState;
 
             //skybox.Draw(_camera.ViewMatrix, _projectionMatrix, _camera.Position);
 
-       //     GraphicsDevice.RasterizerState = originalRasterizerState;
+            //     GraphicsDevice.RasterizerState = originalRasterizerState;
 
             //DrawModelWithEffect(_reflectShader, _camera.Position, _cube, Matrix.Identity, _camera.ViewMatrix, _projectionMatrix);
 
@@ -197,24 +198,20 @@ namespace WpfTest.Scenes
             skybox.Draw(_camera.ViewMatrix, _projectionMatrix, _camera.Position);
             GraphicsDevice.RasterizerState.CullMode = CullMode.CullCounterClockwiseFace;*/
 
-        //
-        //    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-        //    GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-        //
+            //
+            //    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            //    GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            //
             //_shader.CurrentTechnique = _shader.Techniques["Diffuse"];
 
 
             CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
             {
                 Projection = _projectionMatrix,
-                View = _camera.ViewMatrix
+                View = _camera.ViewMatrix,
+                IBLMap = textureCube,
+                CameraPosition = _camera.Position
             };
-
-            /*foreach (var item in DrawBuffer)
-                item.Update(time);*/
-
-            /*foreach (var item in DrawBuffer)
-                item.Draw(GraphicsDevice, Matrix.Identity, commonShaderParameters);*/
 
             if (SceneGraphRootNode != null)
             {
@@ -230,8 +227,9 @@ namespace WpfTest.Scenes
     {
         public Matrix View { get; set; }
         public Matrix Projection { get; set; }
+        public TextureCube IBLMap { get; set; }
+        public Vector3 CameraPosition { get; set; }
     }
-
 
     public class RenderItem 
     {
@@ -268,11 +266,16 @@ namespace WpfTest.Scenes
                 world = Matrix.CreateTranslation(_model.Pivot) * world;
             _shader.Parameters["World"].SetValue(world);
             _shader.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(world)));
+
+            if (this as MeshRenderItem != null)
+            {
+                _shader.Parameters["CameraPosition"].SetValue(commonShaderParameters.CameraPosition);
+                _shader.Parameters["IBLTexture"].SetValue(commonShaderParameters.IBLMap);
+            }
         }
 
         public virtual void ApplyCustomShaderParams()
         { 
-        
         }
 
         public virtual void Update(GameTime time)
@@ -296,38 +299,38 @@ namespace WpfTest.Scenes
     {
         public MeshRenderItem(MeshModel model, Effect shader) : base(model, shader) 
         {
-        
         }
+    }
+
+    public class TextureMeshRenderItem : MeshRenderItem
+    {
+        public Dictionary<TexureType, Texture2D> Textures { get; set; } = new Dictionary<TexureType, Texture2D>();
+
+        public TextureMeshRenderItem(MeshModel model, Effect shader) : base(model, shader)
+        { }
 
         public override void ApplyCustomShaderParams()
         {
+            var hasDiffuse = Textures.TryGetValue(TexureType.Diffuse, out var diffuseTexture);
+            _shader.Parameters["HasDiffuse"].SetValue(hasDiffuse);
+            if (hasDiffuse)
+                _shader.Parameters["DiffuseTexture"].SetValue(diffuseTexture);
 
+            var hasSpecular = Textures.TryGetValue(TexureType.Specular, out var specularTexture);
+            _shader.Parameters["HasSpecular"].SetValue(hasSpecular);
+            if (hasDiffuse)
+                _shader.Parameters["SpecularTexture"].SetValue(specularTexture);
+
+
+
+            
+            /*var hasSpecular = Textures.TryGetValue(TexureType.Specular, out var specularTexture);
+            _shader.Parameters["HasSpecular"].SetValue(hasSpecular);
+            if (hasDiffuse)
+                _shader.Parameters["SpecularTexture"].SetValue(specularTexture);*/
         }
 
-        public override void Update(GameTime time)
-        {
-            base.Update(time);
-        }
     }
-
-    public class AttachmentResolver
-    {
-        int _boneIndex = -1;
-        SkeletonModel _skeleton;
-        public AttachmentResolver(string name, SkeletonModel skeleton)
-        {
-            _skeleton = skeleton;
-            _boneIndex = _skeleton.GetBoneIndex(name);
-        }
-
-        public Matrix GetWorldMatrix()
-        {
-            if(_boneIndex != -1)
-                return _skeleton.GetAnimatedBone(_boneIndex);
-            return Matrix.Identity;
-        }
-    }
-
     public interface ISceneGraphNode
     {
         Matrix WorldTransform { get; set; }

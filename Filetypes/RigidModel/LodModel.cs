@@ -45,6 +45,7 @@ namespace Filetypes.RigidModel
 
         public byte[] Unknown0;
         public byte[] Unknown1;
+        public byte[] Unknown2;
         public AlphaMode AlphaMode { get; set; }
 
         public Vertex[] VertexArray;
@@ -70,16 +71,17 @@ namespace Filetypes.RigidModel
             lodModel.BoundingBox = BoundingBox.Create(chunk);
 
             lodModel.MateriaType = Util.SanatizeFixedString(chunk.ReadFixedLength(30));
-            var unk = chunk.ReadUShort();
+            lodModel.Unknown1 = chunk.ReadBytes(2);
             lodModel.VertexFormatValue = chunk.ReadUShort();
             lodModel.ModelName = Util.SanatizeFixedString(chunk.ReadFixedLength(32));
             lodModel.TextureDirectory = Util.SanatizeFixedString(chunk.ReadFixedLength(256));
 
-            var unknownChunk0 = chunk.ReadBytes(258); // Contains some transformations
+            var unknownChunk0 = chunk.ReadBytes(258); // Unknown data
             
             lodModel.Pivot[0] = chunk.ReadSingle();
             lodModel.Pivot[1] = chunk.ReadSingle();
             lodModel.Pivot[2] = chunk.ReadSingle();
+
             lodModel.Pivot[3] = chunk.ReadSingle();
 
             var unknownChunk1 = chunk.ReadBytes(148); // Contains some transformations?
@@ -95,7 +97,7 @@ namespace Filetypes.RigidModel
             for (int i = 0; i < lodModel.MaterialCount; i++)
                 lodModel.Materials.Add(Material.Create(chunk));
 
-            lodModel.Unknown1 = chunk.ReadBytes(4);
+            lodModel.Unknown2 = chunk.ReadBytes(4);
             lodModel.AlphaMode = (AlphaMode)chunk.ReadUInt32();
 
             lodModel.VertexArray = CreateVertexArray(lodModel, chunk, lodModel.VertexCount, lodModel.VertexFormatValue);

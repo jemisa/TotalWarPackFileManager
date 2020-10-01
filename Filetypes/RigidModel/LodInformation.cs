@@ -6,12 +6,13 @@ namespace Filetypes.RigidModel
     public class LodInformation
     {
         public uint GroupsCount { get; set; }
-        public uint Unknown0 { get; set; }
-        public uint Unknown1 { get; set; }
+        public byte[] Unknown0 { get; set; }
+        public byte[] Unknown1 { get; set; }
+        public byte[] Unknown2 { get; set; }
         public uint StartOffset { get; set; }
         public float Scale { get; set; }
         public uint LodLevel { get; set; }//??
-        public uint Unknown3 { get; set; }
+       
 
         public List<LodModel> LodModels = new List<LodModel>();
 
@@ -20,12 +21,12 @@ namespace Filetypes.RigidModel
             var data = new LodInformation()
             {
                 GroupsCount = chunk.ReadUInt32(),
-                Unknown0 = chunk.ReadUInt32(),
-                Unknown1 = chunk.ReadUInt32(),
+                Unknown0 = chunk.ReadBytes(4),
+                Unknown1 = chunk.ReadBytes(4),
                 StartOffset = chunk.ReadUInt32(),
                 Scale = chunk.ReadSingle(),
                 LodLevel = chunk.ReadUInt32(),
-                Unknown3 = chunk.ReadUInt32()
+                Unknown2 = chunk.ReadBytes(4)
             };
             return data;
         }

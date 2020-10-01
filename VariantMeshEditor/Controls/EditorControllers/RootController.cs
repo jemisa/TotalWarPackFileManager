@@ -65,7 +65,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             //def_armoured_cold_one.variantmeshdefinition
             //brt_pegasus.variantmeshdefinition
             SceneLoader sceneLoader = new SceneLoader(_resourceLibary);
-            var element = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_pegasus.variantmeshdefinition", new RootElement());
+            var element = sceneLoader.Load("variantmeshes\\variantmeshdefinitions\\brt_royal_pegasus.variantmeshdefinition", new RootElement());
             element.CreateContent(_virtualWorld, _resourceLibary);
 
             var mesh = element.Children.First();

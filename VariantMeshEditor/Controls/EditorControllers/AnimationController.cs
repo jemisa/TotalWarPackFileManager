@@ -2,13 +2,17 @@
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel.Animation;
 using Serilog;
+using SharpDX.Direct2D1;
 using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media;
 using VariantMeshEditor.Util;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
@@ -53,20 +57,54 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
         private void FilterConditionChanged()
         {
+            _viewModel.FilterText.Background = new System.Windows.Media.SolidColorBrush(Colors.White);
             _viewModel.AnimationList.Items.Clear();
+
+
+            var filterText = _viewModel.FilterText.Text.ToLower();
+            if (string.IsNullOrWhiteSpace(filterText))
+            {
+                var toolTip = _viewModel.FilterText.ToolTip as ToolTip;
+                if (toolTip != null)
+                    toolTip.IsOpen = false;
+
+                foreach (var item in _animationFiles)
+                    _viewModel.AnimationList.Items.Add(item);
+                return;
+            }
+
+            Regex rx = null;
+            try
+            {
+                rx = new Regex(filterText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                var toolTip = _viewModel.FilterText.ToolTip as ToolTip;
+                if (toolTip != null)
+                    toolTip.IsOpen = false;
+            }
+            catch (Exception e)
+            {
+                _viewModel.FilterText.Background = new System.Windows.Media.SolidColorBrush(Colors.Red);
+                var toolTip = _viewModel.FilterText.ToolTip as ToolTip;
+                if (toolTip == null)
+                {
+                    toolTip = new ToolTip();
+                    _viewModel.FilterText.ToolTip = toolTip;
+                }
+
+                toolTip.IsOpen = true;
+                toolTip.Content = e.Message;
+                toolTip.Content += "\n\nCommon usage:";
+                toolTip.Content += "Value0.*Value1.*Value2 -> for searching for multiple substrings";
+            }
+
+            if (rx == null)
+                return;
+
             foreach (var item in _animationFiles)
             {
-                var filterText = _viewModel.FilterText.Text.ToLower();
-                if (!string.IsNullOrWhiteSpace(filterText))
-                {
-                    var contains = item.File.FullPath.ToLower().Contains(filterText);
-                    if (contains)
-                        _viewModel.AnimationList.Items.Add(item);
-                }
-                else
-                {
+                var match = rx.Match(item.File.FullPath);
+                if (match.Success)
                     _viewModel.AnimationList.Items.Add(item);
-                }
             }
         }
 

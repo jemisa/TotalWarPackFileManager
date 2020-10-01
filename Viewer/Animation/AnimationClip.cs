@@ -54,10 +54,8 @@ namespace Viewer.Animation
                     var index = _animation.TranslationMappingID[0][i];
                     var pos = animationKeyFrameData.Transforms[i];
                     if (animateInPlace && index == 0)
-                    {
                         pos = new AnimationFile.Frame.Transform(0, 0, 0);
-                    }
-                        var temp = currentFrame.BoneTransforms[index].Transform;
+                    var temp = currentFrame.BoneTransforms[index].Transform;
                     temp.Translation = new Vector3(pos.X, pos.Y, pos.Z);
                     currentFrame.BoneTransforms[index].Transform = temp;
                 }
@@ -74,16 +72,6 @@ namespace Viewer.Animation
                     currentFrame.BoneTransforms[mappingIdx].Transform = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateTranslation(translation);
                 }
 
-                /*if (animateInPlace)
-                {
-                    var worldMatrix = _skeletonModel.Bones[0].WorldPosition;
-                    worldMatrix.Translation = new Vector3(0);
-                    _skeletonModel.Bones[0].WorldPosition = worldMatrix;
-
-                    var matrix = _skeletonModel.Bones[0].Position;
-                    matrix.Translation = new Vector3(0);
-                    _skeletonModel.Bones[0].Position = matrix;
-                }*/
 
                 // Move into world space
                 for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)

@@ -1,15 +1,66 @@
-﻿float4x4 World;
+﻿// Camera ----------
+float4x4 World;
 float4x4 View;
 float4x4 Projection;
+float4x4 WorldInverseTranspose;
+float3 CameraPosition;
+// -----------------
 
+// ShadingValues ---
 float4 AmbientColor = float4(1, 1, 1, 1);
 float AmbientIntensity = 0.4;
-
-float4x4 WorldInverseTranspose;
-
 float3 DiffuseLightDirection = float3(1, 0, 0);
 float4 DiffuseColor = float4(1, 1, 1, 1);
 float DiffuseIntensity = 1.0;
+
+float LightStrength = 5;
+// -----------------
+
+// Textues ---------
+bool HasIBL = false;
+Texture IBLTexture;
+samplerCUBE IBLSampler = sampler_state
+{
+    texture = <IBLTexture>;
+    magfilter = LINEAR;
+    minfilter = LINEAR;
+    mipfilter = LINEAR;
+    AddressU = Mirror;
+    AddressV = Mirror;
+};
+
+
+bool HasDiffuse = false;
+texture DiffuseTexture;
+sampler2D DiffuseSampler = sampler_state {
+    Texture = (DiffuseTexture);
+    MinFilter = Linear;
+    MagFilter = Linear;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+bool HasSpecular = false;
+texture SpecularTexture;
+sampler2D SpecularSampler = sampler_state {
+    Texture = (SpecularTexture);
+    MinFilter = Linear;
+    MagFilter = Linear;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+bool HasMask = false;
+texture MaskTexture;
+sampler2D MaskSampler = sampler_state {
+    Texture = (MaskTexture);
+    MinFilter = Linear;
+    MagFilter = Linear;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+// -----------------
+
 
 texture ModelTexture;
 sampler2D textureSampler = sampler_state {
@@ -31,8 +82,26 @@ struct VertexShaderOutput
 {
     float4 Position : SV_POSITION;
     float2 TextureCoordinate: TEXCOORD0;
+    float3 Normal  : NORMAL0;
     float4 Color : COLOR0;
+    float3 eyeVec : TEXCOORD1;
 };
+
+
+float ComputeIndirectDiffuse(float3 normal)
+{
+    float4 indirectDiffuse = texCUBE(IBLSampler, normal);
+    float averageLightValue = (indirectDiffuse.x + indirectDiffuse.y + indirectDiffuse.z) / 3;
+    return averageLightValue * LightStrength;
+}
+
+float ComputeIndirectSpecular(float3 normal, float3 eyeVector, float reflectivity)
+{
+    float3 R = reflect(eyeVector, normal);
+    float4 indirectSpecular = texCUBE(IBLSampler, R) * reflectivity;
+    float averageLightValue = (indirectSpecular.x + indirectSpecular.y + indirectSpecular.z) / 3;
+    return averageLightValue * LightStrength;
+}
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
@@ -47,18 +116,48 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     output.Color = saturate(DiffuseColor * DiffuseIntensity * lightIntensity);
 	output.Color.w = 1;
     output.TextureCoordinate = input.TextureCoordinate;
+    output.Normal = normalize(mul(input.Normal, WorldInverseTranspose));
+
+    output.eyeVec = normalize(worldPosition - float4(CameraPosition, 1));
+
     return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : SV_TARGET0
 {
-    // float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
-    //if(textureColor.a == 0)
-    //       clip(-1);
-    //textureColor.a = 0.5f;
-    //return textureColor;
-     return saturate(input.Color);// + AmbientColor * AmbientIntensity) * float4(input.TextureCoordinate.x, input.TextureCoordinate.y,0,1);
+    float Reflectivity = 0.5;
+
+     float4 diffuseColour = float4(1,1,1,1);
+     if(HasDiffuse) 
+         diffuseColour = tex2D(DiffuseSampler, input.TextureCoordinate);
+
+     if (diffuseColour.a != 1)
+         clip(-1);
+
+     half oneMinusReflectivity = 1 - Reflectivity;
+     diffuseColour.xyz = lerp(0, diffuseColour.xyz, oneMinusReflectivity);
+
+     float4 specularColour = float4(1, 1, 1, 1);
+     if (HasSpecular)
+        specularColour = tex2D(SpecularSampler, input.TextureCoordinate);
+     specularColour.a = 1;
+
+     float3 N = input.Normal;
+     float3 eyeVec = normalize(input.eyeVec);
+
+     float indirectDiffuse = ComputeIndirectDiffuse(N);
+     float4 diffuse = diffuseColour * indirectDiffuse;
+
+     float indirectSpecular = ComputeIndirectSpecular(N, eyeVec, Reflectivity);
+     float4 specular = specularColour * indirectSpecular;
+
+     float4 finalColour =  saturate(diffuse + specular);// + AmbientColor * AmbientIntensity) * float4(input.TextureCoordinate.x, input.TextureCoordinate.y,0,1);
+     finalColour.a = 1;
+     return finalColour;
 }
+
+
+
 
 technique Diffuse
 {

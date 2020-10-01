@@ -87,6 +87,9 @@
       <DependentUpon>BrowsableItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EditorViews\Util\CollapsableButtonControl.cs" />
+    <Compile Include="Views\EditorViews\Util\LodEditorView.xaml.cs">
+      <DependentUpon>LodEditorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditorViews\Util\RigidModelMeshEditor.xaml.cs">
       <DependentUpon>RigidModelMeshEditor.xaml</DependentUpon>
     </Compile>
@@ -124,6 +127,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditorViews\Util\BrowsableItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\Util\LodEditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

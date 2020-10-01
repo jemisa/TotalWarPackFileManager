@@ -1,5 +1,6 @@
 ﻿using Common;
 using Filetypes.RigidModel;
+using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,9 @@ namespace VariantMeshEditor.Controls.EditorControllers
             _modelEditors[item.Key] = meshInstance;
         }
 
+
+
+
         private void PopulateUi(RigidModelEditorView view, RigidModelElement element)
         {
             bool firstSub = true;
@@ -43,6 +47,13 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 var lodContent = new CollapsableButtonControl($"Lod - {lod.LodLevel}");
 
                 var lodStackPanel = new StackPanel();
+
+                LodEditorView lodEditorView = new LodEditorView();
+                lodEditorView.Scale.Text = $"{lod.Scale}";
+                lodEditorView.MeshCount.Text = $"{lod.GroupsCount}";
+                lodEditorView.Debug.Text = $"{GetUnknownString(lod.Unknown0)}, {GetUnknownString(lod.Unknown1)}, {GetUnknownString(lod.Unknown2)}";
+
+                lodStackPanel.Children.Add(lodEditorView);
                 lodContent.Content = lodStackPanel;
 
                 var currentModelIndex = 0;
@@ -67,30 +78,24 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     meshView.VertexType.Text = mesh.VertexFormatValue.ToString();
                     meshView.VertexCount.Text = mesh.VertexCount.ToString();
                     meshView.FaceCount.Text = mesh.FaceCount.ToString();
-
+                    meshView.AlphaMode.Items.Add(mesh.AlphaMode);
+                    meshView.AlphaMode.SelectedIndex = 0;
                     foreach (var bone in mesh.Bones)
                     {
                         meshView.BoneList.Items.Add(bone.Name);
                     }
 
-                    meshView.MaterialName.Text = mesh.MateriaType;
-                    meshView.TextureDirectory.Text = mesh.TextureDirectory;
+                    meshView.TextureDir.LabelName.Width = 100;
+                    meshView.TextureDir.LabelName.Content = "Texture Directory";
+                    meshView.TextureDir.PathTextBox.Text = mesh.TextureDirectory;
+                    meshView.TextureDir.RemoveButton.Visibility = System.Windows.Visibility.Hidden;
+                    meshView.TextureDir.PreviewButton.Visibility = System.Windows.Visibility.Hidden;
 
-                    meshView.DiffusePath.Text = GetTexuterName(mesh, TexureType.Diffuse);
-                    meshView.DiffuseView.Click += (sender, file) => DisplayTexture(TexureType.Diffuse, meshView.DiffusePath);
-
-                    meshView.AlphaPath.Text = GetTexuterName(mesh, TexureType.Mask);
-                    meshView.AlphaView.Click += (sender, file) => DisplayTexture(TexureType.Mask, meshView.AlphaPath);
-
-
-                    meshView.NormalPath.Text = GetTexuterName(mesh, TexureType.Normal);
-                    meshView.NormalView.Click += (sender, file) => DisplayTexture(TexureType.Normal, meshView.NormalPath);
-
-                    meshView.GlossPath.Text = GetTexuterName(mesh, TexureType.Gloss);
-                    meshView.GlossView.Click += (sender, file) => DisplayTexture(TexureType.Gloss, meshView.GlossPath);
-
-                    meshView.SpecularPath.Text = GetTexuterName(mesh, TexureType.Specular);
-                    meshView.SpecularView.Click += (sender, file) => DisplayTexture(TexureType.Specular, meshView.SpecularPath);
+                    CreateTextureDisplayItem(mesh, meshView.Diffuse, TexureType.Diffuse);
+                    CreateTextureDisplayItem(mesh, meshView.Specular, TexureType.Specular);
+                    CreateTextureDisplayItem(mesh, meshView.Normal, TexureType.Normal);
+                    CreateTextureDisplayItem(mesh, meshView.Mask, TexureType.Mask);
+                    CreateTextureDisplayItem(mesh, meshView.Gloss, TexureType.Gloss);
 
                     AddUnknownTexture(meshView, mesh);
                     AddUnknowData(meshView, mesh);
@@ -115,13 +120,28 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
         }
 
+        void CreateTextureDisplayItem(LodModel mesh, BrowsableItemView view, TexureType textureType)
+        {
+            view.LabelName.Width = 100;
+            view.LabelName.Content = textureType.ToString();
+            view.PathTextBox.Text = GetTextureName(mesh, textureType);
+            view.CheckBox.Visibility = System.Windows.Visibility.Visible;
+            if (view.PathTextBox.Text.Length != 0)
+                view.CheckBox.IsChecked = true;
+
+            view.PreviewButton.Click += (sender, file) => DisplayTexture(textureType, view.PathTextBox.Text);
+            view.RemoveButton.Click += (sender, file) => DisplayTexture(textureType, view.PathTextBox.Text);
+            view.BrowseButton.Click += (sender, file) => DisplayTexture(textureType, view.PathTextBox.Text);
+            view.CheckBox.Click += (sender, file) => DisplayTexture(textureType, view.PathTextBox.Text);
+        }
+
         private void VisibleCheckBox_Click(RigidModelMeshEditorView editorView)
         {
             var model = _modelEditors[editorView];
             model.Visible = editorView.VisibleCheckBox.IsChecked == true;
         }
 
-        void DisplayTexture(TexureType type, TextBox pathContainer )
+        void DisplayTexture(TexureType type, string path)
         {
         }
 
@@ -145,7 +165,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
         
         }
 
-        string GetTexuterName(LodModel model, TexureType type)
+        string GetTextureName(LodModel model, TexureType type)
         {
             foreach (var material in model.Materials)
             {
@@ -154,6 +174,12 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
 
             return "";
+        }
+
+        string GetUnknownString(byte[] bytes)
+        {
+            var bytesAsString = bytes.Select(x => x.ToString());
+            return "[" + String.Join(", ", bytesAsString) + "]";
         }
     }
 }

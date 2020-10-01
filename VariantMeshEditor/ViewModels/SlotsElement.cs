@@ -31,7 +31,6 @@ namespace VariantMeshEditor.ViewModels
         }
         public override FileSceneElementEnum Type => FileSceneElementEnum.Slot;
 
-        AttachmentResolver _attachmentResolver;
         SlotController _controller;
         SkeletonElement _skeleton;
         void SetDisplayName(string attachmentPointName)
@@ -45,11 +44,6 @@ namespace VariantMeshEditor.ViewModels
             SlotEditorView view = new SlotEditorView();
             _controller = new SlotController(view, this, _skeleton);
             Editor = view;
-
-            if (!string.IsNullOrWhiteSpace(AttachmentPoint))
-            {
-                _attachmentResolver = new AttachmentResolver(AttachmentPoint, _skeleton?.SkeletonModel);
-            }
         }
 
         protected override void UpdateNode(GameTime time)
