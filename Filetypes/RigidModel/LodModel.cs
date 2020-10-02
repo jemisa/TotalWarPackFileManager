@@ -59,6 +59,9 @@ namespace Filetypes.RigidModel
         public byte[] Unknown0;
         public byte[] Unknown1;
         public byte[] Unknown2;
+        public byte[] Unknown3;
+        public byte[] Unknown4;
+        public byte[] Unknown5;
         public AlphaMode AlphaMode { get; set; }
 
         public Vertex[] VertexArray;
@@ -89,22 +92,17 @@ namespace Filetypes.RigidModel
             lodModel.ModelName = Util.SanatizeFixedString(chunk.ReadFixedLength(32));
             lodModel.TextureDirectory = Util.SanatizeFixedString(chunk.ReadFixedLength(256));
 
-            var unknownChunk0 = chunk.ReadBytes(258); // Unknown data. Almost always 0, appart from 2 last bytes
+            lodModel.Unknown2 = chunk.ReadBytes(258); // Unknown data. Almost always 0, appart from 2 last bytes
 
             var transformationChunk = new ByteChunk(chunk.ReadBytes(156));
             lodModel.Transformation = LoadTransformations(transformationChunk);
 
+            lodModel.Unknown3 = chunk.ReadBytes(8); 
 
-
-            var unknownChunk2 = chunk.ReadBytes(8); // Contains some transformations?
-
-           
-
-            // 152 - 8 = 144
             lodModel.BoneCount = chunk.ReadUInt32();
             lodModel.MaterialCount = chunk.ReadUInt32();
 
-            var unknownChunk3 = chunk.ReadBytes(140);
+            lodModel.Unknown4 = chunk.ReadBytes(140);
 
             for (int i = 0; i < lodModel.BoneCount; i++)
                 lodModel.Bones.Add(Bone.Create(chunk));
@@ -112,7 +110,7 @@ namespace Filetypes.RigidModel
             for (int i = 0; i < lodModel.MaterialCount; i++)
                 lodModel.Materials.Add(Material.Create(chunk));
 
-            lodModel.Unknown2 = chunk.ReadBytes(4);
+            lodModel.Unknown5 = chunk.ReadBytes(4);
             lodModel.AlphaMode = (AlphaMode)chunk.ReadUInt32();
 
             lodModel.VertexArray = CreateVertexArray(lodModel, chunk, lodModel.VertexCount, lodModel.VertexFormatValue);

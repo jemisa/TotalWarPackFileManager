@@ -3,11 +3,16 @@ using Filetypes.RigidModel;
 using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 using VariantMeshEditor.Views.EditorViews.Util;
+using VariantMeshEditor.Views.TexturePreview;
 using Viewer.GraphicModels;
 using WpfTest.Scenes;
 
@@ -175,6 +180,43 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
         void DisplayTexture(TexureType type, string path)
         {
+            TexturePreviewView view = new TexturePreviewView();
+            var dataContext = new TexturePreviewViewModel()
+            {
+                Format = "DDS0",
+                Name = "MyTestImage.png",
+                Height = 512,
+                Width = 1024
+            };
+            view.DataContext = dataContext;
+            var w = new Window();
+            w.Title = "Texture Preview Window";
+
+            var bitmap = new Bitmap(dataContext.Width, dataContext.Height);
+            using (Graphics gfx = Graphics.FromImage(bitmap))
+            using (SolidBrush brush = new SolidBrush(Color.FromArgb(255, 0, 0)))
+            {
+                gfx.FillRectangle(brush, 0, 0, dataContext.Width, dataContext.Height);
+            }
+            dataContext.Image = BitmapToImageSource(bitmap);
+            w.Content = view;
+            w.ShowDialog();
+        }
+
+        BitmapImage BitmapToImageSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
         }
 
         void AddUnknownTexture(RigidModelMeshEditorView view, LodModel model)
@@ -193,8 +235,13 @@ namespace VariantMeshEditor.Controls.EditorControllers
         }
 
         void AddUnknowData(RigidModelMeshEditorView view, LodModel model)
-        { 
-        
+        {
+            view.UnkownDataView0.SetData("Unknown 0", model.Unknown0);
+            view.UnkownDataView1.SetData("Unknown 1", model.Unknown1);
+            view.UnkownDataView2.SetData("Unknown 2", model.Unknown2);
+            view.UnkownDataView3.SetData("Unknown 3", model.Unknown3);
+            view.UnkownDataView4.SetData("Unknown 4", model.Unknown4);
+            view.UnkownDataView5.SetData("Unknown 5", model.Unknown5);
         }
 
         string GetTextureName(LodModel model, TexureType type)

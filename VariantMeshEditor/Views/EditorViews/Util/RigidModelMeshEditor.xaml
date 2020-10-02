@@ -42,6 +42,23 @@
             </Expander>
         </StackPanel>
 
+        <DockPanel  DockPanel.Dock="Top">
+            <Label Width="100">Unknown data</Label>
+            <Label>:</Label>
+
+            <Expander >
+                <DockPanel >
+                    <local:UnknownDataView DockPanel.Dock="Top" x:Name="UnkownDataView0"></local:UnknownDataView>
+                    <local:UnknownDataView DockPanel.Dock="Top" x:Name="UnkownDataView1"></local:UnknownDataView>
+                    <local:UnknownDataView DockPanel.Dock="Top" x:Name="UnkownDataView2"></local:UnknownDataView>
+                    <local:UnknownDataView DockPanel.Dock="Top" x:Name="UnkownDataView3"></local:UnknownDataView>
+                    <local:UnknownDataView DockPanel.Dock="Top" x:Name="UnkownDataView4"></local:UnknownDataView>
+                    <local:UnknownDataView DockPanel.Dock="Top" x:Name="UnkownDataView5"></local:UnknownDataView>
+                </DockPanel>
+            </Expander>
+        </DockPanel>
+
+
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Label Width="100">Vertex Type</Label>

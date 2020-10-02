@@ -96,6 +96,9 @@
     <Compile Include="Views\EditorViews\Util\RigidModelMeshEditor.xaml.cs">
       <DependentUpon>RigidModelMeshEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EditorViews\Util\UnknownDataView.xaml.cs">
+      <DependentUpon>UnknownDataView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditorViews\Util\Vector3View.xaml.cs">
       <DependentUpon>Vector3View.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,13 @@
     <Compile Include="Views\ImprovedTreeView\VirtualToggleButton.cs" />
     <Compile Include="Views\ImprovedTreeView\ImprovedTreeViewWindow.xaml.cs">
       <DependentUpon>ImprovedTreeViewWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TexturePreview\TexturePreviewView.xaml.cs">
+      <DependentUpon>TexturePreviewView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TexturePreview\TexturePreviewViewModel.cs" />
+    <Compile Include="Views\TexturePreview\TexturePreviewWindow.xaml.cs">
+      <DependentUpon>TexturePreviewWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -148,6 +158,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\EditorViews\Util\UnknownDataView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\EditorViews\Util\Vector3View.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -164,6 +178,14 @@
       <DependentUpon>VariantMeshEditorControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\TexturePreview\TexturePreviewView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TexturePreview\TexturePreviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
