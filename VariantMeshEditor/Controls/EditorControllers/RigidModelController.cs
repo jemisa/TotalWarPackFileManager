@@ -74,16 +74,18 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
                     meshView.ModelType.Text = mesh.GroupType.ToString();
                     meshView.VisibleCheckBox.Click += (sender, arg) => VisibleCheckBox_Click(meshView);
-                    meshView.PivotText.Text = $"{mesh.Pivot[0]},{mesh.Pivot[1]},{mesh.Pivot[2]},{mesh.Pivot[3]}";
+
+                    DisplayTransforms(mesh, meshView);
+
                     meshView.VertexType.Text = mesh.VertexFormatValue.ToString();
                     meshView.VertexCount.Text = mesh.VertexCount.ToString();
                     meshView.FaceCount.Text = mesh.FaceCount.ToString();
+                    
                     meshView.AlphaMode.Items.Add(mesh.AlphaMode);
                     meshView.AlphaMode.SelectedIndex = 0;
+
                     foreach (var bone in mesh.Bones)
-                    {
                         meshView.BoneList.Items.Add(bone.Name);
-                    }
 
                     meshView.TextureDir.LabelName.Width = 100;
                     meshView.TextureDir.LabelName.Content = "Texture Directory";
@@ -118,6 +120,36 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     lodContent.OnClick();
                 first = false;
             }
+        }
+
+        void DisplayTransforms(LodModel mesh, RigidModelMeshEditorView view)
+        {
+            view.PivotView.GroupBox.Header = "Pivot";
+            view.PivotView.Row0_0.Text = mesh.Transformation.Pivot.X.ToString();
+            view.PivotView.Row0_1.Text = mesh.Transformation.Pivot.Y.ToString();
+            view.PivotView.Row0_2.Text = mesh.Transformation.Pivot.Z.ToString();
+            DisplayMatrix("Unknown0", view.MatrixView0, mesh.Transformation.Matrices[0]);
+            DisplayMatrix("Unknown1", view.MatrixView1, mesh.Transformation.Matrices[1]);
+            DisplayMatrix("Unknown2", view.MatrixView2, mesh.Transformation.Matrices[2]);
+        }
+
+        void DisplayMatrix(string name, Matrix3x4View view, FileMatrix3x4 matrix)
+        {
+            view.GroupBox.Header = name;
+            view.Row0_0.Text = matrix.Matrix[0].X.ToString();
+            view.Row0_1.Text = matrix.Matrix[0].Y.ToString();
+            view.Row0_2.Text = matrix.Matrix[0].Z.ToString();
+            view.Row0_3.Text = matrix.Matrix[0].W.ToString();
+
+            view.Row1_0.Text = matrix.Matrix[1].X.ToString();
+            view.Row1_1.Text = matrix.Matrix[1].Y.ToString();
+            view.Row1_2.Text = matrix.Matrix[1].Z.ToString();
+            view.Row1_3.Text = matrix.Matrix[1].W.ToString();
+
+            view.Row2_0.Text = matrix.Matrix[2].X.ToString();
+            view.Row2_1.Text = matrix.Matrix[2].Y.ToString();
+            view.Row2_2.Text = matrix.Matrix[2].Z.ToString();
+            view.Row2_3.Text = matrix.Matrix[2].W.ToString();
         }
 
         void CreateTextureDisplayItem(LodModel mesh, BrowsableItemView view, TexureType textureType)

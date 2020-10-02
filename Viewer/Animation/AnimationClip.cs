@@ -32,9 +32,9 @@ namespace Viewer.Animation
         public void ReCreate(bool animateInPlace)
         {
             KeyFrameCollection.Clear();
-            for (int frameIndex = 0; frameIndex < _animation.Frames.Count(); frameIndex++)
+            for (int frameIndex = 0; frameIndex < _animation.DynamicFrames.Count(); frameIndex++)
             {
-                var animationKeyFrameData = _animation.Frames[frameIndex];
+                var animationKeyFrameData = _animation.DynamicFrames[frameIndex];
                 var currentFrame = new AnimationFrame();
 
                 // Copy base pose
@@ -51,7 +51,7 @@ namespace Viewer.Animation
                 // Apply animation translation
                 for (int i = 0; i < animationKeyFrameData.Transforms.Count(); i++)
                 {
-                    var index = _animation.TranslationMappingID[0][i];
+                    var index = _animation.DynamicTranslationMappingID[i];
                     var pos = animationKeyFrameData.Transforms[i];
                     if (animateInPlace && index == 0)
                         pos = new AnimationFile.Frame.Transform(0, 0, 0);
@@ -67,7 +67,7 @@ namespace Viewer.Animation
                     var quaternion = new Microsoft.Xna.Framework.Quaternion(animQ[0], animQ[1], animQ[2], animQ[3]);
                     quaternion.Normalize();
 
-                    var mappingIdx = _animation.RotationMappingID[0][i];
+                    var mappingIdx = _animation.DynamicRotationMappingID[i];
                     var translation = currentFrame.BoneTransforms[mappingIdx].Transform.Translation;
                     currentFrame.BoneTransforms[mappingIdx].Transform = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateTranslation(translation);
                 }

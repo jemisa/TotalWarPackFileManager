@@ -29,11 +29,17 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <Label Width="100">Pivot</Label>
+            <Label Width="100">Transforms</Label>
             <Label>:</Label>
-            <Border BorderBrush="{x:Null}" >
-                <TextBlock x:Name="PivotText" TextWrapping="NoWrap" Text="0,0,0,0" VerticalAlignment="Center"/>
-            </Border>
+
+            <Expander>
+                <StackPanel Orientation="Horizontal">
+                    <local:Vector3View x:Name="PivotView"></local:Vector3View>
+                    <local:Matrix3x4View x:Name="MatrixView0"></local:Matrix3x4View>
+                    <local:Matrix3x4View x:Name="MatrixView1"></local:Matrix3x4View>
+                    <local:Matrix3x4View x:Name="MatrixView2"></local:Matrix3x4View>
+                </StackPanel>
+            </Expander>
         </StackPanel>
 
 

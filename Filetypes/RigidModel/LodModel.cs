@@ -23,6 +23,18 @@ namespace Filetypes.RigidModel
         Cinematic = 4
     };
 
+    public class Transformation
+    {
+        public FileVector3 Pivot { get; set; } = new FileVector3();
+        public FileMatrix3x4[] Matrices { get; set; } = new FileMatrix3x4[] { new FileMatrix3x4(), new FileMatrix3x4(), new FileMatrix3x4() };
+    }
+
+    public class FileMatrix3x4
+    {
+        public FileVector4[] Matrix { get; set; } = new FileVector4[3] { new FileVector4(), new FileVector4(), new FileVector4() };
+
+    }
+
     public class LodModel
     {
         public GroupTypeEnum GroupType { get; set; }
@@ -39,9 +51,10 @@ namespace Filetypes.RigidModel
 
         public BoundingBox BoundingBox { get; set; }
 
+        public Transformation Transformation { get; set; }
+
         public uint MaterialCount { get; set; }
         public List<Material> Materials { get; set; } = new List<Material>();
-        public float[] Pivot { get; set; } = new float[4];
 
         public byte[] Unknown0;
         public byte[] Unknown1;
@@ -76,16 +89,18 @@ namespace Filetypes.RigidModel
             lodModel.ModelName = Util.SanatizeFixedString(chunk.ReadFixedLength(32));
             lodModel.TextureDirectory = Util.SanatizeFixedString(chunk.ReadFixedLength(256));
 
-            var unknownChunk0 = chunk.ReadBytes(258); // Unknown data
-            
-            lodModel.Pivot[0] = chunk.ReadSingle();
-            lodModel.Pivot[1] = chunk.ReadSingle();
-            lodModel.Pivot[2] = chunk.ReadSingle();
+            var unknownChunk0 = chunk.ReadBytes(258); // Unknown data. Almost always 0, appart from 2 last bytes
 
-            lodModel.Pivot[3] = chunk.ReadSingle();
+            var transformationChunk = new ByteChunk(chunk.ReadBytes(156));
+            lodModel.Transformation = LoadTransformations(transformationChunk);
 
-            var unknownChunk1 = chunk.ReadBytes(148); // Contains some transformations?
 
+
+            var unknownChunk2 = chunk.ReadBytes(8); // Contains some transformations?
+
+           
+
+            // 152 - 8 = 144
             lodModel.BoneCount = chunk.ReadUInt32();
             lodModel.MaterialCount = chunk.ReadUInt32();
 
@@ -111,6 +126,28 @@ namespace Filetypes.RigidModel
             ushort[] output = new ushort[indexCount];
             for (int i = 0; i < indexCount; i++)
                 output[i] = chunk.ReadUShort();
+            return output;
+        }
+
+        static Transformation LoadTransformations(ByteChunk chunk)
+        {
+            var output = new Transformation();
+            output.Pivot.X= chunk.ReadSingle();
+            output.Pivot.Y = chunk.ReadSingle();
+            output.Pivot.Z = chunk.ReadSingle();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var matrix = output.Matrices[i];
+                for (int row = 0; row < 3; row++)
+                {
+                    matrix.Matrix[row].X = chunk.ReadSingle();
+                    matrix.Matrix[row].Y = chunk.ReadSingle();
+                    matrix.Matrix[row].Z = chunk.ReadSingle();
+                    matrix.Matrix[row].W = chunk.ReadSingle();
+                }
+            }
+            
             return output;
         }
 
@@ -269,7 +306,36 @@ namespace Filetypes.RigidModel
         }
     }
 
-    
+    public class FileVector3
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+
+        public FileVector3(float x = 0, float y = 0, float z = 0)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
+
+
+    public class FileVector4
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+        public float W { get; set; }
+
+        public FileVector4(float x = 0, float y = 0, float z = 0, float w = 0)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
+        }
+    }
 
     public class Vertex
     {
@@ -284,22 +350,10 @@ namespace Filetypes.RigidModel
             }
         }
 
-        public class Vector3
-        {
-            public float X { get; set; }
-            public float Y { get; set; }
-            public float Z { get; set; }
 
-            public Vector3(float x = 0, float y = 0, float z = 0)
-            {
-                X = x;
-                Y = y;
-                Z = z;
-            }
-        }
 
-        public Vector3 Position { get; set; } = new Vector3();
-        public Vector3 Normal { get; set; } = new Vector3();
+        public FileVector3 Position { get; set; } = new FileVector3();
+        public FileVector3 Normal { get; set; } = new FileVector3();
 
 
         public float Uv0 { get; set; }

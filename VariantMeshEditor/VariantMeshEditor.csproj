@@ -90,8 +90,14 @@
     <Compile Include="Views\EditorViews\Util\LodEditorView.xaml.cs">
       <DependentUpon>LodEditorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EditorViews\Util\Matrix3x4View.xaml.cs">
+      <DependentUpon>Matrix3x4View.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditorViews\Util\RigidModelMeshEditor.xaml.cs">
       <DependentUpon>RigidModelMeshEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditorViews\Util\Vector3View.xaml.cs">
+      <DependentUpon>Vector3View.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ImprovedTreeView\TreeViewDataModel.cs" />
     <Compile Include="Views\ImprovedTreeView\VirtualToggleButton.cs" />
@@ -134,7 +140,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\EditorViews\Util\Matrix3x4View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\EditorViews\Util\RigidModelMeshEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditorViews\Util\Vector3View.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -24,7 +24,7 @@ namespace Viewer.GraphicModels
                 _bufferArray[i].TextureCoordinate = new Vector2(vertex.Uv0, vertex.Uv1);
             }
 
-            Pivot = new Vector3(_model.Pivot[0], _model.Pivot[1], _model.Pivot[2]);
+            Pivot = new Vector3(_model.Transformation.Pivot.X, _model.Transformation.Pivot.Y, _model.Transformation.Pivot.Z);
 
             Create(animationPlayer, device, _bufferArray, _model.IndicesBuffer);
         }
@@ -57,7 +57,7 @@ namespace Viewer.GraphicModels
             _vertexBuffer.SetData(_bufferArray);
         }
 
-        Vector3 ApplyAnimation(Vertex.Vector3 vertex, Matrix animationTransform, bool normalize = false)
+        Vector3 ApplyAnimation(FileVector3 vertex, Matrix animationTransform, bool normalize = false)
         {
             Vector3 vector = new Vector3
             {
