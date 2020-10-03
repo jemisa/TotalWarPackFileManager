@@ -113,6 +113,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/Diffuse.fx
 
+#begin Shaders/File.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/File.fx
+
 #begin Shaders/LineShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -160,6 +166,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Shaders/Textured.fx
+
+#begin Shaders/TexturePreview.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/TexturePreview.fx
 
 #begin Shaders/Transparency.fx
 /importer:EffectImporter

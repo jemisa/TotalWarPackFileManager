@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpDX.Direct3D11;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,12 +16,85 @@ namespace VariantMeshEditor.Views.TexturePreview
         public ImageSource Image
         {
             get { return _image; }
-            set 
-            { 
+            set
+            {
                 _image = value;
                 NotifyPropertyChanged();
             }
         }
+
+        void UpdateFormat(int index, bool value)
+        {
+            for (int i = 0; i < 5; i++)
+                _formatCheckbox[i] = false;
+
+            _formatCheckbox[index] = value;
+            NotifyPropertyChanged("FormatRgbaCheckbox");
+            NotifyPropertyChanged("FormatRCheckbox");
+            NotifyPropertyChanged("FormatGCheckbox");
+            NotifyPropertyChanged("FormatBCheckbox");
+            NotifyPropertyChanged("FormatACheckbox");
+            Image = PreviewImage[index];
+        }
+
+        List<bool> _formatCheckbox = new List<bool>() { false, false, false, false, false };
+
+        public bool FormatRgbaCheckbox
+        {
+            get { return _formatCheckbox[0]; }
+            set
+            {
+                UpdateFormat(0, value);
+            }
+        }
+
+        public bool FormatRCheckbox
+        {
+            get { return _formatCheckbox[1]; }
+            set
+            {
+                UpdateFormat(1, value);
+            }
+        }
+
+        public bool FormatGCheckbox
+        {
+            get { return _formatCheckbox[2]; }
+            set
+            {
+                UpdateFormat(2, value);
+            }
+        }
+
+        public bool FormatBCheckbox
+        {
+            get { return _formatCheckbox[3]; }
+            set
+            {
+                UpdateFormat(3, value);
+            }
+        }
+
+        public bool FormatACheckbox
+        {
+            get { return _formatCheckbox[4]; }
+            set
+            {
+                UpdateFormat(4, value);
+            }
+        }
+
+        ImageSource[] _previewImage = new ImageSource[5];
+        public ImageSource[] PreviewImage
+        {
+            get { return _previewImage; }
+            set
+            {
+                _previewImage = value;
+                NotifyPropertyChanged();
+            }
+        }
+
 
         string _imageName;
         public string Name

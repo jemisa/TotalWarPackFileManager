@@ -107,13 +107,11 @@
     <Compile Include="Views\ImprovedTreeView\ImprovedTreeViewWindow.xaml.cs">
       <DependentUpon>ImprovedTreeViewWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\TexturePreview\TexturePreviewController.cs" />
     <Compile Include="Views\TexturePreview\TexturePreviewView.xaml.cs">
       <DependentUpon>TexturePreviewView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TexturePreview\TexturePreviewViewModel.cs" />
-    <Compile Include="Views\TexturePreview\TexturePreviewWindow.xaml.cs">
-      <DependentUpon>TexturePreviewWindow.xaml</DependentUpon>
-    </Compile>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -179,10 +177,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\TexturePreview\TexturePreviewView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\TexturePreview\TexturePreviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

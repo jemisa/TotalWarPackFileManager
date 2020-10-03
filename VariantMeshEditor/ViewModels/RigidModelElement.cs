@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Views.EditorViews;
 using Viewer.Animation;
@@ -35,7 +36,7 @@ namespace VariantMeshEditor.ViewModels
         {
             RigidModelEditorView view = new RigidModelEditorView();
 
-            var controller = new RigidModelController(view, this);
+            var controller = new RigidModelController(view, this, resourceLibary, virtualWorld);
             Editor = view;
             Controller = controller;
 

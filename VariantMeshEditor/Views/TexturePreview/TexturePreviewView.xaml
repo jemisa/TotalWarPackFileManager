@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:VariantMeshEditor.Views.TexturePreview"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel >
@@ -36,34 +35,46 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">RGB</Label>
-                        <Label>:</Label>
-                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
-                    </StackPanel>
-            
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">A</Label>
-                        <Label>:</Label>
-                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+                        <StackPanel>
+                            <Label HorizontalContentAlignment="Center" Width="40" >RGBA</Label>
+                            <CheckBox  IsChecked="{Binding FormatRgbaCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Image Source="{Binding Path=PreviewImage[0], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">R</Label>
-                        <Label>:</Label>
-                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+                        <StackPanel>
+                            <Label HorizontalContentAlignment="Center" Width="40">R</Label>
+                            <CheckBox  IsChecked="{Binding FormatRCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Image Source="{Binding Path=PreviewImage[1], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">G</Label>
-                        <Label>:</Label>
-                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+                        <StackPanel>
+                            <Label HorizontalContentAlignment="Center" Width="40">G</Label>
+                            <CheckBox IsChecked="{Binding FormatGCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Image Source="{Binding Path=PreviewImage[2], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <Label Width="60">B</Label>
-                        <Label>:</Label>
-                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+                        <StackPanel>
+                            <Label HorizontalContentAlignment="Center" Width="40">B</Label>
+                            <CheckBox IsChecked="{Binding FormatBCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Image Source="{Binding Path=PreviewImage[3], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
                     </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                        <StackPanel>
+                            <Label HorizontalContentAlignment="Center" Width="40" >A</Label>
+                            <CheckBox IsChecked="{Binding FormatACheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Image Source="{Binding Path=PreviewImage[4], UpdateSourceTrigger=PropertyChanged}" Width="60" Height="60" HorizontalAlignment="Right"></Image>
+                    </StackPanel>
+
+
                 </StackPanel>
             </GroupBox>
         </DockPanel>
@@ -73,6 +84,6 @@
         </StackPanel>
 
         <Image  Source="{Binding Path=Image, UpdateSourceTrigger=PropertyChanged}"></Image>
-
+     
     </DockPanel>
 </UserControl>

@@ -16,6 +16,7 @@ namespace Viewer.Scene
     { 
         Line,
         Mesh,
+        TexturePreview
     }
 
     public class ResourceLibary

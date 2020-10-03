@@ -59,7 +59,7 @@ namespace PackFileManager
             textFileEditorControl = WpfPackedFileEditorHost.Create<AdvancedTextFileEditorControl>();
             PackedFileEditorRegistry.Editors.Add(textFileEditorControl);
         }
-   
+
         public PackFileManagerForm (string[] args) 
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Application.ExecutablePath));

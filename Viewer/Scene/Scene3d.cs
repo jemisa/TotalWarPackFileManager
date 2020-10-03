@@ -8,6 +8,7 @@ using SharpDX.DXGI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Viewer.Animation;
@@ -48,7 +49,8 @@ namespace WpfTest.Scenes
 
 
         ResourceLibary _resourceLibary;
-
+        public TextureToTextureRenderer TextureToTextureRenderer { get; private set; }
+        SpriteBatch _spriteBatch;
         protected override void Initialize()
         {
             //ContentManager
@@ -62,8 +64,9 @@ namespace WpfTest.Scenes
             _keyboard = new WpfKeyboard(this);
             _mouse = new WpfMouse(this);
             _basicEffect = ShaderConfiguration.CreateBasicEffect(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
 
-   
             // Camera         
             _camera = new ArcBallCamera(1, new Vector3(0));
             _camera.NearPlane = 0.001f;
@@ -84,7 +87,9 @@ namespace WpfTest.Scenes
             };
             _resourceLibary.LoadEffect("Shaders\\TestShader", ShaderTypes.Mesh);
             _resourceLibary.LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
+            _resourceLibary.LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
 
+            TextureToTextureRenderer = new TextureToTextureRenderer(GraphicsDevice, _spriteBatch, _resourceLibary);
         }
 
 
@@ -172,7 +177,6 @@ namespace WpfTest.Scenes
             base.Update(gameTime);
         }
 
-
         protected override void Draw(GameTime time)
         {
             RefreshProjection();
@@ -204,7 +208,6 @@ namespace WpfTest.Scenes
             //
             //_shader.CurrentTechnique = _shader.Techniques["Diffuse"];
 
-
             CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
             {
                 Projection = _projectionMatrix,
@@ -222,6 +225,8 @@ namespace WpfTest.Scenes
             base.Draw(time);
         }
     }
+
+   
 
     public class CommonShaderParameters
     {
