@@ -68,7 +68,12 @@ namespace Viewer.Animation
         public AnimationFrame GetCurrentFrame()
         {
             if (_currentAnimation != null)
+            {
+                if (_currentAnimation.KeyFrameCollection.Count == 0)
+                    return null;
+
                 return _currentAnimation.KeyFrameCollection[_currentFrame];
+            }
             return null;
         }
 

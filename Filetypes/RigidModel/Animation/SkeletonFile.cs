@@ -50,7 +50,9 @@ namespace Filetypes.RigidModel.Animation
 
 			for (int i = 0; i < boneCount; i++)
 			{ 
-				chunk.ReadInt32();
+
+
+				chunk.ReadInt32(); System.Security.Cryptography.AsymmetricSignatureDeformatter asd // Mapping related?
 				chunk.ReadInt32();
 			}
 

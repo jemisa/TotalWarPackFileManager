@@ -63,15 +63,17 @@ namespace Filetypes.RigidModel.Animation
             var ouput = new AnimationFile();
             chunk.Reset();
             ouput.AnimationType = chunk.ReadUInt32();
-            ouput.Unknown0 = chunk.ReadUInt32();
-            ouput.Unknown1 = chunk.ReadShort();
-            ouput.Unknown2 = chunk.ReadShort();
+            ouput.Unknown0 = chunk.ReadUInt32();        // Always 1?
+            var framerate = chunk.ReadSingle();
             var nameSize= chunk.ReadShort();
             ouput.SkeletonName = chunk.ReadFixedLength(nameSize);
-            ouput.Unknown3 = chunk.ReadUInt32();
+            ouput.Unknown3 = chunk.ReadUInt32();        // Always 0? padding?
 
-            if(ouput.AnimationType == 7)
-                ouput.Unknown4 = chunk.ReadUInt32();
+            if (ouput.AnimationType == 7)
+            {
+                var animationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
+            }
+        
 
             var boneCount = chunk.ReadUInt32();
 
@@ -84,31 +86,38 @@ namespace Filetypes.RigidModel.Animation
                 boneParent.Add(chunk.ReadInt32());
             }
 
+
+            // Remapping tables, not sure how they really should be used, but this works.
             for (int i = 0; i < boneCount; i++)
             {
+
                 var boneId = chunk.ReadByte();
                 var boneFlag = chunk.ReadByte();
                 var ukn = chunk.ReadShort();
 
-                if (boneFlag == 0x00)
+                if (boneFlag == 0)
                     ouput.DynamicTranslationMappingID.Add(i);
-                if (boneFlag == 0x27)
+                if (boneFlag == 39)
                     ouput.StaticTranslationMappingID.Add(i);
             }
 
             for (int i = 0; i < boneCount; i++)
             {
+
                 var boneId = chunk.ReadByte();
                 var boneFlag = chunk.ReadByte();
                 var ukn = chunk.ReadShort();
 
-                if (boneFlag == 0x00)
+                if (boneFlag == 0)
                     ouput.DynamicRotationMappingID.Add(i);
-                if (boneFlag == 0x27)
+                if (boneFlag == 39)
                     ouput.StaticRotationMappingID.Add(i);
             }
 
-            // We dont care about this?
+            // ----------------------
+
+
+            // A single static frame - Can be inverse, a pose or empty. Not sure? Hand animations are stored here
             if (ouput.AnimationType == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
@@ -129,10 +138,13 @@ namespace Filetypes.RigidModel.Animation
 
                 ouput.StaticFrame = frame;
             }
+            // ----------------------
 
+
+            // Animation Data
             var animPosCount = chunk.ReadUInt32();
             var animRotCount = chunk.ReadUInt32();
-            var frameCount = chunk.ReadUInt32();
+            var frameCount = chunk.ReadUInt32();    // Always 3 when there is no data? Why?
 
             if (animPosCount != 0 || animRotCount != 0)
             {
@@ -154,6 +166,7 @@ namespace Filetypes.RigidModel.Animation
                     ouput.DynamicFrames.Add(frame);
                 }
             }
+            // ----------------------
 
             return ouput;
         }
