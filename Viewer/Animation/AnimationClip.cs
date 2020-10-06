@@ -84,27 +84,31 @@ namespace Viewer.Animation
         {
             KeyFrameCollection.Clear();
 
-
             Matrix[] skeletonTransform = new Matrix[_skeletonModel.Bones.Count()];
             Matrix[] skeletonWorldTransform = new Matrix[_skeletonModel.Bones.Count()];
 
+            int skeletonWeirdIndex = 0;
             for (int i = 0; i < _skeletonModel.Bones.Count(); i++)
             {
                 var x = new Quaternion(
-                    _skeletonModel.DynamicFrames[0].Quaternion[i][0],
-                    _skeletonModel.DynamicFrames[0].Quaternion[i][1],
-                    _skeletonModel.DynamicFrames[0].Quaternion[i][2],
-                    _skeletonModel.DynamicFrames[0].Quaternion[i][3]);
+                    _skeletonModel.DynamicFrames[skeletonWeirdIndex].Quaternion[i][0],
+                    _skeletonModel.DynamicFrames[skeletonWeirdIndex].Quaternion[i][1],
+                    _skeletonModel.DynamicFrames[skeletonWeirdIndex].Quaternion[i][2],
+                    _skeletonModel.DynamicFrames[skeletonWeirdIndex].Quaternion[i][3]);
                 x.Normalize();
 
                 var scale = Matrix.CreateScale(1);
                 if (i == 0)
                     scale = Matrix.CreateScale(-1, 1, 1);
-                var pos = scale * Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(_skeletonModel.DynamicFrames[0].Transforms[i].X, _skeletonModel.DynamicFrames[0].Transforms[i].Y, _skeletonModel.DynamicFrames[0].Transforms[i].Z);
+                var pos = scale * Matrix.CreateFromQuaternion(x) * 
+                    Matrix.CreateTranslation(
+                        _skeletonModel.DynamicFrames[skeletonWeirdIndex].Transforms[i].X, 
+                        _skeletonModel.DynamicFrames[skeletonWeirdIndex].Transforms[i].Y, 
+                        _skeletonModel.DynamicFrames[skeletonWeirdIndex].Transforms[i].Z);
+
                 skeletonTransform[i] = pos;
                 skeletonWorldTransform[i] = pos;
             }
-
 
             for (int i = 0; i < _skeletonModel.Bones.Count(); i++)
             {
@@ -112,7 +116,6 @@ namespace Viewer.Animation
                 if (parentIndex == -1)
                     continue;
                 skeletonWorldTransform[i] = skeletonWorldTransform[i] * skeletonWorldTransform[parentIndex];
-
             }
 
 

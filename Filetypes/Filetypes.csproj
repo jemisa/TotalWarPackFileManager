@@ -78,7 +78,6 @@
     <Compile Include="PackedFileEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RigidModel\Animation\AnimationFile.cs" />
-    <Compile Include="RigidModel\Animation\SkeletonFile.cs" />
     <Compile Include="RigidModel\Bone.cs" />
     <Compile Include="RigidModel\BoundingBox.cs" />
     <Compile Include="RigidModel\RigidModel.cs" />

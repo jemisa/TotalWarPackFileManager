@@ -10,6 +10,13 @@ namespace Filetypes.RigidModel.Animation
 {
     public class AnimationFile
     {
+        public class BoneInfo
+        {
+            public string Name { get; set; }
+            public int Id { get; set; }
+            public int ParentId { get; set; }
+        }
+
         public class Frame
         {
             public class Transform

@@ -1,12 +1,6 @@
-﻿using Common;
-using Filetypes.RigidModel.Animation;
-using System;
-using System.Collections.Generic;
+﻿using Filetypes.RigidModel.Animation;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using VariantMeshEditor.Util;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 
@@ -49,7 +43,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
         }
 
-        TreeViewItem CreateNode(BoneInfo bone)
+        TreeViewItem CreateNode(AnimationFile.BoneInfo bone)
         {
             TreeViewItem item = new TreeViewItem
             {
@@ -60,7 +54,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             return item;
         }
 
-        TreeViewItem GetParent(ItemCollection root, BoneInfo parentBone)
+        TreeViewItem GetParent(ItemCollection root, AnimationFile.BoneInfo parentBone)
         {
             foreach (TreeViewItem item in root)
             {
