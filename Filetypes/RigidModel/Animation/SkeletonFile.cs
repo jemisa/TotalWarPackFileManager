@@ -9,7 +9,7 @@ namespace Filetypes.RigidModel.Animation
 {
     public class SkeletonFile
     {
-		public string Name { get; set; }
+		/*public string Name { get; set; }
 		BoneInfo[] _Bones;
 
 		public BoneInfo[] Bones { get { return Frames[0]; } }
@@ -92,7 +92,7 @@ namespace Filetypes.RigidModel.Animation
 			}
 
 			return skeleton;
-		}
+		}*/
     }
 
 	public class BoneInfo

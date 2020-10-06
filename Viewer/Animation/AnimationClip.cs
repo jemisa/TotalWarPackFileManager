@@ -31,7 +31,7 @@ namespace Viewer.Animation
         }
 
         AnimationFile _animation;
-        SkeletonModel _skeletonModel;
+        AnimationFile _skeletonModel;
 
         public List<AnimationFrame> KeyFrameCollection = new List<AnimationFrame>();
 
@@ -84,14 +84,46 @@ namespace Viewer.Animation
         {
             KeyFrameCollection.Clear();
 
+
+            Matrix[] skeletonTransform = new Matrix[_skeletonModel.Bones.Count()];
+            Matrix[] skeletonWorldTransform = new Matrix[_skeletonModel.Bones.Count()];
+
+            for (int i = 0; i < _skeletonModel.Bones.Count(); i++)
+            {
+                var x = new Quaternion(
+                    _skeletonModel.DynamicFrames[0].Quaternion[i][0],
+                    _skeletonModel.DynamicFrames[0].Quaternion[i][1],
+                    _skeletonModel.DynamicFrames[0].Quaternion[i][2],
+                    _skeletonModel.DynamicFrames[0].Quaternion[i][3]);
+                x.Normalize();
+
+                var scale = Matrix.CreateScale(1);
+                if (i == 0)
+                    scale = Matrix.CreateScale(-1, 1, 1);
+                var pos = scale * Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(_skeletonModel.DynamicFrames[0].Transforms[i].X, _skeletonModel.DynamicFrames[0].Transforms[i].Y, _skeletonModel.DynamicFrames[0].Transforms[i].Z);
+                skeletonTransform[i] = pos;
+                skeletonWorldTransform[i] = pos;
+            }
+
+
+            for (int i = 0; i < _skeletonModel.Bones.Count(); i++)
+            {
+                var parentIndex = _skeletonModel.Bones[i].ParentId;
+                if (parentIndex == -1)
+                    continue;
+                skeletonWorldTransform[i] = skeletonWorldTransform[i] * skeletonWorldTransform[parentIndex];
+
+            }
+
+
             var defaultFrame = new AnimationFrame();
             for (int i = 0; i < _skeletonModel.Bones.Count(); i++)
             {
                 defaultFrame.BoneTransforms.Add(new AnimationKeyFrame()
                 {
-                    Transform = (_skeletonModel.Bones[i].Position),
-                    BoneIndex = _skeletonModel.Bones[i].Index,
-                    ParentBoneIndex = _skeletonModel.Bones[i].ParentIndex
+                    Transform = (skeletonTransform[i]),
+                    BoneIndex = _skeletonModel.Bones[i].Id,
+                    ParentBoneIndex = _skeletonModel.Bones[i].ParentId
                 });
             }
 
@@ -130,7 +162,7 @@ namespace Viewer.Animation
                 // Mult with inverse bind matrix, in worldspace
                 for (int i = 0; i < _skeletonModel.Bones.Count(); i++)
                 {
-                    var inv = Matrix.Invert(_skeletonModel.Bones[i].WorldPosition);
+                    var inv = Matrix.Invert(skeletonWorldTransform[i]);
                     currentFrame.BoneTransforms[i].Transform = Matrix.Multiply(inv, currentFrame.BoneTransforms[i].Transform);
                 }
             }
@@ -138,7 +170,7 @@ namespace Viewer.Animation
 
 
 
-        public static AnimationClip Create(AnimationFile animation, SkeletonModel skeletonModel)
+        public static AnimationClip Create(AnimationFile animation, AnimationFile skeletonModel)
         {
             AnimationClip model = new AnimationClip();
             model._animation = animation;

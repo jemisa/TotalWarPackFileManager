@@ -70,24 +70,24 @@ namespace Viewer.GraphicModels
             return Bones[index].AnimatedPosition;
         }
 
-        public void Create(AnimationPlayer animationPlayer, SkeletonFile skeleton)
+        public void Create(AnimationPlayer animationPlayer, AnimationFile skeleton)
         {
             _lineBox.Create();
             _animationPlayer = animationPlayer;
            
             for (int i = 0; i < skeleton.Bones.Count(); i++)
             {
-                var x = new Microsoft.Xna.Framework.Quaternion(
-                    skeleton.Bones[i].Rotation_X,
-                    skeleton.Bones[i].Rotation_Y,
-                    skeleton.Bones[i].Rotation_Z,
-                    skeleton.Bones[i].Rotation_W);
+                var x = new Quaternion(
+                    skeleton.DynamicFrames[0].Quaternion[i][0],
+                    skeleton.DynamicFrames[0].Quaternion[i][1],
+                    skeleton.DynamicFrames[0].Quaternion[i][2],
+                    skeleton.DynamicFrames[0].Quaternion[i][3]);
                 x.Normalize();
 
                 var scale = Matrix.CreateScale(1); 
                 if (i == 0)
                     scale = Matrix.CreateScale(-1, 1, 1);
-                var pos = scale * Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(skeleton.Bones[i].Position_X, skeleton.Bones[i].Position_Y, skeleton.Bones[i].Position_Z);
+                var pos = scale * Matrix.CreateFromQuaternion(x) * Matrix.CreateTranslation(skeleton.DynamicFrames[0].Transforms[i].X, skeleton.DynamicFrames[0].Transforms[i].Y, skeleton.DynamicFrames[0].Transforms[i].Z);
                 var info = new BoneInfo()
                 {
                     Index = skeleton.Bones[i].Id,

@@ -40,7 +40,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             _animationElement = animationElement;
 
             _viewModel.CurrentAnimation.Text = "";
-            _viewModel.CurrentSkeletonName.Text = _skeletonElement.SkeletonFile.Name;
+            _viewModel.CurrentSkeletonName.Text = _skeletonElement.SkeletonFile.SkeletonName;
             _viewModel.AnimationList.SelectionChanged += OnAnimationChange;
             _viewModel.PlayPauseButton.Click += (sender, e) => OnPlayButtonPressed();
             _viewModel.NextFrameButton.Click += (sender, e) => NextFrame();
@@ -118,7 +118,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     try
                     {
                         AnimationFile file = AnimationFile.Create(new ByteChunk(item.File.Data));
-                        AnimationClip clip = AnimationClip.Create(file, _skeletonElement.SkeletonModel);
+                        AnimationClip clip = AnimationClip.Create(file, _skeletonElement.SkeletonFile);
                         _animationElement.AnimationPlayer.SetAnimation(clip);
 
                         _viewModel.CurrentAnimation.Text = item.File.Name;
@@ -205,7 +205,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 try
                 {
                     var animationSkeletonName = AnimationFile.GetAnimationSkeletonName(new ByteChunk(item.File.Data));
-                    if (animationSkeletonName == _skeletonElement.SkeletonFile.Name)
+                    if (animationSkeletonName == _skeletonElement.SkeletonFile.SkeletonName)
                         filteredList.Add(new AnimationListItem() { File = item.File });
                 }
                 catch (Exception exception)

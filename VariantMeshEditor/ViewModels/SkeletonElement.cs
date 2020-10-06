@@ -22,7 +22,7 @@ namespace VariantMeshEditor.ViewModels
     {
 
         public SkeletonController Controller { get; set; }
-        public SkeletonFile SkeletonFile { get; set; }
+        public AnimationFile SkeletonFile { get; set; }
         public SkeletonModel SkeletonModel { get; set; }
         public SkeletonElement(FileSceneElement parent, string fullPath) : base(parent, "", fullPath, "Skeleton")
         {
@@ -38,7 +38,7 @@ namespace VariantMeshEditor.ViewModels
             var file = PackFileLoadHelper.FindFile(loadedContent, skeletonFilePath);
             if (file != null)
             {
-                SkeletonFile = SkeletonFile.Create(new ByteChunk(file.Data), out string errorMessage);
+                SkeletonFile = AnimationFile.Create(new ByteChunk(file.Data));
                 FullPath = skeletonFilePath;
                 FileName = Path.GetFileNameWithoutExtension(skeletonFilePath);
             }
