@@ -30,6 +30,8 @@ namespace Filetypes.RigidModel.Animation
             public List<short[]> Quaternion { get; set; } = new List<short[]>();
         }
 
+        public BoneInfo[] Bones;
+
         public List<int> DynamicTranslationMappingID = new List<int>();
         public List<int> DynamicRotationMappingID = new List<int>();
         public List<Frame> DynamicFrames = new List<Frame>();
@@ -72,14 +74,16 @@ namespace Filetypes.RigidModel.Animation
 
             var boneCount = chunk.ReadUInt32();
 
-            // We dont care about this data
-            var boneNames = new List<string>();
-            var boneParent = new List<int>();
+            output.Bones = new BoneInfo[boneCount];
             for (int i = 0; i < boneCount; i++)
             {
                 var boneNameSize = chunk.ReadShort();
-                boneNames.Add(chunk.ReadFixedLength(boneNameSize));
-                boneParent.Add(chunk.ReadInt32());
+                output.Bones[i] = new BoneInfo()
+                {
+                    Name = chunk.ReadFixedLength(boneNameSize),
+                    ParentId = chunk.ReadInt32(),
+                    Id = i
+                };
             }
 
             // Remapping tables, not sure how they really should be used, but this works.
@@ -112,6 +116,7 @@ namespace Filetypes.RigidModel.Animation
             if (output.AnimationType == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
+
                 var staticRotCount = chunk.ReadUInt32();
 
                 var frame = new Frame();

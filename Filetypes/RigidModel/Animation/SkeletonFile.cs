@@ -23,25 +23,31 @@ namespace Filetypes.RigidModel.Animation
 			errorMessage = "";
 			chunk.Reset();
 
-			var unk0 = chunk.ReadBytes(12);
+			//var unk0 = chunk.ReadBytes(12);
+
+			var AnimationType = chunk.ReadUInt32();
+			var Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
+			var FrameRate = chunk.ReadSingle();
+
 			var nameLength = chunk.ReadUShort();
 			skeleton.Name = chunk.ReadFixedLength(nameLength);
 			var flag = chunk.ReadUInt32();
-			if(flag == 0)
-				chunk.ReadUInt32();
+			if (flag == 0)
+			{
+				var AnimationTotalPlayTimeInSec = chunk.ReadSingle();
+			//	chunk.ReadUInt32();
+			}
 
 			var boneCount = chunk.ReadInt32();
 			skeleton._Bones = new BoneInfo[boneCount];
 
 			for (int i = 0; i < boneCount; i++)
 			{
-				var boneNameSize = chunk.ReadShort();
-				var boneName = chunk.ReadFixedLength(boneNameSize);
-				var parentId = chunk.ReadInt32();
 				skeleton._Bones[i] = new BoneInfo();
-				skeleton._Bones[i].Name = boneName;
+				var boneNameSize = chunk.ReadShort();
+				skeleton._Bones[i].Name = chunk.ReadFixedLength(boneNameSize);
 				skeleton._Bones[i].Id = i;
-				skeleton._Bones[i].ParentId = parentId;
+				skeleton._Bones[i].ParentId = chunk.ReadInt32();
 			}
 
 			//X Bytes - UInt16[BonesCount] // They are the bone IDs.
