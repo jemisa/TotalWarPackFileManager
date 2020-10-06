@@ -37,16 +37,14 @@ namespace Filetypes.RigidModel.Animation
         public List<int> StaticTranslationMappingID = new List<int>();
         public List<int> StaticRotationMappingID = new List<int>();
         public Frame StaticFrame { get; set; } = null;
-
+        public float FrameRate { get; set; }
+        public float AnimationTotalPlayTimeInSec { get; set; }
         public string SkeletonName { get; set; }
         public uint AnimationType { get; set; }
 
-        public uint Unknown0 { get; set; }
-        public short Unknown1 { get; set; }
-        public short Unknown2 { get; set; }
-        public uint Unknown3 { get; set; }
-        public uint Unknown4 { get; set; }
-
+        public uint Unknown0_alwaysOne { get; set; }
+        public uint Unknown1_alwaysZero { get; set; }
+  
         public static string GetAnimationSkeletonName(ByteChunk chunk)
         {
             var animationType = chunk.ReadUInt32();
@@ -60,110 +58,58 @@ namespace Filetypes.RigidModel.Animation
 
         public static AnimationFile Create(ByteChunk chunk)
         {
-            var ouput = new AnimationFile();
+            var output = new AnimationFile();
             chunk.Reset();
-            ouput.AnimationType = chunk.ReadUInt32();
-            ouput.Unknown0 = chunk.ReadUInt32();        // Always 1?
-            var framerate = chunk.ReadSingle();
-            var nameSize= chunk.ReadShort();
-            ouput.SkeletonName = chunk.ReadFixedLength(nameSize);
-            ouput.Unknown3 = chunk.ReadUInt32();        // Always 0? padding?
+            output.AnimationType = chunk.ReadUInt32();
+            output.Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
+            output.FrameRate = chunk.ReadSingle();
+            var nameLength = chunk.ReadShort();
+            output.SkeletonName = chunk.ReadFixedLength(nameLength);
+            output.Unknown1_alwaysZero = chunk.ReadUInt32();        // Always 0? padding?
 
-            if (ouput.AnimationType == 7)
-            {
-                var animationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
-            }
-        
+            if (output.AnimationType == 7)
+                output.AnimationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
 
             var boneCount = chunk.ReadUInt32();
 
-            var boneName = new List<string>();
+            // We dont care about this data
+            var boneNames = new List<string>();
             var boneParent = new List<int>();
             for (int i = 0; i < boneCount; i++)
             {
                 var boneNameSize = chunk.ReadShort();
-                boneName.Add(chunk.ReadFixedLength(boneNameSize));
+                boneNames.Add(chunk.ReadFixedLength(boneNameSize));
                 boneParent.Add(chunk.ReadInt32());
             }
-            var offset = 1;
-
-
-            List<int> mapping0 = new List<int>();
-            List<int> mapping1 = new List<int>();
 
             // Remapping tables, not sure how they really should be used, but this works.
             for (int i = 0; i < boneCount; i++)
             {
-                //mapping0.Add(chunk.ReadInt32());
-
-                //var x = chunk.ReadShort();
-                //var y = chunk.ReadShort();
-                //var z = chunk.ReadShort();
-                //var w = chunk.ReadShort();
-                //var boneId = chunk.ReadByte();
-
-                //var ukn = chunk.ReadShort();
-
-                //var boneId = chunk.ReadByte();
-                //var boneFlag = chunk.ReadByte();
-                //var ukn = chunk.ReadShort();
-                //var boneFlag = chunk.ReadInt32();
-                //if (boneFlag != -1)
-                //{
-                //    int mask = 10000;
-                //
-                //    var isStatic = (boneFlag & mask) == mask;
-                //
-                //    if (!isStatic)
-                //        ouput.DynamicTranslationMappingID.Add(i);
-                //    else 
-                //        ouput.StaticTranslationMappingID.Add(i);
-                //}
-                //
-                var boneId = chunk.ReadByte();
+                var boneId = chunk.ReadByte();          // This just counts up when ever the value is not -1, one set for each flag
                 var boneFlag = chunk.ReadByte();
                 var ukn = chunk.ReadShort();
                 
                 if (boneFlag == 0)
-                    ouput.DynamicTranslationMappingID.Add(i);
+                    output.DynamicTranslationMappingID.Add(i);
                 if (boneFlag == 39)
-                    ouput.StaticTranslationMappingID.Add(i);
+                    output.StaticTranslationMappingID.Add(i);
             }   
 
             for (int i = 0; i < boneCount; i++)
             {
-
-                //mapping1.Add(chunk.ReadInt32());
-
-
-             // var boneFlag = chunk.ReadInt32();
-             //if (boneFlag != -1)
-             //{
-             //      int mask = 10000;
-             //
-             //      var isStatic = (boneFlag & mask) == mask;
-             //
-             //      if (!isStatic)
-             //          ouput.DynamicRotationMappingID.Add(i);
-             //    else
-             //        ouput.StaticRotationMappingID.Add(i);
-             //}
+                var boneId = chunk.ReadByte();
+                var boneFlag = chunk.ReadByte();
+                var ukn = chunk.ReadShort();
             
-            var boneId = chunk.ReadByte();
-            var boneFlag = chunk.ReadByte();
-            var ukn = chunk.ReadShort();
-            
-            if (boneFlag == 0)
-                ouput.DynamicRotationMappingID.Add(i);
-            if (boneFlag == 39)
-                ouput.StaticRotationMappingID.Add(i);
+                if (boneFlag == 0)
+                    output.DynamicRotationMappingID.Add(i);
+                if (boneFlag == 39)
+                output.StaticRotationMappingID.Add(i);
             }
-
-            // ----------------------
 
 
             // A single static frame - Can be inverse, a pose or empty. Not sure? Hand animations are stored here
-            if (ouput.AnimationType == 7)
+            if (output.AnimationType == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
                 var staticRotCount = chunk.ReadUInt32();
@@ -181,52 +127,8 @@ namespace Filetypes.RigidModel.Animation
                     frame.Quaternion.Add(quat);
                 }
 
-                ouput.StaticFrame = frame;
+                output.StaticFrame = frame;
             }
-            // ----------------------
-
-
-            //--
-
-
-            for (int i = 0; i < mapping0.Count; i++)
-            {
-                var boneFlag = mapping0[i];
-                if (boneFlag != -1)
-                {
-                    if (boneFlag < 500)
-                    {
-                        ouput.DynamicTranslationMappingID.Add(boneFlag);
-                        ouput.StaticTranslationMappingID.Add(-1);
-                    }
-                    else
-                    {
-                        ouput.StaticTranslationMappingID.Add(boneFlag - 10000);
-                        ouput.DynamicTranslationMappingID.Add(-1);
-                    }
-                }
-            }
-
-            for (int i = 0; i < mapping1.Count; i++)
-            {
-                var boneFlag = mapping1[i];
-                if (boneFlag != -1)
-                {
-                    if (boneFlag < 500)
-                    {
-                        ouput.DynamicRotationMappingID.Add(boneFlag);
-                        ouput.StaticRotationMappingID.Add(-1);
-                    }
-                    else
-                    {
-                        ouput.StaticRotationMappingID.Add(boneFlag - 10000);
-                        ouput.DynamicRotationMappingID.Add(-1);
-                    }
-                }
-            }
-
-            //-
-
 
             // Animation Data
             var animPosCount = chunk.ReadUInt32();
@@ -250,12 +152,12 @@ namespace Filetypes.RigidModel.Animation
                         frame.Quaternion.Add(quat);
                     }
 
-                    ouput.DynamicFrames.Add(frame);
+                    output.DynamicFrames.Add(frame);
                 }
             }
             // ----------------------
 
-            return ouput;
+            return output;
         }
 
     }

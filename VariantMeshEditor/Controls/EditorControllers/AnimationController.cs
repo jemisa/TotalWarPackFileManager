@@ -125,7 +125,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                         _viewModel.AnimationSkeleton.Text = file.SkeletonName;
                         _viewModel.AnimationType.Text = file.AnimationType.ToString();
                         _viewModel.NoFramesLabel.Content = "/" + clip.KeyFrameCollection.Count();
-                        _viewModel.DebugData.Text = $"[{file.Unknown0}] [{file.Unknown1}] [{file.Unknown2}] [{file.Unknown3}] [{file.Unknown4}]";
+                        _viewModel.DebugData.Text = $"[{file.Unknown0_alwaysOne}] [{file.Unknown1_alwaysZero}]";
                     }
                     catch (Exception exception)
                     {
