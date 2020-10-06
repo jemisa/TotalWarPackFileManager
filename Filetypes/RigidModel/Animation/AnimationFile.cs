@@ -85,33 +85,78 @@ namespace Filetypes.RigidModel.Animation
                 boneName.Add(chunk.ReadFixedLength(boneNameSize));
                 boneParent.Add(chunk.ReadInt32());
             }
+            var offset = 1;
 
+
+            List<int> mapping0 = new List<int>();
+            List<int> mapping1 = new List<int>();
 
             // Remapping tables, not sure how they really should be used, but this works.
             for (int i = 0; i < boneCount; i++)
             {
+                //mapping0.Add(chunk.ReadInt32());
 
+                //var x = chunk.ReadShort();
+                //var y = chunk.ReadShort();
+                //var z = chunk.ReadShort();
+                //var w = chunk.ReadShort();
+                //var boneId = chunk.ReadByte();
+
+                //var ukn = chunk.ReadShort();
+
+                //var boneId = chunk.ReadByte();
+                //var boneFlag = chunk.ReadByte();
+                //var ukn = chunk.ReadShort();
+                //var boneFlag = chunk.ReadInt32();
+                //if (boneFlag != -1)
+                //{
+                //    int mask = 10000;
+                //
+                //    var isStatic = (boneFlag & mask) == mask;
+                //
+                //    if (!isStatic)
+                //        ouput.DynamicTranslationMappingID.Add(i);
+                //    else 
+                //        ouput.StaticTranslationMappingID.Add(i);
+                //}
+                //
                 var boneId = chunk.ReadByte();
                 var boneFlag = chunk.ReadByte();
                 var ukn = chunk.ReadShort();
-
+                
                 if (boneFlag == 0)
                     ouput.DynamicTranslationMappingID.Add(i);
                 if (boneFlag == 39)
                     ouput.StaticTranslationMappingID.Add(i);
-            }
+            }   
 
             for (int i = 0; i < boneCount; i++)
             {
 
-                var boneId = chunk.ReadByte();
-                var boneFlag = chunk.ReadByte();
-                var ukn = chunk.ReadShort();
+                //mapping1.Add(chunk.ReadInt32());
 
-                if (boneFlag == 0)
-                    ouput.DynamicRotationMappingID.Add(i);
-                if (boneFlag == 39)
-                    ouput.StaticRotationMappingID.Add(i);
+
+             // var boneFlag = chunk.ReadInt32();
+             //if (boneFlag != -1)
+             //{
+             //      int mask = 10000;
+             //
+             //      var isStatic = (boneFlag & mask) == mask;
+             //
+             //      if (!isStatic)
+             //          ouput.DynamicRotationMappingID.Add(i);
+             //    else
+             //        ouput.StaticRotationMappingID.Add(i);
+             //}
+            
+            var boneId = chunk.ReadByte();
+            var boneFlag = chunk.ReadByte();
+            var ukn = chunk.ReadShort();
+            
+            if (boneFlag == 0)
+                ouput.DynamicRotationMappingID.Add(i);
+            if (boneFlag == 39)
+                ouput.StaticRotationMappingID.Add(i);
             }
 
             // ----------------------
@@ -139,6 +184,48 @@ namespace Filetypes.RigidModel.Animation
                 ouput.StaticFrame = frame;
             }
             // ----------------------
+
+
+            //--
+
+
+            for (int i = 0; i < mapping0.Count; i++)
+            {
+                var boneFlag = mapping0[i];
+                if (boneFlag != -1)
+                {
+                    if (boneFlag < 500)
+                    {
+                        ouput.DynamicTranslationMappingID.Add(boneFlag);
+                        ouput.StaticTranslationMappingID.Add(-1);
+                    }
+                    else
+                    {
+                        ouput.StaticTranslationMappingID.Add(boneFlag - 10000);
+                        ouput.DynamicTranslationMappingID.Add(-1);
+                    }
+                }
+            }
+
+            for (int i = 0; i < mapping1.Count; i++)
+            {
+                var boneFlag = mapping1[i];
+                if (boneFlag != -1)
+                {
+                    if (boneFlag < 500)
+                    {
+                        ouput.DynamicRotationMappingID.Add(boneFlag);
+                        ouput.StaticRotationMappingID.Add(-1);
+                    }
+                    else
+                    {
+                        ouput.StaticRotationMappingID.Add(boneFlag - 10000);
+                        ouput.DynamicRotationMappingID.Add(-1);
+                    }
+                }
+            }
+
+            //-
 
 
             // Animation Data

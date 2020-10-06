@@ -52,7 +52,7 @@ namespace Filetypes.RigidModel.Animation
 			{ 
 
 
-				chunk.ReadInt32(); System.Security.Cryptography.AsymmetricSignatureDeformatter asd // Mapping related?
+				chunk.ReadInt32(); //System.Security.Cryptography.AsymmetricSignatureDeformatter asd // Mapping related?
 				chunk.ReadInt32();
 			}
 

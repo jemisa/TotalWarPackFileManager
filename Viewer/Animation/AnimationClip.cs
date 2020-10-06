@@ -30,7 +30,7 @@ namespace Viewer.Animation
         }
 
 
-        void ApplyFrame(bool animateInPlace, AnimationFile.Frame animationKeyFrameData, AnimationFrame currentFrame)
+        void ApplyFrame(bool animateInPlace, AnimationFile.Frame animationKeyFrameData, AnimationFrame currentFrame, AnimationFile.Frame staticFrame)
         {
             int boneCount = 72;
             for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
@@ -48,28 +48,66 @@ namespace Viewer.Animation
             }
 
             // Apply animation translation
+            if(animationKeyFrameData != null)
             for (int i = 0; i < animationKeyFrameData.Transforms.Count(); i++)
             {
-                var index = _animation.DynamicTranslationMappingID[i];
-                var pos = animationKeyFrameData.Transforms[i];
-                if (animateInPlace && index == 0)
-                    pos = new AnimationFile.Frame.Transform(0, 0, 0);
-                var temp = currentFrame.BoneTransforms[index].Transform;
-                temp.Translation = new Vector3(pos.X, pos.Y, pos.Z);
-                currentFrame.BoneTransforms[index].Transform = temp;
+                var dynamicIndex = _animation.DynamicTranslationMappingID[i];
+                if (dynamicIndex != -1)
+                {
+                    var pos = animationKeyFrameData.Transforms[i];
+
+                    var temp = currentFrame.BoneTransforms[dynamicIndex].Transform;
+                    temp.Translation = new Vector3(pos.X, pos.Y, pos.Z);
+                    currentFrame.BoneTransforms[dynamicIndex].Transform = temp;
+                }
+
+
             }
 
+            if(staticFrame != null)
+            for (int i = 0; i < staticFrame.Transforms.Count(); i++)
+            {
+                var staticIndex = _animation.StaticTranslationMappingID[i];
+                if (staticIndex != -1)
+                {
+                    var pos = staticFrame.Transforms[i];
+
+                    var temp = currentFrame.BoneTransforms[staticIndex].Transform;
+                    temp.Translation = new Vector3(pos.X, pos.Y, pos.Z);
+                    currentFrame.BoneTransforms[staticIndex].Transform = temp;
+                }
+            }
 
             // Apply animation rotation
-            for (int i = 0; i < animationKeyFrameData.Quaternion.Count(); i++)
+            if (animationKeyFrameData != null)
+                for (int i = 0; i < animationKeyFrameData.Quaternion.Count(); i++)
             {
-                var animQ = animationKeyFrameData.Quaternion[i];
-                var quaternion = new Microsoft.Xna.Framework.Quaternion(animQ[0], animQ[1], animQ[2], animQ[3]);
-                quaternion.Normalize();
+                var dynamicIndex = _animation.DynamicRotationMappingID[i];
+                if (dynamicIndex != -1)
+                {
+                    var animQ = animationKeyFrameData.Quaternion[i];
+                    var quaternion = new Quaternion(animQ[0], animQ[1], animQ[2], animQ[3]);
+                    quaternion.Normalize();
+                    var translation = currentFrame.BoneTransforms[dynamicIndex].Transform.Translation;
+                    currentFrame.BoneTransforms[dynamicIndex].Transform = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateTranslation(translation);
+                }
 
-                var mappingIdx = _animation.DynamicRotationMappingID[i];
-                var translation = currentFrame.BoneTransforms[mappingIdx].Transform.Translation;
-                currentFrame.BoneTransforms[mappingIdx].Transform = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateTranslation(translation);
+
+
+            }
+
+            if (staticFrame != null)
+                for (int i = 0; i < staticFrame.Quaternion.Count(); i++)
+            {
+                var staticIndex = _animation.StaticRotationMappingID[i];
+                if (staticIndex != -1)
+                {
+                    var animQ = staticFrame.Quaternion[i];
+                    var quaternion = new Microsoft.Xna.Framework.Quaternion(animQ[0], animQ[1], animQ[2], animQ[3]);
+                    quaternion.Normalize();
+                    var translation = currentFrame.BoneTransforms[staticIndex].Transform.Translation;
+                    currentFrame.BoneTransforms[staticIndex].Transform = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateTranslation(translation);
+                }
             }
         }
 
@@ -92,7 +130,7 @@ namespace Viewer.Animation
                     });
                 }
 
-                ApplyFrame(animateInPlace, animationKeyFrameData, currentFrame);
+                ApplyFrame(animateInPlace, animationKeyFrameData, currentFrame, _animation.StaticFrame);
 
 
                 // Move into world space
@@ -138,6 +176,7 @@ namespace Viewer.Animation
                 // Apply animation translation
                 if (animationKeyFrameData != null)
                 {
+               
                     for (int i = 0; i < animationKeyFrameData.Transforms.Count(); i++)
                     {
                         var mappingIdx = _animation.StaticTranslationMappingID[i];
