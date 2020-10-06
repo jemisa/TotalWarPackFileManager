@@ -1,21 +1,12 @@
-﻿using Common;
-using Filetypes.ByteParsing;
-using Filetypes.RigidModel;
-using Filetypes.RigidModel.Animation;
+﻿
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using TreeViewWithCheckBoxes;
 using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Views.EditorViews;
-using Viewer.GraphicModels;
 using Viewer.Scene;
 using WpfTest.Scenes;
 
@@ -33,9 +24,6 @@ namespace VariantMeshEditor.ViewModels
         RigidModel,
         WsModel
     }
-
-
-
 
     public abstract class FileSceneElement : TreeViewDataModel, ISceneGraphNode
     {
@@ -117,7 +105,6 @@ namespace VariantMeshEditor.ViewModels
             RootEditorView view = new RootEditorView();
             RootController controller = new RootController(view, this, resourceLibary, virtualWorld);
             Editor = view;
-            
         }
     }
 

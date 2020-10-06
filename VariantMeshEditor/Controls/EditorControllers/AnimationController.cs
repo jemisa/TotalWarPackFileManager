@@ -1,6 +1,6 @@
 ﻿using Common;
 using Filetypes.ByteParsing;
-using Filetypes.RigidModel.Animation;
+using Filetypes.RigidModel;
 using Serilog;
 using SharpDX.Direct2D1;
 using SharpDX.MediaFoundation;
@@ -118,7 +118,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     try
                     {
                         AnimationFile file = AnimationFile.Create(new ByteChunk(item.File.Data));
-                        AnimationClip clip = AnimationClip.Create(file, _skeletonElement.SkeletonFile);
+                        AnimationClip clip = AnimationClip.Create(file, _skeletonElement.SkeletonFile, _skeletonElement.Skeleton);
                         _animationElement.AnimationPlayer.SetAnimation(clip);
 
                         _viewModel.CurrentAnimation.Text = item.File.Name;

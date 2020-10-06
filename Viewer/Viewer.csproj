@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Animation\AnimationClip.cs" />
     <Compile Include="Animation\AnimationPlayer.cs" />
+    <Compile Include="Animation\Skeleton.cs" />
     <Compile Include="GraphicModels\CubeModel.cs" />
     <Compile Include="GraphicModels\LineBox.cs" />
     <Compile Include="GraphicModels\LineModel.cs" />

@@ -1,4 +1,4 @@
-﻿using Filetypes.RigidModel.Animation;
+﻿using Filetypes.RigidModel;
 using System.Linq;
 using System.Windows.Controls;
 using VariantMeshEditor.ViewModels;

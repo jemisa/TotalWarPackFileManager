@@ -1,12 +1,7 @@
 ﻿using Filetypes.ByteParsing;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Filetypes.RigidModel.Animation
+namespace Filetypes.RigidModel
 {
     public class AnimationFile
     {
@@ -19,7 +14,7 @@ namespace Filetypes.RigidModel.Animation
 
         public class Frame
         {
-            public class Transform
+           /* public class Transform
             {
                 public Transform(float x, float y, float z)
                 {
@@ -31,9 +26,9 @@ namespace Filetypes.RigidModel.Animation
                 public float X;
                 public float Y;
                 public float Z;
-            }
+            }*/
 
-            public List<Transform> Transforms { get; set; } = new List<Transform>();
+            public List<float[]> Transforms { get; set; } = new List<float[]>();
             public List<short[]> Quaternion { get; set; } = new List<short[]>();
         }
 
@@ -123,23 +118,9 @@ namespace Filetypes.RigidModel.Animation
             if (output.AnimationType == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
-
                 var staticRotCount = chunk.ReadUInt32();
-
-                var frame = new Frame();
-                for (int j = 0; j < staticPosCount; j++)
-                {
-                    var pos = new Frame.Transform(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                    frame.Transforms.Add(pos);
-                }
-
-                for (int j = 0; j < staticRotCount; j++)
-                {
-                    var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
-                    frame.Quaternion.Add(quat);
-                }
-
-                output.StaticFrame = frame;
+                if(staticPosCount != 0 && staticRotCount != 0)
+                    output.StaticFrame = ReadFrame(chunk, staticPosCount, staticRotCount);
             }
 
             // Animation Data
@@ -151,25 +132,30 @@ namespace Filetypes.RigidModel.Animation
             {
                 for (int i = 0; i < frameCount; i++)
                 {
-                    var frame = new Frame();
-                    for (int j = 0; j < animPosCount; j++)
-                    {
-                        var pos = new Frame.Transform(chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle());
-                        frame.Transforms.Add(pos);
-                    }
-
-                    for (int j = 0; j < animRotCount; j++)
-                    {
-                        var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
-                        frame.Quaternion.Add(quat);
-                    }
-
+                    var frame = ReadFrame(chunk, animPosCount, animRotCount);
                     output.DynamicFrames.Add(frame);
                 }
             }
             // ----------------------
 
             return output;
+        }
+
+        static Frame ReadFrame(ByteChunk chunk, uint positions, uint rotations)
+        {
+            var frame = new Frame();
+            for (int j = 0; j < positions; j++)
+            {
+                var pos = new float[3] { chunk.ReadSingle(), chunk.ReadSingle(), chunk.ReadSingle() };
+                frame.Transforms.Add(pos);
+            }
+
+            for (int j = 0; j < rotations; j++)
+            {
+                var quat = new short[4] { chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort(), chunk.ReadShort() };
+                frame.Quaternion.Add(quat);
+            }
+            return frame;
         }
 
     }

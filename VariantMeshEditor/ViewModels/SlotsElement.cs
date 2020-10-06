@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Views.EditorViews;
 using Viewer.Scene;
@@ -19,8 +15,13 @@ namespace VariantMeshEditor.ViewModels
 
     public class SlotElement : FileSceneElement
     {
+        SlotController _controller;
+        AnimationElement _animation;
+        SkeletonElement _skeleton;
+
         public string SlotName { get; set; }
         public string AttachmentPoint { get; set; }
+        public override FileSceneElementEnum Type => FileSceneElementEnum.Slot;
 
         public SlotElement(FileSceneElement parent, string slotName, string attachmentPoint) : base(parent, "", "", "")
         {
@@ -29,17 +30,10 @@ namespace VariantMeshEditor.ViewModels
 
             SetDisplayName(AttachmentPoint);
         }
-        public override FileSceneElementEnum Type => FileSceneElementEnum.Slot;
-
-        SlotController _controller;
-        SkeletonElement _skeleton;
-        void SetDisplayName(string attachmentPointName)
-        {
-            DisplayName = $"Slot -{SlotName} - {attachmentPointName}";
-        }
-
+     
         protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
         {
+            _animation = SceneElementHelper.GetAllOfTypeInSameVariantMesh<AnimationElement>(this).FirstOrDefault();
             _skeleton = SceneElementHelper.GetAllOfTypeInSameVariantMesh<SkeletonElement>(this).FirstOrDefault();
             SlotEditorView view = new SlotEditorView();
             _controller = new SlotController(view, this, _skeleton);
@@ -48,16 +42,34 @@ namespace VariantMeshEditor.ViewModels
 
         protected override void UpdateNode(GameTime time)
         {
-            if (_controller.AttachmentBoneIndex != -1)
+            int boneIndex = _controller.AttachmentBoneIndex;
+            if (boneIndex != -1)
             {
-                WorldTransform = _skeleton.SkeletonModel.GetAnimatedBone(_controller.AttachmentBoneIndex);
-                SetDisplayName(_skeleton.SkeletonModel.Bones[_controller.AttachmentBoneIndex].Name);
+                var bonePos = _skeleton.Skeleton.WorldTransform[boneIndex];
+                WorldTransform = Matrix.Multiply(bonePos, GetAnimatedBone(boneIndex));
+                SetDisplayName(_skeleton.Skeleton.BoneNames[boneIndex]);
             }
             else
             {
                 WorldTransform = Matrix.Identity;
                 SetDisplayName("");
             }
+        }
+
+        public Matrix GetAnimatedBone(int index)
+        {
+            if (index == -1)
+                return Matrix.Identity;
+            var currentFrame = _animation.AnimationPlayer.GetCurrentFrame();
+            if (currentFrame == null)
+                return Matrix.Identity;
+
+            return _animation.AnimationPlayer.GetCurrentFrame().BoneTransforms[index].Transform;
+        }
+
+        void SetDisplayName(string attachmentPointName)
+        {
+            DisplayName = $"Slot -{SlotName} - {attachmentPointName}";
         }
     }
 }

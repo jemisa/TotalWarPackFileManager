@@ -1,14 +1,10 @@
 ﻿using Common;
 using Filetypes.ByteParsing;
-using Filetypes.RigidModel.Animation;
+using Filetypes.RigidModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Views.EditorViews;
 using Viewer.Animation;
@@ -23,7 +19,9 @@ namespace VariantMeshEditor.ViewModels
 
         public SkeletonController Controller { get; set; }
         public AnimationFile SkeletonFile { get; set; }
-        public SkeletonModel SkeletonModel { get; set; }
+        SkeletonModel SkeletonModel { get; set; }
+        public Skeleton Skeleton { get; set; }
+
         public SkeletonElement(FileSceneElement parent, string fullPath) : base(parent, "", fullPath, "Skeleton")
         {
            
@@ -41,10 +39,11 @@ namespace VariantMeshEditor.ViewModels
                 SkeletonFile = AnimationFile.Create(new ByteChunk(file.Data));
                 FullPath = skeletonFilePath;
                 FileName = Path.GetFileNameWithoutExtension(skeletonFilePath);
+                Skeleton = new Skeleton(SkeletonFile);
             }
 
             SkeletonModel = new SkeletonModel(resourceLibary.GetEffect(ShaderTypes.Line));
-            SkeletonModel.Create(animationPlayer, SkeletonFile);
+            SkeletonModel.Create(animationPlayer, Skeleton);
         }
 
         protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)

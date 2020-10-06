@@ -33,7 +33,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             _viewModel.AttachmentPointComboBox.SelectionChanged += AttachmentPointComboBox_SelectionChanged;
             if (_skeletonElement != null)
             {
-                foreach (var bone in _skeletonElement.SkeletonModel.Bones)
+                foreach (var bone in _skeletonElement.SkeletonFile.Bones)
                     _viewModel.AttachmentPointComboBox.Items.Add(bone.Name);
 
                 if (!string.IsNullOrWhiteSpace(_slotElement.AttachmentPoint))
@@ -56,7 +56,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
             else
             {
-                AttachmentBoneIndex = _skeletonElement.SkeletonModel.GetBoneIndex(selectedItem);
+                AttachmentBoneIndex = _skeletonElement.Skeleton.GetBoneIndex(selectedItem);
             }  
         }
 
