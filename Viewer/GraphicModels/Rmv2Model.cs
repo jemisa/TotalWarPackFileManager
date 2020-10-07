@@ -16,7 +16,7 @@ namespace Viewer.GraphicModels
         public void Create(AnimationPlayer animationPlayer, GraphicsDevice device, RigidModel rigidModelData, int lodLevel, int model)
         {
             _animationPlayer = animationPlayer;
-            _model = rigidModelData.LodInformations[lodLevel].LodModels[model];
+            _model = rigidModelData.LodHeaders[lodLevel].LodModels[model];
             _bufferArray = new VertexPositionNormalTexture[_model.VertexArray.Length];
             for (int i = 0; i < _model.VertexArray.Length; i++)
             {

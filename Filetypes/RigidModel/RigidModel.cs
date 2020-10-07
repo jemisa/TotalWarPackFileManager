@@ -12,7 +12,7 @@ namespace Filetypes.RigidModel
         public uint Version { get; set; }
         public uint LodCount { get; set; }
         public string BaseSkeleton { get; set; }
-        public List<LodInformation> LodInformations = new List<LodInformation>();
+        public List<LodHeader> LodHeaders = new List<LodHeader>();
        
 
         static bool Validate(ByteChunk chunk, out string errorMessage)
@@ -34,11 +34,11 @@ namespace Filetypes.RigidModel
             };
 
             for (int i = 0; i < model.LodCount; i++)
-                model.LodInformations.Add(LodInformation.Create(chunk));
+                model.LodHeaders.Add(LodHeader.Create(chunk));
 
             for (int i = 0; i < model.LodCount; i++)
-                for(int j = 0; j < model.LodInformations[i].GroupsCount; j++)
-                    model.LodInformations[i].LodModels.Add(LodModel.Create(chunk));
+                for(int j = 0; j < model.LodHeaders[i].GroupsCount; j++)
+                    model.LodHeaders[i].LodModels.Add(LodModel.Create(chunk));
 
             Validate(chunk, out errorMessage);
 

@@ -82,7 +82,7 @@
     <Compile Include="RigidModel\BoundingBox.cs" />
     <Compile Include="RigidModel\RigidModel.cs" />
     <Compile Include="RigidModel\GroupTypeEnum.cs" />
-    <Compile Include="RigidModel\LodInformation.cs" />
+    <Compile Include="RigidModel\LodHeader.cs" />
     <Compile Include="RigidModel\LodModel.cs" />
     <Compile Include="RigidModel\Material.cs" />
     <Compile Include="RigidModel\VariantMeshDefinition.cs" />

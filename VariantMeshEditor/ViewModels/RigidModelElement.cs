@@ -45,11 +45,11 @@ namespace VariantMeshEditor.ViewModels
 
         void Create3dModels(Scene3d virtualWorld, ResourceLibary resourceLibary)
         {
-            for (int lodIndex = 0; lodIndex < Model.LodInformations.Count; lodIndex++)
+            for (int lodIndex = 0; lodIndex < Model.LodHeaders.Count; lodIndex++)
             {
                 MeshInstances.Add(new List<MeshRenderItem>());
 
-                for (int modelIndex = 0; modelIndex < Model.LodInformations[lodIndex].LodModels.Count(); modelIndex++)
+                for (int modelIndex = 0; modelIndex < Model.LodHeaders[lodIndex].LodModels.Count(); modelIndex++)
                 {
                     var animation = SceneElementHelper.GetAllOfTypeInSameVariantMesh<AnimationElement>(this).FirstOrDefault();
 

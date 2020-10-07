@@ -55,22 +55,22 @@ namespace VariantMeshEditor.Controls.EditorControllers
             bool firstSub = true;
             bool first = true;
             int currentLodIndex = 0;
-            foreach (var lod in element.Model.LodInformations)
+            foreach (var loadHead in element.Model.LodHeaders)
             {
-                var lodContent = new CollapsableButtonControl($"Lod - {lod.LodLevel}");
+                var lodContent = new CollapsableButtonControl($"Lod - {loadHead.LodLevel}");
 
                 var lodStackPanel = new StackPanel();
 
                 LodEditorView lodEditorView = new LodEditorView();
-                lodEditorView.Scale.Text = $"{lod.Scale}";
-                lodEditorView.MeshCount.Text = $"{lod.GroupsCount}";
-                lodEditorView.Debug.Text = $"{GetUnknownString(lod.Unknown0)}, {GetUnknownString(lod.Unknown1)}, {GetUnknownString(lod.Unknown2)}";
+                lodEditorView.Scale.Text = $"{loadHead.LodZoomFactor}";
+                lodEditorView.MeshCount.Text = $"{loadHead.GroupsCount}";
+                lodEditorView.Debug.Text = "[" + loadHead.Unknown + "]";
 
                 lodStackPanel.Children.Add(lodEditorView);
                 lodContent.Content = lodStackPanel;
 
                 var currentModelIndex = 0;
-                foreach (var mesh in lod.LodModels)
+                foreach (var mesh in loadHead.LodModels)
                 {
                     var meshContnet = new CollapsableButtonControl($"{mesh.ModelName}");
                     var meshStackPanel = new StackPanel();
@@ -230,12 +230,6 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
 
             return "";
-        }
-
-        string GetUnknownString(byte[] bytes)
-        {
-            var bytesAsString = bytes.Select(x => x.ToString());
-            return "[" + String.Join(", ", bytesAsString) + "]";
         }
     }
 }
