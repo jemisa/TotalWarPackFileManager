@@ -45,34 +45,28 @@ namespace Filetypes.RigidModel
 
         public AnimationHeader Header { get; set; } = new AnimationHeader();
   
-        public static string GetAnimationSkeletonName(ByteChunk chunk)
+        public static AnimationHeader GetAnimationHeader(ByteChunk chunk)
         {
-            var animationType = chunk.ReadUInt32();
-            var unknown0 = chunk.ReadUInt32();
-            var unknown1 = chunk.ReadShort();
-            var unknown2 = chunk.ReadShort();
-            var nameSize = chunk.ReadShort();
-            var skeletonName = chunk.ReadFixedLength(nameSize);
-            return skeletonName;
+            var header = new AnimationHeader();
+            header.AnimationType = chunk.ReadUInt32();
+            header.Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
+            header.FrameRate = chunk.ReadSingle();
+            var nameLength = chunk.ReadShort();
+            header.SkeletonName = chunk.ReadFixedLength(nameLength);
+            header.Unknown1_alwaysZero = chunk.ReadUInt32();        // Always 0? padding?
+            return header;
         }
 
         public static AnimationFile Create(ByteChunk chunk)
         {
             var output = new AnimationFile();
             chunk.Reset();
-            output.Header.AnimationType = chunk.ReadUInt32();
-            output.Header.Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
-            output.Header.FrameRate = chunk.ReadSingle();
-            var nameLength = chunk.ReadShort();
-            output.Header.SkeletonName = chunk.ReadFixedLength(nameLength);
-            output.Header.Unknown1_alwaysZero = chunk.ReadUInt32();        // Always 0? padding?
-
+            output.Header = GetAnimationHeader(chunk);
 
             if (output.Header.AnimationType == 7)
                 output.AnimationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
 
             var boneCount = chunk.ReadUInt32();
-
             output.Bones = new BoneInfo[boneCount];
             for (int i = 0; i < boneCount; i++)
             {

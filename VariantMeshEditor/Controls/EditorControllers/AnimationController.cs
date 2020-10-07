@@ -204,7 +204,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             {
                 try
                 {
-                    var animationSkeletonName = AnimationFile.GetAnimationSkeletonName(new ByteChunk(item.File.Data));
+                    var animationSkeletonName = AnimationFile.GetAnimationHeader(new ByteChunk(item.File.Data)).SkeletonName;
                     if (animationSkeletonName == _skeletonElement.SkeletonFile.Header.SkeletonName)
                         filteredList.Add(new AnimationListItem() { File = item.File });
                 }
