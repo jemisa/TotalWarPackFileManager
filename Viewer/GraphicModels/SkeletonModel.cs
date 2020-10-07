@@ -12,7 +12,7 @@ namespace Viewer.GraphicModels
         AnimationPlayer _animationPlayer;
         Skeleton _skeleton;
         Matrix[] _drawPositions;
-        LineBox _lineBox = new LineBox();
+        LineBox _lineBox;
 
         public SkeletonModel(Effect shader) : base(null, shader)
         {
@@ -20,11 +20,10 @@ namespace Viewer.GraphicModels
 
         public void Create(AnimationPlayer animationPlayer, Skeleton skeleton)
         {
-            _lineBox.Create();
+            _lineBox = new LineBox();
             _skeleton = skeleton;
-            
             _animationPlayer = animationPlayer;
-            _drawPositions = new Matrix[skeleton.BoneCount];
+            _drawPositions = new Matrix[_skeleton.BoneCount];
         }
 
         public override void Update(GameTime time)

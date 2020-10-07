@@ -14,40 +14,36 @@ namespace Filetypes.RigidModel
 
         public class Frame
         {
-           /* public class Transform
-            {
-                public Transform(float x, float y, float z)
-                {
-                    X = x;
-                    Y = y;
-                    Z = z;
-                }
-
-                public float X;
-                public float Y;
-                public float Z;
-            }*/
-
             public List<float[]> Transforms { get; set; } = new List<float[]>();
             public List<short[]> Quaternion { get; set; } = new List<short[]>();
         }
 
+        public class AnimationHeader
+        {
+            public uint AnimationType { get; set; }
+            public uint Unknown0_alwaysOne { get; set; }
+            public float FrameRate { get; set; }
+            public string SkeletonName { get; set; }
+            public uint Unknown1_alwaysZero { get; set; }
+        }
+
         public BoneInfo[] Bones;
 
-        public List<int> DynamicTranslationMappingID = new List<int>();
-        public List<int> DynamicRotationMappingID = new List<int>();
-        public List<Frame> DynamicFrames = new List<Frame>();
+        // Version 7 spesific 
+        public float AnimationTotalPlayTimeInSec { get; set; }
 
         public List<int> StaticTranslationMappingID = new List<int>();
         public List<int> StaticRotationMappingID = new List<int>();
         public Frame StaticFrame { get; set; } = null;
-        public float FrameRate { get; set; }
-        public float AnimationTotalPlayTimeInSec { get; set; }
-        public string SkeletonName { get; set; }
-        public uint AnimationType { get; set; }
 
-        public uint Unknown0_alwaysOne { get; set; }
-        public uint Unknown1_alwaysZero { get; set; }
+
+        // Keyframes/default pose
+        public List<int> DynamicTranslationMappingID = new List<int>();
+        public List<int> DynamicRotationMappingID = new List<int>();
+        public List<Frame> DynamicFrames = new List<Frame>();
+
+
+        public AnimationHeader Header { get; set; } = new AnimationHeader();
   
         public static string GetAnimationSkeletonName(ByteChunk chunk)
         {
@@ -64,14 +60,15 @@ namespace Filetypes.RigidModel
         {
             var output = new AnimationFile();
             chunk.Reset();
-            output.AnimationType = chunk.ReadUInt32();
-            output.Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
-            output.FrameRate = chunk.ReadSingle();
+            output.Header.AnimationType = chunk.ReadUInt32();
+            output.Header.Unknown0_alwaysOne = chunk.ReadUInt32();        // Always 1?
+            output.Header.FrameRate = chunk.ReadSingle();
             var nameLength = chunk.ReadShort();
-            output.SkeletonName = chunk.ReadFixedLength(nameLength);
-            output.Unknown1_alwaysZero = chunk.ReadUInt32();        // Always 0? padding?
+            output.Header.SkeletonName = chunk.ReadFixedLength(nameLength);
+            output.Header.Unknown1_alwaysZero = chunk.ReadUInt32();        // Always 0? padding?
 
-            if (output.AnimationType == 7)
+
+            if (output.Header.AnimationType == 7)
                 output.AnimationTotalPlayTimeInSec = chunk.ReadSingle(); // Play time
 
             var boneCount = chunk.ReadUInt32();
@@ -115,7 +112,7 @@ namespace Filetypes.RigidModel
 
 
             // A single static frame - Can be inverse, a pose or empty. Not sure? Hand animations are stored here
-            if (output.AnimationType == 7)
+            if (output.Header.AnimationType == 7)
             {
                 var staticPosCount = chunk.ReadUInt32();
                 var staticRotCount = chunk.ReadUInt32();

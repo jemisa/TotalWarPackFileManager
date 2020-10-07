@@ -9,7 +9,7 @@ namespace Viewer.GraphicModels
 {
     public class LineBox : LineModel
     {
-        public void Create()
+        public LineBox()
         {
             var offset = new Vector3(-0.5f, -0.5f, -0.5f);
             var a0 = new Vector3(0, 0, 0) + offset;

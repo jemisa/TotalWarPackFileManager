@@ -40,7 +40,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             _animationElement = animationElement;
 
             _viewModel.CurrentAnimation.Text = "";
-            _viewModel.CurrentSkeletonName.Text = _skeletonElement.SkeletonFile.SkeletonName;
+            _viewModel.CurrentSkeletonName.Text = _skeletonElement.SkeletonFile.Header.SkeletonName;
             _viewModel.AnimationList.SelectionChanged += OnAnimationChange;
             _viewModel.PlayPauseButton.Click += (sender, e) => OnPlayButtonPressed();
             _viewModel.NextFrameButton.Click += (sender, e) => NextFrame();
@@ -122,10 +122,10 @@ namespace VariantMeshEditor.Controls.EditorControllers
                         _animationElement.AnimationPlayer.SetAnimation(clip);
 
                         _viewModel.CurrentAnimation.Text = item.File.Name;
-                        _viewModel.AnimationSkeleton.Text = file.SkeletonName;
-                        _viewModel.AnimationType.Text = file.AnimationType.ToString();
+                        _viewModel.AnimationSkeleton.Text = file.Header.SkeletonName;
+                        _viewModel.AnimationType.Text = file.Header.AnimationType.ToString();
                         _viewModel.NoFramesLabel.Content = "/" + clip.KeyFrameCollection.Count();
-                        _viewModel.DebugData.Text = $"[{file.Unknown0_alwaysOne}] [{file.Unknown1_alwaysZero}]";
+                        _viewModel.DebugData.Text = $"[{file.Header.Unknown0_alwaysOne}] [{file.Header.Unknown1_alwaysZero}]";
                     }
                     catch (Exception exception)
                     {
@@ -205,7 +205,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 try
                 {
                     var animationSkeletonName = AnimationFile.GetAnimationSkeletonName(new ByteChunk(item.File.Data));
-                    if (animationSkeletonName == _skeletonElement.SkeletonFile.SkeletonName)
+                    if (animationSkeletonName == _skeletonElement.SkeletonFile.Header.SkeletonName)
                         filteredList.Add(new AnimationListItem() { File = item.File });
                 }
                 catch (Exception exception)
