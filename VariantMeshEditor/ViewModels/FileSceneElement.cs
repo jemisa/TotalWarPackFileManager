@@ -1,7 +1,11 @@
 ﻿
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Serilog.Events;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Controls;
 using TreeViewWithCheckBoxes;
@@ -33,7 +37,7 @@ namespace VariantMeshEditor.ViewModels
         public abstract FileSceneElementEnum Type { get; }
         public string FileName { get; set; }
         public string FullPath { get; set; }
-        public UserControl Editor { get; set; }
+        public virtual UserControl EditorViewModel { get; protected set; }
 
         public bool Visible { get; set; } = true;
 
@@ -48,8 +52,6 @@ namespace VariantMeshEditor.ViewModels
 
         public override string ToString() => DisplayName;
 
-
-
         public void CreateContent(Scene3d virtualWorld, ResourceLibary resourceLibary)
         {
             CreateEditor(virtualWorld, resourceLibary);
@@ -57,6 +59,7 @@ namespace VariantMeshEditor.ViewModels
             {
                 child.CreateContent(virtualWorld, resourceLibary);
             }
+            
         }
 
         protected virtual void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
@@ -98,13 +101,12 @@ namespace VariantMeshEditor.ViewModels
         public RootElement() : base(null, "", "", "Root") { }
         public override FileSceneElementEnum Type => FileSceneElementEnum.Root;
 
-
         protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
         {
          
             RootEditorView view = new RootEditorView();
             RootController controller = new RootController(view, this, resourceLibary, virtualWorld);
-            Editor = view;
+            EditorViewModel = view;
         }
     }
 

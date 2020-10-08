@@ -227,11 +227,9 @@ namespace Common {
 
             foreach (var directory in loadedPackFiles)
             {
-                foreach (var file in directory)
-                {
-                    if (file.FullPath == filename)
-                        return file;
-                }
+                var f = directory[filename];
+                if (f != null)
+                    return f as PackedFile;
             }
             return null;
         }

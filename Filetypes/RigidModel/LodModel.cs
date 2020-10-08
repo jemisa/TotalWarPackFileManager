@@ -37,7 +37,7 @@ namespace Filetypes.RigidModel
 
     public class LodModel
     {
-        public GroupTypeEnum GroupType { get; set; }
+        public GroupTypeEnum MaterialId { get; set; }
 
         public List<Bone> Bones { get; set; } = new List<Bone>();
         public uint BoneCount { get; set; }
@@ -61,7 +61,9 @@ namespace Filetypes.RigidModel
         public byte[] Unknown2;
         public byte[] Unknown3;
         public byte[] Unknown4;
-        public byte[] Unknown5;
+        public byte[] AlphaKeyValue;
+        public byte[] ShaderValues;
+
         public AlphaMode AlphaMode { get; set; }
 
         public Vertex[] VertexArray;
@@ -75,7 +77,7 @@ namespace Filetypes.RigidModel
             var offset = chunk.Index;
             var lodModel = new LodModel();
 
-            lodModel.GroupType = (GroupTypeEnum)chunk.ReadUInt32();
+            lodModel.MaterialId = (GroupTypeEnum)chunk.ReadUInt32();
             lodModel.Unknown0 = chunk.ReadBytes(4);
 
             var VertOffset = chunk.ReadUInt32() + offset;
@@ -90,15 +92,13 @@ namespace Filetypes.RigidModel
             lodModel.Unknown1 = chunk.ReadBytes(2);
             lodModel.VertexFormatValue = chunk.ReadUShort();
             lodModel.ModelName = Util.SanatizeFixedString(chunk.ReadFixedLength(32));
+            //lodModel.ShaderValues = chunk.ReadBytes(20);
+
+
             lodModel.TextureDirectory = Util.SanatizeFixedString(chunk.ReadFixedLength(256));
-
             lodModel.Unknown2 = chunk.ReadBytes(258); // Unknown data. Almost always 0, appart from 2 last bytes
-
-            var transformationChunk = new ByteChunk(chunk.ReadBytes(156));
-            lodModel.Transformation = LoadTransformations(transformationChunk);
-
+            lodModel.Transformation = LoadTransformations(chunk);
             lodModel.Unknown3 = chunk.ReadBytes(8); 
-
             lodModel.BoneCount = chunk.ReadUInt32();
             lodModel.MaterialCount = chunk.ReadUInt32();
 
@@ -110,7 +110,7 @@ namespace Filetypes.RigidModel
             for (int i = 0; i < lodModel.MaterialCount; i++)
                 lodModel.Materials.Add(Material.Create(chunk));
 
-            lodModel.Unknown5 = chunk.ReadBytes(4);
+            lodModel.AlphaKeyValue = chunk.ReadBytes(4);
             lodModel.AlphaMode = (AlphaMode)chunk.ReadUInt32();
 
             lodModel.VertexArray = CreateVertexArray(lodModel, chunk, lodModel.VertexCount, lodModel.VertexFormatValue);
@@ -287,16 +287,24 @@ namespace Filetypes.RigidModel
 
         static Vertex[] CreateVertexArray(LodModel model, ByteChunk chunk, uint count,uint vertexType)
         {
+            
+
             switch (vertexType)
             {
                 case 0:
+                    //chunk.Index += (int)count * 32;
                     model.VertexFormat = VertexFormat.Default;
                     return CreateDefaultVertex(chunk, count);
+                    //return null;
                 case 3:
+                    //chunk.Index += (int)count * 28;
                     model.VertexFormat = VertexFormat.Weighted;
                     return CreateWeighthedVertex(chunk, count);
+                    //return null;
                 case 4:
+                    //chunk.Index += (int)count * 32;
                     model.VertexFormat = VertexFormat.Cinematic;
+                    //return null;
                     return CreateCinematicVertex(chunk, count);
                 default:
                     throw new NotImplementedException();

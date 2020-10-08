@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Controls;
 using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Views.EditorViews;
 using Viewer.Animation;
@@ -17,10 +18,13 @@ namespace VariantMeshEditor.ViewModels
     public class SkeletonElement : FileSceneElement
     {
 
-        public SkeletonController Controller { get; set; }
+        SkeletonController Controller { get; set; }
         public AnimationFile SkeletonFile { get; set; }
         SkeletonModel SkeletonModel { get; set; }
         public Skeleton Skeleton { get; set; }
+
+
+        public override UserControl EditorViewModel { get => Controller.GetView(); protected set => throw new System.Exception(); }
 
         public SkeletonElement(FileSceneElement parent, string fullPath) : base(parent, "", fullPath, "Skeleton")
         {
@@ -29,11 +33,11 @@ namespace VariantMeshEditor.ViewModels
         public override FileSceneElementEnum Type => FileSceneElementEnum.Skeleton;
 
 
-        public void Create(AnimationPlayer animationPlayer, List<PackFile> loadedContent, ResourceLibary resourceLibary, string skeletonName)
+        public void Create(AnimationPlayer animationPlayer, ResourceLibary resourceLibary, string skeletonName)
         {
             string animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + skeletonName;
-            var file = PackFileLoadHelper.FindFile(loadedContent, skeletonFilePath);
+            var file = PackFileLoadHelper.FindFile(resourceLibary.PackfileContent, skeletonFilePath);
             if (file != null)
             {
                 SkeletonFile = AnimationFile.Create(new ByteChunk(file.Data));
@@ -48,9 +52,7 @@ namespace VariantMeshEditor.ViewModels
 
         protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
         {
-            SkeletonEditorView view = new SkeletonEditorView();
-            SkeletonController controller = new SkeletonController(view, this);
-            Editor = view;
+            Controller = new SkeletonController(this);
         }
 
         protected override void UpdateNode(GameTime time)

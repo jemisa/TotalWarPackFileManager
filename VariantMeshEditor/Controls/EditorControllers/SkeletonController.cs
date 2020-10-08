@@ -1,6 +1,7 @@
 ﻿using Filetypes.RigidModel;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 
@@ -11,13 +12,20 @@ namespace VariantMeshEditor.Controls.EditorControllers
         SkeletonEditorView _viewModel;
         SkeletonElement _skeletonElement;
 
-        public SkeletonController(SkeletonEditorView viewModel, SkeletonElement skeletonElement)
+        public SkeletonController(SkeletonElement skeletonElement)
         {
-            _viewModel = viewModel;
             _skeletonElement = skeletonElement;
+        }
 
-            _viewModel.SkeletonName.Content = "Skeleton Name: " + skeletonElement.DisplayName;
-            CreateBoneOverview();
+        public SkeletonEditorView GetView()
+        {
+            if (_viewModel == null)
+            {
+                _viewModel = new SkeletonEditorView();
+                _viewModel.SkeletonName.Content = "Skeleton Name: " + _skeletonElement.DisplayName;
+                CreateBoneOverview();
+            }
+            return _viewModel;
         }
 
         void CreateBoneOverview()

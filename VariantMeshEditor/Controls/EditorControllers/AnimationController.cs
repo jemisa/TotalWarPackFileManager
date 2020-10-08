@@ -32,27 +32,34 @@ namespace VariantMeshEditor.Controls.EditorControllers
         ILogger _logger = Logging.Create<AnimationController>();
 
         List<AnimationListItem> _animationFiles = new List<AnimationListItem>();
-        public AnimationController(AnimationEditorView viewModel, ResourceLibary resourceLibary, AnimationElement animationElement, SkeletonElement skeletonElement)
+        public AnimationController( ResourceLibary resourceLibary, AnimationElement animationElement, SkeletonElement skeletonElement)
         {
-            _viewModel = viewModel;
             _resourceLibary = resourceLibary;
             _skeletonElement = skeletonElement;
             _animationElement = animationElement;
+        }
 
-            _viewModel.CurrentAnimation.Text = "";
-            _viewModel.CurrentSkeletonName.Text = _skeletonElement.SkeletonFile.Header.SkeletonName;
-            _viewModel.AnimationList.SelectionChanged += OnAnimationChange;
-            _viewModel.PlayPauseButton.Click += (sender, e) => OnPlayButtonPressed();
-            _viewModel.NextFrameButton.Click += (sender, e) => NextFrame();
-            _viewModel.PrivFrameButton.Click += (sender, e) => PrivFrame();
-            _viewModel.AnimateInPlaceCheckBox.Click += (sender, e) => OnAnimateInPlaceChanged();
+        public AnimationEditorView GetView()
+        {
+            if (_viewModel == null)
+            {
+                _viewModel = new AnimationEditorView();
+                _viewModel.CurrentAnimation.Text = "";
+                _viewModel.CurrentSkeletonName.Text = _skeletonElement.SkeletonFile.Header.SkeletonName;
+                _viewModel.AnimationList.SelectionChanged += OnAnimationChange;
+                _viewModel.PlayPauseButton.Click += (sender, e) => OnPlayButtonPressed();
+                _viewModel.NextFrameButton.Click += (sender, e) => NextFrame();
+                _viewModel.PrivFrameButton.Click += (sender, e) => PrivFrame();
+                _viewModel.AnimateInPlaceCheckBox.Click += (sender, e) => OnAnimateInPlaceChanged();
 
-            _viewModel.ClearFilterButton.Click += (sender, e) => FindAllAnimations();
-            _viewModel.FilterText.TextChanged += (sender, e) => FilterConditionChanged();
-            _viewModel.FindAllValidAnimations.Click += (sender, e) => FindAllValidAnimations();
+                _viewModel.ClearFilterButton.Click += (sender, e) => FindAllAnimations();
+                _viewModel.FilterText.TextChanged += (sender, e) => FilterConditionChanged();
+                _viewModel.FindAllValidAnimations.Click += (sender, e) => FindAllValidAnimations();
 
-            FindAllAnimations();
-            CreateAnimationSpeed();
+                FindAllAnimations();
+                CreateAnimationSpeed();
+            }
+            return _viewModel;
         }
 
         private void FilterConditionChanged()
@@ -223,12 +230,15 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
         public string GetCurrentAnimationName()
         {
+            if (_viewModel == null)
+                return "";
             return _viewModel.CurrentAnimation.Text;
         }
 
         public void Update()
         {
-            _viewModel.CurretFrameText.Text = _animationElement.AnimationPlayer.CurrentFrame.ToString();
+            if(_viewModel != null)
+                _viewModel.CurretFrameText.Text = _animationElement.AnimationPlayer.CurrentFrame.ToString();
         }
 
         class AnimationListItem

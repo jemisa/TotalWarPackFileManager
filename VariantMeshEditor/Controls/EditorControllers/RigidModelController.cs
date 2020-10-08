@@ -31,23 +31,61 @@ namespace VariantMeshEditor.Controls.EditorControllers
         ResourceLibary _resourceLibary;
         Scene3d _world;
         Dictionary<RigidModelMeshEditorView, MeshRenderItem> _modelEditors = new Dictionary<RigidModelMeshEditorView, MeshRenderItem>();
-         
-        public RigidModelController(RigidModelEditorView view, RigidModelElement element, ResourceLibary resourceLibary, Scene3d world)
+        List<List<MeshRenderItem>> MeshInstances { get; set; } = new List<List<MeshRenderItem>>();
+
+        public RigidModelController(RigidModelElement element, ResourceLibary resourceLibary, Scene3d world)
         {
-            _view = view;
             _element = element;
             _resourceLibary = resourceLibary;
             _world = world;
-            PopulateUi(_view, _element);
+            //PopulateUi(_view, _element);
+
+            Create3dModels(world, resourceLibary);
         }
+
+        public RigidModelEditorView GetView()
+        {
+            if (_view == null)
+            {
+                _view = new RigidModelEditorView();
+                PopulateUi(_view, _element);
+            }
+            return _view;
+        }
+
 
         public void AssignModel(MeshRenderItem meshInstance, int lodIndex, int modelIndex)
         {
-            var item = _modelEditors.Where(x => x.Key.ModelIndex == modelIndex && x.Key.LodIndex == lodIndex).First();
-            _modelEditors[item.Key] = meshInstance;
+            //var item = _modelEditors.Where(x => x.Key.ModelIndex == modelIndex && x.Key.LodIndex == lodIndex).First();
+            //_modelEditors[item.Key] = meshInstance;
         }
 
+        void Create3dModels( Scene3d virtualWorld, ResourceLibary resourceLibary)
+        {
+            var animation = SceneElementHelper.GetAllOfTypeInSameVariantMesh<AnimationElement>(_element).FirstOrDefault();
 
+            for (int lodIndex = 0; lodIndex < _element.Model.LodHeaders.Count; lodIndex++)
+            {
+                MeshInstances.Add(new List<MeshRenderItem>());
+
+                for (int modelIndex = 0; modelIndex < _element.Model.LodHeaders[lodIndex].LodModels.Count(); modelIndex++)
+                {
+                    
+
+                    Rmv2Model meshModel = new Rmv2Model();
+                    meshModel.Create(animation?.AnimationPlayer, virtualWorld.GraphicsDevice, _element.Model, lodIndex, modelIndex);
+
+                    TextureMeshRenderItem meshRenderItem = new TextureMeshRenderItem(meshModel, resourceLibary.GetEffect(ShaderTypes.Mesh))
+                    {
+                        Visible = lodIndex == 0,
+                        Textures = meshModel.ResolveTextures(resourceLibary, virtualWorld.GraphicsDevice)
+                    };
+
+                    MeshInstances[lodIndex].Add(meshRenderItem);
+                    AssignModel(meshRenderItem, lodIndex, modelIndex);
+                }
+            }
+        }
 
 
         private void PopulateUi(RigidModelEditorView view, RigidModelElement element)
@@ -85,7 +123,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
                     };
                     _modelEditors.Add(meshView, null);
 
-                    meshView.ModelType.Text = mesh.GroupType.ToString();
+                    meshView.ModelType.Text = mesh.MaterialId.ToString();
                     meshView.VisibleCheckBox.Click += (sender, arg) => VisibleCheckBox_Click(meshView);
 
                     DisplayTransforms(mesh, meshView);
@@ -186,15 +224,10 @@ namespace VariantMeshEditor.Controls.EditorControllers
             model.Visible = editorView.VisibleCheckBox.IsChecked == true;
         }
 
-
-   
-
         void DisplayTexture(TexureType type, string path)
         {
             TexturePreviewController.Create(path, _world.TextureToTextureRenderer, _resourceLibary);
         }
-
-      
 
         void AddUnknownTexture(RigidModelMeshEditorView view, LodModel model)
         {
@@ -218,7 +251,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
             view.UnkownDataView2.SetData("Unknown 2", model.Unknown2);
             view.UnkownDataView3.SetData("Unknown 3", model.Unknown3);
             view.UnkownDataView4.SetData("Unknown 4", model.Unknown4);
-            view.UnkownDataView5.SetData("Unknown 5", model.Unknown5);
+            view.UnkownDataView5.SetData("Unknown 5", model.AlphaKeyValue);
         }
 
         string GetTextureName(LodModel model, TexureType type)
@@ -230,6 +263,16 @@ namespace VariantMeshEditor.Controls.EditorControllers
             }
 
             return "";
+        }
+
+
+        public void DrawNode(GraphicsDevice device, Microsoft.Xna.Framework.Matrix parentTransform, CommonShaderParameters commonShaderParameters)
+        {
+            foreach (var item in MeshInstances)
+            {
+                foreach (var item2 in item)
+                    item2.Draw(device, parentTransform, commonShaderParameters);
+            }
         }
     }
 }

@@ -525,6 +525,11 @@ namespace Filetypes.ByteParsing
             return destination;
         }
 
+        public void Advance(int byteCount)
+        {
+            _currentIndex += byteCount;
+        }
+
         public void Read(IByteParser parser, out string value, out string error)
         {
             if (!parser.TryDecode(_buffer, _currentIndex, out  value, out int bytesRead, out error))

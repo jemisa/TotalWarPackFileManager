@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using VariantMeshEditor.Controls.EditorControllers;
 using VariantMeshEditor.Views.EditorViews;
 using Viewer.Animation;
@@ -19,6 +20,8 @@ namespace VariantMeshEditor.ViewModels
         public AnimationElement(FileSceneElement parent) : base(parent, "", "", "Animation") { }
         public override FileSceneElementEnum Type => FileSceneElementEnum.Animation;
 
+        public override UserControl EditorViewModel { get => _controller.GetView(); protected set => throw new System.Exception(); }
+
         AnimationController _controller;
 
         protected override void CreateEditor(Scene3d virtualWorld, ResourceLibary resourceLibary)
@@ -26,9 +29,7 @@ namespace VariantMeshEditor.ViewModels
             var skeleton = SceneElementHelper.GetAllOfTypeInSameVariantMesh<SkeletonElement>(this);
             if (skeleton.Count == 1)
             {
-                var view = new AnimationEditorView();
-                Editor = view;
-                _controller = new AnimationController(view, resourceLibary, this, skeleton.First());
+                _controller = new AnimationController(resourceLibary, this, skeleton.First());
             }
         }
 

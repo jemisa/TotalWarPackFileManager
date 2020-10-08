@@ -37,7 +37,7 @@ namespace VariantMeshEditor.ViewModels
             _skeleton = SceneElementHelper.GetAllOfTypeInSameVariantMesh<SkeletonElement>(this).FirstOrDefault();
             SlotEditorView view = new SlotEditorView();
             _controller = new SlotController(view, this, _skeleton);
-            Editor = view;
+            EditorViewModel = view;
         }
 
         protected override void UpdateNode(GameTime time)
