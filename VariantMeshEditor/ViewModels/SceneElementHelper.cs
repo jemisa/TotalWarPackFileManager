@@ -76,5 +76,13 @@ namespace VariantMeshEditor.ViewModels
                 SetInitialVisability(item, shouldBeSelected);
             }
         }
+
+
+        public static FileSceneElement GetRoot(FileSceneElement item)
+        {
+            if (item.Parent == null)
+                return item;
+            return GetRoot(item.Parent);
+        }
     }
 }

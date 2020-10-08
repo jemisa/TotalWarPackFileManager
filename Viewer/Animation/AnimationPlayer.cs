@@ -84,9 +84,12 @@ namespace Viewer.Animation
             return 0;
         }
 
-        public void AnimateInPlace(bool state)
+        public void UpdatCurrentAnimationSettings(bool animateInPlace, bool applyDynamicFrames, bool applyStaticFrames)
         {
-            _currentAnimation.ReCreate(state);
+            _currentAnimation.ReCreate(animateInPlace, applyDynamicFrames, applyStaticFrames);
+            var totalFrames = _currentAnimation.KeyFrameCollection.Count();
+            if (totalFrames == 1 || totalFrames == 0)
+                _currentFrame = 0;
         }
     }
 }

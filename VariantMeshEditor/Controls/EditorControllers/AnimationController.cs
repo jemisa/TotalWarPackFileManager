@@ -2,18 +2,12 @@
 using Filetypes.ByteParsing;
 using Filetypes.RigidModel;
 using Serilog;
-using SharpDX.Direct2D1;
-using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
-using VariantMeshEditor.Util;
 using VariantMeshEditor.ViewModels;
 using VariantMeshEditor.Views.EditorViews;
 using Viewer.Animation;
@@ -21,8 +15,6 @@ using Viewer.Scene;
 
 namespace VariantMeshEditor.Controls.EditorControllers
 {
-
-
     class AnimationController
     {
         AnimationEditorView _viewModel;
@@ -30,6 +22,7 @@ namespace VariantMeshEditor.Controls.EditorControllers
         SkeletonElement _skeletonElement;
         AnimationElement _animationElement;
         ILogger _logger = Logging.Create<AnimationController>();
+        string _currentAnimationName;
 
         List<AnimationListItem> _animationFiles = new List<AnimationListItem>();
         public AnimationController( ResourceLibary resourceLibary, AnimationElement animationElement, SkeletonElement skeletonElement)
@@ -44,13 +37,14 @@ namespace VariantMeshEditor.Controls.EditorControllers
             if (_viewModel == null)
             {
                 _viewModel = new AnimationEditorView();
-                _viewModel.CurrentAnimation.Text = "";
                 _viewModel.CurrentSkeletonName.Text = _skeletonElement.SkeletonFile.Header.SkeletonName;
                 _viewModel.AnimationList.SelectionChanged += OnAnimationChange;
                 _viewModel.PlayPauseButton.Click += (sender, e) => OnPlayButtonPressed();
                 _viewModel.NextFrameButton.Click += (sender, e) => NextFrame();
                 _viewModel.PrivFrameButton.Click += (sender, e) => PrivFrame();
-                _viewModel.AnimateInPlaceCheckBox.Click += (sender, e) => OnAnimateInPlaceChanged();
+                _viewModel.AnimateInPlaceCheckBox.Click += (sender, e) => OnAnimationSettingsChanged();
+                _viewModel.DynamicFrameCheckbox.Click += (sender, e) => OnAnimationSettingsChanged();
+                _viewModel.StaticFramesCheckbox.Click += (sender, e) => OnAnimationSettingsChanged();
 
                 _viewModel.ClearFilterButton.Click += (sender, e) => FindAllAnimations();
                 _viewModel.FilterText.TextChanged += (sender, e) => FilterConditionChanged();
@@ -66,7 +60,6 @@ namespace VariantMeshEditor.Controls.EditorControllers
         {
             _viewModel.FilterText.Background = new System.Windows.Media.SolidColorBrush(Colors.White);
             _viewModel.AnimationList.Items.Clear();
-
 
             var filterText = _viewModel.FilterText.Text.ToLower();
             if (string.IsNullOrWhiteSpace(filterText))
@@ -124,15 +117,23 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 {
                     try
                     {
-                        AnimationFile file = AnimationFile.Create(new ByteChunk(item.File.Data));
-                        AnimationClip clip = AnimationClip.Create(file, _skeletonElement.SkeletonFile, _skeletonElement.Skeleton);
+                        AnimationFile animationFile = AnimationFile.Create(new ByteChunk(item.File.Data));
+                        AnimationClip clip = AnimationClip.Create(animationFile, _skeletonElement.SkeletonFile, _skeletonElement.Skeleton);
                         _animationElement.AnimationPlayer.SetAnimation(clip);
 
-                        _viewModel.CurrentAnimation.Text = item.File.Name;
-                        _viewModel.AnimationSkeleton.Text = file.Header.SkeletonName;
-                        _viewModel.AnimationType.Text = file.Header.AnimationType.ToString();
+                        _currentAnimationName = item.File.Name;
+                        _viewModel.MainAnimationExpander.Header = "Main animation : " + _currentAnimationName;
+                        _viewModel.AnimationType.Text = animationFile.Header.AnimationType.ToString();
                         _viewModel.NoFramesLabel.Content = "/" + clip.KeyFrameCollection.Count();
-                        _viewModel.DebugData.Text = $"[{file.Header.Unknown0_alwaysOne}] [{file.Header.Unknown1_alwaysZero}]";
+
+                        _viewModel.DynamicFrameCheckbox.IsEnabled = animationFile.DynamicFrames.Count != 0;
+                        _viewModel.DynamicFrameCheckbox.IsChecked = _viewModel.DynamicFrameCheckbox.IsEnabled;
+
+                        _viewModel.StaticFramesCheckbox.IsEnabled = animationFile.StaticFrame != null;
+                        _viewModel.StaticFramesCheckbox.IsChecked = _viewModel.StaticFramesCheckbox.IsEnabled;
+
+                        SyncAllAnimations();
+
                     }
                     catch (Exception exception)
                     {
@@ -151,23 +152,32 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 player.Pause();
             else
                 player.Play();
+
+            SyncAllAnimations();
         }
 
         void NextFrame()
         {
             _animationElement.AnimationPlayer.Pause();
             _animationElement.AnimationPlayer.CurrentFrame++;
+
+            SyncAllAnimations();
         }
 
         void PrivFrame()
         {
             _animationElement.AnimationPlayer.Pause();
             _animationElement.AnimationPlayer.CurrentFrame--;
+
+            SyncAllAnimations();
         }
 
-        void OnAnimateInPlaceChanged()
+        void OnAnimationSettingsChanged()
         {
-            _animationElement.AnimationPlayer.AnimateInPlace(_viewModel.AnimateInPlaceCheckBox.IsChecked.Value);
+            _animationElement.AnimationPlayer.UpdatCurrentAnimationSettings(
+                _viewModel.AnimateInPlaceCheckBox.IsChecked.Value, 
+                _viewModel.DynamicFrameCheckbox.IsChecked.Value, 
+                _viewModel.StaticFramesCheckbox.IsChecked.Value);
         }
 
         void CreateAnimationSpeed()
@@ -188,6 +198,8 @@ namespace VariantMeshEditor.Controls.EditorControllers
                 foreach (AnimationSpeedItem item in e.AddedItems)
                     _animationElement.AnimationPlayer.FrameRate = item.FrameRate;
             }
+
+            SyncAllAnimations();
         }
 
         void FindAllAnimations()
@@ -230,15 +242,30 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
         public string GetCurrentAnimationName()
         {
-            if (_viewModel == null)
-                return "";
-            return _viewModel.CurrentAnimation.Text;
+            return _currentAnimationName;
         }
 
         public void Update()
         {
             if(_viewModel != null)
-                _viewModel.CurretFrameText.Text = _animationElement.AnimationPlayer.CurrentFrame.ToString();
+                _viewModel.CurretFrameText.Text = (_animationElement.AnimationPlayer.CurrentFrame + 1).ToString();
+        }
+
+        void SyncAllAnimations()
+        {
+            var root = SceneElementHelper.GetRoot(_animationElement);
+            List<AnimationElement> animationItems = new List<AnimationElement>();
+            SceneElementHelper.GetAllChildrenOfType<AnimationElement>(root, animationItems);
+            animationItems.Remove(_animationElement);
+
+            foreach (var animationItem in animationItems)
+            {
+                animationItem.AnimationPlayer.CurrentFrame = _animationElement.AnimationPlayer.CurrentFrame;
+                if (_animationElement.AnimationPlayer.IsPlaying)
+                    animationItem.AnimationPlayer.Play();
+                else
+                    animationItem.AnimationPlayer.Pause();
+            }
         }
 
         class AnimationListItem

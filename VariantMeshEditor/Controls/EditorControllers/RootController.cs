@@ -70,8 +70,8 @@ namespace VariantMeshEditor.Controls.EditorControllers
 
             var mesh = element.Children.First();
             mesh.Parent = null;
-            SceneElementHelper.SetInitialVisability(mesh, true); ;
-            _rootElement.Children.Add(mesh);
+            SceneElementHelper.SetInitialVisability(mesh, true);
+            _rootElement.AddChild(mesh);
 
             CreateMeshList();
         }

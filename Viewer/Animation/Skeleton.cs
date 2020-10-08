@@ -42,8 +42,8 @@ namespace Viewer.Animation
                             skeletonFile.DynamicFrames[skeletonWeirdIndex].Transforms[i][2]);
 
                 var scale = Matrix.CreateScale(1);
-                if(i == 0)
-                    scale = Matrix.CreateScale(-1, 1, 1);
+                //if(i == 0)
+                //    scale = Matrix.CreateScale(-1, 1, 1);
                 
                 var transform = scale * rotationMatrix * translationMatrix;
 

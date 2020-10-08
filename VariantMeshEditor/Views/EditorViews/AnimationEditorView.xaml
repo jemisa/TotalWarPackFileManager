@@ -21,7 +21,9 @@
             <Button x:Name="NextFrameButton" FontSize="20">⏭︎</Button>
             <ComboBox x:Name="AnimationSpeedComboBox"></ComboBox>
         </StackPanel>
-
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Center">
+            <CheckBox x:Name="SyncAnimationCheckbox">Sync Animations</CheckBox>
+        </StackPanel>
 
 
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -36,70 +38,54 @@
             <Label Width="120">Animation skeleton</Label>
             <Label>:</Label>
             <Border BorderBrush="{x:Null}" >
-                <TextBlock x:Name="CurrentSkeletonName"  TextWrapping="NoWrap" Text="SkellyBoi" VerticalAlignment="Center"/>
+                <TextBlock x:Name="CurrentSkeletonName"  TextWrapping="NoWrap" VerticalAlignment="Center"/>
             </Border>
         </StackPanel>
 
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" >
-            <Border Width="3" BorderBrush="LightGray"  ></Border>
-        </StackPanel>
+        <Expander  x:Name="MainAnimationExpander" Header="Main animation :" IsExpanded="true">
+            <DockPanel>
 
-        <DockPanel DockPanel.Dock="Top" >
-            <Label Width="120">Animation</Label>
-            <Label>:</Label>
-            <Button DockPanel.Dock="Right" Width="70" >Browse</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="CurrentAnimation" IsReadOnly="true"  TextWrapping="NoWrap" Text="AnimationName.anim" VerticalAlignment="Center"/>
-            </Border>
-        </DockPanel>
+                <DockPanel DockPanel.Dock="Top" >
+                    <Label Width="120">Animation Version</Label>
+                    <Label>:</Label>
+                    <Border BorderBrush="{x:Null}" >
+                        <TextBox x:Name="AnimationType" IsReadOnly="true" TextWrapping="NoWrap"  VerticalAlignment="Center"  Margin="0,0,70,0"/>
+                    </Border>
+                </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top" >
-            <Label Width="120">Animation Skeleton</Label>
-            <Label>:</Label>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="AnimationSkeleton" IsReadOnly="true" TextWrapping="NoWrap" Text="SkellyBoi" VerticalAlignment="Center" Margin="0,0,70,0"/>
-            </Border>
-        </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top" >
-            <Label Width="120">Animation Type</Label>
-            <Label>:</Label>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="AnimationType" IsReadOnly="true" TextWrapping="NoWrap" Text="SkellyBoi" VerticalAlignment="Center"  Margin="0,0,70,0"/>
-            </Border>
-        </DockPanel>
+                <DockPanel DockPanel.Dock="Top" >
+                    <Label Width="120">Frame Types</Label>
+                    <Label>:</Label>
+                    <CheckBox Content="Static" x:Name="StaticFramesCheckbox" VerticalAlignment="Center"/>
+                    <CheckBox Content="Dynamic" x:Name="DynamicFrameCheckbox" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top" >
-            <Label Width="120">Debug</Label>
-            <Label>:</Label>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="DebugData" IsReadOnly="true" TextWrapping="NoWrap" Text="[]" VerticalAlignment="Center"  Margin="0,0,70,0"/>
-            </Border>
-        </DockPanel>
+                <DockPanel DockPanel.Dock="Top" >
+                    <Label DockPanel.Dock="Left">Filter:</Label>
+                    <Button x:Name="ClearFilterButton" DockPanel.Dock="Right" Width="70" >Clear</Button>
+                    <Border BorderBrush="{x:Null}" >
+                        <TextBox x:Name="FilterText"  TextWrapping="NoWrap" Text="FilterText" VerticalAlignment="Center"/>
+                    </Border>
+                </DockPanel>
 
-      
+                <DockPanel DockPanel.Dock="Top">
+                    <Button x:Name="FindAllValidAnimations" Margin="70,0,70,0">Find all animations for current skeleton</Button>
+                </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top" >
-            <Label DockPanel.Dock="Left">Filter:</Label>
-            <Button x:Name="ClearFilterButton" DockPanel.Dock="Right" Width="70" >Clear</Button>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="FilterText"  TextWrapping="NoWrap" Text="FilterText" VerticalAlignment="Center"/>
-            </Border>
-        </DockPanel>
-
-        <DockPanel DockPanel.Dock="Top">
-            <Button x:Name="FindAllValidAnimations" Margin="70,0,70,0">Find all animations for current skeleton</Button>
-        </DockPanel>
-
-        <DockPanel DockPanel.Dock="Bottom" >
-            <Label DockPanel.Dock="Left">Error:</Label>
-            <Border BorderBrush="{x:Null}" >
-                <TextBox x:Name="ErrorText"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center"/>
-            </Border>
-        </DockPanel>
+                <DockPanel DockPanel.Dock="Bottom" >
+                    <Label DockPanel.Dock="Left">Error:</Label>
+                    <Border BorderBrush="{x:Null}" >
+                        <TextBox x:Name="ErrorText"  TextWrapping="NoWrap" Text="" VerticalAlignment="Center"/>
+                    </Border>
+                </DockPanel>
 
 
         
-        <ListView x:Name="AnimationList"></ListView>
+                <ListView x:Name="AnimationList"></ListView>
+            </DockPanel>
+        </Expander>
+        
+        
     </DockPanel>
 </UserControl>

@@ -80,7 +80,7 @@ namespace Viewer.Animation
             }
         }
 
-        public void ReCreate(bool animateInPlace)
+        public void ReCreate(bool animateInPlace, bool applyDynamicFrames, bool applyStaticFrames)
         {
             KeyFrameCollection.Clear();
 
@@ -95,13 +95,17 @@ namespace Viewer.Animation
                 });
             }
 
-            ApplyFrame(animateInPlace, _animation.StaticFrame, _animation.StaticTranslationMappingID, _animation.StaticRotationMappingID, defaultFrame);
-
-            if (_animation.DynamicFrames.Count() == 0)
+            if (applyStaticFrames)
             {
-                KeyFrameCollection.Add(defaultFrame); 
+                ApplyFrame(animateInPlace, _animation.StaticFrame, _animation.StaticTranslationMappingID, _animation.StaticRotationMappingID, defaultFrame);
+
+                if (_animation.DynamicFrames.Count() == 0 || applyDynamicFrames == false)
+                {
+                    KeyFrameCollection.Add(defaultFrame);
+                }
             }
-            else
+
+            if(applyDynamicFrames)
             {
                 for (int frameIndex = 0; frameIndex < _animation.DynamicFrames.Count(); frameIndex++)
                 {
@@ -121,8 +125,14 @@ namespace Viewer.Animation
                 for (int i = 0; i < currentFrame.BoneTransforms.Count(); i++)
                 {
                     var parentindex = currentFrame.BoneTransforms[i].ParentBoneIndex;
+
+
                     if (parentindex == -1)
+                    {
+                        var scale = Matrix.CreateScale(-1, 1, 1); 
+                        currentFrame.BoneTransforms[i].Transform = (scale * currentFrame.BoneTransforms[i].Transform);
                         continue;
+                    }
 
 
                     currentFrame.BoneTransforms[i].Transform = currentFrame.BoneTransforms[i].Transform * currentFrame.BoneTransforms[parentindex].Transform;
@@ -142,7 +152,7 @@ namespace Viewer.Animation
             AnimationClip model = new AnimationClip();
             model._skeleton = skeleton;
             model._animation = animation;
-            model.ReCreate(false);
+            model.ReCreate(false, true, true);
             return model;
         }
     }
